@@ -8,6 +8,8 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
+//TODO Update all of below to point to MvM scripts
+
 ClientUI = { }
 
 // Below are the rules for what scripts should be active when the local player is on certain teams.

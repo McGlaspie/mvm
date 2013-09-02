@@ -1,10 +1,10 @@
 //
-//
-//
+//	
 //
 //
 
 
+Script.Load("lua/Globals.lua")
 Script.Load("lua/mvm_Globals.lua")
 Script.Load("lua/Render.lua")
 Script.Load("lua/GUIManager.lua")
