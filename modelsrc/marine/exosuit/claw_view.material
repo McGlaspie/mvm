@@ -1,0 +1,13 @@
+shader = "shaders/Model_Colored.surface_shader"
+
+albedoMap = "models/marine/exosuit/claw_view.dds"
+albedoMapTeam1 = "models/marine/team_1/exosuit/claw_view.dds"
+albedoMapTeam2 = "models/marine/team_2/exosuit/claw_view.dds"
+
+normalMap = "models/marine/exosuit/claw_view_normal.dds"
+
+specularMap = "models/marine/exosuit/claw_view_spec.dds"
+specularMapTeam1 = "models/marine/exosuit/claw_view_spec.dds"
+specularMapTeam2 = "models/marine/exosuit/claw_view_spec.dds"
+
+surface = "metal"

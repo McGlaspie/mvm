@@ -1,0 +1,36 @@
+<shader>
+	
+	<inputs>
+		<input name="emissiveMap" type="texture" address="wrap" srgb="true"/>
+		<input name="emissiveMapTeam1" type="texture" address="wrap" srgb="true"/>
+		<input name="emissiveMapTeam2" type="texture" address="wrap" srgb="true"/>
+
+		<input name="TeamNumber" type="float">0.0</input>
+	</inputs>
+	
+	<code>
+	<![CDATA[
+		void MaterialShader(in Material_Input input, inout Material material)
+		{
+
+			const float Team1	= 1;
+			const float Team2	= 2;
+
+			if (TeamNumber == Team1) {
+				float4 tex = tex2D(emissiveMapTeam1, input.texCoord);
+				material.emissive = tex.rgb * input.color.rgb;
+				material.opacity  = tex.a * input.color.a;
+			} else if (TeamNumber == Team2) {
+				float4 tex = tex2D(emissiveMapTeam2, input.texCoord);
+				material.emissive = tex.rgb * input.color.rgb;
+				material.opacity  = tex.a * input.color.a;
+			} else {
+				float4 tex = tex2D(emissiveMap, input.texCoord);
+				material.emissive = tex.rgb * input.color.rgb;
+				material.opacity  = tex.a * input.color.a;
+			}
+		}
+	]]>
+	</code>
+
+</shader>

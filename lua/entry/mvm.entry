@@ -1,0 +1,7 @@
+modEntry = [[
+	Client: lua/mvm_Client.lua,
+	Server: lua/mvm_Server.lua,
+	Shared: lua/mvm_Shared.lua,
+	ModName: Marive vs Marine,
+	Priority: 10
+]]

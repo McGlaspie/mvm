@@ -1,0 +1,18 @@
+shader = "shaders/Model_emissive_Colored.surface_shader"
+
+
+albedoMap = "models/marine/mine/mine_view.dds"
+albedoMapTeam1 = "models/marine/team_1/mine/mine_view.dds"
+albedoMapTeam2 = "models/marine/team_2/mine/mine_view.dds"
+
+normalMap = "models/marine/mine/mine_view_normal.dds"
+
+emissiveMap = "models/marine/mine/mine_view_illum.dds"
+emissiveMapTeam1 = "models/marine/team_1/mine/mine_view_illum.dds"
+emissiveMapTeam2 = "models/marine/mine/mine_view_illum.dds"
+
+specularMap = "models/marine/mine/mine_spec.dds"
+specularMapTeam1 = "models/marine/team_1/mine/mine_view_spec.dds"
+specularMapTeam2 = "models/marine/mine/mine_spec.dds"
+
+surface = "metal"

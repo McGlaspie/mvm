@@ -1,0 +1,15 @@
+shader = "shaders/Model_emissive_Colored.surface_shader"
+
+albedoMap = "models/marine/rifle/rifle_view.dds"
+albedoMapTeam1 = "models/marine/rifle/rifle_view.dds"
+albedoMapTeam2 = "models/marine/rifle/rifle_view.dds"
+
+normalMap = "models/marine/rifle/rifle_view_normal.dds"
+
+emissiveMap = "models/marine/rifle/rifle_view_illum.dds"
+emissiveMapTeam1 = "models/marine/rifle/rifle_view_illum.dds"
+emissiveMapTeam2 = "models/marine/rifle/rifle_view_illum.dds"
+
+specularMap = "models/marine/rifle/rifle_view_spec.dds"
+specularMapTeam1 = "models/marine/rifle/rifle_view_spec.dds"
+specularMapTeam2 = "models/marine/rifle/rifle_view_spec.dds"

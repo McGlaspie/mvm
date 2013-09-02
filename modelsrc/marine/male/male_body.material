@@ -1,0 +1,17 @@
+shader = "models/marine/marine_teamColor.surface_shader"
+
+albedoMap = "models/marine/male/male_body.dds"
+albedoMapTeam1 = "models/marine/team_1/male/male_body.dds"
+albedoMapTeam2 = "models/marine/team_2/male/male_body.dds"
+
+normalMap = "models/marine/male/male_body_normal.dds"
+
+emissiveMap = "models/marine/male/male_body_illum.dds"
+emissiveMapTeam1 = "models/marine/team_1/male/male_body_illum.dds"
+emissiveMapTeam2 = "models/marine/team_2/male/male_body_illum.dds"
+
+specularMap = "models/marine/male/male_body_spec.dds"
+specularMapTeam1 = "models/marine/team_1/male/male_body_spec.dds"
+specularMapTeam2 = "models/marine/team_2/male/male_body_spec.dds"
+
+surface = "organic"

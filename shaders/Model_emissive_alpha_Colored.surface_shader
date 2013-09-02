@@ -1,0 +1,77 @@
+<shader>
+	
+	<inputs>
+		<input name="albedoMap" type="texture" address="wrap" />
+		<input name="albedoMapTeam1" type="texture" address="wrap" />
+		<input name="albedoMapTeam2" type="texture" address="wrap" />
+
+		<input name="normalMap" type="texture" address="wrap" />
+
+		<input name="specularMap" type="texture" address="wrap" />
+		<input name="specularMapTeam1" type="texture" address="wrap" />
+		<input name="specularMapTeam2" type="texture" address="wrap" />
+		
+		<input name="emissiveMap" type="texture" address="wrap" srgb="true"/>
+		<input name="emissiveMapTeam1" type="texture" address="wrap" srgb="true"/>
+		<input name="emissiveMapTeam2" type="texture" address="wrap" srgb="true"/>
+		
+		<input name="opacityMap" type="texture" address="wrap" />
+
+		<input name="TeamNumber" type="float">0.0</input>
+	</inputs>
+
+	<params>
+		<param name="alphaTest">true</param>
+	</params>
+	
+	<code>
+	<![CDATA[
+		float3 DecodeNormal(const float4 texNormal)
+		{
+			float4 n = texNormal * 2 - 1;
+			//return float3(n.a, n.g, sqrt(1 - dot(n.ag, n.ag)) );
+			return n.xyz;
+		}
+		void MaterialShader(in Material_Input input, inout Material material)
+		{
+		
+			const float Team1	= 1;
+			const float Team2	= 2;
+
+			if (TeamNumber == Team1) {
+
+				float4 specularGloss = tex2D(specularMapTeam1, input.texCoord);
+			
+				material.albedo 	= tex2D(albedoMapTeam1, input.texCoord).rgb;
+				material.tsNormal 	= DecodeNormal( tex2D(normalMap, input.texCoord) );;
+				material.specular	= specularGloss.rgb;
+				material.gloss		= specularGloss.a;
+				material.emissive   = tex2D(emissiveMapTeam1, input.texCoord).rgb;
+
+			} else if (TeamNumber == Team2) {
+
+				float4 specularGloss = tex2D(specularMapTeam2, input.texCoord);
+			
+				material.albedo 	= tex2D(albedoMapTeam2, input.texCoord).rgb;
+				material.tsNormal 	= DecodeNormal( tex2D(normalMap, input.texCoord) );;
+				material.specular	= specularGloss.rgb;
+				material.gloss		= specularGloss.a;
+				material.emissive   = tex2D(emissiveMapTeam2, input.texCoord).rgb;
+
+			} else {
+				float4 specularGloss = tex2D(specularMap, input.texCoord);
+			
+				material.albedo 	= tex2D(albedoMap, input.texCoord).rgb;
+				material.tsNormal 	= DecodeNormal( tex2D(normalMap, input.texCoord) );;
+				material.specular	= specularGloss.rgb;
+				material.gloss		= specularGloss.a;
+				material.emissive   	= tex2D(emissiveMap, input.texCoord).rgb;
+			}
+
+			material.opacity    = tex2D(opacityMap, input.texCoord).r;
+			
+		}
+	]]>		
+	</code>
+
+</shader>

@@ -1,0 +1,17 @@
+shader = "models/marine/marine_teamColor.surface_shader"
+
+albedoMap = "models/marine/jetpack/jetpack.dds"
+albedoMapTeam1 = "models/marine/team_1/jetpack/jetpack.dds"
+albedoMapTeam2 = "models/marine/team_2/jetpack/jetpack.dds"
+
+normalMap = "models/marine/jetpack/jetpack_normal.dds"
+
+emissiveMap = "models/marine/jetpack/jetpack_illum.dds"
+emissiveMapTeam1 = "models/marine/jetpack/jetpack_illum.dds"
+emissiveMapTeam2 = "models/marine/team_2/jetpack/jetpack_illum.dds"
+
+specularMap = "models/marine/jetpack/jetpack_spec.dds"
+specularMapTeam1 = "models/marine/team_1/jetpack/jetpack_spec.dds"
+specularMapTeam2 = "models/marine/team_2/jetpack/jetpack_spec.dds"
+
+surface = "metal"

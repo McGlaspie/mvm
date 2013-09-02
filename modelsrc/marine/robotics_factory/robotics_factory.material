@@ -1,0 +1,17 @@
+shader = "models/marine/marine_teamColor.surface_shader"
+
+albedoMap = "models/marine/robotics_factory/robotics_factory.dds"
+albedoMapTeam1 = "models/marine/team_1/robotics_factory/robotics_factory.dds"
+albedoMapTeam2 = "models/marine/team_2/robotics_factory/robotics_factory.dds"
+
+normalMap = "models/marine/robotics_factory/robotics_factory_normal.dds"
+
+emissiveMap = "models/marine/robotics_factory/robotics_factory_illum.dds"
+emissiveMapTeam1 = "models/marine/robotics_factory/robotics_factory_illum.dds"
+emissiveMapTeam2 = "models/marine/robotics_factory/robotics_factory_illum.dds"
+
+specularMap = "models/marine/robotics_factory/robotics_factory_spec.dds"
+specularMapTeam1 = "models/marine/robotics_factory/robotics_factory_spec.dds"
+specularMapTeam2 = "models/marine/robotics_factory/robotics_factory_spec.dds"
+
+surface = "metal"

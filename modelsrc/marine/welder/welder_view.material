@@ -1,0 +1,11 @@
+shader = "shaders/Model_Colored.surface_shader"
+
+albedoMap = "models/marine/welder/welder_view.dds"
+albedoMapTeam1 = "models/marine/welder/welder_view.dds"
+albedoMapTeam2 = "models/marine/welder/welder_view.dds"
+
+normalMap = "models/marine/welder/welder_view_normal.dds"
+
+specularMap = "models/marine/welder/welder_view_spec.dds"
+specularMapTeam1 = "models/marine/welder/welder_view_spec.dds"
+specularMapTeam2 = "models/marine/welder/welder_view_spec.dds"

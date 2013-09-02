@@ -1,0 +1,4 @@
+shader = "shaders/Model.surface_shader"
+albedoMap = "models/marine/grenadelauncher/box2.dds"
+specularMap = "materials/dev/black.dds"
+normalMap = "materials/dev/dev_normal.dds"

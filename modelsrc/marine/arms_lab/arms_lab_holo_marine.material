@@ -1,0 +1,19 @@
+shader = "shaders/Model_emissive_alpha_Colored.surface_shader"
+
+albedoMap = "models/marine/arms_lab/arms_lab_holo_marine.dds"
+albedoMapTeam1 = "models/marine/arms_lab/arms_lab_holo_marine.dds"
+albedoMapTeam2 = "models/marine/team_2/arms_lab/arms_lab_holo_marine.dds"
+
+emissiveMap = "models/marine/arms_lab/arms_lab_holo_marine_illum.dds"
+emissiveMapTeam1 = "models/marine/arms_lab/arms_lab_holo_marine_illum.dds"
+emissiveMapTeam2 = "models/marine/team_2/arms_lab/arms_lab_holo_marine_illum.dds"
+
+normalMap = "materials/dev/dev_normal.dds"
+
+specularMap = "materials/dev/black.dds"
+specularMapTeam1 = "materials/dev/black.dds"
+specularMapTeam2 = "materials/dev/black.dds"
+
+opacityMap = "models/marine/arms_lab/arms_lab_holo_border_alpha.dds"
+
+surface = "thin_metal"

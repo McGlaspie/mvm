@@ -1,0 +1,17 @@
+shader = "models/marine/marine_teamColor.surface_shader"
+
+albedoMap = "models/marine/extractor/extractor.dds"
+albedoMapTeam1 = "models/marine/team_1/extractor/extractor.dds"
+albedoMapTeam2 = "models/marine/team_2/extractor/extractor.dds"
+
+normalMap = "models/marine/extractor/extractor_normal.dds"
+
+emissiveMap = "models/marine/extractor/extractor_illum.dds"
+emissiveMapTeam1 = "models/marine/extractor/extractor_illum.dds"
+emissiveMapTeam2 = "models/marine/team_2/extractor/extractor_illum.dds"
+
+specularMap = "models/marine/extractor/extractor_spec.dds"
+specularMapTeam1 = "models/marine/extractor/extractor_spec.dds"
+specularMapTeam2 = "models/marine/extractor/extractor_spec.dds"
+
+surface = "metal"

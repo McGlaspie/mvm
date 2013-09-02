@@ -1,0 +1,17 @@
+shader = "models/marine/marine_teamColor.surface_shader"
+
+albedoMap = "models/marine/arms_lab/arms_lab.dds"
+albedoMapTeam1 = "models/marine/team_1/arms_lab/arms_lab.dds"
+albedoMapTeam2 = "models/marine/team_2/arms_lab/arms_lab.dds"
+
+normalMap = "models/marine/arms_lab/arms_lab_normal.dds"
+
+emissiveMap = "models/marine/arms_lab/arms_lab_illum.dds"
+emissiveMapTeam1 = "models/marine/arms_lab/arms_lab_illum.dds"
+emissiveMapTeam2 = "models/marine/team_2/arms_lab/arms_lab_illum.dds"
+
+specularMap = "models/marine/arms_lab/arms_lab_spec.dds"
+specularMapTeam1 = "models/marine/arms_lab/arms_lab_spec.dds"
+specularMapTeam2 = "models/marine/arms_lab/arms_lab_spec.dds"
+
+surface = "metal"

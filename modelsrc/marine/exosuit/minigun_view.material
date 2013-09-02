@@ -1,0 +1,13 @@
+shader = "shaders/ExoMinigunView_Colored.surface_shader"
+
+albedoMap = "models/marine/exosuit/minigun_view.dds"
+albedoMapTeam1 = "models/marine/team_1/exosuit/minigun_view.dds"
+albedoMapTeam2 = "models/marine/team_2/exosuit/minigun_view.dds"
+
+normalMap = "models/marine/exosuit/minigun_view_normal.dds"
+
+specularMap = "models/marine/exosuit/minigun_view_spec.dds"
+specularMapTeam1 = "models/marine/exosuit/minigun_view_spec.dds"
+specularMapTeam2 = "models/marine/exosuit/minigun_view_spec.dds"
+
+surface = "metal"

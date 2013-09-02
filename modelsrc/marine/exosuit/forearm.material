@@ -1,0 +1,17 @@
+shader = "models/marine/marine_teamColor.surface_shader"
+
+albedoMap = "models/marine/exosuit/forearm.dds"
+albedoMapTeam1 = "models/marine/team_1/exosuit/forearm.dds"
+albedoMapTeam2 = "models/marine/team_2/exosuit/forearm.dds"
+
+normalMap = "models/marine/exosuit/forearm_normal.dds"
+
+specularMap = "models/marine/exosuit/forearm_spec.dds"
+specularMapTeam1 = "models/marine/exosuit/forearm_spec.dds"
+specularMapTeam2 = "models/marine/exosuit/forearm_spec.dds"
+
+emissiveMap = "materials/dev/black.dds"
+emissiveMapTeam1 = "materials/dev/black.dds"
+emissiveMapTeam2 = "materials/dev/black.dds"
+
+surface = "metal"
