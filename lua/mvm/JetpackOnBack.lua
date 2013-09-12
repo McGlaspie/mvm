@@ -1,6 +1,6 @@
 
 
-Script.Load("lua/mvm/TeamColorSkinMixin.lua")
+Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
 
 //-----------------------------------------------------------------------------

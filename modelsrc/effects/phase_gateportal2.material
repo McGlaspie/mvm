@@ -1,0 +1,5 @@
+shader = "shaders/Emissive.surface_shader"
+
+emissiveMap = "models/effects/phase_gate_portal_team2.dds"
+
+surface = "electric"

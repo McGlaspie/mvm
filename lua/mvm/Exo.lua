@@ -2,7 +2,7 @@
 
 Script.Load("lua/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
-Script.Load("lua/mvm/TeamColorSkinMixin.lua")
+Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
 
 
@@ -39,8 +39,27 @@ function Exo:OnInitialized()
 	
 	oldExoInit(self)
 	
-	InitMixin(self, TeamColorSkinMixin)
+	if Client then
+		InitMixin(self, ColoredSkinsMixin)
+	end
 	
+end
+
+
+if Client then
+
+	function Exo:GetBaseSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
+	end
+
+	function Exo:GetAccentSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+	end
+
+	function Exo:GetTrimSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
+	end
+
 end
 
 

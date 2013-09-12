@@ -3,7 +3,7 @@
  */
 //=============================================================================
 
-Script.Load("lua/mvm/TeamColorSkinMixin.lua")
+Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
 Script.Load("lua/DetectableMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
@@ -22,10 +22,12 @@ function ARC:OnCreate()
 	
 	orgArcCreate(self)
 
-	InitMixin(self, TeamColorSkinMixin)
     InitMixin(self, DetectableMixin)
     InitMixin(self, FireMixin)
-    //weldable?
+
+	if Client then
+		InitMixin(self, ColoredSkinsMixin)
+	end
 	
 	self:SetPhysicsType(PhysicsType.Kinematic)
     self:SetPhysicsGroup(PhysicsGroup.WhipGroup)
@@ -57,6 +59,25 @@ function ARC:OnInitialized()
 	InitMixin(self, ControllerMixin)
         
 	self:CreateController(PhysicsGroup.WhipGroup)
+
+end
+
+
+if Client then
+
+	//Team Skins 
+	function ARC:GetBaseSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
+	end
+
+	function ARC:GetAccentSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+	end
+
+	function ARC:GetTrimSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
+	end
+	//End Team Skins
 
 end
 

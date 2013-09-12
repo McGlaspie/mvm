@@ -10,7 +10,22 @@
     <filename>mvm\ArmsLab.lua</filename>
   </file>
   <file>
+    <filename>mvm\Balance.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\BalanceHealth.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\BalanceMisc.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\ColoredSkinsMixin.lua</filename>
+  </file>
+  <file>
     <filename>mvm\CommandStation.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\ConstructMixin.lua</filename>
   </file>
   <file>
     <filename>mvm\DamageMixin.lua</filename>
@@ -61,6 +76,9 @@
     <filename>mvm\LiveMixin.lua</filename>
   </file>
   <file>
+    <filename>mvm\MAC.lua</filename>
+  </file>
+  <file>
     <filename>mvm\MapBlip.lua</filename>
   </file>
   <file>
@@ -77,6 +95,9 @@
   </file>
   <file>
     <filename>mvm\MvMUtility.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\NS2GameRules.lua</filename>
   </file>
   <file>
     <filename>mvm\NanoshieldMixin.lua</filename>
@@ -130,10 +151,10 @@
     <filename>mvm\TargetCache.lua</filename>
   </file>
   <file>
-    <filename>mvm\TeamColorSkinMixin.lua</filename>
+    <filename>mvm\TeamMixin.lua</filename>
   </file>
   <file>
-    <filename>mvm\TeamMixin.lua</filename>
+    <filename>mvm\Weapons\Marine\Welder.lua</filename>
   </file>
   <file>
     <filename>mvm_Client.lua</filename>

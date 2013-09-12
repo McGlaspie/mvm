@@ -24,6 +24,7 @@ function ReadyRoomTeam:GetRespawnMapName(player)
     if mapName == JetpackMarine.kMapName then
 		mapName = ReadyRoomPlayer.kMapName
     end
+    
     return mapName
 
 end

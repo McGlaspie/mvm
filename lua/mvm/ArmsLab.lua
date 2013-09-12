@@ -1,5 +1,5 @@
 
-Script.Load("lua/mvm/TeamColorSkinMixin.lua")
+Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
 Script.Load("lua/DetectableMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
@@ -20,9 +20,32 @@ function ArmsLab:OnCreate()
 
 	InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
-    InitMixin(self, TeamColorSkinMixin)	//Client only?
+    
+    if Client then
+		InitMixin(self, ColoredSkinsMixin)
+	end
 
 end
+
+
+if Client then
+
+	//Team Skins 
+	function ArmsLab:GetBaseSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
+	end
+
+	function ArmsLab:GetAccentSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+	end
+
+	function ArmsLab:GetTrimSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
+	end
+	//End Team Skins
+
+end
+
 
 //-----------------------------------------------------------------------------
 

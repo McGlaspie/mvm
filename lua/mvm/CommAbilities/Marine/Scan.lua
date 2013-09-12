@@ -10,13 +10,7 @@ Scan.kScanEffectTeam2 = PrecacheAsset("cinematics/marine/observatory/scan_team2.
 //-----------------------------------------------------------------------------
 
 function Scan:GetRepeatCinematic()
-	
-	if self:GetTeamNumber() == kTeam2Index then
-		return Scan.kScanEffectTeam2
-	end
-	
-	return Scan.kScanEffect
-	
+	return ConditionalValue( self:GetTeamNumber() == kTeam2Index, Scan.kScanEffectTeam2, Scan.kScanEffect )
 end
 
 //-----------------------------------------------------------------------------

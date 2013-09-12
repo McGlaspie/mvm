@@ -2,7 +2,7 @@
 
 Script.Load("lua/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
-Script.Load("lua/mvm/TeamColorSkinMixin.lua")
+Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
 
 //-----------------------------------------------------------------------------
@@ -42,9 +42,29 @@ function Sentry:OnCreate()
 	oldSentryCreate(self)
 	
 	InitMixin(self, FireMixin)
-    InitMixin(self, TeamColorSkinMixin)
     InitMixin(self, DetectableMixin)
+    
+    if Client then
+		InitMixin(self, ColoredSkinsMixin)
+	end
 	
+end
+
+
+if Client then
+
+	function Sentry:GetBaseSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
+	end
+
+	function Sentry:GetAccentSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+	end
+	
+	function Sentry:GetTrimSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
+	end
+
 end
 
 

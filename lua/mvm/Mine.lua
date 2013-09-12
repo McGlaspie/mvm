@@ -1,7 +1,7 @@
 
 
 Script.Load("lua/mvm/FireMixin.lua")
-Script.Load("lua/mvm/TeamColorSkinMixin.lua")
+Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
 
 
@@ -22,7 +22,27 @@ function Mine:OnCreate()
 	oldMineCreate(self)
 	
 	InitMixin(self, FireMixin)
-	InitMixin(self, TeamColorSkinMixin)
+	
+	if Client then
+		InitMixin(self, ColoredSkinsMixin)
+	end
+
+end
+
+
+if Client then
+
+	function Mine:GetBaseSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
+	end
+
+	function Mine:GetAccentSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+	end
+	
+	function Mine:GetTrimSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
+	end
 
 end
 

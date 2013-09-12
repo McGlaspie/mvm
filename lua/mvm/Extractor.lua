@@ -2,7 +2,7 @@
 
 Script.Load("lua/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
-Script.Load("lua/mvm/TeamColorSkinMixin.lua")
+Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 
 local newNetworkVars = {}
 
@@ -20,9 +20,32 @@ function Extractor:OnCreate()
 	
 	InitMixin(self, FireMixin)
 	InitMixin(self, DetectableMixin)
-	InitMixin(self, TeamColorSkinMixin)
+	
+	if Client then
+		InitMixin(self, ColoredSkinsMixin)
+	end
 	
 end
+
+
+if Client then
+
+	//Team Skins 
+	function Extractor:GetBaseSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
+	end
+
+	function Extractor:GetAccentSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+	end
+
+	function Extractor:GetTrimSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
+	end
+	//End Team Skins
+
+end
+
 
 function Extractor:GetIsFlameAble()
 	return false

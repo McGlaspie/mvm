@@ -2,7 +2,7 @@
 
 Script.Load("lua/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
-Script.Load("lua/mvm/TeamColorSkinMixin.lua")
+Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
 
 
@@ -24,7 +24,10 @@ function Observatory:OnCreate()
 	
 	InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
-    InitMixin(self, TeamColorSkinMixin)
+    
+    if Client then
+		InitMixin(self, ColoredSkinsMixin)
+	end
 
 	if Server then
     
@@ -47,6 +50,24 @@ function Observatory:OnCreate()
     end
 
 end
+
+
+if Client then
+
+	function Observatory:GetBaseSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
+	end
+
+	function Observatory:GetAccentSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+	end
+
+	function Observatory:GetTrimSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
+	end
+
+end
+
 
 function Observatory:TriggerDistressBeacon()
 

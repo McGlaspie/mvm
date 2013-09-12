@@ -2,7 +2,7 @@
 
 Script.Load("lua/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
-Script.Load("lua/mvm/TeamColorSkinMixin.lua")
+Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
 
 
@@ -20,9 +20,30 @@ function PhaseGate:OnCreate()
 	
 	InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
-    InitMixin(self, TeamColorSkinMixin)
+    
+    if Client then
+		InitMixin(self, ColoredSkinsMixin)
+	end
 
 end
+
+
+if Client then
+
+	function PhaseGate:GetBaseSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
+	end
+
+	function PhaseGate:GetAccentSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+	end
+
+	function PhaseGate:GetTrimSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
+	end
+
+end
+
 
 function PhaseGate:OnUpdateRender()
 

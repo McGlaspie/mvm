@@ -1,7 +1,8 @@
 
-
-Shared.PrecacheSurfaceShader("cinematics/vfx_materials/nanoshield_team2.surface_shader")
-Shared.PrecacheSurfaceShader("cinematics/vfx_materials/nanoshield_view_team2.surface_shader")
+if Client then
+	Shared.PrecacheSurfaceShader("cinematics/vfx_materials/nanoshield_team2.surface_shader")
+	Shared.PrecacheSurfaceShader("cinematics/vfx_materials/nanoshield_view_team2.surface_shader")
+end
 
 //-----------------------------------------------------------------------------
 
