@@ -1,5 +1,7 @@
 
+
 Script.Load("lua/Weapons/Marine/ClipWeapon.lua")
+Script.Load("lua/mvm/Weapons/Weapon.lua")
 Script.Load("lua/mvm/Weapons/BulletsMixin.lua")
 
 
@@ -22,6 +24,10 @@ function ClipWeapon:OnCreate()
     
     InitMixin(self, BulletsMixin)
     
+end
+
+function ClipWeapon:SetTeamNumber( teamNumber )
+	self.teamNumber = teamNumber
 end
 
 

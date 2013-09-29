@@ -17,4 +17,13 @@ function LayMines:GetIsValidRecipient(recipient)
 end
 
 
+if Client then
+
+	function LayMines:GetUIDisplaySettings()
+        return { xSize = 256, ySize = 417, script = "lua/mvm/Hud/GUIMineDisplay.lua" }
+    end
+    
+end
+
+
 Class_Reload("LayMines", {})

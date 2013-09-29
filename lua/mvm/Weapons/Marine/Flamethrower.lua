@@ -94,6 +94,15 @@ local function ApplyConeDamage(self, player)
 end
 
 
+if Client then
+	
+    function Flamethrower:GetUIDisplaySettings()
+        return { xSize = 128, ySize = 256, script = "lua/mvm/Hud/GUIFlamethrowerDisplay.lua" }
+    end
+
+end
+
+
 //-----------------------------------------------------------------------------
 
 Class_Reload("Flamethrower", newNetworkVars)

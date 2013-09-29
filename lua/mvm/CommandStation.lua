@@ -47,9 +47,9 @@ end
 if Client then
 	
 	function CommandStation:InitializeSkin()
-		self._activeBaseColor = self:GetBaseSkinColor()
-		self._activeAccentColor = self:GetAccentSkinColor()
-		self._activeTrimColor = self:GetTrimSkinColor()
+		self.skinBaseColor = self:GetBaseSkinColor()
+		self.skinAccentColor = self:GetAccentSkinColor()
+		self.skinTrimColor = self:GetTrimSkinColor()
 	end
 	
 	function CommandStation:GetBaseSkinColor()

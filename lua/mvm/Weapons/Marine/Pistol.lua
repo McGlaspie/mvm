@@ -1,28 +1,27 @@
 
+
 Script.Load("lua/PostLoadMod.lua")
 
 Script.Load("lua/mvm/Weapons/Marine/ClipWeapon.lua")
 Script.Load("lua/mvm/PickupableWeaponMixin.lua")
 Script.Load("lua/mvm/LiveMixin.lua")
 
-local newNetworkVars = {}
-
-
 //-----------------------------------------------------------------------------
 
-function Rifle:GetSpread()
-    return ClipWeapon.kCone3Degrees
+
+function Pistol:GetHasSecondary(player)
+    return false
 end
 
 
 if Client then
-	
-	function Rifle:GetUIDisplaySettings()
-        return { xSize = 256, ySize = 417, script = "lua/mvm/Hud/GUIRifleDisplay.lua" }
+
+	function Pistol:GetUIDisplaySettings()
+        return { xSize = 256, ySize = 256, script = "lua/mvm/Hud/GUIPistolDisplay.lua" }
     end
     
 end
 
 //-----------------------------------------------------------------------------
 
-Class_Reload("Rifle", newNetworkVars)
+Class_Reload("Pistol", {})

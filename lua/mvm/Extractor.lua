@@ -2,6 +2,7 @@
 
 Script.Load("lua/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
+Script.Load("lua/mvm/PowerConsumerMixin.lua")
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 
 local newNetworkVars = {}
@@ -21,9 +22,9 @@ function Extractor:OnCreate()
 	InitMixin(self, FireMixin)
 	InitMixin(self, DetectableMixin)
 	
-	//if Client then
+	if Client then
 		InitMixin(self, ColoredSkinsMixin)
-	//end
+	end
 	
 end
 
@@ -33,19 +34,19 @@ function Extractor:OnInitialized()
 	
 	orgExtractorInit(self)
 	
-	//if Client then
+	if Client then
 		self:InitializeSkin()
-	//end
+	end
 	
 end
 
 
-//if Client then
+if Client then
 
 	function Extractor:InitializeSkin()
-		self._activeBaseColor = self:GetBaseSkinColor()
-		self._activeAccentColor = self:GetAccentSkinColor()
-		self._activeTrimColor = self:GetTrimSkinColor()
+		self.skinBaseColor = self:GetBaseSkinColor()
+		self.skinAccentColor = self:GetAccentSkinColor()
+		self.skinTrimColor = self:GetTrimSkinColor()
 	end
 	
 	function Extractor:GetBaseSkinColor()
@@ -59,16 +60,8 @@ end
 	function Extractor:GetTrimSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
 	end
-	
-	function Extractor:OnPowerOff()
-		self._activeAccentColor = Color(0,0,0,1)
-	end
-	
-	function Extractor:OnPowerOn()
-		self._activeAccentColor = self:GetAccentSkinColor()
-	end
 
-//end
+end
 
 
 function Extractor:GetIsFlameAble()

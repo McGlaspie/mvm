@@ -58,37 +58,6 @@ function Sentry:OnInitialized()
 	if Client then
 		self:InitializeSkin()
 	end
-
-end
-
-
-if Client then
-	
-	function Sentry:InitializeSkin()
-		self._activeBaseColor = self:GetBaseSkinColor()
-		self._activeAccentColor = self:GetAccentSkinColor()
-		self._activeTrimColor = self:GetTrimSkinColor()
-	end
-
-	function Sentry:GetBaseSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
-	end
-
-	function Sentry:GetAccentSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
-	end
-	
-	function Sentry:GetTrimSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
-	end
-
-end
-
-
-local oldSentryInit = Sentry.OnInitialized
-function Sentry:OnInitialized()
-
-	oldSentryInit(self)
 	
 	if Server then
 		
@@ -104,6 +73,29 @@ function Sentry:OnInitialized()
 			}
 		)
 		
+	end
+
+end
+
+
+if Client then
+	
+	function Sentry:InitializeSkin()
+		self.skinBaseColor = self:GetBaseSkinColor()
+		self.skinAccentColor = self:GetAccentSkinColor()
+		self.skinTrimColor = self:GetTrimSkinColor()
+	end
+
+	function Sentry:GetBaseSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
+	end
+
+	function Sentry:GetAccentSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+	end
+	
+	function Sentry:GetTrimSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
 	end
 
 end
@@ -131,6 +123,26 @@ function Sentry:OnWeldOverride(entity, elapsedTime)
     
 end
 
+if Client then
+
+	local orgSentryUpdate = Sentry.OnUpdate
+	function Sentry:OnUpdate(time)
+	
+		orgSentryUpdate(self, time)
+		
+		if HasMixin(self, "ColoredSkin") then
+		
+			self.skinAccentColor = ConditionalValue(
+				self.attachedToBattery,
+				self:GetAccentSkinColor(),
+				Color( 0, 0, 0, 1 )
+			)
+		
+		end
+	
+	end
+
+end
 
 if Server then
 

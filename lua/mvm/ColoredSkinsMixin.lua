@@ -69,9 +69,9 @@ ColoredSkinsMixin.optionalCallbacks = {}
 //are on screen.
 function ColoredSkinsMixin:__initmixin()
 	
-	self._activeBaseColor = Color(0, 0, 0, 0)
-	self._activeAccentColor = Color(0, 0, 0, 0)
-	self._activeTrimColor = Color(0, 0, 0, 0)
+	self.skinBaseColor = Color(0, 0, 0, 0)
+	self.skinAccentColor = Color(0, 0, 0, 0)
+	self.skinTrimColor = Color(0, 0, 0, 0)
 	
 	self._coloredSkinEnabled = true	//Allows for colored skins to be toggled on per-entity basis
 	
@@ -107,15 +107,15 @@ function ColoredSkinsMixin:OnUpdateRender()
 				[6] = Color(0, 0, 0)
 			}
 			
-			self._activeBaseColor = LerpColor( self._activeBaseColor, rc[ math.random(1,6) ] , 0.025 )
-			self._activeAccentColor = LerpColor( self._activeAccentColor, rc[ math.random(6,1) ] , 0.5 )
-			self._activeTrimColor = LerpColor( self._activeTrimColor, rc[ math.random(6,1) ] , 0.01 )
+			self.skinBaseColor = LerpColor( self.skinBaseColor, rc[ math.random(1,6) ] , 0.025 )
+			self.skinAccentColor = LerpColor( self.skinAccentColor, rc[ math.random(6,1) ] , 0.5 )
+			self.skinTrimColor = LerpColor( self.skinTrimColor, rc[ math.random(6,1) ] , 0.01 )
 			
 		else
 			
-			self._activeBaseColor = LerpColor( self._activeBaseColor, kTeam2_BaseColor, 0.001 )
-			self._activeAccentColor = LerpColor( self._activeAccentColor, kTeam2_AccentColor , 0.01 )
-			self._activeTrimColor = LerpColor( self._activeTrimColor, kTeam2_TrimColor , 0.005 )
+			self.skinBaseColor = LerpColor( self.skinBaseColor, kTeam2_BaseColor, 0.001 )
+			self.skinAccentColor = LerpColor( self.skinAccentColor, kTeam2_AccentColor , 0.01 )
+			self.skinTrimColor = LerpColor( self.skinTrimColor, kTeam2_TrimColor , 0.005 )
 			
 		end
 		*/
@@ -134,17 +134,17 @@ function ColoredSkinsMixin:OnUpdateRender()
 		//If these values do NOT have a distinct color. The implementing Entity WILL appear black
 		//Because no color specified will amount to setting Color(0,0,0) as the material parameter
 		
-		model:SetMaterialParameter( "modelColorBaseR", self._activeBaseColor.r )
-		model:SetMaterialParameter( "modelColorBaseG", self._activeBaseColor.g )
-		model:SetMaterialParameter( "modelColorBaseB", self._activeBaseColor.b )
+		model:SetMaterialParameter( "modelColorBaseR", self.skinBaseColor.r )
+		model:SetMaterialParameter( "modelColorBaseG", self.skinBaseColor.g )
+		model:SetMaterialParameter( "modelColorBaseB", self.skinBaseColor.b )
 		
-		model:SetMaterialParameter( "modelColorAccentR", self._activeAccentColor.r )
-		model:SetMaterialParameter( "modelColorAccentG", self._activeAccentColor.g )
-		model:SetMaterialParameter( "modelColorAccentB", self._activeAccentColor.b )
+		model:SetMaterialParameter( "modelColorAccentR", self.skinAccentColor.r )
+		model:SetMaterialParameter( "modelColorAccentG", self.skinAccentColor.g )
+		model:SetMaterialParameter( "modelColorAccentB", self.skinAccentColor.b )
 		
-		model:SetMaterialParameter( "modelColorTrimR", self._activeTrimColor.r )
-		model:SetMaterialParameter( "modelColorTrimG", self._activeTrimColor.g )
-		model:SetMaterialParameter( "modelColorTrimB", self._activeTrimColor.b )
+		model:SetMaterialParameter( "modelColorTrimR", self.skinTrimColor.r )
+		model:SetMaterialParameter( "modelColorTrimG", self.skinTrimColor.g )
+		model:SetMaterialParameter( "modelColorTrimB", self.skinTrimColor.b )
 		
 		//Set enabled state
 		model:SetMaterialParameter( "colorizeModel", enabled )
@@ -168,17 +168,17 @@ function ColoredSkinsMixin:OnUpdateRender()
 				
 				if jpModel then
 					
-					jpModel:SetMaterialParameter( "modelColorBaseR", self._activeBaseColor.r )
-					jpModel:SetMaterialParameter( "modelColorBaseG", self._activeBaseColor.g )
-					jpModel:SetMaterialParameter( "modelColorBaseB", self._activeBaseColor.b )
+					jpModel:SetMaterialParameter( "modelColorBaseR", self.skinBaseColor.r )
+					jpModel:SetMaterialParameter( "modelColorBaseG", self.skinBaseColor.g )
+					jpModel:SetMaterialParameter( "modelColorBaseB", self.skinBaseColor.b )
 					
-					jpModel:SetMaterialParameter( "modelColorAccentR", self._activeAccentColor.r )
-					jpModel:SetMaterialParameter( "modelColorAccentG", self._activeAccentColor.g )
-					jpModel:SetMaterialParameter( "modelColorAccentB", self._activeAccentColor.b )
+					jpModel:SetMaterialParameter( "modelColorAccentR", self.skinAccentColor.r )
+					jpModel:SetMaterialParameter( "modelColorAccentG", self.skinAccentColor.g )
+					jpModel:SetMaterialParameter( "modelColorAccentB", self.skinAccentColor.b )
 					
-					jpModel:SetMaterialParameter( "modelColorTrimR", self._activeTrimColor.r )
-					jpModel:SetMaterialParameter( "modelColorTrimG", self._activeTrimColor.g )
-					jpModel:SetMaterialParameter( "modelColorTrimB", self._activeTrimColor.b )
+					jpModel:SetMaterialParameter( "modelColorTrimR", self.skinTrimColor.r )
+					jpModel:SetMaterialParameter( "modelColorTrimG", self.skinTrimColor.g )
+					jpModel:SetMaterialParameter( "modelColorTrimB", self.skinTrimColor.b )
 					
 					//Set enabled state
 					jpModel:SetMaterialParameter( "colorizeModel", enabled )
@@ -201,17 +201,17 @@ function ColoredSkinsMixin:OnUpdateRender()
 			
 			if viewModel then
 				
-				viewModel:SetMaterialParameter( "modelColorBaseR", self._activeBaseColor.r )
-				viewModel:SetMaterialParameter( "modelColorBaseG", self._activeBaseColor.g )
-				viewModel:SetMaterialParameter( "modelColorBaseB", self._activeBaseColor.b )
+				viewModel:SetMaterialParameter( "modelColorBaseR", self.skinBaseColor.r )
+				viewModel:SetMaterialParameter( "modelColorBaseG", self.skinBaseColor.g )
+				viewModel:SetMaterialParameter( "modelColorBaseB", self.skinBaseColor.b )
 				
-				viewModel:SetMaterialParameter( "modelColorAccentR", self._activeAccentColor.r )
-				viewModel:SetMaterialParameter( "modelColorAccentG", self._activeAccentColor.g )
-				viewModel:SetMaterialParameter( "modelColorAccentB", self._activeAccentColor.b )
+				viewModel:SetMaterialParameter( "modelColorAccentR", self.skinAccentColor.r )
+				viewModel:SetMaterialParameter( "modelColorAccentG", self.skinAccentColor.g )
+				viewModel:SetMaterialParameter( "modelColorAccentB", self.skinAccentColor.b )
 				
-				viewModel:SetMaterialParameter( "modelColorTrimR", self._activeTrimColor.r )
-				viewModel:SetMaterialParameter( "modelColorTrimG", self._activeTrimColor.g )
-				viewModel:SetMaterialParameter( "modelColorTrimB", self._activeTrimColor.b )
+				viewModel:SetMaterialParameter( "modelColorTrimR", self.skinTrimColor.r )
+				viewModel:SetMaterialParameter( "modelColorTrimG", self.skinTrimColor.g )
+				viewModel:SetMaterialParameter( "modelColorTrimB", self.skinTrimColor.b )
 				
 				//Set enabled state
 				jpModel:SetMaterialParameter( "colorizeModel", enabled )

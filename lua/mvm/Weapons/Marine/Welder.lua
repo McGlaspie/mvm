@@ -2,6 +2,10 @@
 
 Script.Load("lua/PostLoadMod.lua")
 
+Script.Load("lua/mvm/Weapons/Weapon.lua")
+Script.Load("lua/mvm/PickupableWeaponMixin.lua")
+Script.Load("lua/mvm/LiveMixin.lua")
+
 
 local newNetworkVars = {}
 
@@ -60,6 +64,15 @@ function Welder:OnPrimaryAttack(player)
         
     end
 
+end
+
+
+if Client then
+
+    function Welder:GetUIDisplaySettings()
+        return { xSize = 512, ySize = 512, script = "lua/mvm/Hud/GUIWelderDisplay.lua" }
+    end
+    
 end
 
 

@@ -6,9 +6,16 @@ Script.Load("lua/PostLoadMod.lua")
 
 
 // The amount of time until the mine is detonated once armed.
-local kTimeArmed = 0.15
+local kTimeArmed = 0.17
 // The amount of time it takes other mines to trigger their detonate sequence when nearby mines explode.
-local kTimedDestruction = 0.4
+local kTimedDestruction = 0.5
+
+// range in which other mines are trigger when detonating
+local kMineChainDetonateRange = 3
+
+local kMineCameraShakeDistance = 15
+local kMineMinShakeIntensity = 0.01
+local kMineMaxShakeIntensity = 0.13
 
 local newNetworkVars = {}
 
@@ -44,9 +51,9 @@ end
 if Client then
 	
 	function Mine:InitializeSkin()
-		self._activeBaseColor = self:GetBaseSkinColor()
-		self._activeAccentColor = self:GetAccentSkinColor()
-		self._activeTrimColor = self:GetTrimSkinColor()
+		self.skinBaseColor = self:GetBaseSkinColor()
+		self.skinAccentColor = self:GetAccentSkinColor()
+		self.skinTrimColor = self:GetTrimSkinColor()
 	end
 
 	function Mine:GetBaseSkinColor()
@@ -61,6 +68,62 @@ if Client then
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
 	end
 
+end
+
+
+
+local function SineFalloff(distanceFraction)
+    local piFraction = Clamp(distanceFraction, 0, 1) * math.pi / 2
+    return math.cos(piFraction + math.pi) + 1 
+end
+
+local function Detonate(self, armFunc)
+
+    local hitEntities = GetEntitiesWithMixinWithinRange("Live", self:GetOrigin(), kMineDetonateRange)
+    RadiusDamage(hitEntities, self:GetOrigin(), kMineDetonateRange, kMineDamage, self, false, SineFalloff)
+    
+    // Start the timed destruction sequence for any mine within range of this exploded mine.
+    local nearbyMines = GetEntitiesWithinRange("Mine", self:GetOrigin(), kMineChainDetonateRange)
+    for _, mine in ipairs(nearbyMines) do
+    
+        if mine ~= self and not mine.armed then
+            mine:AddTimedCallback(function() armFunc(mine) end, (math.random() + math.random()) * kTimedDestruction)
+        end
+        
+    end
+    
+    local params = {}
+    params[kEffectHostCoords] = Coords.GetLookIn( self:GetOrigin(), self:GetCoords().zAxis )
+    
+    if GetIsVortexed(self) then
+        params[kEffectSurface] = "ethereal"
+    else
+        params[kEffectSurface] = "metal"
+    end
+    
+    self:TriggerEffects("mine_explode", params)
+    
+    DestroyEntity(self)
+    
+    CreateExplosionDecals(self)
+    TriggerCameraShake(self, kMineMinShakeIntensity, kMineMaxShakeIntensity, kMineCameraShakeDistance)
+    
+    TEST_EVENT("Mine detonated")
+    
+end
+
+local function Arm(self)
+
+    if not self.armed then
+        
+        self:AddTimedCallback(function() Detonate(self, Arm) end, kTimeArmed)
+        
+        self:TriggerEffects("mine_arm")
+        
+        self.armed = true
+
+    end
+    
 end
 
 

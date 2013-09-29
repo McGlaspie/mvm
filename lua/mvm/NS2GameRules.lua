@@ -16,6 +16,7 @@ local kSendNoCommanderMessageRate = 50
 if Server then
 
     Script.Load("lua/mvm/ReadyRoomTeam.lua")
+    Script.Load("lua/mvm/NS2ConsoleCommands_Server.lua")
 	
 	
 	function NS2Gamerules:BuildTeam(teamType)        
