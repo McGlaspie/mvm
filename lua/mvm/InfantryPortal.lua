@@ -19,7 +19,7 @@ function InfantryPortal:OnCreate()
 	
 	InitMixin(self, FireMixin)
 	InitMixin(self, DetectableMixin)
-	
+
 	if Client then
 		InitMixin(self, ColoredSkinsMixin)
 	end
@@ -27,12 +27,30 @@ function InfantryPortal:OnCreate()
 end
 
 
+local orgInfantryPortalInit = InfantryPortal.OnInitialized
+function InfantryPortal:OnInitialized()
+
+	orgInfantryPortalInit(self)
+	
+	if Client then
+		self:InitializeSkin()
+	end
+
+end
+
+
 if Client then
+
+	function InfantryPortal:InitializeSkin()
+		self._activeBaseColor = self:GetBaseSkinColor()
+		self._activeAccentColor = self:GetAccentSkinColor()
+		self._activeTrimColor = self:GetTrimSkinColor()
+	end
 
 	function InfantryPortal:GetBaseSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
 	end
-
+	
 	function InfantryPortal:GetAccentSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
 	end

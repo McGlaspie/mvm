@@ -6,6 +6,7 @@ Script.Load("lua/PostLoadMod.lua")
 //-----------------------------------------------------------------------------
 
 //Hmm, something doesn't seem right with this...
+//Nope...where is the original Marine:OnCreate run?
 
 function JetpackOnBack:OnCreate()
 

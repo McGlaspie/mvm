@@ -18,15 +18,33 @@ function RoboticsFactory:OnCreate()
 	
 	InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
-    
-    if Client then
+
+	if Client then
 		InitMixin(self, ColoredSkinsMixin)
 	end
 
 end
 
 
+local orgRoboFactInit = RoboticsFactory.OnInitialized
+function RoboticsFactory:OnInitialized()
+
+	orgRoboFactInit(self)
+	
+	if Client then
+		self:InitializeSkin()
+	end
+
+end
+
+
 if Client then
+	
+	function RoboticsFactory:InitializeSkin()
+		self._activeBaseColor = self:GetBaseSkinColor()
+		self._activeAccentColor = self:GetAccentSkinColor()
+		self._activeTrimColor = self:GetTrimSkinColor()
+	end
 
 	function RoboticsFactory:GetBaseSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )

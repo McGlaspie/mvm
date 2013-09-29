@@ -25,10 +25,26 @@ function Exosuit:OnCreate()
 
 end
 
+local orgExoSuitInit = Exosuit.OnInitialized
+function Exosuit:OnInitialized()
+
+	orgExosuitInit(self)
+	
+	if Client then
+		self:InitializeSkin()
+	end
+
+end
+
 
 if Client then
-
-	//Team Skins 
+	
+	function Exosuit:InitializeSkin()
+		self._activeBaseColor = self:GetBaseSkinColor()
+		self._activeAccentColor = self:GetAccentSkinColor()
+		self._activeTrimColor = self:GetTrimSkinColor()
+	end
+	
 	function Exosuit:GetBaseSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
 	end
@@ -40,7 +56,6 @@ if Client then
 	function Exosuit:GetTrimSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
 	end
-	//End Team Skins
 
 end
 

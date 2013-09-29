@@ -5,6 +5,9 @@ Script.Load("lua/PostLoadMod.lua")
 
 local newNetworkVars = {}
 
+local kWelderEffectRate = 0.45
+local kWelderFireDelay = 0.5
+
 
 //-----------------------------------------------------------------------------
 
@@ -61,6 +64,7 @@ end
 
 
 //-----------------------------------------------------------------------------
+
 
 Class_Reload("Welder", newNetworkVars)
 

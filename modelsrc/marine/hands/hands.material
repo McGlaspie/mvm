@@ -1,13 +1,7 @@
-shader = "shaders/Model_Colored.surface_shader"
+shader = "shaders/Model.surface_shader"
 
 albedoMap = "models/marine/hands/hands.dds"
-albedoMapTeam1 = "models/marine/team_1/hands/hands.dds"
-albedoMapTeam2 = "models/marine/team_2/hands/hands.dds"
-
 normalMap = "models/marine/hands/hands_normal.dds"
-
 specularMap = "models/marine/hands/hands_spec.dds"
-specularMapTeam1 = "models/marine/team_1/hands/hands_spec.dds"
-specularMapTeam2 = "models/marine/team_2/hands/hands_spec.dds"
 
 surface = "metal"

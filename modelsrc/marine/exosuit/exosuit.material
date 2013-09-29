@@ -1,17 +1,8 @@
-shader = "models/marine/marine_teamColor.surface_shader"
+shader = "models/marine/marine.surface_shader"
 
 albedoMap = "models/marine/exosuit/exosuit.dds"
-albedoMapTeam1 = "models/marine/team_1/exosuit/exosuit.dds"
-albedoMapTeam2 = "models/marine/team_2/exosuit/exosuit.dds"
-
 normalMap = "models/marine/exosuit/exosuit_normal.dds"
-
 emissiveMap = "models/marine/exosuit/exosuit_illum.dds"
-emissiveMapTeam1 = "models/marine/exosuit/exosuit_illum.dds"
-emissiveMapTeam2 = "models/marine/team_2/exosuit/exosuit_illum.dds"
-
 specularMap = "models/marine/exosuit/exosuit_spec.dds"
-specularMapTeam1 = "models/marine/exosuit/exosuit_spec.dds"
-specularMapTeam2 = "models/marine/exosuit/exosuit_spec.dds"
 
 surface = "metal"

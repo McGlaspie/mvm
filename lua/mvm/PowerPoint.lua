@@ -10,7 +10,7 @@ AddMixinNetworkVars(FireMixin, newNetworkVars)
 
 
 if Client then	//????
-	PowerPoint.kDisabledColor = Color(0.013, 0.013, 0.013)		//Move to globals.lua?
+	PowerPoint.kDisabledColor = Color(0.013, 0.013, 0.013)		//Move to globals.lua? Balance?
 	PowerPoint.kDisabledCommanderColor = Color(0.15, 0.15, 0.15)
 end
 
@@ -45,7 +45,7 @@ local kMaxAttackTime = 10
 
 //-----------------------------------------------------------------------------
 
-function PowerPoint:OnCreate()
+function PowerPoint:OnCreate()	//Overrides
 	
 	ScriptActor.OnCreate(self)
     
@@ -104,7 +104,20 @@ function PowerPoint:GetCanConstructOverride(player)
 end
 
 
+
 if Server then
+	
+	
+	local function PowerUp(self)
+    
+        self:SetInternalPowerState(PowerPoint.kPowerState.socketed)
+        self:SetLightMode(kLightMode.Normal)
+        self:StopSound(kAuxPowerBackupSound)
+        self:TriggerEffects("fixed_power_up")
+        self:SetPoweringState(true)
+        
+    end
+
 
 	// Repaired by marine with welder or MAC 
     function PowerPoint:OnWeldOverride(entity, elapsedTime)

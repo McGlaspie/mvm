@@ -5,6 +5,7 @@
 
 decoda_name = "Server"
 
+Print(" \t MVM SERVER ")
 
 Script.Load("lua/PreLoadMod.lua")
 Script.Load("lua/Server.lua")

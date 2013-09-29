@@ -11,7 +11,7 @@ kTeam2Type = kMarineTeamType
 kTeam1Name = "Blue Team"
 kTeam2Name = "Gold Team"
 
-
+//TODO Remove below
 kInventoryIconsTexture = "ui/inventory_icons.dds"
 kInventoryIconsTextureTeam2 = "ui/inventory_icons_team2.dds"
 
@@ -26,17 +26,52 @@ kPlayerLOSDistance = 30		//NS2: 20	????: Performance hit through blips?
 kStructureLOSDistance = 5	//NS2 3.5
 
 
+
+kNameTagFontColors = { 
+	[kTeam1Index] = kMarineFontColor,
+	[kTeam2Index] = kAlienFontColor,
+    [kTeamReadyRoom] = kNeutralFontColor 
+}
+
+kNameTagFontNames = { 
+	[kTeam1Index] = kMarineFontName,
+	[kTeam2Index] = kAlienFontName,
+	[kTeamReadyRoom] = kNeutralFontName 
+}
+
+kHealthBarColors = { 
+	[kTeam1Index] = Color(0.725, 0.921, 0.949, 1),
+	[kTeam2Index] = Color(0.776, 0.364, 0.031, 1),
+	[kTeamReadyRoom] = Color(1, 1, 1, 1) 
+}
+
+kArmorBarColors = { 
+	[kTeam1Index] = Color(0.078, 0.878, 0.984, 1),
+	[kTeam2Index] = Color(0.576, 0.194, 0.011, 1),
+	[kTeamReadyRoom] = Color(0.5, 0.5, 0.5, 1) 
+}
+
+kIconColors = {
+    [kTeam1Index] = Color(0.8, 0.96, 1, 1),
+    [kTeam2Index] = Color(1, 0.9, 0.4, 1),
+    [kTeamReadyRoom] = Color(1, 1, 1, 1),
+}
+
+
+
 // 
 // ColorSkinMixin Globals
 // This file is only here to separate these settings into its own file.
 // Typically for most mods, these settings would be placed in Global.lua
 //
-
-kTeam1_BaseColor = Color(0.302, 0.859, 1, 1)
+kTeam1_BaseColor = Color(0.078, 0.878, 0.984, 1)
 kTeam1_AccentColor = Color(0.756, 0.982, 1, 1)
-kTeam1_TrimColor = Color(0.5, 0.5, 0.5, 1)
+kTeam1_TrimColor = Color(0.725, 0.921, 0.949, 1)
 
 kTeam2_BaseColor = Color(0.61, 0.43, 0.16, 1)
 kTeam2_AccentColor = Color(1.0, 0.0, 0.0, 1)
-kTeam2_TrimColor = Color(0.32, 0.2, 0.2, 1)
+kTeam2_TrimColor = Color(0.576, 0.194, 0.011, 1)
+
+
+//TODO Devise color [sets] for UI based shaders
 

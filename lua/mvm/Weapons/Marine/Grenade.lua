@@ -16,7 +16,7 @@ if Server then
 					( HasMixin(entity, "Team") 
 					and entity:GetTeamNumber() ~= self:GetTeamNumber()
 					and entity ~= self:GetOwner() )
-					or ( entity:isa("PowerPoint") and entity:GetIsBuilt() )
+					or ( entity:isa("PowerPoint") and entity:GetIsBuilt() )		//FIXME Check is failing
 			end
 		)
         

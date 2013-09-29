@@ -31,6 +31,10 @@ function Exo:OnCreate()
 	InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
 	
+	if Client then
+		InitMixin(self, ColoredSkinsMixin)
+	end
+	
 end
 
 
@@ -40,13 +44,19 @@ function Exo:OnInitialized()
 	oldExoInit(self)
 	
 	if Client then
-		InitMixin(self, ColoredSkinsMixin)
+		self:InitializeSkin()
 	end
 	
 end
 
 
 if Client then
+
+	function Exo:InitializeSkin()
+		self._activeBaseColor = self:GetBaseSkinColor()
+		self._activeAccentColor = self:GetAccentSkinColor()
+		self._activeTrimColor = self:GetTrimSkinColor()
+	end
 
 	function Exo:GetBaseSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )

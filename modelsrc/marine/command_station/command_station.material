@@ -1,17 +1,10 @@
-shader = "models/marine/marine_teamColor.surface_shader"
+shader = "shaders/ColoredSkins.surface_shader"
 
 albedoMap = "models/marine/command_station/command_station.dds"
-albedoMapTeam1 = "models/marine/team_1/command_station/command_station.dds"
-albedoMapTeam2 = "models/marine/team_2/command_station/command_station.dds"
-
 normalMap = "models/marine/command_station/command_station_normal.dds"
-
 emissiveMap = "models/marine/command_station/command_station_illum.dds"
-emissiveMapTeam1 = "models/marine/command_station/command_station_illum.dds"
-emissiveMapTeam2 = "models/marine/command_station/command_station_illum.dds"
-
 specularMap = "models/marine/command_station/command_station_spec.dds"
-specularMapTeam1 = "models/marine/team_1/command_station/command_station_spec.dds"
-specularMapTeam2 = "models/marine/command_station/command_station_spec.dds"
+
+modelColorMap = "models/marine/command_station/command_station_colorMap.dds"
 
 surface = "metal"

@@ -1,17 +1,8 @@
-shader = "models/marine/marine_teamColor.surface_shader"
+shader = "models/marine/marine.surface_shader"
 
 albedoMap = "models/marine/phase_gate/phase_gate.dds"
-albedoMapTeam1 = "models/marine/team_1/phase_gate/phase_gate.dds"
-albedoMapTeam2 = "models/marine/team_2/phase_gate/phase_gate.dds"
-
 normalMap = "models/marine/phase_gate/phase_gate_normal.dds"
-
 emissiveMap = "models/marine/phase_gate/phase_gate_illum.dds"
-emissiveMapTeam1 = "models/marine/phase_gate/phase_gate_illum.dds"
-emissiveMapTeam2 = "models/marine/team_2/phase_gate/phase_gate_illum.dds"
-
 specularMap = "models/marine/phase_gate/phase_gate_spec.dds"
-specularMapTeam1 = "models/marine/team_1/phase_gate/phase_gate_spec.dds"
-specularMapTeam2 = "models/marine/phase_gate/phase_gate_spec.dds"
 
 surface = "metal"

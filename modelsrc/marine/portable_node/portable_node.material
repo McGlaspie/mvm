@@ -1,17 +1,8 @@
-shader = "models/marine/marine_teamColor.surface_shader"
+shader = "models/marine/marine.surface_shader"
 
 albedoMap = "models/marine/portable_node/portable_node.dds"
-albedoMapTeam1 = "models/marine/team_1/portable_node/portable_node.dds"
-albedoMapTeam2 = "models/marine/team_2/portable_node/portable_node.dds"
-
 normalMap = "models/marine/portable_node/portable_node_normal.dds"
-
 emissiveMap = "models/marine/portable_node/portable_node_illum.dds"
-emissiveMapTeam1 = "models/marine/portable_node/portable_node_illum.dds"
-emissiveMapTeam2 = "models/marine/team_2/portable_node/portable_node_illum.dds"
-
 specularMap = "models/marine/portable_node/portable_node_spec.dds"
-specularMapTeam1 = "models/marine/portable_node/portable_node_spec.dds"
-specularMapTeam2 = "models/marine/portable_node/portable_node_spec.dds"
 
 surface = "metal"

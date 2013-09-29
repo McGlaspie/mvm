@@ -21,20 +21,37 @@ function Extractor:OnCreate()
 	InitMixin(self, FireMixin)
 	InitMixin(self, DetectableMixin)
 	
-	if Client then
+	//if Client then
 		InitMixin(self, ColoredSkinsMixin)
-	end
+	//end
 	
 end
 
 
-if Client then
+local orgExtractorInit = Extractor.OnInitialized
+function Extractor:OnInitialized()
+	
+	orgExtractorInit(self)
+	
+	//if Client then
+		self:InitializeSkin()
+	//end
+	
+end
 
-	//Team Skins 
+
+//if Client then
+
+	function Extractor:InitializeSkin()
+		self._activeBaseColor = self:GetBaseSkinColor()
+		self._activeAccentColor = self:GetAccentSkinColor()
+		self._activeTrimColor = self:GetTrimSkinColor()
+	end
+	
 	function Extractor:GetBaseSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
 	end
-
+	
 	function Extractor:GetAccentSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
 	end
@@ -42,9 +59,16 @@ if Client then
 	function Extractor:GetTrimSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
 	end
-	//End Team Skins
+	
+	function Extractor:OnPowerOff()
+		self._activeAccentColor = Color(0,0,0,1)
+	end
+	
+	function Extractor:OnPowerOn()
+		self._activeAccentColor = self:GetAccentSkinColor()
+	end
 
-end
+//end
 
 
 function Extractor:GetIsFlameAble()

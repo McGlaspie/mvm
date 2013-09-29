@@ -12,7 +12,7 @@ local function BurnSporesAndUmbra(self, startPoint, endPoint)
 end
 
 
-//Removed check to burn spores and umbra, same otherwise
+//MvM:Removed check to burn spores and umbra, same otherwise
 local function ApplyConeDamage(self, player)
     
     local barrelPoint = self:GetBarrelPoint() - Vector(0, 0.4, 0)

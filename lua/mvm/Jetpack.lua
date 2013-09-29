@@ -24,8 +24,25 @@ function Jetpack:OnCreate()
 	
 end
 
+local orgJetpackInit = Jetpack.OnInitialized
+function Jetpack:OnInitialized()
+	
+	orgJetpackInit(self)
+
+	if Client then
+		self:InitializeSkin()
+	end
+
+end
+
 
 if Client then
+
+	function Jetpack:InitializeSkin()
+		self._activeBaseColor = self:GetBaseSkinColor()
+		self._activeAccentColor = self:GetAccentSkinColor()
+		self._activeTrimColor = self:GetTrimSkinColor()
+	end
 
 	function Jetpack:GetBaseSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )

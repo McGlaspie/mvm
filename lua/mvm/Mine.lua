@@ -29,8 +29,25 @@ function Mine:OnCreate()
 
 end
 
+local orgMineInit = Mine.OnInitialized
+function Mine:OnInitialized()
+	
+	orgMineInit(self)
+
+	if Client then
+		self:InitializeSkin()
+	end
+
+end
+
 
 if Client then
+	
+	function Mine:InitializeSkin()
+		self._activeBaseColor = self:GetBaseSkinColor()
+		self._activeAccentColor = self:GetAccentSkinColor()
+		self._activeTrimColor = self:GetTrimSkinColor()
+	end
 
 	function Mine:GetBaseSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )

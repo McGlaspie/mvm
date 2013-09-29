@@ -1,0 +1,4 @@
+shader = "cinematics/vfx_materials/heal_exo_team2_view.surface_shader"
+
+noiseMap = "cinematics/vfx_materials/vfx_circuit_01.dds"
+particles = "materials/effects/nanoclone.dds"

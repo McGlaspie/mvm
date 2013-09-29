@@ -3,6 +3,9 @@
 Script.Load("lua/DamageMixin.lua")
 
 
+//-----------------------------------------------------------------------------
+
+
 // damage type, doer and attacker don't need to be passed. that info is going to be fetched here. pass optional surface name
 // pass surface "none" for not hit/flinch effect
 function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode, showtracer)
@@ -14,12 +17,12 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
     
     local killedFromDamage = false
     local doer = self
-
+	
     // attacker is always a player, doer is 'self'
     local attacker = nil
     local parentVortexed = false
     
-    if target and target:isa("Ragdoll") then
+    if target and target:isa("Ragdoll") then	//exclude this when marine? Nothing like shooting corpses...?
         return false
     end
     
@@ -64,12 +67,14 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
                 if not direction then
                     direction = Vector(0, 0, 1)
                 end
-                                
+				
                 // Many types of damage events are server-only, such as grenades.
                 // Send the player a message so they get feedback about what damage they've done.
                 // We use messages to handle multiple-hits per frame, such as splash damage from grenades.
                 if Server and attacker:isa("Player") and (not doer.GetShowHitIndicator or doer:GetShowHitIndicator()) then
-                    local showNumbers = GetAreEnemies(attacker,target) and target:GetIsAlive()
+                    
+					local showNumbers = GetAreEnemies(attacker,target) and target:GetIsAlive()
+                    
                     if showNumbers then
                         local msg = BuildDamageMessage(target, damage, point)
                         Server.SendNetworkMessage(attacker, "Damage", msg, false)
@@ -77,6 +82,7 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
                     
                     // This makes the cross hair turn red. Show it when hitting anything
                     attacker.giveDamageTime = Shared.GetTime()
+                    
                 end
                 
                 killedFromDamage = target:TakeDamage(damage, attacker, doer, point, direction, armorUsed, healthUsed, damageType)

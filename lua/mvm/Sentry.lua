@@ -50,8 +50,25 @@ function Sentry:OnCreate()
 	
 end
 
+local orgSentryInit = Sentry.OnInitialized
+function Sentry:OnInitialized()
+
+	orgSentryInit(self)
+	
+	if Client then
+		self:InitializeSkin()
+	end
+
+end
+
 
 if Client then
+	
+	function Sentry:InitializeSkin()
+		self._activeBaseColor = self:GetBaseSkinColor()
+		self._activeAccentColor = self:GetAccentSkinColor()
+		self._activeTrimColor = self:GetTrimSkinColor()
+	end
 
 	function Sentry:GetBaseSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
@@ -73,18 +90,21 @@ function Sentry:OnInitialized()
 
 	oldSentryInit(self)
 	
-	// configure how targets are selected and validated
-	self.targetSelector = TargetSelector():Init(
-		self,
-		Sentry.kRange, 
-		true,
-		{ kMarineStaticTargets, kMarineMobileTargets },
-		{ 
-			PitchTargetFilter(self,  -Sentry.kMaxPitch, Sentry.kMaxPitch), 
-			CloakTargetFilter(),
-			TeamTargetFilter(self:GetTeamNumber())
-		}
-	)
+	if Server then
+		
+		self.targetSelector = TargetSelector():Init(
+			self,
+			Sentry.kRange, 
+			true,
+			{ kMarineStaticTargets, kMarineMobileTargets },
+			{ 
+				PitchTargetFilter(self,  -Sentry.kMaxPitch, Sentry.kMaxPitch), 
+				CloakTargetFilter(),
+				TeamTargetFilter( self:GetTeamNumber() )
+			}
+		)
+		
+	end
 
 end
 

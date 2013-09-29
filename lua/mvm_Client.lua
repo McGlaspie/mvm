@@ -6,6 +6,8 @@
 
 decoda_name = "Client"
 
+Print(" \t MVM CLIENT ")
+
 Script.Load("lua/PreLoadMod.lua")
 
 Script.Load("lua/Client.lua")	//Load normal NS2 Client

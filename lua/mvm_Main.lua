@@ -14,8 +14,9 @@ Script.Load("lua/MainMenu.lua")
 
 
 local renderCamera = nil
-    
-MenuManager.SetMenuCinematic("cinematics/main_menu.cinematic")
+
+//MenuManager.SetMenuCinematic("cinematics/main_menu.cinematic")
+MenuManager.SetMenuCinematic("cinematics/mvmmenu.cinematic")
 
 local function OnUpdateRender()
 

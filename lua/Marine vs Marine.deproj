@@ -19,10 +19,28 @@
     <filename>mvm\BalanceMisc.lua</filename>
   </file>
   <file>
+    <filename>mvm\BuildingMixin.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Weapons\BulletsMixin.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Weapons\Marine\ClipWeapon.lua</filename>
+  </file>
+  <file>
     <filename>mvm\ColoredSkinsMixin.lua</filename>
   </file>
   <file>
     <filename>mvm\CommandStation.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Commander.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Commander_Client.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Commander_Ping.lua</filename>
   </file>
   <file>
     <filename>mvm\ConstructMixin.lua</filename>
@@ -49,6 +67,108 @@
     <filename>mvm\Weapons\Marine\Flamethrower.lua</filename>
   </file>
   <file>
+    <filename>mvm\GUIChat.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\GUICommanderAlerts.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\GUICommanderButtons.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\GUICommanderButtonsMarines.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\GUICommanderLogout.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\GUICommanderTooltip.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\GUIDeathMessages.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\GUIEvent.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\Exo\GUIExoArmorDisplay.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\Exo\GUIExoEject.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\Exo\GUIExoHud.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\Exo\GUIExoThruster.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\GUIGameEnd.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\GUIHotkeyIcons.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\GUIInventory.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\Marine\GUIJetpackFuel.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\GUIMarineHUDStyle.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\Marine\GUIMarineHud.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\Marine\GUIMarineStatus.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\GUIMinimap.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\GUIMinimapButtons.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\GUIMinimapFrame.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\GUINotificationItem.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\GUINotifications.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\GUIPlayerResource.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\GUIProduction.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\GUIProgressBar.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\GUIResourceDisplay.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\GUISelectionPanel.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\GUISensorBlips.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\GUITechMap.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\GUIUnitStatus.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\GUIWaypoints.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\GUIWorldText.lua</filename>
+  </file>
+  <file>
     <filename>mvm\GhostStructureMixin.lua</filename>
   </file>
   <file>
@@ -56,6 +176,9 @@
   </file>
   <file>
     <filename>mvm\InfantryPortal.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\InsightNetworkMessages.lua</filename>
   </file>
   <file>
     <filename>mvm\Jetpack.lua</filename>
@@ -88,7 +211,13 @@
     <filename>mvm\Marine.lua</filename>
   </file>
   <file>
+    <filename>mvm\MarineCommander.lua</filename>
+  </file>
+  <file>
     <filename>mvm\MarineGhostModel.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\MarineStructureEffects.lua</filename>
   </file>
   <file>
     <filename>mvm\Mine.lua</filename>
@@ -97,10 +226,16 @@
     <filename>mvm\MvMUtility.lua</filename>
   </file>
   <file>
+    <filename>mvm\NS2ConsoleCommands_Server.lua</filename>
+  </file>
+  <file>
     <filename>mvm\NS2GameRules.lua</filename>
   </file>
   <file>
     <filename>mvm\NanoshieldMixin.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\NetworkMessages.lua</filename>
   </file>
   <file>
     <filename>mvm\Observatory.lua</filename>
@@ -119,9 +254,6 @@
   </file>
   <file>
     <filename>mvm\Prototypelab.lua</filename>
-  </file>
-  <file>
-    <filename>mvm\ReadyRoomPlayer.lua</filename>
   </file>
   <file>
     <filename>mvm\ReadyRoomTeam.lua</filename>
@@ -151,7 +283,13 @@
     <filename>mvm\TargetCache.lua</filename>
   </file>
   <file>
+    <filename>mvm\TeamInfo.lua</filename>
+  </file>
+  <file>
     <filename>mvm\TeamMixin.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\WeldableMixin.lua</filename>
   </file>
   <file>
     <filename>mvm\Weapons\Marine\Welder.lua</filename>

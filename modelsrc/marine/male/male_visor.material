@@ -1,7 +1,5 @@
-shader = "shaders/Emissive_Colored.surface_shader"
+shader = "shaders/Emissive.surface_shader"
 
 emissiveMap = "models/marine/male/male_visor.dds"
-emissiveMapTeam1 = "models/marine/male/male_visor.dds"
-emissiveMapTeam2 = "models/marine/team_2/male/male_visor.dds"
 
 surface = "organic"

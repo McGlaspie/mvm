@@ -1,15 +1,25 @@
 
+Script.Load("lua/NanoshieldMixin.lua")
+
+
 if Client then
 	Shared.PrecacheSurfaceShader("cinematics/vfx_materials/nanoshield_team2.surface_shader")
 	Shared.PrecacheSurfaceShader("cinematics/vfx_materials/nanoshield_view_team2.surface_shader")
+	//Shared.PrecacheSurfaceShader("cinematics/vfx_materials/nanoshield_exoview.surface_shader")	TODO - Make team2 version
 end
+
+
+local kNanoShieldStartSound = PrecacheAsset("sound/NS2.fev/marine/commander/nano_shield_3D")
+local kNanoLoopSound = PrecacheAsset("sound/NS2.fev/marine/commander/nano_loop")
+local kNanoDamageSound = PrecacheAsset("sound/NS2.fev/marine/commander/nano_damage")
+
 
 //-----------------------------------------------------------------------------
 
 function NanoShieldMixin:__initmixin()
 
     //if Server then
-        self.timeNanoShieldInit = 0
+        self.timeNanoShieldInit = 0		//Used for IP shields
         self.tempShieldLifeTime = 0
         self.nanoShielded = false
     //end
@@ -42,26 +52,22 @@ function NanoShieldMixin:OnDestroy()
     
 end
 
-function NanoShieldMixin:ActivateNanoShield(shieldLifeTime)
-	
+function NanoShieldMixin:ActivateNanoShield()
+
     if self:GetCanBeNanoShielded() then
     
         self.timeNanoShieldInit = Shared.GetTime()
         self.nanoShielded = true
         
-        if shieldLifeTime ~= nil and shieldLifeTime > 0 then
-			self.tempShieldLifeTime = shieldLifeTime
-		else
-			self.tempShieldLifeTime = 0
-		end
-        
         if Server then
-			
+        
             assert(self.shieldLoopSound == nil)
             self.shieldLoopSound = Server.CreateEntity(SoundEffect.kMapName)
             self.shieldLoopSound:SetAsset(kNanoLoopSound)
             self.shieldLoopSound:SetParent(self)
             self.shieldLoopSound:Start()
+            
+            StartSoundEffectOnEntity(kNanoShieldStartSound, self)
             
         end
         
@@ -116,12 +122,63 @@ end
 
 if Client then
 
+	/** Adds the material effect to the entity and all child entities (hat have a Model mixin) */
+    local function AddEffect(entity, material, viewMaterial, entities)
+    
+        local numChildren = entity:GetNumChildren()
+        
+        if HasMixin(entity, "Model") then
+            local model = entity._renderModel
+            if model ~= nil then
+                if model:GetZone() == RenderScene.Zone_ViewModel then
+                    model:AddMaterial(viewMaterial)
+                else
+                    model:AddMaterial(material)
+                end
+                table.insert(entities, entity:GetId())
+            end
+        end
+        
+        for i = 1, entity:GetNumChildren() do
+            local child = entity:GetChildAtIndex(i - 1)
+            AddEffect(child, material, viewMaterial, entities)
+        end
+    
+    end
+    
+    local function RemoveEffect(entities, material, viewMaterial)
+    
+        for i =1, #entities do
+            local entity = Shared.GetEntity( entities[i] )
+            if entity ~= nil and HasMixin(entity, "Model") then
+                local model = entity._renderModel
+                if model ~= nil then
+                    if model:GetZone() == RenderScene.Zone_ViewModel then
+                        model:RemoveMaterial(viewMaterial)
+                    else
+                        model:RemoveMaterial(material)
+                    end
+                end                    
+            end
+        end
+        
+    end
+    
+
 	function NanoShieldMixin:_CreateEffect()
    
         if not self.nanoShieldMaterial then
         
             local material = Client.CreateRenderMaterial()
             local viewMaterial = Client.CreateRenderMaterial()
+            
+            /*	Update for Exos
+            if self:isa("Exo") then
+                viewMaterial:SetMaterial("cinematics/vfx_materials/nanoshield_exoview.material")
+            else
+                viewMaterial:SetMaterial("cinematics/vfx_materials/nanoshield_view.material")
+            end
+            */
             
             //TODO Try using material param
             if self:GetTeamNumber() == kTeam2Index then

@@ -15,7 +15,8 @@ AddMixinNetworkVars(DetectableMixin, newNetworkVars)
 
 local oldProtoLabCreate = PrototypeLab.OnCreate
 function PrototypeLab:OnCreate()
-	oldProtoLabCreate()
+	
+	oldProtoLabCreate(self)
 	
 	InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
@@ -26,8 +27,25 @@ function PrototypeLab:OnCreate()
     
 end
 
+local orgProtoInit = PrototypeLab.OnInitialized
+function PrototypeLab:OnInitialized()
+
+	orgProtoInit(self)
+	
+	if Client then
+		self:InitializeSkin()
+	end
+
+end
+
 
 if Client then
+	
+	function PrototypeLab:InitializeSkin()
+		self._activeBaseColor = self:GetBaseSkinColor()
+		self._activeAccentColor = self:GetAccentSkinColor()
+		self._activeTrimColor = self:GetTrimSkinColor()
+	end
 
 	function PrototypeLab:GetBaseSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
@@ -43,22 +61,6 @@ if Client then
 
 end
 
-
-function PrototypeLab:GetTechButtons(techId)
-
-    return { 
-		kTechId.JetpackTech, 
-		kTechId.ExosuitTech, 
-		kTechId.DualMinigunTech, 
-		kTechId.ClawRailgunTech 	//TODO Duel-Rail
-	}
-    
-end
-
-function PrototypeLab:GetItemList()
-	//TODO Duel-Rail
-    return { kTechId.Jetpack, kTechId.Exosuit, kTechId.DualMinigunExosuit, kTechId.ClawRailgunExosuit }
-end
 
 //-----------------------------------------------------------------------------
 

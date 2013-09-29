@@ -1,17 +1,8 @@
-shader = "models/marine/marine_teamColor.surface_shader"
+shader = "models/marine/marine.surface_shader"
 
 albedoMap = "models/marine/male/male_special_v1.dds"
-albedoMapTeam1 = "models/marine/team_1/male/male_special_v1.dds"
-albedoMapTeam2 = "models/marine/team_2/male/male_special_v1.dds"
-
 normalMap = "models/marine/male/male_special_v1_normal.dds"
-
 emissiveMap = "models/marine/male/male_special_v1_illum.dds"
-emissiveMapTeam1 = "models/marine/team_1/male/male_special_v1_illum.dds"
-emissiveMapTeam2 = "models/marine/team_2/male/male_special_v1_illum.dds"
-
 specularMap = "models/marine/male/male_special_v1_spec.dds"
-specularMapTeam1 = "models/marine/team_1/male/male_special_v1_spec.dds"
-specularMapTeam2 = "models/marine/team_2/male/male_special_v1_spec.dds"
 
 surface = "organic"

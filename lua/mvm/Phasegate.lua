@@ -27,8 +27,25 @@ function PhaseGate:OnCreate()
 
 end
 
+local orgPhaseGateInit = PhaseGate.OnInitialized
+function PhaseGate:OnInitialized()
+
+	orgPhaseGateInit(self)
+	
+	if Client then
+		self:InitializeSkin()
+	end
+
+end
+
 
 if Client then
+
+	function PhaseGate:InitializeSkin()
+		self._activeBaseColor = self:GetBaseSkinColor()
+		self._activeAccentColor = self:GetAccentSkinColor()
+		self._activeTrimColor = self:GetTrimSkinColor()
+	end
 
 	function PhaseGate:GetBaseSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )

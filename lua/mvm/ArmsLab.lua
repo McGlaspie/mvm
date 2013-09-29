@@ -20,17 +20,33 @@ function ArmsLab:OnCreate()
 
 	InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
-    
-    if Client then
+
+	if Client then
 		InitMixin(self, ColoredSkinsMixin)
 	end
 
 end
 
+local orgArmsLabInit = ArmsLab.OnInitialized
+function ArmsLab:OnInitialized()
+	
+	orgArmsLabInit(self)
+	
+	if Client then
+		self:InitializeSkin()
+	end
+	
+end
+
 
 if Client then
+	
+	function ArmsLab:InitializeSkin()
+		self._activeBaseColor = self:GetBaseSkinColor()
+		self._activeAccentColor = self:GetAccentSkinColor()
+		self._activeTrimColor = self:GetTrimSkinColor()
+	end
 
-	//Team Skins 
 	function ArmsLab:GetBaseSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
 	end
@@ -42,7 +58,6 @@ if Client then
 	function ArmsLab:GetTrimSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
 	end
-	//End Team Skins
 
 end
 

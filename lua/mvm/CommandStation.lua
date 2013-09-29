@@ -23,30 +23,50 @@ function CommandStation:OnCreate()
 
 	InitMixin(self, FireMixin)
 	InitMixin(self, DetectableMixin)
-	
+
 	if Client then
 		InitMixin(self, ColoredSkinsMixin)
 	end
 
 end
 
+
+local orgCommandStationInit = CommandStation.OnInitialized
+function CommandStation:OnInitialized()
+
+	orgCommandStationInit(self)
+	
+	if Client then
+		self:InitializeSkin()
+	end
+
+end
+
+
 //Team Skins 
 if Client then
-
+	
+	function CommandStation:InitializeSkin()
+		self._activeBaseColor = self:GetBaseSkinColor()
+		self._activeAccentColor = self:GetAccentSkinColor()
+		self._activeTrimColor = self:GetTrimSkinColor()
+	end
+	
 	function CommandStation:GetBaseSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
+		return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_BaseColor, kTeam2_BaseColor )
 	end
 
 	function CommandStation:GetAccentSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+		return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
 	end
-
+	
 	function CommandStation:GetTrimSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
+		return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_TrimColor, kTeam2_TrimColor )
 	end
 	
 end
 //End Team Skins
+
 
 
 //Overrides original
@@ -62,16 +82,27 @@ function CommandStation:OnUpdateRender()
         local state = kCommandStationState.Normal
         local player = Client.GetLocalPlayer()
         
-        //FIXME Set to ignore team checks for Spectator team
-        if self:GetIsOccupied() and self:GetTeamNumber() == player:GetTeamNumber() then
+        if player:GetTeamNumber() ~= kSpectatorIndex then
         
-            state = kCommandStationState.Welcome
-            
-        elseif GetTeamHasCommander( self:GetTeamNumber() ) or self:GetTeamNumber() ~= player:GetTeamNumber() then
-        
-            state = kCommandStationState.Locked
-            
-        end
+			if self:GetIsOccupied() and self:GetTeamNumber() == player:GetTeamNumber() then
+			
+				state = kCommandStationState.Welcome
+				
+			elseif GetTeamHasCommander( self:GetTeamNumber() ) or self:GetTeamNumber() ~= player:GetTeamNumber() then
+			
+				state = kCommandStationState.Locked
+				
+			end
+			
+		else
+			
+			if GetTeamHasCommander( self:GetTeamNumber() ) then
+				state = kCommandStationState.Locked
+			else
+				state = kCommandStationState.Welcome
+			end
+			
+		end
         
         model:SetMaterialParameter("state", state)
         

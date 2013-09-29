@@ -8,39 +8,47 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
-//TODO Update all of below to point to MvM scripts
-
 ClientUI = { }
 
 // Below are the rules for what scripts should be active when the local player is on certain teams.
 local kTeamTypes = { "all", kTeamReadyRoom, kTeam1Index, kTeam2Index, kSpectatorIndex }
 local kShowOnTeam = { }
-kShowOnTeam["all"] = { GUIFeedback = true, GUIScoreboard = true, GUIDeathMessages = true, GUIChat = true,
-                       GUIVoiceChat = true, GUIMinimapFrame = true, GUIMapAnnotations = true,
-                       GUICommunicationStatusIcons = true, GUIUnitStatus = true, GUIDeathScreen = true,
-                       GUITipVideo = true, GUIVoteMenu = true, GUIStartVoteMenu = true }
+kShowOnTeam["all"] = { 
+	GUIFeedback = true, 
+	GUIScoreboard = true, 
+	["mvm/GUIDeathMessages"] = true, 
+	["mvm/GUIChat"] = true,
+	GUIVoiceChat = true, 
+	["mvm/GUIMinimapFrame"] = true, 
+	GUIMapAnnotations = true,
+	GUICommunicationStatusIcons = true, 
+	["mvm/GUIUnitStatus"] = true, 
+	GUIDeathScreen = true,
+	GUITipVideo = true, 
+	GUIVoteMenu = true, 
+	GUIStartVoteMenu = true
+}
+
 
 kShowOnTeam[kTeamReadyRoom] = { GUIReadyRoomOrders = true } // , GUIPlayerRanking = true }
 kShowOnTeam[kTeam1Index] = { }
-kShowOnTeam[kTeam2Index] = { GUIAlienSpectatorHUD = true }
+kShowOnTeam[kTeam2Index] = { }
 kShowOnTeam[kSpectatorIndex] = { GUIGameEnd = true, GUISpectator = true }
 
 local kBothAlienAndMarine = { 
 	GUICrosshair = true, 
-	GUINotifications = true, 
+	["mvm/GUINotifications"] = true, 
 	GUIDamageIndicators = true, 
-	GUIGameEnd = true, 
-	GUIWorldText = true,
+	["mvm/GUIGameEnd"] = true, 
+	["mvm/GUIWorldText"] = true,
 	GUIPing = true, 
 	GUIWaitingForAutoTeamBalance = true, 
-	GUITechMap = true 
+	["mvm/GUITechMap"] = true 
 }
-                              
-for n, e in pairs(kBothAlienAndMarine) do
 
+for n, e in pairs(kBothAlienAndMarine) do
     kShowOnTeam[kTeam1Index][n] = e
     kShowOnTeam[kTeam2Index][n] = e
-    
 end
 
 function AddClientUIScriptForTeam(showOnTeam, scriptName)
@@ -50,39 +58,71 @@ end
 // Below are the rules for what scripts should be active when the local player is a certain class.
 local kShowAsClass = { }
 kShowAsClass["Marine"] = { 
-	["Hud/Marine/GUIMarineHUD"] = true, 
-	GUIPoisonedFeedback = false, //TODO Convert to EMP'ed
+	["mvm/Hud/Marine/GUIMarineHUD"] = true, 
+	GUIPoisonedFeedback = false, 
 	GUIPickups = true,
-	GUISensorBlips = true, 
+	["mvm/GUISensorBlips"] = true, 
 	GUIObjectiveDisplay = true, 
-	GUIProgressBar = true, 
+	["mvm/Hud/GUIProgressBar"] = true, 
 	GUIRequestMenu = true,
-	GUIWaypoints = true 
+	["mvm/GUIWaypoints"] = true 
 }
 
-//kShowAsClass["InfiltratorMarine"] = { GUICloakEnergy = true, GUIHackingTool = true }
-kShowAsClass["JetpackMarine"] = { GUIJetpackFuel = true }
+kShowAsClass["JetpackMarine"] = { 
+	["mvm/Hud/Marine/GUIJetpackFuel"] = true 
+}
+//kShowAsClass["InfiltratorMarine"] = { }	-	Future use
 kShowAsClass["Exo"] = { 
-	GUIExoThruster = true, 
-	["Hud/Marine/GUIMarineHUD"] = true, 
-	["Hud/Marine/GUIExoHUD"] = true, 
-	GUIProgressBar = true, 
+	["mvm/Hud/Exo/GUIExoThruster"] = true,
+	["mvm/Hud/Marine/GUIMarineHUD"] = true, 
+	["mvm/Hud/Exo/GUIExoHUD"] = true, 
+	["mvm/Hud/GUIProgressBar"] = true, 
 	GUIRequestMenu = true, 
-	GUIWaypoints = true, 
-	GUIExoEject = true 
+	["mvm/GUIWaypoints"] = true, 
+	["mvm/Hud/Exo/GUIExoEject"] = true
 }
 
 kShowAsClass["MarineSpectator"] = { GUIRequestMenu = true }
 
-//kShowAsClass["Alien"] = { GUIObjectiveDisplay = true, GUIProgressBar = true, GUIRequestMenu = true, GUIWaypoints = true, GUIAlienHUD = true, GUIEggDisplay = true, GUIRegenerationFeedback = true, GUIBioMassDisplay = true, GUIUpgradeChamberDisplay = true, GUIAuraDisplay = true }
-//kShowAsClass["AlienSpectator"] = { GUIRequestMenu = true }
-//kShowAsClass["Fade"] = { GUIFadeVortex = true }
-kShowAsClass["Commander"] = { GUICommanderOrders = true }
-kShowAsClass["MarineCommander"] = { GUICommanderTutorial = true, GUISensorBlips = true, GUIDistressBeacon = true }
-//kShowAsClass["AlienCommander"] = { GUICommanderTutorial = true, GUIEggDisplay = true, GUICommanderPheromoneDisplay = true, GUIBioMassDisplay = true }
+kShowAsClass["Commander"] = { 
+	GUICommanderOrders = true 
+}
+kShowAsClass["MarineCommander"] = { 
+	GUICommanderTutorial = true, 
+	GUISensorBlips = true, 
+	GUIDistressBeacon = true 
+}
+
+/*
+kShowAsClass["Alien"] = { 
+	GUIObjectiveDisplay = false, 
+	GUIProgressBar = false, 
+	GUIRequestMenu = false, 
+	GUIWaypoints = false, 
+	GUIAlienHUD = false,
+	GUIEggDisplay = false, 
+	GUIRegenerationFeedback = false, 
+	GUIBioMassDisplay = false, 
+	GUIUpgradeChamberDisplay = false,
+	GUIAuraDisplay = false 
+}
+kShowAsClass["AlienSpectator"] = { GUIRequestMenu = false }
+kShowAsClass["Fade"] = { GUIFadeVortex = false }
+kShowAsClass["AlienCommander"] = { 
+	GUICommanderTutorial = false, 
+	GUIEggDisplay = false, 
+	GUICommanderPheromoneDisplay = false, 
+	GUIBioMassDisplay = false 
+}
+*/
+
+
 kShowAsClass["ReadyRoomPlayer"] = { }
 kShowAsClass["TeamSpectator"] = { }
 kShowAsClass["Spectator"] = { }
+
+
+
 
 function AddClientUIScriptForClass(className, scriptName)
 

@@ -15,6 +15,14 @@ local newNetworkVars = {}
 AddMixinNetworkVars(FireMixin, newNetworkVars)
 AddMixinNetworkVars(DetectableMixin, newNetworkVars)
 
+local kDistressBeaconSoundMarine = PrecacheAsset("sound/NS2.fev/marine/common/distress_beacon_marine")
+local kDistressBeaconSoundAlien = PrecacheAsset("sound/NS2.fev/marine/common/distress_beacon_alien")
+
+local kObservatoryTechButtons = { kTechId.Scan, kTechId.DistressBeacon, kTechId.Detector, kTechId.None,
+                                   kTechId.PhaseTech, kTechId.None, kTechId.None, kTechId.None }
+                                   
+
+
 //-----------------------------------------------------------------------------
 
 local oldObsCreate = Observatory.OnCreate
@@ -33,11 +41,11 @@ function Observatory:OnCreate()
     
         self.distressBeaconSoundMarine = Server.CreateEntity(SoundEffect.kMapName)
         self.distressBeaconSoundMarine:SetAsset(kDistressBeaconSoundMarine)
-        self.distressBeaconSoundMarine:SetRelevancyDistance(kDistressBeaconSoundDistance)
+        self.distressBeaconSoundMarine:SetRelevancyDistance(Math.infinity)
 		
         self.distressBeaconSoundAlien = Server.CreateEntity(SoundEffect.kMapName)
         self.distressBeaconSoundAlien:SetAsset(kDistressBeaconSoundAlien)
-        self.distressBeaconSoundAlien:SetRelevancyDistance(kDistressBeaconSoundDistance)
+        self.distressBeaconSoundAlien:SetRelevancyDistance(Math.infinity)
         
         if self:GetTeamNumber() == kTeam2Index then
 			self.distressBeaconSoundMarine:SetExcludeRelevancyMask(kRelevantToTeam2)
@@ -51,8 +59,25 @@ function Observatory:OnCreate()
 
 end
 
+local orgObsInit = Observatory.OnInitialized
+function Observatory:OnInitialized()
+
+	orgObsInit(self)
+	
+	if Client then
+		self:InitializeSkin()
+	end
+
+end
+
 
 if Client then
+	
+	function Observatory:InitializeSkin()
+		self._activeBaseColor = self:GetBaseSkinColor()
+		self._activeAccentColor = self:GetAccentSkinColor()
+		self._activeTrimColor = self:GetTrimSkinColor()
+	end
 
 	function Observatory:GetBaseSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
@@ -67,6 +92,74 @@ if Client then
 	end
 
 end
+
+
+local function TriggerMarineBeaconEffects( self )
+
+	for index, player in ipairs( GetEntitiesForTeam("Player", self:GetTeamNumber()) ) do
+		
+        if player:GetIsAlive() and (player:isa("Marine") or player:isa("Exo")) then
+            player:TriggerEffects("player_beacon")
+        end
+    
+    end
+
+end
+
+
+
+local function GetIsPlayerNearby(self, player, toOrigin)
+    return (player:GetOrigin() - toOrigin):GetLength() < Observatory.kDistressBeaconRange
+end
+
+
+local function GetPlayersToBeacon(self, toOrigin)
+
+    local players = { }
+    
+    for index, player in ipairs( self:GetTeam():GetPlayers() ) do
+    
+        // Don't affect Commanders or Heavies
+        if player:isa("Marine") or player:isa("Exo") then
+        
+            // Don't respawn players that are already nearby.
+            if not GetIsPlayerNearby(self, player, toOrigin) then
+                table.insert(players, player)
+            end
+            
+        end
+        
+    end
+    
+    return players
+    
+end
+
+
+// Spawn players at nearest Command Station to Observatory - not initial marine start like in NS1. Allows relocations and more versatile tactics.
+local function RespawnPlayer(self, player, distressOrigin)
+
+    // Always marine capsule (player could be dead/spectator)
+    local extents = HasMixin(player, "Extents") and player:GetExtents() or LookupTechData(kTechId.Marine, kTechDataMaxExtents)
+    local capsuleHeight, capsuleRadius = GetTraceCapsuleFromExtents(extents)
+    local range = Observatory.kDistressBeaconRange
+    local spawnPoint = GetRandomSpawnForCapsule(capsuleHeight, capsuleRadius, distressOrigin, 2, range, EntityFilterAll())
+    
+    if spawnPoint then
+    
+        player:SetOrigin(spawnPoint)
+        if player.TriggerBeaconEffects then
+            player:TriggerBeaconEffects()
+        end
+        
+    else
+        Print("Observatory:RespawnPlayer(): Couldn't find space to respawn player.")
+    end
+    
+    return spawnPoint ~= nil
+    
+end
+
 
 
 function Observatory:TriggerDistressBeacon()
@@ -94,6 +187,7 @@ function Observatory:TriggerDistressBeacon()
 			
 
 			if Server then
+				
                 TriggerMarineBeaconEffects(self)
                 
                 local location = GetLocationForPoint(self:GetDistressOrigin())

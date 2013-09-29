@@ -3,19 +3,48 @@ Script.Load("lua/PostLoadMod.lua")
 
 
 local newNetworkVars = {
-	//Add previousTeamNumber?
+	//Add previousTeamNumber?	Yes...need this, must be propogated, etc
 }
 
 //-----------------------------------------------------------------------------
+
+
+function Player:AddResources(amount)
+
+    local resReward = 0
+	
+    if amount <= 0 or not self.blockPersonalResources then	//Shared.GetCheatsEnabled() or (
+
+        resReward = math.min(amount, kMaxPersonalResources - self:GetResources())
+        local oldRes = self.resources
+        self:SetResources(self:GetResources() + resReward)
+        
+        if oldRes ~= self.resources then
+            self:SetScoreboardChanged(true)
+        end
+    
+    end
+    
+    return resReward
+    
+end
+
+
 
 if Client then
 	
 	
 	function Player:ShowMap(showMap, showBig, forceReset)
+		
 		self.minimapVisible = showMap and showBig
 		
 		ClientUI.GetScript("mvm/GUIMinimapFrame"):ShowMap(showMap)
-		ClientUI.GetScript("mvm/GUIMinimapFrame"):SetBackgroundMode((showBig and GUIMinimapFrame.kModeBig) or GUIMinimapFrame.kModeMini, forceReset)
+		ClientUI.GetScript("mvm/GUIMinimapFrame"):SetBackgroundMode(
+			( showBig and GUIMinimapFrame.kModeBig ) 
+			or GUIMinimapFrame.kModeMini, 
+			forceReset
+		)
+		
 	end
 	
 	
@@ -27,26 +56,52 @@ if Client then
 		return self:GetTeamType() == kMarineTeamType //or self:GetTeamNumber() == kAlienTeamType
 	end
 
-	function PlayerUI_GetOrderPath()
 	
+	function PlayerUI_GetOrderPath()
+
 		local player = Client.GetLocalPlayer()
-		
 		if player then
+		
+			/*
+			TODO Adjust below to support "Command Directives" feature
+			
+			if player:isa("Alien") then
+			
+				local playerOrigin = player:GetOrigin()
+				local pheromone = GetMostRelevantPheromone(playerOrigin)
+				if pheromone then
+				
+					local points = PointArray()
+					local isReachable = Pathing.GetPathPoints(playerOrigin, pheromone:GetOrigin(), points)
+					if isReachable then
+						return points
+					end
+					
+				end
+				
+			else
+			*/
+			
 			if HasMixin(player, "Orders") then
 			
 				local currentOrder = player:GetCurrentOrder()
 				if currentOrder then
+				
 					local targetLocation = currentOrder:GetLocation()
-					local points = {}
+					local points = PointArray()
 					local isReachable = Pathing.GetPathPoints(player:GetOrigin(), targetLocation, points)
-					
 					if isReachable then
 						return points
 					end
+					
 				end
+				
 			end
+			
 		end
-	
+		
+		return nil
+		
 	end
 	
 	
@@ -105,10 +160,17 @@ if Client then
 	end
 	
 	
+	local function LocalIsFriendlyCommander(player, unit)
+		return player:isa("Commander") and ( unit:isa("Player") or (HasMixin(unit, "Selectable") and unit:GetIsSelected(player:GetTeamNumber())) )
+	end
+	
+	
 	local kUnitStatusDisplayRange = 20	//Org: 13
 	local kUnitStatusCommanderDisplayRange = 50
-	local kDefaultHealthOffset = Vector(0, 1.2, 0)
+	local kDefaultHealthOffset = 1.2
 	
+	
+		
 	function PlayerUI_GetUnitStatusInfo()
 
 		local unitStates = { }
@@ -125,12 +187,14 @@ if Client then
 			if player:isa("Commander") then
 				range = kUnitStatusCommanderDisplayRange
 			end
+			
+			local healthOffsetDirection = player:isa("Commander") and Vector.xAxis or Vector.yAxis
 		
-			for index, unit in ipairs( GetEntitiesWithMixinWithinRange("UnitStatus", eyePos, range) ) do
+			for index, unit in ipairs(GetEntitiesWithMixinWithinRange("UnitStatus", eyePos, range)) do
 			
 				// checks here if the model was rendered previous frame as well
 				local status = unit:GetUnitStatus(player)
-				if unit:GetShowUnitStatusFor(player) and (unit:isa("Player") or status ~= kUnitStatus.None or unit == crossHairTarget) then       
+				if unit:GetShowUnitStatusFor(player) then       
 
 					// Get direction to blip. If off-screen, don't render. Bad values are generated if 
 					// Client.WorldToScreen is called on a point behind the camera.
@@ -153,19 +217,26 @@ if Client then
 						local description = unit:GetUnitName(player)
 						local action = unit:GetActionName(player)
 						local hint = unit:GetUnitHint(player)
+						local distance = (origin - eyePos):GetLength()
 						
-						local healthBarOrigin = origin + kDefaultHealthOffset
+						local healthBarOffset = kDefaultHealthOffset
+						
 						local getHealthbarOffset = unit.GetHealthbarOffset
 						if getHealthbarOffset then
-							healthBarOrigin = origin + getHealthbarOffset(unit)
+							healthBarOffset = getHealthbarOffset(unit)
 						end
+						
+						local healthBarOrigin = origin + healthOffsetDirection * healthBarOffset
 						
 						local worldOrigin = Vector(origin)
 						origin = Client.WorldToScreen(origin)
 						healthBarOrigin = Client.WorldToScreen(healthBarOrigin)
 						
 						if unit == crossHairTarget then
+						
 							healthBarOrigin.y = math.max(GUIScale(180), healthBarOrigin.y)
+							healthBarOrigin.x = Clamp(healthBarOrigin.x, GUIScale(320), Client.GetScreenWidth() - GUIScale(320))
+							
 						end
 
 						local health = 0
@@ -196,10 +267,19 @@ if Client then
 
 						end
 						
-						local badge = ""
+						local badgeTextures = ""
 						
-						if HasMixin(unit, "Badge") then
-							badge = unit:GetBadgeIcon() or ""
+						if HasMixin(unit, "Player") then
+							if unit.GetShowBadgeOverride and not unit:GetShowBadgeOverride() then
+								badgeTextures = {}
+							else
+								badgeTextures = Badges_GetBadgeTextures(unit:GetClientIndex(), "unitstatus") or {}
+							end
+						end
+						
+						local hasWelder = false 
+						if distance < 10 then    
+							hasWelder = unit:GetHasWelder(player)
 						end
 						
 						local unitState = {
@@ -214,12 +294,12 @@ if Client then
 							StatusFraction = statusFraction,
 							HealthFraction = health,
 							ArmorFraction = armor,
-							IsCrossHairTarget = (unit == crossHairTarget and visibleToPlayer) or LocalIsFriendlyMarineComm(player, unit),
+							IsCrossHairTarget = (unit == crossHairTarget and visibleToPlayer) or LocalIsFriendlyCommander(player, unit),
 							TeamType = kNeutralTeamType,
-							TeamNumber = kReadyRoomIndex,
+							TeamNumber = kTeamReadyRoom,
 							ForceName = unit:isa("Player") and not GetAreEnemies(player, unit),
-							OnScreen = onScreen,
-							BadgeTexture = badge
+							BadgeTextures = badgeTextures,
+							HasWelder = hasWelder
 						
 						}
 						
@@ -235,6 +315,7 @@ if Client then
 							unitState.TeamNumber = unit:GetTeamNumber()
 						end
 						
+						
 						table.insert(unitStates, unitState)
 					
 					end
@@ -249,6 +330,19 @@ if Client then
 
 	end
 
+
+	function PlayerUI_IsOnMarineTeam()
+		
+		local player = Client.GetLocalPlayer()
+		if player and HasMixin(player, "Team") then
+			return player:GetTeamNumber() == kMarineTeamType
+		end
+		
+		return false    
+		
+	end
+
+	
 	function PlayerUI_IsOnAlienTeam()
 		local player = Client.GetLocalPlayer()
 		if player and HasMixin(player, "Team") then
@@ -266,6 +360,14 @@ if Client then
 		end
 		
 		return 0
+	end
+	
+	
+	function PlayerUI_GetIsTechMapVisible()
+
+		local script = ClientUI.GetScript("mvm/GUITechMap")
+		return script ~= nil and script:GetIsVisible()
+
 	end
 	
 	
@@ -401,113 +503,32 @@ end	//Client
 
 if Server then
 
+/*
 	local oldPlayerCreate = Player.OnCreate
 	function Player:OnCreate()
 		
 		oldPlayerCreate(self)
 		
 		//Server-side only, not networkvar
-		self.previousTeamNumber = 0	//Will need to update for all CopyX cases
+		//self.previousTeamNumber = 0	//Will need to update for all CopyX cases
 		
 	end
 	
 	
+	local oldReplacePlayer = Player.Replace
 	function Player:Replace(mapName, newTeamNumber, preserveWeapons, atOrigin, extraValues)
 		
-		local team = self:GetTeam()
-		if team == nil then
-			return self
+		oldReplacePlayer(self, mapName, newTeamNumber, preserveWeapons, atOrigin, extraValues)
+		///*
+		if self:GetTeamNumber() ~= newTeamNumber then
+			self.previousTeamNumber = self:GetTeamNumber()
+		else
+			self.previousTeamNumber = newTeamNumber
 		end
-		
-		local teamNumber = team:GetTeamNumber()
-		local client = Server.GetOwner(self)
-		local teamChanged = newTeamNumber ~= nil and newTeamNumber ~= self:GetTeamNumber()
-		
-		// Add new player to new team if specified
-		// Both nil and -1 are possible invalid team numbers.
-		if newTeamNumber ~= nil and newTeamNumber ~= -1 then
-			teamNumber = newTeamNumber
-		end
-		
-		local player = CreateEntity(mapName, atOrigin or Vector(self:GetOrigin()), teamNumber, extraValues)
-		
-		//Save last team for RR model skinning
-		player.previousTeamNumber = ConditionalValue( teamChanged, teamNumber, 0 )
-		
-		// Save last player map name so we can show player of appropriate form in the ready room if the game ends while spectating
-		player.previousMapName = self:GetMapName()
-		
-		// The class may need to adjust values before copying to the new player (such as gravity).
-		self:PreCopyPlayerData()
-		
-		// If the atOrigin is specified, set self to that origin before
-		// the copy happens or else it will be overridden inside player.
-		if atOrigin then
-			self:SetOrigin(atOrigin)
-		end
-		// Copy over the relevant fields to the new player, before we delete it
-		player:CopyPlayerDataFrom(self)
-		
-		// Make model look where the player is looking
-		player.standingBodyYaw = Math.Wrap( self:GetAngles().yaw, 0, 2*math.pi )
-		
-		if not player:GetTeam():GetSupportsOrders() and HasMixin(player, "Orders") then
-			player:ClearOrders()
-		end
-		
-		// Remove newly spawned weapons and reparent originals
-		if preserveWeapons then
-		
-			player:DestroyWeapons()
-			
-			local allWeapons = { }
-			local function AllWeapons(weapon) table.insert(allWeapons, weapon) end
-			ForEachChildOfType(self, "Weapon", AllWeapons)
-			
-			for i, weapon in ipairs(allWeapons) do
-				player:AddWeapon(weapon)
-			end
-			
-		end
-		
-		// Notify others of the change     
-		self:SendEntityChanged(player:GetId())
-		
-		// Update scoreboard because of new entity and potentially new team
-		player:SetScoreboardChanged(true)
-		
-		// This player is no longer controlled by a client.
-		self.client = nil
-		
-		// Remove any spectators currently spectating this player.
-		self:RemoveSpectators(player)
-		
-		// Only destroy the old player if it is not a ragdoll.
-		// Ragdolls will eventually destroy themselve.
-		if not HasMixin(self, "Ragdoll") or not self:GetIsRagdoll() then
-			DestroyEntity(self)
-		end
-		
-		player:SetControllerClient(client)
-		
-		// There are some cases where the spectating player isn't set to nil.
-		// Handle any edge cases here (like being dead when the game is reset).
-		// In some cases, client will be nil (when the map is changing for example).
-		if client and not player:isa("Spectator") then
-			client:SetSpectatingPlayer(nil)
-		end
-		
-		// Must happen after the client has been set on the player.
-		player:InitializeBadges()
-		
-		// Log player spawning
-		if teamNumber ~= 0 then
-			PostGameViz(string.format("%s spawned", SafeClassName(self)), self)
-		end
-		
-		return player
+		///
 	
 	end
+*/
 	
 
 end

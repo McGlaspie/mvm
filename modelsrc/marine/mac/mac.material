@@ -1,17 +1,12 @@
-shader = "models/marine/marine_teamColor.surface_shader"
+shader = "shaders/ColoredSkins.surface_shader"
 
 albedoMap = "models/marine/mac/mac.dds"
-albedoMapTeam1 = "models/marine/team_1/mac/mac.dds"
-albedoMapTeam2 = "models/marine/mac/mac.dds"
-
 normalMap = "models/marine/mac/mac_normal.dds"
-
 emissiveMap = "models/marine/mac/mac_illum.dds"
-emissiveMapTeam1 = "models/marine/team_1/mac/mac_illum.dds"
-emissiveMapTeam2 = "models/marine/mac/mac_illum.dds"
-
 specularMap = "models/marine/mac/mac_spec.dds"
-specularMapTeam1 = "models/marine/team_1/mac/mac_spec.dds"
-specularMapTeam2 = "models/marine/mac/mac_spec.dds"
+
+modelColorMap = "models/marine/mac/mac_colorMap.dds"
+colorizeModel = 1
+
 
 surface = "metal"

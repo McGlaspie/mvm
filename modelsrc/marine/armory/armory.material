@@ -1,17 +1,11 @@
-shader = "models/marine/marine_teamColor.surface_shader"
+shader = "shaders/ColoredSkins.surface_shader"
 
 albedoMap = "models/marine/armory/armory.dds"
-albedoMapTeam1 = "models/marine/team_1/armory/armory.dds"
-albedoMapTeam2 = "models/marine/team_2/armory/armory.dds"
-
 normalMap = "models/marine/armory/armory_normal.dds"
-
 emissiveMap = "models/marine/armory/armory_illum.dds"
-emissiveMapTeam1 = "models/marine/team_1/armory/armory_illum.dds"
-emissiveMapTeam2 = "models/marine/team_2/armory/armory_illum.dds"
-
 specularMap = "models/marine/armory/armory_spec.dds"
-specularMapTeam1 = "models/marine/team_1/armory/armory_spec.dds"
-specularMapTeam2 = "models/marine/team_2/armory/armory_spec.dds"
+
+modelColorMap = "models/marine/armory/armory_colorMap.dds"
+
 
 surface = "metal"

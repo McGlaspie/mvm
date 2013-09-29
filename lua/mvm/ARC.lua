@@ -24,7 +24,7 @@ function ARC:OnCreate()
 
     InitMixin(self, DetectableMixin)
     InitMixin(self, FireMixin)
-
+	
 	if Client then
 		InitMixin(self, ColoredSkinsMixin)
 	end
@@ -37,47 +37,58 @@ end
 
 local orgArcInit = ARC.OnInitialized
 function ARC:OnInitialized()
-
-	orgArcInit()
-
-	// Prioritize targetting non-Eggs first.
-	self.targetSelector = TargetSelector():Init(
-		self,
-		ARC.kFireRange,
-		false, 
-		{ 
-			kMarineStaticTargets, 
-			kMarineMobileTargets 
-		},
-		{
-			self.FilterTarget(self),
-			TeamTargetFilter( self:GetTeamNumber() )
-		}
-		//TODO Auto-Prioritization of targets
-	)
 	
-	InitMixin(self, ControllerMixin)
+	orgArcInit(self)
+	
+	if Server then
+	
+		self.targetSelector = TargetSelector():Init(	//OVERRIDE
+			self,
+			ARC.kFireRange,
+			false, 
+			{ kMarineStaticTargets, kMarineMobileTargets },
+			{ 
+				self.FilterTarget(self), 
+				TeamTargetFilter( self:GetTeamNumber() ),
+				CloakTargetFilter()
+				//PitchTargetFilter(self,  -Sentry.kMaxPitch, Sentry.kMaxPitch)	- Will be needed when direct fire mode added
+			}
+			//TODO Auto-Prioritization of targets
+		)
+		
+		
+		InitMixin(self, ControllerMixin)
         
-	self:CreateController(PhysicsGroup.WhipGroup)
+		self:CreateController(PhysicsGroup.WhipGroup)
+		
+	end
+	
+	if Client then
+		self:InitializeSkin()
+	end
 
 end
 
 
 if Client then
 
-	//Team Skins 
+	function ARC:InitializeSkin()
+		self._activeBaseColor = self:GetBaseSkinColor()
+		self._activeAccentColor = self:GetAccentSkinColor()
+		self._activeTrimColor = self:GetTrimSkinColor()
+	end
+	
 	function ARC:GetBaseSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
+		return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_BaseColor, kTeam2_BaseColor )
 	end
 
 	function ARC:GetAccentSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+		return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
 	end
 
 	function ARC:GetTrimSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
+		return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_TrimColor, kTeam2_TrimColor )
 	end
-	//End Team Skins
 
 end
 

@@ -1,17 +1,10 @@
-shader = "models/marine/marine_teamColor.surface_shader"
+shader = "shaders/ColoredSkins.surface_shader"
 
 albedoMap = "models/marine/infantry_portal/infantry_portal.dds"
-albedoMapTeam1 = "models/marine/team_1/infantry_portal/infantry_portal.dds"
-albedoMapTeam2 = "models/marine/team_2/infantry_portal/infantry_portal.dds"
-
 normalMap = "models/marine/infantry_portal/infantry_portal_normal.dds"
-
 emissiveMap = "models/marine/infantry_portal/infantry_portal_illum.dds"
-emissiveMapTeam1 = "models/marine/infantry_portal/infantry_portal_illum.dds"
-emissiveMapTeam2 = "models/marine/team_2/infantry_portal/infantry_portal_illum.dds"
-
 specularMap = "models/marine/infantry_portal/infantry_portal_spec.dds"
-specularMapTeam1 = "models/marine/infantry_portal/infantry_portal_spec.dds"
-specularMapTeam2 = "models/marine/infantry_portal/infantry_portal_spec.dds"
+
+modelColorMap = "models/marine/infantry_portal/infantry_portal_colorMap.dds"
 
 surface = "metal"

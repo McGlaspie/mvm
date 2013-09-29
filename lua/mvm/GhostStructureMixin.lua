@@ -10,6 +10,19 @@ end
 
 //-----------------------------------------------------------------------------
 
+
+local function ClearGhostStructure(self)
+
+    self.isGhostStructure = false
+    self:TriggerEffects("ghoststructure_destroy")
+    local cost = LookupTechData(self:GetTechId(), kTechDataCostKey, 0)
+    self:GetTeam():AddTeamResources(cost)
+    self:GetTeam():PrintWorldTextForTeamInRange(kWorldTextMessageType.Resources, cost, self:GetOrigin() + kWorldMessageResourceOffset, kResourceMessageRange)
+    DestroyEntity(self)
+    
+end
+
+
 local function SharedUpdate_MvM(self, deltaTime)
 
     if Server and self:GetIsGhostStructure() then
@@ -39,6 +52,8 @@ local function SharedUpdate_MvM(self, deltaTime)
         if HasMixin(self, "Model") then
             model = self:GetRenderModel()
         end
+        
+        //TODO Convert to shader base param, versus different materials
         
         if model then
 

@@ -49,6 +49,9 @@ function Marine:OnCreate()
 	InitMixin(self, DetectableMixin)
 	
 	if Client then
+		
+		//InitMixin(self, ColoredSkinsMixin)
+		
 		if self.flashlight ~= nil then
 		//have to do this to "clean", otherwise will probably leave unused resources
             Client.DestroyRenderLight(self.flashlight)
@@ -57,16 +60,14 @@ function Marine:OnCreate()
         self.flashlight = Client.CreateRenderLight()
         
         self.flashlight:SetType( RenderLight.Type_Spot )
-        self.flashlight:SetColor( Color(.8, .8, 1) )
+        self.flashlight:SetColor( Color(.8, .8, 1) )	//TODO Theme per teamNumber
         self.flashlight:SetInnerCone( math.rad(30) )
         self.flashlight:SetOuterCone( math.rad(35) )
         self.flashlight:SetIntensity( 10 )
         self.flashlight:SetRadius( 16 ) 	//15
         self.flashlight:SetGoboTexture("models/marine/male/flashlight.dds")
         
-        self.flashlight:SetIsVisible(false)
-        
-        InitMixin(self, ColoredSkinsMixin)
+        self.flashlight:SetIsVisible(false)		
         
     end
 	
@@ -180,13 +181,6 @@ function Marine:GetIsFlameAble()
     return false	//causing WAY too much damage
 end
 
-function Marine:GetAirMoveScalar()
-    return 0.1
-end
-
-function Marine:GetAirFrictionForce()
-    return 1.5 * self.slowAmount
-end
 
 function Marine:OnWeldOverride(doer, elapsedTime)
 
@@ -204,18 +198,22 @@ function Marine:OnWeldOverride(doer, elapsedTime)
     
 end
 
-
+//OVERRIDES
 function Marine:OnProcessMove(input)
 
+    if self.catpackboost then
+        self.catpackboost = Shared.GetTime() - self.timeCatpackboost < kCatPackDuration
+    end
+	
     if Server then
     
-        //self.ruptured = Shared.GetTime() - self.timeRuptured < Rupture.kDuration
-        //self.interruptAim  = Shared.GetTime() - self.interruptStartTime < Gore.kAimInterruptDuration
-        self.catpackboost = Shared.GetTime() - self.timeCatpackboost < CatPack.kDuration
+		//self.ruptured = Shared.GetTime() - self.timeRuptured < Rupture.kDuration
+		//self.interruptAim  = Shared.GetTime() - self.interruptStartTime < Gore.kAimInterruptDuration
         
         if self.unitStatusPercentage ~= 0 and self.timeLastUnitPercentageUpdate + 2 < Shared.GetTime() then
             self.unitStatusPercentage = 0
         end    
+        
         /*
         if self.poisoned then
         
@@ -246,11 +244,17 @@ function Marine:OnProcessMove(input)
         end
         */
         
+        // check nano armor
+        if not self:GetIsInCombat() and self.hasNanoArmor then            
+            self:SetArmor(self:GetArmor() + input.time * kNanoArmorHealPerSecond, true)            
+        end
+        
     end
     
     Player.OnProcessMove(self, input)
     
 end
+
 
 
 
