@@ -8,6 +8,8 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
+Script.Load("lua/mvm/GUIColorGlobals.lua")
+
 // Global state that can be externally set to adjust the display.
 armorAmount = 0
 

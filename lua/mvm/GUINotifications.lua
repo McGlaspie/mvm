@@ -10,6 +10,7 @@
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 Script.Load("lua/GUIAnimatedScript.lua")
+Script.Load("lua/mvm/GUIColorGlobals.lua")
 
 class 'GUINotifications' (GUIAnimatedScript)
 
@@ -74,8 +75,8 @@ function GUINotifications:EnableMarineStyle()
 
     PROFILE("GUINotifications:EnableMarineStyle")
 
-    self.locationText:SetColor(GUINotifications.kMarineColor)
-    self.locationText:SetFontName(GUINotifications.kMarineFont)
+    self.locationText:SetColor( GUINotifications.kMarineColor )
+    self.locationText:SetFontName( GUINotifications.kMarineFont )
     self.tooltipBackground:SetColor(Color(1,1,1,0))
     self.tooltipText:SetColor(GUINotifications.kMarineColor)
     self.scoreDisplay:SetColor(GUINotifications.kMarineColor)
@@ -95,10 +96,10 @@ function GUINotifications:EnableAlienStyle()
     PROFILE("GUINotifications:EnableAlienStyle")
 
 	self.locationText:SetColor( kAlienTeamColorFloat )
-    self.locationText:SetFontName( kAlienFont )
+    self.locationText:SetFontName( GUINotifications.kMarineFont )
     self.tooltipBackground:SetColor( Color(1,1,1,0) )
-    self.tooltipText:SetColor( GUINotifications.kMarineColor )
-    self.scoreDisplay:SetColor( GUINotifications.kMarineColor )
+    self.tooltipText:SetColor( kGUI_HealthBarColors[kTeam2Index] )
+    self.scoreDisplay:SetColor( kGUI_HealthBarColors[kTeam2Index] )
     self.tooltipBackground:SetAnchor(GUIItem.Middle, GUIItem.Bottom)
     local currentWidth = self.tooltipBackground:GetSize().x
     self.tooltipBackground:SetPosition(Vector(-currentWidth / 2, GUINotifications.kTooltipMarineYOffset, 0))
@@ -108,16 +109,6 @@ function GUINotifications:EnableAlienStyle()
     self.toolTipIcon:SetTexturePixelCoordinates(unpack(GUINotifications.kMarineIconPixelCoords))
     
     self.toolTipIcon:SetIsVisible(true)
-
-/*
-    self.locationText:SetColor(kAlienTeamColorFloat)
-    self.locationText:SetFontName(kAlienFont)
-    self.tooltipBackground:SetColor(GUINotifications.kTooltipBackgroundColor)
-    self.tooltipText:SetColor(kAlienTeamColorFloat)
-    self.scoreDisplay:SetColor(GUINotifications.kScoreDisplayTextColor)
-    self.tooltipBackground:SetAnchor(GUIItem.Left, GUIItem.Bottom)
-    self.toolTipIcon:SetIsVisible(false)
-*/
     
 end
 
@@ -155,7 +146,7 @@ function GUINotifications:InitializeTooltip()
     self.tooltipBackground:SetAnchor(GUIItem.Left, GUIItem.Bottom)
     self.tooltipBackground:SetSize(Vector(0, GUINotifications.kTooltipBackgroundHeight, 0))
     self.tooltipBackground:SetPosition(Vector(GUINotifications.kTooltipXOffset, GUINotifications.kTooltipYOffset, 0))
-    self.tooltipBackground:SetColor(GUINotifications.kTooltipBackgroundColor)
+    self.tooltipBackground:SetColor( GUINotifications.kTooltipBackgroundColor )
     self.tooltipBackground:SetIsVisible(false)
     
     self.tooltipText = self:CreateAnimatedTextItem()
@@ -165,7 +156,7 @@ function GUINotifications:InitializeTooltip()
     self.tooltipText:SetPosition(Vector(GUINotifications.kTooltipBackgroundWidthBuffer, 0, 0))
     self.tooltipText:SetTextAlignmentX(GUIItem.Align_Min)
     self.tooltipText:SetTextAlignmentY(GUIItem.Align_Center)
-    self.tooltipText:SetColor(GUINotifications.kTooltipTextColor)
+    self.tooltipText:SetColor( GUINotifications.kTooltipTextColor )
     self.tooltipText:SetText(PlayerUI_GetLocationName())
     
     self.toolTipIcon = self:CreateAnimatedGraphicItem()
@@ -197,7 +188,7 @@ function GUINotifications:InitializeScoreDisplay()
     self.scoreDisplay:SetPosition(Vector(0, GUINotifications.kScoreDisplayYOffset, 0))
     self.scoreDisplay:SetTextAlignmentX(GUIItem.Align_Center)
     self.scoreDisplay:SetTextAlignmentY(GUIItem.Align_Center)
-    self.scoreDisplay:SetColor(GUINotifications.kScoreDisplayTextColor)
+    self.scoreDisplay:SetColor( GUINotifications.kScoreDisplayTextColor )
     self.scoreDisplay:SetIsVisible(false)
     
     self.scoreDisplayPopupTime = 0
@@ -280,11 +271,29 @@ local function UpdateScoreDisplay(self, deltaTime)
     
 end
 
+
+function GUINotifications:UpdateTeamColors()
+
+	local playerTeam = PlayerUI_GetTeamNumber()
+	local ui_iconColor = ConditionalValue(
+		playerTeam == kTeam1Index,
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
+	)
+	
+	self.toolTipIcon:SetFloatParameter( "teamBaseColorR", ui_iconColor.r )
+	self.toolTipIcon:SetFloatParameter( "teamBaseColorG", ui_iconColor.g )
+	self.toolTipIcon:SetFloatParameter( "teamBaseColorB", ui_iconColor.b )
+
+end
+
 function GUINotifications:Update(deltaTime)
 
     PROFILE("GUINotifications:Update")
     
     GUIAnimatedScript.Update(self, deltaTime)
+    
+    self:UpdateTeamColors()
     
     // The commander has their own location text.
     if PlayerUI_IsACommander() or PlayerUI_IsOnMarineTeam() then

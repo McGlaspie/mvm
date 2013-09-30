@@ -6,6 +6,11 @@ Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
 
 
+if Client then
+    Script.Load("lua/mvm/TeamMessageMixin.lua")
+end
+
+
 //Is below even needed now?
 Script.Load("lua/Alien_Upgrade.lua")		//FIXME Refactor out the required functions into separate files
 
@@ -40,22 +45,43 @@ AddMixinNetworkVars(DetectableMixin, newNetworkVars)
 //-----------------------------------------------------------------------------
 
 
-local oldMarineCreate = Marine.OnCreate
-function Marine:OnCreate()
+function Marine:OnCreate()	//OVERRIDE
 
-	oldMarineCreate(self)
-	
-	InitMixin(self, FireMixin)
-	InitMixin(self, DetectableMixin)
-	
-	if Client then
-		
-		//InitMixin(self, ColoredSkinsMixin)
-		
-		if self.flashlight ~= nil then
-		//have to do this to "clean", otherwise will probably leave unused resources
-            Client.DestroyRenderLight(self.flashlight)
-        end
+    InitMixin(self, BaseMoveMixin, { kGravity = Player.kGravity })
+    InitMixin(self, GroundMoveMixin)
+    InitMixin(self, JumpMoveMixin)
+    InitMixin(self, CrouchMoveMixin)
+    InitMixin(self, LadderMoveMixin)
+    InitMixin(self, CameraHolderMixin, { kFov = kDefaultFov })
+    InitMixin(self, MarineActionFinderMixin)
+    InitMixin(self, ScoringMixin, { kMaxScore = kMaxScore })
+    InitMixin(self, VortexAbleMixin)
+    InitMixin(self, CombatMixin)
+    InitMixin(self, SelectableMixin)
+    
+    Player.OnCreate(self)
+    
+    InitMixin(self, DissolveMixin)
+    InitMixin(self, LOSMixin)
+    InitMixin(self, ParasiteMixin)
+    InitMixin(self, RagdollMixin)
+    InitMixin(self, WebableMixin)
+    InitMixin(self, CorrodeMixin)
+    InitMixin(self, TunnelUserMixin)
+    InitMixin(self, PhaseGateUserMixin)
+    InitMixin(self, PredictedProjectileShooterMixin)
+    InitMixin(self, MarineVariantMixin)
+    
+    if Server then
+    
+        self.timePoisoned = 0
+        self.poisoned = false
+        
+        // stores welder / builder progress
+        self.unitStatusPercentage = 0
+        self.timeLastUnitPercentageUpdate = 0
+        
+    elseif Client then
 	
         self.flashlight = Client.CreateRenderLight()
         
@@ -66,12 +92,18 @@ function Marine:OnCreate()
         self.flashlight:SetIntensity( 10 )
         self.flashlight:SetRadius( 16 ) 	//15
         self.flashlight:SetGoboTexture("models/marine/male/flashlight.dds")
+        self.flashlight:SetIsVisible(false)
         
-        self.flashlight:SetIsVisible(false)		
+        InitMixin(self, TeamMessageMixin, { kGUIScriptName = "mvm/Hud/Marine/GUIMarineTeamMessage" })
+
+        InitMixin(self, DisorientableMixin)
+        
+        //InitMixin(self, ColoredSkinsMixin)
         
     end
-	
+
 end
+
 
 function Marine:OnInitialized()	//OVERRIDE
 

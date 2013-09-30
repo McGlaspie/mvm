@@ -45,6 +45,8 @@ Script.Load("lua/mvm/NS2Gamerules.lua")
 
 Script.Load("lua/mvm/Player.lua")
 
+Script.Load("lua/mvm/MarineSpectator.lua")
+
 Script.Load("lua/mvm/MarineCommander.lua")
 
 Script.Load("lua/mvm/MAC.lua")

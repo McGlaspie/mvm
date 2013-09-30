@@ -76,6 +76,9 @@
     <filename>mvm\GUIChat.lua</filename>
   </file>
   <file>
+    <filename>mvm\GUIColorGlobals.lua</filename>
+  </file>
+  <file>
     <filename>mvm\GUICommanderAlerts.lua</filename>
   </file>
   <file>
@@ -92,6 +95,9 @@
   </file>
   <file>
     <filename>mvm\GUIDeathMessages.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\GUIDistressBeacon.lua</filename>
   </file>
   <file>
     <filename>mvm\Hud\GUIEvent.lua</filename>
@@ -115,6 +121,9 @@
     <filename>mvm\GUIGameEnd.lua</filename>
   </file>
   <file>
+    <filename>mvm\Hud\GUIGrenadelauncherDisplay.lua</filename>
+  </file>
+  <file>
     <filename>mvm\Hud\GUIHotkeyIcons.lua</filename>
   </file>
   <file>
@@ -131,6 +140,12 @@
   </file>
   <file>
     <filename>mvm\Hud\Marine\GUIMarineStatus.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\Marine\GUIMarineTeamMessage.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\GUIMineDisplay.lua</filename>
   </file>
   <file>
     <filename>mvm\GUIMinimap.lua</filename>
@@ -169,7 +184,7 @@
     <filename>mvm\Hud\GUISelectionPanel.lua</filename>
   </file>
   <file>
-    <filename>mvm\GUISensorBlips.lua</filename>
+    <filename>mvm\Hud\GUISensorBlips.lua</filename>
   </file>
   <file>
     <filename>mvm\Hud\GUIShotgunDisplay.lua</filename>
@@ -194,6 +209,9 @@
   </file>
   <file>
     <filename>mvm\Weapons\Marine\Grenade.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Weapons\Marine\GrenadeLauncher.lua</filename>
   </file>
   <file>
     <filename>mvm\InfantryPortal.lua</filename>
@@ -274,6 +292,9 @@
     <filename>mvm\Player.lua</filename>
   </file>
   <file>
+    <filename>mvm\PowerConsumerMixin.lua</filename>
+  </file>
+  <file>
     <filename>mvm\PowerPoint.lua</filename>
   </file>
   <file>
@@ -314,6 +335,9 @@
   </file>
   <file>
     <filename>mvm\TeamMixin.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Weapons\Weapon.lua</filename>
   </file>
   <file>
     <filename>mvm\WeldableMixin.lua</filename>

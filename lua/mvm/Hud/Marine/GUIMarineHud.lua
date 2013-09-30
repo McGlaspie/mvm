@@ -202,7 +202,6 @@ function GUIMarineHUD:Initialize()
     self.nanoshieldBackground:SetPosition( Vector(0, 0, 0) ) 
     self.nanoshieldBackground:SetIsVisible(true)
     self.nanoshieldBackground:SetColor( Color(0.3, 0.3, 1, 0.0) )
-    self.nanoshieldBackground:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.nanoshieldBackground:SetLayer(kGUILayerPlayerHUDBackground)
     
     self.nanoshieldText = GetGUIManager():CreateTextItem()
@@ -618,8 +617,9 @@ end
 //FIXME This is SO fucking ugly it's not even remotely close to funny...
 function GUIMarineHUD:UpdateHudColors()
 
+	local playerTeam = PlayerUI_GetTeamNumber()
 	local ui_baseColor = ConditionalValue(
-		PlayerUI_GetTeamNumber() == kTeam1Index,
+		playerTeam == kTeam1Index,
 		kTeam1_BaseColor,
 		kTeam2_BaseColor
 	)
@@ -672,9 +672,7 @@ function GUIMarineHUD:UpdateHudColors()
     self.weaponLevel:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
     self.weaponLevel:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
     
-    self.nanoshieldBackground:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
-    self.nanoshieldBackground:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
-    self.nanoshieldBackground:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+    self.nanoshieldText:SetColor( kNameTagFontColors[playerTeam] )
 
 end
 
@@ -932,14 +930,23 @@ function GUIMarineHUD:OnAnimationCompleted(animatedItem, animationName, itemHand
                     end)
             
             end)
-            
+//FIXME Move to colors global file
     elseif animationName == "NANO_SHIELD_IN" then
-    
-        self.nanoshieldBackground:SetColor(Color(0.3, 0.3, 1, 0.1), 0.3, "NANO_SHIELD_OUT")
-    
+		
+		local ui_nanoColor = ConditionalValue(
+			PlayerUI_GetTeamNumber() == kTeam1Index,
+			Color(0.3, 0.3, 1, 0.1),
+			Color(1, 0.85, 0.3, 0.1)
+		)
+        self.nanoshieldBackground:SetColor( ui_nanoColor , 0.3, "NANO_SHIELD_OUT")
+		
     elseif animationName == "NANO_SHIELD_OUT" then
-
-        self.nanoshieldBackground:SetColor(Color(0.3, 0.3, 1, 0.2), 0.3, "NANO_SHIELD_IN")
+		local ui_nanoColor = ConditionalValue(
+			PlayerUI_GetTeamNumber() == kTeam1Index,
+			Color(0.3, 0.3, 1, 0.2),
+			Color(1, 0.85, 0.3, 0.2)
+		)
+        self.nanoshieldBackground:SetColor( ui_nanoColor , 0.3, "NANO_SHIELD_IN")
     
     end
 

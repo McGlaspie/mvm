@@ -61,8 +61,8 @@ kShowAsClass["Marine"] = {
 	["mvm/Hud/Marine/GUIMarineHUD"] = true, 
 	GUIPoisonedFeedback = false, 
 	GUIPickups = true,
-	["mvm/GUISensorBlips"] = true, 
-	GUIObjectiveDisplay = true, 
+	["mvm/Hud/GUISensorBlips"] = true, 
+	["mvm/Hud/GUIObjectiveDisplay"] = true, 
 	["mvm/Hud/GUIProgressBar"] = true, 
 	GUIRequestMenu = true,
 	["mvm/GUIWaypoints"] = true 
@@ -89,8 +89,8 @@ kShowAsClass["Commander"] = {
 }
 kShowAsClass["MarineCommander"] = { 
 	GUICommanderTutorial = true, 
-	GUISensorBlips = true, 
-	GUIDistressBeacon = true 
+	["mvm/Hud/GUISensorBlips"] = true, 
+	["mvm/Hud/GUIDistressBeacon"] = true 
 }
 
 /*

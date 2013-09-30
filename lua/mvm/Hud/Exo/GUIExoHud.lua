@@ -6,6 +6,9 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
+Script.Load("lua/mvm/GUIColorGlobals.lua")
+
+
 local kSheet1 = PrecacheAsset("ui/exosuit_HUD1.dds")
 local kSheet2 = PrecacheAsset("ui/exosuit_HUD2.dds")
 local kSheet3 = PrecacheAsset("ui/exosuit_HUD3.dds")

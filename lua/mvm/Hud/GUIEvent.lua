@@ -10,6 +10,7 @@
 
 Script.Load("lua/Hud/GUINotificationItem.lua")
 Script.Load("lua/Utility.lua")
+Script.Load("lua/mvm/GUIColorGlobals.lua")
 
 class 'GUIEvent'
 
@@ -26,7 +27,6 @@ function CreateEventDisplay(scriptHandle, hudLayer, frame, useMarineStyle)
 end
 
 GUIEvent.kUnlockTexture = PrecacheAsset("ui/marine_HUD_unlocked.dds")
-GUIEvent.kAlienUnlockTexture = PrecacheAsset("ui/alien_HUD_unlocked.dds")
 
 GUIEvent.kUnlockFontSize = 16
 GUIEvent.kUnlockBottomTextColor = Color(246/255, 254/255, 37/255 )
@@ -159,26 +159,25 @@ function GUIEvent:Initialize()
     self.notificationAlign:SetLayer(1)
     self.notificationFrame:AddChild(self.notificationAlign)
     
-    local texture = ConditionalValue(self.useMarineStyle, GUIEvent.kTexture, GUIEvent.kAlienTexture)
-    
     self.borderTop = self.script:CreateAnimatedGraphicItem()
-    self.borderTop:SetTexture(texture)
+    self.borderTop:SetTexture( GUIEvent.kTexture )
+    self.borderTop:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.borderTop:SetBlendTechnique(GUIItem.Add)
-    self.borderTop:SetColor(Color(1,1,1,0))
+    self.borderTop:SetColor( Color(1,1,1,0) )
     self.borderTop:AddAsChildTo(self.notificationFrame)
     
-    local middleTexture = ConditionalValue(self.useMarineStyle, GUIEvent.kTextureMiddleBorder, GUIEvent.kAlienTextureMiddleBorder)
-    
     self.middleBorder = self.script:CreateAnimatedGraphicItem()
-    self.middleBorder:SetTexture(middleTexture)
+    self.middleBorder:SetTexture( GUIEvent.kTextureMiddleBorder )
+    self.middleBorder:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.middleBorder:SetTexturePixelCoordinates(unpack(GUIEvent.kMiddleTextureCoords))
     self.middleBorder:SetBlendTechnique(GUIItem.Add)
     self.middleBorder:AddAsChildTo(self.notificationFrame)
     
     self.middleBackground = self.script:CreateAnimatedGraphicItem()
-    self.middleBackground:SetTexture(middleTexture)
+    self.middleBackground:SetTexture( GUIEvent.kTextureMiddleBorder )
+    self.middleBackground:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.middleBackground:SetTexturePixelCoordinates(unpack(GUIEvent.kMiddleTextureCoords))
-    self.middleBackground:SetColor(Color(1,1,1,GUIEvent.kBackgroundAlpha))
+    self.middleBackground:SetColor( Color(1,1,1,GUIEvent.kBackgroundAlpha) )
     self.middleBackground:AddAsChildTo(self.notificationFrame)
     
     self.unlockFrame = self.script:CreateAnimatedGraphicItem()
@@ -186,17 +185,18 @@ function GUIEvent:Initialize()
     self.unlockFrame:SetColor(Color(0,0,0,0))
     self.frame:AddChild(self.unlockFrame)
     
-    local unlockTexture = ConditionalValue(self.useMarineStyle, GUIEvent.kUnlockTexture, GUIEvent.kAlienUnlockTexture)
-    local color = Color(ConditionalValue(self.useMarineStyle, kMarineFontColor, kAlienFontColor)) 
+    local color = Color( ConditionalValue( PlayerUI_GetTeamNumber() == kTeam1Index , kMarineFontColor, kAlienFontColor )) 
     
     self.unlockBackground = self.script:CreateAnimatedGraphicItem()
-    self.unlockBackground:SetTexture(unlockTexture)
+    self.unlockBackground:SetTexture( GUIEvent.kUnlockTexture )
+    self.unlockBackground:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.unlockBackground:SetColor(Color(1,1,1,0))
     self.unlockBackground:SetLayer(self.hudLayer)
     self.unlockBackground:AddAsChildTo(self.unlockFrame)
     
     self.unlockIcon = self.script:CreateAnimatedGraphicItem()
     self.unlockIcon:SetTexture(kIconTexture)
+    self.unlockIcon:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.unlockIcon:SetLayer(self.hudLayer + 1)
     self.unlockIcon:SetColor(color)
     self.unlockIcon:SetAnchor(GUIItem.Middle, GUIItem.Center)
@@ -317,9 +317,41 @@ function GUIEvent:SetFrameHeight(height, animDuration)
 
 end
 
+function GUIEvent:UpdateTeamColors()
+	
+	local playerTeam = PlayerUI_GetTeamNumber()
+	local ui_borderColor = ConditionalValue(
+		playerTeam == kTeam1Index,
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
+	)
+	
+	local ui_iconColor = kGUI_HealthBarColors[playerTeam]
+	
+	self.borderTop:SetFloatParameter( "teamBaseColorR", ui_borderColor.r )
+	self.borderTop:SetFloatParameter( "teamBaseColorG", ui_borderColor.g )
+	self.borderTop:SetFloatParameter( "teamBaseColorB", ui_borderColor.b )
+	self.middleBorder:SetFloatParameter( "teamBaseColorR", ui_borderColor.r )
+	self.middleBorder:SetFloatParameter( "teamBaseColorG", ui_borderColor.g )
+	self.middleBorder:SetFloatParameter( "teamBaseColorB", ui_borderColor.b )
+	self.middleBackground:SetFloatParameter( "teamBaseColorR", ui_borderColor.r )
+	self.middleBackground:SetFloatParameter( "teamBaseColorG", ui_borderColor.g )
+	self.middleBackground:SetFloatParameter( "teamBaseColorB", ui_borderColor.b )
+	
+	self.unlockIcon:SetFloatParameter( "teamBaseColorR", ui_iconColor.r )
+	self.unlockIcon:SetFloatParameter( "teamBaseColorG", ui_iconColor.g )
+	self.unlockIcon:SetFloatParameter( "teamBaseColorB", ui_iconColor.b )
+	self.unlockBackground:SetFloatParameter( "teamBaseColorR", ui_borderColor.r )
+	self.unlockBackground:SetFloatParameter( "teamBaseColorG", ui_borderColor.g )
+	self.unlockBackground:SetFloatParameter( "teamBaseColorB", ui_borderColor.b )
+
+end
+
 function GUIEvent:Update(deltaTime, parameters)
 
     local notification, newPurchaseable, playSound = parameters[1], parameters[2], parameters[3]
+    
+    self:UpdateTeamColors()
     
     local shiftDown = false
     local remainingNotifications = {}

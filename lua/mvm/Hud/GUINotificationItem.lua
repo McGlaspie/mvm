@@ -16,7 +16,7 @@ GUINotificationItem.kNotificationIconsTexture = "ui/buildmenu.dds"
 GUINotificationItem.kAlienNotificationIconsTexture = "ui/buildmenu.dds"
 
 GUINotificationItem.kMarineNotificationTexture = PrecacheAsset("ui/marine_HUD_notification.dds")
-GUINotificationItem.kAlienNotificationTexture = PrecacheAsset("ui/alien_HUD_notification.dds")
+//GUINotificationItem.kAlienNotificationTexture = PrecacheAsset("ui/alien_HUD_notification.dds")
 
 GUINotificationItem.kNotificationBorderCoords = { 0, 2, 263, 50 }
 GUINotificationItem.kNotificationBgCoords = { 0, 50, 263, 98 }
@@ -37,7 +37,7 @@ GUINotificationItem.kFontName = "fonts/AgencyFB_small.fnt"
 
 // utility functions:
 function CreateNotificationItem(scriptHandle, locationName, techId, scale, parent, useMarineStyle)
-
+	
     local notification = GUINotificationItem()
     notification.scale = scale
     notification.parent = parent
@@ -65,8 +65,8 @@ function GUINotificationItem:Initialize()
     self.background = self.script:CreateAnimatedGraphicItem()
     self.background:SetUniformScale(self.scale)
     self.background:SetSize(GUINotificationItem.kNotificationSize)    
-    local texture = ConditionalValue(self.useMarineStyle, GUINotificationItem.kMarineNotificationTexture, GUINotificationItem.kAlienNotificationTexture)
-    self.background:SetTexture(texture)    
+    self.background:SetTexture( GUINotificationItem.kMarineNotificationTexture )
+    self.background:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.background:SetTexturePixelCoordinates(unpack(GUINotificationItem.kNotificationBgCoords))
     self.background:SetColor(Color(1, 1, 1, GUINotificationItem.kIconAlpha))
     self.background:SetIsVisible(false)
@@ -87,8 +87,8 @@ function GUINotificationItem:Initialize()
     self.border = self.script:CreateAnimatedGraphicItem()
     self.border:SetUniformScale(self.scale)
     self.border:SetSize(GUINotificationItem.kNotificationSize)    
-    texture = ConditionalValue(self.useMarineStyle, GUINotificationItem.kMarineNotificationTexture, GUINotificationItem.kAlienNotificationTexture)
-    self.border:SetTexture(texture)    
+    self.border:SetTexture( GUINotificationItem.kMarineNotificationTexture )
+    self.border:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.border:SetTexturePixelCoordinates(unpack(GUINotificationItem.kNotificationBorderCoords))
     self.border:AddAsChildTo(self.background)
     
@@ -97,8 +97,8 @@ function GUINotificationItem:Initialize()
     self.icon:SetSize(GUINotificationItem.kIconSize)
     self.icon:SetAnchor(GUIItem.Left, GUIItem.Center)
     self.icon:SetPosition( Vector(40, -(GUINotificationItem.kIconSize.y/2), 0) )
-    texture = ConditionalValue(self.useMarineStyle, GUINotificationItem.kNotificationIconsTexture, GUINotificationItem.kAlienNotificationIconsTexture)
-    self.icon:SetTexture(texture)
+    self.icon:SetTexture( GUINotificationItem.kNotificationIconsTexture )
+    self.icon:SetShader("shaders/GUI_TeamThemed.surface_shaders")
     self.icon:SetTexturePixelCoordinates(unpack(GetTextureCoordinatesForIcon(self.techId, self.useMarineStyle)))
     self.icon:AddAsChildTo(self.background)
     

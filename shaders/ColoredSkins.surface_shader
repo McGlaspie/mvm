@@ -11,7 +11,10 @@
 		
 		<input name="hiddenAmount" type="float">0.0</input>
 		
+		
 		<input name="colorizeModel" type="float">1.0</input>
+		<input name="poweredBool" type="float">1.0</input>
+		
 		<input name="modelColorMap" type="texture" address="wrap" />
 		
 		<input name="modelColorBaseR" type="float">0.0</input>
@@ -166,35 +169,29 @@
 			
 			if( modelColorMapTex.a > 0.0 ) {
 			//Apply gray-scale of teamColorMap to albedo to effect shapes/patterns before color is blended in
+			//Note: some detail of the original albedo texture is lost in the process
 				modBaseAlbedoTex = lerp( grayAlbedoMap.rgb, grayAlbedoMap.rgb + modelColorMapTex.rgb, modelColorMapTex.a);
 			}
-						
+			
 			float3 blackColor = float3(0,0,0);
+			float3 tmpColor = float3(0,0,0);
+			
+			//FIXME Below doesn't allow for pure black or white
 			// apply the blend mode math - Hue & Saturation
-			//tmpColor.rgb = BlendColor( modBaseAlbedoTex.rgb, tempModelColorBase.rgb );
-			
-			float3 tmpColor = float3(0.0, 0.0, 0.0);
-			
 			tmpColor += BlendColor( modBaseAlbedoTex.rgb, modelColorBase.rgb ) * modelColorMapTex.r;
+			
+			if( poweredBool == 0 ) {
+				modelColorAccent = blackColor;
+			}
+			
 			tmpColor += BlendColor( modBaseAlbedoTex.rgb, modelColorAccent.rgb ) * modelColorMapTex.g;
 			tmpColor += BlendColor( modBaseAlbedoTex.rgb, modelColorTrim.rgb ) * modelColorMapTex.b;
 			
-			if( colorizeModel == 1 ) {
+			if( colorizeModel == 1 && modelColorMapTex.a > 0.0 ) {
 				material.albedo = (1 - modelColorMapTex.a) * albedoTex.rgb + tmpColor.rgb * modelColorMapTex.a;
 			} else {
 				material.albedo = albedoTex;
 			}
-			
-			/*
-			// re-multiply the tempTeamColorBase alpha in to blendColor, weight tmpColor according to modelColorMapTex.a
-			//FIXME 
-			if( modelColorBase.r == 0 && modelColorBase.g == 0 && modelColorBase.b == 0 ) {
-			//FIXME The above is a seriously lazy/lame way to hack in support for black team colors
-				material.albedo = (1 - modelColorMapTex.a) * albedoTex.rgb - tmpColor.rgb * modelColorMapTex.a;
-			} else {
-				material.albedo = (1 - modelColorMapTex.a) * albedoTex.rgb + tmpColor.rgb * modelColorMapTex.a;
-			}
-			*/
 			
 			
 			// Blending

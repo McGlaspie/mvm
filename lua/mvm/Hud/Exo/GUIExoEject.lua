@@ -6,6 +6,8 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
+Script.Load("lua/mvm/GUIColorGlobals.lua")
+
 local kButtonPos = GUIScale(Vector(180, - 120, 0))
 local kTextOffset = GUIScale(Vector(0, 20, 0))
 
