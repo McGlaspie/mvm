@@ -5,7 +5,7 @@ Script.Load("lua/NanoshieldMixin.lua")
 if Client then
 	Shared.PrecacheSurfaceShader("cinematics/vfx_materials/nanoshield_team2.surface_shader")
 	Shared.PrecacheSurfaceShader("cinematics/vfx_materials/nanoshield_view_team2.surface_shader")
-	//Shared.PrecacheSurfaceShader("cinematics/vfx_materials/nanoshield_exoview.surface_shader")	TODO - Make team2 version
+	Shared.PrecacheSurfaceShader("cinematics/vfx_materials/nanoshield_exoview_team2.surface_shader")
 end
 
 
@@ -75,6 +75,22 @@ function NanoShieldMixin:ActivateNanoShield()
     
 end
 
+
+function NanoShieldMixin:GetIsNanoShielded()
+    return self.nanoShielded
+end
+
+function NanoShieldMixin:GetCanBeNanoShielded()
+
+    local resultTable = { shieldedAllowed = not self.nanoShielded }
+    
+    if self.GetCanBeNanoShieldedOverride then
+        self:GetCanBeNanoShieldedOverride(resultTable)
+    end
+    
+    return resultTable.shieldedAllowed
+    
+end
 
 local function UpdateClientNanoShieldEffects(self)
 
@@ -172,21 +188,21 @@ if Client then
             local material = Client.CreateRenderMaterial()
             local viewMaterial = Client.CreateRenderMaterial()
             
-            /*	Update for Exos
-            if self:isa("Exo") then
-                viewMaterial:SetMaterial("cinematics/vfx_materials/nanoshield_exoview.material")
-            else
-                viewMaterial:SetMaterial("cinematics/vfx_materials/nanoshield_view.material")
-            end
-            */
-            
-            //TODO Try using material param
+            //TODO Change to use material param (reduce to single shader)
             if self:GetTeamNumber() == kTeam2Index then
+				if self:isa("Exo") then
+					viewMaterial:SetMaterial("cinematics/vfx_materials/nanoshield_exoview_team2.material")
+				else
+					viewMaterial:SetMaterial("cinematics/vfx_materials/nanoshield_view_team2.material")
+				end
 				material:SetMaterial("cinematics/vfx_materials/nanoshield_team2.material")
-				viewMaterial:SetMaterial("cinematics/vfx_materials/nanoshield_view_team2.material")
 			else
+				if self:isa("Exo") then
+					viewMaterial:SetMaterial("cinematics/vfx_materials/nanoshield_exoview.material")
+				else
+					viewMaterial:SetMaterial("cinematics/vfx_materials/nanoshield_view.material")
+				end
 				material:SetMaterial("cinematics/vfx_materials/nanoshield.material")
-				viewMaterial:SetMaterial("cinematics/vfx_materials/nanoshield_view.material")
 			end
             
             self.nanoShieldEntities = {}

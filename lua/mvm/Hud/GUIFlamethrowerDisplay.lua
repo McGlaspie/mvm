@@ -23,13 +23,13 @@ bulletDisplay  = nil
 //GUIFlamethrowerDisplay.kClipDisplay = { 0, 198, 20, 103 }
 local kBgTexCoords = { 0, 0, 128, 256 }
 local kBarTexCoords = { 148, 34, 233, 238 }
-local kClipHeight = 200
+local kClipHeight = 320
 
 class 'GUIFlamethrowerDisplay' (GUIScript)
 
 function GUIFlamethrowerDisplay:Initialize()
 
-    self.weaponClip     = 0
+    self.weaponClip = 0
     self.maxClip = 50
     self.teamNumber = 0
     
@@ -45,7 +45,7 @@ function GUIFlamethrowerDisplay:Initialize()
     
     self.clipDisplay = GUIManager:CreateGraphicItem()
     self.clipDisplay:SetAnchor(GUIItem.Top, GUIItem.Left)
-    self.clipDisplay:SetSize(Vector(85, -kClipHeight, 0))
+    self.clipDisplay:SetSize( Vector(85, -kClipHeight, 0) )
     self.clipDisplay:SetPosition(Vector(20, 230, 0) )
     self.clipDisplay:SetTexture("ui/FlamethrowerDisplay.dds")
     self.clipDisplay:SetShader("shaders/GUI_TeamThemed.surface_shader")
@@ -88,13 +88,11 @@ function GUIFlamethrowerDisplay:Update(deltaTime)
 
     PROFILE("GUIFlamethrowerDisplay:Update")
     
-    self:UpdateTeamColors()
-    
     // Update the clip and ammo counter.
     local clipFraction = self.weaponClip / self.maxClip
-    local clipHeigth = kClipHeight * clipFraction * -1
+    local clipHeight = kClipHeight * clipFraction * -1
   
-    self.clipDisplay:SetSize( Vector(85, clipHeigth, 0) )
+    self.clipDisplay:SetSize( Vector(85, clipHeight, 0) )
     
     local y1 = (kBarTexCoords[2] - kBarTexCoords[4]) * clipFraction + kBarTexCoords[4]
     
@@ -121,6 +119,8 @@ function GUIFlamethrowerDisplay:Update(deltaTime)
         end
     
     end
+    
+    self:UpdateTeamColors()
     
 end
 

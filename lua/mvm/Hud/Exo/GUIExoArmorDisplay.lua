@@ -8,10 +8,12 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
+Script.Load("lua/Utility.lua")
 Script.Load("lua/mvm/GUIColorGlobals.lua")
 
 // Global state that can be externally set to adjust the display.
 armorAmount = 0
+teamNumber = 0
 
 local background = nil
 local text = nil
@@ -22,13 +24,23 @@ local kTexture = "models/marine/exosuit/exosuit_view_panel_armor.dds"
 
 function Update(dt)
 
-    local useColor = kNormalColor
+    //local useColor = kNormalColor
+    local useColor = kGUI_NameTagFontColors[ teamNumber ]
+    
     if armorAmount < 100 then
         useColor = kNearDeathColor
     end
-    text:SetColor(useColor)
     
+    text:SetColor(useColor)
     text:SetText(tostring(armorAmount))
+    
+    background:SetColor(
+		ConditionalValue(
+			teamNumber == kGUI_Team1Index,
+			kGUI_Team1_BaseColor,
+			kGUI_Team2_BaseColor
+		)
+    )
     
 end
 
@@ -41,6 +53,13 @@ function Initialize()
     background:SetPosition(Vector(0, 0, 0))
     background:SetTexturePixelCoordinates(0, 0, 256, 256)
     background:SetTexture(kTexture)
+    background:SetColor(
+		ConditionalValue(
+			teamNumber == kGUI_Team1Index,
+			kGUI_Team1_BaseColor,
+			kGUI_Team2_BaseColor
+		)
+    )
     background:SetBlendTechnique(GUIItem.Add)
     
     text = GUI.CreateItem()

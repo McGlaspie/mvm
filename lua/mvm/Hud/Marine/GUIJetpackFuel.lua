@@ -8,6 +8,8 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
+Script.Load("lua/mvm/GuIColorGlobals.lua")
+
 class 'GUIJetpackFuel' (GUIScript)
 
 GUIJetpackFuel.kJetpackFuelTexture = "ui/marine_jetpackfuel.dds"

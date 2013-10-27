@@ -10,6 +10,8 @@
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 Script.Load("lua/GUIScript.lua")
+Script.Load("lua/mvm/GUIColorGlobals.lua")
+
 
 class 'GUICommanderTooltip' (GUIScript)
 
@@ -110,6 +112,7 @@ function GUICommanderTooltip:Initialize()
     self.resourceIcon:SetAnchor(GUIItem.Right, GUIItem.Top)
     self.resourceIcon:SetPosition(Vector(-GUICommanderTooltip.kResourceIconSize + GUICommanderTooltip.kResourceIconXOffset, GUICommanderTooltip.kResourceIconYOffset, 0))
     self.resourceIcon:SetTexture(self.textureName)
+    self.resourceIcon:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.resourceIcon:SetIsVisible(false)
     self.background:AddChild(self.resourceIcon)
     
@@ -129,6 +132,7 @@ function GUICommanderTooltip:Initialize()
     self.supplyIcon:SetAnchor(GUIItem.Right, GUIItem.Top)
     self.supplyIcon:SetPosition(Vector(-GUICommanderTooltip.kResourceIconSize * 3 + GUICommanderTooltip.kResourceIconXOffset, GUICommanderTooltip.kResourceIconYOffset, 0))
     self.supplyIcon:SetTexture(self.textureName)
+    self.supplyIcon:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.supplyIcon:SetTexturePixelCoordinates(unpack(GUICommanderTooltip.WorkerIconCoords))
     self.supplyIcon:SetIsVisible(false)
     self.background:AddChild(self.supplyIcon)
@@ -212,6 +216,7 @@ function GUICommanderTooltip:InitializeBackground()
     self.backgroundTop:SetAnchor(GUIItem.Left, GUIItem.Top)
     self.backgroundTop:SetSize(Vector(self.tooltipWidth, self.tooltipHeight, 0))
     self.backgroundTop:SetTexture(self.textureName)
+    self.backgroundTop:SetShader("shaders/GUI_TeamThemed.surface_shader")
     GUISetTextureCoordinatesTable(self.backgroundTop, GUICommanderTooltip.kBackgroundTopCoords)
     
     self.background = self.backgroundTop
@@ -220,6 +225,7 @@ function GUICommanderTooltip:InitializeBackground()
     self.backgroundCenter:SetAnchor(GUIItem.Left, GUIItem.Bottom)
     self.backgroundCenter:SetSize(Vector(self.tooltipWidth, self.tooltipHeight, 0))
     self.backgroundCenter:SetTexture(self.textureName)
+    self.backgroundCenter:SetShader("shaders/GUI_TeamThemed.surface_shader")
     GUISetTextureCoordinatesTable(self.backgroundCenter, GUICommanderTooltip.kBackgroundCenterCoords)
     self.backgroundTop:AddChild(self.backgroundCenter)
     
@@ -227,6 +233,7 @@ function GUICommanderTooltip:InitializeBackground()
     self.backgroundBottom:SetAnchor(GUIItem.Left, GUIItem.Bottom)
     self.backgroundBottom:SetSize(Vector(self.tooltipWidth, GUICommanderTooltip.kBackgroundBottomHeight, 0))
     self.backgroundBottom:SetTexture(self.textureName)
+    self.backgroundBottom:SetShader("shaders/GUI_TeamThemed.surface_shader")
     GUISetTextureCoordinatesTable(self.backgroundBottom, GUICommanderTooltip.kBackgroundBottomCoords)
     self.backgroundCenter:AddChild(self.backgroundBottom)
 
@@ -361,6 +368,41 @@ function GUICommanderTooltip:Register(script)
     table.insertunique(self.registeredScripts, script)
 end
 
+
+function GUICommanderTooltip:UpdateTeamColors()
+
+	local playerTeam = PlayerUI_GetTeamNumber()
+	local ui_baseColor = ConditionalValue(
+		playerTeam == kTeam1Index,
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
+	)
+	
+	//TODO Change Icon colors to something more clean (too much washout)
+	
+	self.resourceIcon:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+	self.resourceIcon:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+	self.resourceIcon:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+	
+	self.supplyIcon:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+	self.supplyIcon:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+	self.supplyIcon:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+	
+	self.backgroundTop:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+	self.backgroundTop:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+	self.backgroundTop:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+	
+	self.backgroundCenter:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+	self.backgroundCenter:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+	self.backgroundCenter:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+	
+	self.backgroundBottom:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+	self.backgroundBottom:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+	self.backgroundBottom:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+
+end
+
+
 function GUICommanderTooltip:Update(deltaTime)
 
     local tooltipData = nil
@@ -373,13 +415,15 @@ function GUICommanderTooltip:Update(deltaTime)
     
     end
 	
+	self:UpdateTeamColors()	
+	
     if tooltipData then
     
         self:UpdateData(tooltipData.text, tooltipData.hotKey, tooltipData.costNumber, tooltipData.requires, tooltipData.enabled, tooltipData.info, tooltipData.resourceType, tooltipData.supply, tooltipData.biomass)
         self.background:SetIsVisible(true)
     
     else
-		if self.background then	//fucking HAX Yo!
+		if self.background ~= nil then	//fucking HAX Yo!
 			self.background:SetIsVisible(false)
         end
     end

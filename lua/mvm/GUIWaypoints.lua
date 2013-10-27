@@ -10,6 +10,7 @@
 
 Script.Load("lua/Marine_Order.lua")
 Script.Load("lua/GUIAnimatedScript.lua")
+Script.Load("lua/mvm/GuIColorGlobals.lua")
 
 class 'GUIWaypoints' (GUIAnimatedScript)
 

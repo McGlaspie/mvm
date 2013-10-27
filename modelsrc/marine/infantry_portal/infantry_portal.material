@@ -6,5 +6,7 @@ emissiveMap = "models/marine/infantry_portal/infantry_portal_illum.dds"
 specularMap = "models/marine/infantry_portal/infantry_portal_spec.dds"
 
 modelColorMap = "models/marine/infantry_portal/infantry_portal_colorMap.dds"
+numColumns = 1
+numRows = 1
 
 surface = "metal"

@@ -1,6 +1,6 @@
 
 
-Script.Load("lua/DetectableMixin.lua")
+Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
@@ -98,7 +98,7 @@ function Marine:OnCreate()	//OVERRIDE
 
         InitMixin(self, DisorientableMixin)
         
-        //InitMixin(self, ColoredSkinsMixin)
+        InitMixin(self, ColoredSkinsMixin)
         
     end
 
@@ -159,6 +159,9 @@ function Marine:OnInitialized()	//OVERRIDE
         self:AddHelpWidget("GUIMapHelp", 1)
         
 		self.notifications = { }
+		
+		self:InitializeSkin()	//Colorized skins system
+		
     end
     
     self.weaponDropTime = 0
@@ -189,6 +192,13 @@ end
 
 if Client then
 
+	function Marine:InitializeSkin()
+		self.skinBaseColor = self:GetBaseSkinColor()
+		self.skinAccentColor = self:GetAccentSkinColor()
+		self.skinTrimColor = self:GetTrimSkinColor()
+		self.skinAtlasIndex = self:GetTeamNumber() - 1
+	end
+	
 	function Marine:GetBaseSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
 	end
@@ -386,10 +396,12 @@ if Client then
 			self.flashlight:SetCoords(coords)
 			
 			// Only display atmospherics for third person players.
-			local density = 0.025	//TODO Move to BalanceMisc.lua?
+			local density = 0.0185
+			/*
 			if isLocal and not self:GetIsThirdPerson() then
-				density = 0
+				density = 0.025
 			end
+			*/
 			self.flashlight:SetAtmosphericDensity(density)
 			
 		end

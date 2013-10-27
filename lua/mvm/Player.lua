@@ -3,7 +3,7 @@ Script.Load("lua/PostLoadMod.lua")
 
 
 local newNetworkVars = {
-	//Add previousTeamNumber?	Yes...need this, must be propogated, etc
+	previousTeamNumber	= string.format("integer (%d to %d)", kTeamInvalid,kSpectatorIndex )
 }
 
 //-----------------------------------------------------------------------------
@@ -142,7 +142,7 @@ if Client then
 												  name = GetDisplayNameForTechId(objectiveInfoEnt:GetTechId()),
 												  health = math.ceil(healthFraction * 100) })
 					
-					return healthFraction, text, objectiveInfoEnt:GetTeamType(), objectiveInfoEnt:GetTeamNumber()
+					return healthFraction, text, objectiveInfoEnt:GetTeamNumber(), objectiveInfoEnt:GetTeamNumber()
 					
 				end
 				
@@ -500,17 +500,15 @@ end	//Client
 
 //-------------------------------------
 
-
+//Previous team member for RR skinning (on game ends)
+//????: Add game-end check also? If player explicity joins RR, then RR model should not skin
 if Server then
 
-/*
 	local oldPlayerCreate = Player.OnCreate
 	function Player:OnCreate()
 		
 		oldPlayerCreate(self)
-		
-		//Server-side only, not networkvar
-		//self.previousTeamNumber = 0	//Will need to update for all CopyX cases
+		self.previousTeamNumber = kTeamInvalid
 		
 	end
 	
@@ -518,18 +516,28 @@ if Server then
 	local oldReplacePlayer = Player.Replace
 	function Player:Replace(mapName, newTeamNumber, preserveWeapons, atOrigin, extraValues)
 		
-		oldReplacePlayer(self, mapName, newTeamNumber, preserveWeapons, atOrigin, extraValues)
-		///*
-		if self:GetTeamNumber() ~= newTeamNumber then
-			self.previousTeamNumber = self:GetTeamNumber()
-		else
-			self.previousTeamNumber = newTeamNumber
+		local team = self:GetTeam()
+		if team == nil then
+			return self
 		end
-		///
-	
-	end
-*/
-	
+		
+		local oldTeamNumber = team:GetTeamNumber()
+		local player = oldReplacePlayer(self, mapName, newTeamNumber, preserveWeapons, atOrigin, extraValues)
+		
+		if newTeamNumber == kTeamReadyRoom then	//wrap in game-state?
+		//Only time an update of previous means anything
+			player.previousTeamNumber = oldTeamNumber
+		else
+			player.previousTeamNumber = kTeamReadyRoom
+		end
+		
+		if newTeamNumber ~= nil then
+			Print("\t Player:Replace() - newTeamNumber=" .. newTeamNumber .. ", previousTeamNumber=".. player.previousTeamNumber)
+		end
+		
+		return player
+		
+	end	
 
 end
 

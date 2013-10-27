@@ -11,6 +11,9 @@
 
 Shared.PrecacheSurfaceShader("shaders/GUI_TeamThemed.surface_shader")
 
+Script.Load("lua/mvm/GUIColorGlobals.lua")
+
+
 class 'GUIPlayerResource'
 
 GUIPlayerResource.kPersonalResourceIcon = { Width = 0, Height = 0, X = 0, Y = 0 }
@@ -29,11 +32,7 @@ GUIPlayerResource.kRTCountSize = Vector(20, 40, 0)
 GUIPlayerResource.kPixelWidth = 16
 GUIPlayerResource.kPixelHeight = 32
 
-local kRTCountTextures = { 
-	//alien = PrecacheAsset("ui/alien_HUD_rtcount.dds"), 
-	alien = PrecacheAsset("ui/marine_HUD_rtcount.dds"),
-	marine = PrecacheAsset("ui/marine_HUD_rtcount.dds") 
-}
+local kRTCountTextures = PrecacheAsset("ui/marine_HUD_rtcount.dds")
 
 GUIPlayerResource.kRTCountYOffset = -16
 
@@ -53,19 +52,11 @@ GUIPlayerResource.kTextFontName = "fonts/AgencyFB_small.fnt"
 GUIPlayerResource.kTresTextFontName = "fonts/AgencyFB_small.fnt"
 GUIPlayerResource.kResGainedFontName = "fonts/AgencyFB_small.fnt"
 
-local kBackgroundTextures = { 
-	//alien = PrecacheAsset("ui/alien_HUD_presbg.dds"), 
-	alien = PrecacheAsset("ui/marine_HUD_presbg.dds"),
-	marine = PrecacheAsset("ui/marine_HUD_presbg.dds")
-}
+local kBackgroundTextures = PrecacheAsset("ui/marine_HUD_presbg.dds")
 
 GUIPlayerResource.kRTCountTextOffset = Vector(460, 90, 0)
 
-local kPresIcons = { 
-	//alien = PrecacheAsset("ui/alien_HUD_presicon.dds"), 
-	alien = PrecacheAsset("ui/marine_HUD_presicon.dds"),
-	marine = PrecacheAsset("ui/marine_HUD_presicon.dds") 
-}
+local kPresIcons = PrecacheAsset("ui/marine_HUD_presicon.dds")
 
 GUIPlayerResource.kBackgroundSize = Vector(280, 58, 0)
 GUIPlayerResource.kBackgroundPos = Vector(-320, -100, 0)
@@ -100,28 +91,28 @@ function GUIPlayerResource:Initialize(style)
     local playerTeam = PlayerUI_GetTeamNumber()
     local ui_baseColor = ConditionalValue(
 		playerTeam == kTeam1Index,
-		kTeam1_BaseColor,
-		kTeam2_BaseColor
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
 	)
     
     // Background.
     self.background = self.script:CreateAnimatedGraphicItem()
     self.background:SetAnchor(GUIItem.Right, GUIItem.Bottom)
-    self.background:SetTexture( kBackgroundTextures[style.textureSet] )
+    self.background:SetTexture( kBackgroundTextures )
     self.background:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.background:AddAsChildTo(self.frame)
     
     self.rtCount = GetGUIManager():CreateGraphicItem()
     self.rtCount:SetAnchor(GUIItem.Middle, GUIItem.Bottom)
     self.rtCount:SetLayer(self.hudLayer + 2)
-    self.rtCount:SetTexture( kRTCountTextures[style.textureSet] )
+    self.rtCount:SetTexture( kRTCountTextures )
     self.rtCount:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.background:AddChild(self.rtCount)
     
     // Personal display.
     self.personalIcon = self.script:CreateAnimatedGraphicItem()
     self.personalIcon:SetAnchor(GUIItem.Left, GUIItem.Top)
-    self.personalIcon:SetTexture( kPresIcons[style.textureSet] )
+    self.personalIcon:SetTexture( kPresIcons )
     self.personalIcon:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.personalIcon:SetFloatParameter( "teamBaseColorR", ui_baseColor.b )
 	self.personalIcon:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
@@ -249,8 +240,8 @@ function GUIPlayerResource:UpdateTeamColors()
 	local playerTeam = PlayerUI_GetTeamNumber()
 	local ui_baseColor = ConditionalValue(
 		playerTeam == kTeam1Index,
-		kTeam1_BaseColor,
-		kTeam2_BaseColor
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
 	)
 	
 	self.background:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )

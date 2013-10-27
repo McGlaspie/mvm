@@ -9,7 +9,8 @@
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 Script.Load("lua/Hud/Marine/GUIMarineHUDElement.lua")
-Script.Load("lua/Hud/Marine/GUIMarineHUDStyle.lua")
+Script.Load("lua/mvm/GUIMarineHUDStyle.lua")
+Script.Load("lua/mvm/GUIColorGlobals.lua")
 
 class 'GUIMarineStatus' (GUIMarineHUDElement)
 
@@ -159,7 +160,13 @@ function GUIMarineStatus:Initialize()
     self.scanLinesForeground:SetTexture(kScanLinesBigTexture)
     self.scanLinesForeground:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.scanLinesForeground:SetTexturePixelCoordinates(unpack(kScanLinesBigCoords))
-    self.scanLinesForeground:SetColor( kBrightColorTransparent )	//####
+    self.scanLinesForeground:SetColor( 
+		ConditionalValue(
+			self.teamNumber == kTeam1Index,
+			kBrightColorTeam1Transparent,
+			kBrightColorTeam2Transparent
+		)
+	)
     self.scanLinesForeground:SetIsVisible(true)
     self.scanLinesForeground:SetLayer(self.hudLayer + 2)
     self.scanLinesForeground:SetAnchor(GUIItem.Right, GUIItem.Top)
@@ -319,8 +326,8 @@ function GUIMarineStatus:UpdateHudTeamColors()
 	local playerTeam = PlayerUI_GetTeamNumber()
 	local ui_baseColor = ConditionalValue(
 		playerTeam == kTeam1Index,
-		kTeam1_BaseColor,
-		kTeam2_BaseColor
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
     )
     
     self.statusbackground:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )

@@ -19,7 +19,7 @@ if Server then
     Script.Load("lua/mvm/NS2ConsoleCommands_Server.lua")
 	
 	
-	function NS2Gamerules:BuildTeam(teamType)        
+	function NS2Gamerules:BuildTeam(teamType)
         return MarineTeam()
     end
     

@@ -19,16 +19,13 @@ local function MvM_UpdateLOS(self)
 
     local mask = bit.bor(kRelevantToTeam1Unit, kRelevantToTeam2Unit, kRelevantToReadyRoom)
     
-    if self.sighted then
-        mask = bit.bor(mask, kRelevantToTeam1Commander, kRelevantToTeam2Commander)
-	elseif self:isa("PowerPoint") then
-	//TEMP HACK: Needs to be handled differently once PP's have ownership (captured)
-		mask = bit.bor(mask, kRelevantToTeam1Commander, kRelevantToTeam2Commander)
-    elseif self:GetTeamNumber() == 1 then
-        mask = bit.bor(mask, kRelevantToTeam1Commander)
-    elseif self:GetTeamNumber() == 2 then
-        mask = bit.bor(mask, kRelevantToTeam2Commander)
-    end
+	if self.sighted then
+		mask = bit.bor(mask, kRelevantToTeam1Commander, kRelevantToTeam2Commander)		
+	elseif self:GetTeamNumber() == kTeam1Index then
+		mask = bit.bor(mask, kRelevantToTeam1Commander)
+	elseif self:GetTeamNumber() == kTeam2Index then
+		mask = bit.bor(mask, kRelevantToTeam2Commander)
+	end
     
     self:SetExcludeRelevancyMask(mask)
     self.visibleClient = self.sighted
@@ -64,7 +61,7 @@ if Server then
         end
         
         // We don't care to sight dead things.
-        local dead = HasMixin(entity, "Live") and not entity:GetIsAlive()
+        local dead = HasMixin(entity, "Live") and not entity:GetIsAlive() and not entity:isa("PowerPoint")
         if dead then
             return false
         end
@@ -131,11 +128,16 @@ if Server then
             local otherEntity = entities[e]
             
             if not otherEntity.sighted then
-            
+				
                 // Only check sight for enemy entities.
-                local areEnemies = otherEntity:GetTeamNumber() == GetEnemyTeamNumber(self:GetTeamNumber())
-                if areEnemies and GetCanSee(self, otherEntity) then
+                local areEnemies = otherEntity:GetTeamNumber() == GetEnemyTeamNumber( self:GetTeamNumber() )
+                
+                if otherEntity:isa("PowerPoint") and GetCanSee(self, otherEntity) then
+					otherEntity:SetIsSighted(true, self)
+					
+                elseif areEnemies and GetCanSee(self, otherEntity) then
                     otherEntity:SetIsSighted(true, self)
+                    
                 end
                 
             end
@@ -156,7 +158,7 @@ if Server then
         end
         
         local lastViewer = self:GetLastViewer()
-        
+        //and not ( lastViewer:isa("Commander") and self:isa("PowerPoint") )
         if not seen and lastViewer then
         
             // prevents flickering, ARCs for example would lose their target
@@ -173,8 +175,17 @@ if Server then
     
         self.updateLOS = true
         
-        for _, entity in ipairs(GetEntitiesWithMixinForTeamWithinRange("LOS", GetEnemyTeamNumber(self:GetTeamNumber()), self:GetOrigin(), kUnitMaxLOSDistance)) do
+        for _, entity in ipairs( 
+							GetEntitiesWithMixinForTeamWithinRange(
+								"LOS", 
+								GetEnemyTeamNumber(self:GetTeamNumber()), 
+								self:GetOrigin(), 
+								kUnitMaxLOSDistance
+							)
+						) do
+						
             entity.updateLOS = true
+            
         end
         
     end
@@ -185,6 +196,8 @@ if Server then
 	local function MvM_SharedUpdate(self, deltaTime)
 		
         PROFILE("LOS:MvM_SharedUpdate")
+        
+        //Print("MvM_SharedUpdate()")
         
         // Prevent entities from being sighted before the game starts.
         if not GetGamerules():GetGameStarted() then
@@ -213,8 +226,8 @@ if Server then
         if self.oldSighted ~= self.sighted then
         
             if self.sighted then
-            
-                UpdateLOS(self)
+				
+                MvM_UpdateLOS(self)
                 self.timeUpdateLOS = nil
                 
             else
@@ -234,6 +247,52 @@ if Server then
         
     end
 	
+	
+	function LOSMixin:OnUpdate(deltaTime)
+        MvM_SharedUpdate(self, deltaTime)
+    end
+    
+    function LOSMixin:OnProcessMove(input)
+        MvM_SharedUpdate(self, input.time)
+    end
+
+
+
+	function LOSMixin:SetIsSighted(sighted, viewer)
+    
+        PROFILE("LOSMixin:SetIsSighted")
+        
+        self.sighted = sighted
+        
+        if viewer then
+			
+            if not HasMixin(viewer, "LOS") and not viewer:isa("CommanderAbility") then	//hackish
+                error(string.format("%s: %s added as a viewer without having LOS mixin", ToString(self), ToString(viewer)))
+            end
+            
+            self.lastViewerId = viewer:GetId()
+            
+        end
+        
+    end
+    
+    
+    function LOSMixin:GetLastViewer()
+
+        if self.lastViewerId and self.lastViewerId ~= Entity.invalidId then
+        
+            local viewer = Shared.GetEntity(self.lastViewerId)
+            
+            if viewer and not HasMixin(viewer, "LOS") and not viewer:isa("CommanderAbility") then	//more hackies
+                error(string.format("%s: %s added as a viewer without having LOS mixin", ToString(self), ToString(viewer)))
+            end
+            
+            return viewer
+            
+        end
+        
+    end
+
 
 end	//Server
 
@@ -242,10 +301,15 @@ end	//Server
 
 
 if Server then
-
-	ReplaceLocals( LOSMixin.OnUpdate , { SharedUpdate = MvM_SharedUpdate } )
-	ReplaceLocals( LOSMixin.__initmixin , { UpdateLOS = MvM_UpdateLOS } )
+	
+	//WEIRD: Apparently using Lua upvalues prevent actual execution or it is handled differently
+	// uncomment below with print statement in MvM_SharedUpdate via upvalues, and print won't work...muh?
+	//ReplaceLocals( LOSMixin.OnUpdate , { SharedUpdate = MvM_SharedUpdate } )
+	//ReplaceLocals( LOSMixin.OnProcessMove , { SharedUpdate = MvM_SharedUpdate } )
 	ReplaceLocals( LOSMixin.OnTeamChange , { UpdateLOS = MvM_UpdateLOS } )
 	
 end
+
+ReplaceLocals( LOSMixin.__initmixin , { UpdateLOS = MvM_UpdateLOS } )
+
 

@@ -14,5 +14,6 @@ Script.Load("lua/Server.lua")
 Script.Load("lua/mvm_Shared.lua")
 Script.Load("lua/mvm/TargetCache.lua")
 
+Script.Load("lua/mvm/MarineTeam.lua")
 
 Script.Load("lua/PostLoadMod.lua")

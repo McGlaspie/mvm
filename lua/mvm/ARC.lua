@@ -5,7 +5,7 @@
 
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
-Script.Load("lua/DetectableMixin.lua")
+Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
 
 //-----------------------------------------------------------------------------
@@ -41,8 +41,9 @@ function ARC:OnInitialized()
 	orgArcInit(self)
 	
 	if Server then
-	
-		self.targetSelector = TargetSelector():Init(	//OVERRIDE
+	    self.targetSelector = nil
+	    
+		self.targetSelector = TargetSelector():Init(	//OVERRIDES?
 			self,
 			ARC.kFireRange,
 			false, 
@@ -76,6 +77,7 @@ if Client then
 		self.skinBaseColor = self:GetBaseSkinColor()
 		self.skinAccentColor = self:GetAccentSkinColor()
 		self.skinTrimColor = self:GetTrimSkinColor()
+		self.skinAtlasIndex = self:GetTeamNumber() - 1
 	end
 	
 	function ARC:GetBaseSkinColor()

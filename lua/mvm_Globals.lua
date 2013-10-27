@@ -64,6 +64,7 @@ kIconColors = {
 // This file is only here to separate these settings into its own file.
 // Typically for most mods, these settings would be placed in Global.lua
 //
+/*
 kTeam1_BaseColor = Color(0.078, 0.878, 0.984, 1)
 kTeam1_AccentColor = Color(0.756, 0.982, 1, 1)
 kTeam1_TrimColor = Color(0.725, 0.921, 0.949, 1)
@@ -71,7 +72,17 @@ kTeam1_TrimColor = Color(0.725, 0.921, 0.949, 1)
 kTeam2_BaseColor = Color(0.61, 0.43, 0.16, 1)
 kTeam2_AccentColor = Color(1.0, 0.0, 0.0, 1)
 kTeam2_TrimColor = Color(0.576, 0.194, 0.011, 1)
+*/
+kTeam1_BaseColor = Color(0.040, 0.058, 0.087, 1)
+kTeam1_AccentColor = Color(0.756, 0.982, 1, 1)
+kTeam1_TrimColor = Color(0.725, 0.921, 0.949, 1)
 
+kTeam2_BaseColor = Color(0.139, 0.073, 0.005, 1)
+kTeam2_AccentColor = Color(1.0, 0.0, 0.0, 1)
+kTeam2_TrimColor = Color(0.179, 0.141, 0.095, 1)
 
+kNeutral_BaseColor = Color( 0.5, 0.5, 0.5, 1 )
+kNeutral_AccentColor = Color( 1, 1, 1, 1 )
+kNeutral_TrimColor = Color( 0, 0, 0, 1 )
 //TODO Devise color [sets] for UI based shaders
 

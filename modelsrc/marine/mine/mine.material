@@ -6,6 +6,7 @@ emissiveMap = "models/marine/mine/mine_illum.dds"
 specularMap = "models/marine/mine/mine_spec.dds"
 
 modelColorMap = "models/marine/mine/mine_colorMap.dds"
-colorizeModel = 1
+numColumns = 1
+numRows = 1
 
 surface = "thin_metal"

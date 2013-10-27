@@ -10,6 +10,8 @@
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 Script.Load("lua/GUIScript.lua")
+Script.Load("lua/mvm/GUIColorGlobals.lua")
+
 
 class 'GUIProgressBar' (GUIScript)
 
@@ -27,10 +29,6 @@ GUIProgressBar.kTextYOffset = GUIScale(6) * kScale
 
 GUIProgressBar.kBarTexCoords = { 256, 0, 256 + 512, 64 }
 
-local kBackgroundNoiseTexture = PrecacheAsset("ui/alien_commander_bg_smoke.dds")
-local kSmokeyBackgroundSize = GUIScale(Vector(400, 200, 0)) * kScale
-local kSmokeyBackgroundPos = -kSmokeyBackgroundSize * .5 + GUIScale(Vector(0, -100, 0)) * kScale
-
 local kAlienColor = Color(1, 0.792, 0.227)
 local kMarineColor = Color(0.725, 0.921, 0.949, 1)
 
@@ -44,12 +42,7 @@ local kShinePos = Vector(-kShineSize.x * .5, -GUIScale(105), 0)
 
 local kWhiteColor = Color(1, 1, 1, 1)
 
-local kTextures =
-{
-    [kMarineTeamType] = PrecacheAsset("ui/progress_bar_marine.dds"),
-    [kAlienTeamType] = PrecacheAsset("ui/progress_bar_alien.dds")
-}
-
+local kTextures = PrecacheAsset("ui/progress_bar_marine.dds")
 local kProgressBarMarineMask = PrecacheAsset("ui/progress_bar_marine_mask.dds")
 
 local kUnitStatusNeutral = PrecacheAsset("ui/unitstatus_neutral.dds")
@@ -59,35 +52,34 @@ local kForegroundPixelCoords = { 0, 50, 230, 100 }
 
 kFadeOutDelay = 0
 
+
+
 function GUIProgressBar:Initialize()
 
     self.timeLastProgress = 0
     
     self.teamType = PlayerUI_GetTeamType()
+    self.teamNumber = PlayerUI_GetTeamNumber()
     
-    local texture = kTextures[self.teamType]
-    
-    if self.teamType == kAlienTeamType then
-        self:InitSmokeBg()
-    end
-
+    local texture = kTextures
+	
     self.progressBarBg = GUIManager:CreateGraphicItem()
     self.progressBarBg:SetSize(GUIProgressBar.kBgSize)
     self.progressBarBg:SetAnchor(GUIItem.Middle, GUIItem.Bottom)
     self.progressBarBg:SetPosition(GUIProgressBar.kBgPosition)
     self.progressBarBg:SetTexture(texture)
+    self.progressBarBg:SetShader("shaders/GUI_TeamThemed.surface_shader")    
     self.progressBarBg:SetTexturePixelCoordinates(unpack(kBackgroundPixelCoords))
     self.progressBarBg:SetLayer(kGUILayerPlayerHUD)
     self.progressBarBg:SetColor(Color(1,1,1,0))
     
-    if self.teamType == kMarineTeamType then
-        self:InitCircleMask()
-    end
+    self:InitCircleMask()
     
     self.progressBar = GUIManager:CreateGraphicItem()
     self.progressBar:SetSize(GUIProgressBar.kSize)
     self.progressBar:SetAnchor(GUIItem.Left, GUIItem.Top)
     self.progressBar:SetTexture(texture)
+    self.progressBar:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.progressBar:SetTexturePixelCoordinates(unpack(kForegroundPixelCoords))
     self.progressBar:SetInheritsParentAlpha(true)
     self.progressBarBg:AddChild(self.progressBar)
@@ -111,7 +103,7 @@ function GUIProgressBar:Initialize()
     self.objectiveText:SetInheritsParentAlpha(true)
     self.objectiveText:SetFontName(GUIProgressBar.kFontName)
     self.objectiveText:SetScale(GUIProgressBar.kFontScale)
-    self.objectiveText:SetColor(Color(1,1,1,1))
+    self.objectiveText:SetColor( Color(1,1,1,1) )
     self.progressBarBg:AddChild(self.objectiveText)
 
 end
@@ -121,39 +113,7 @@ function GUIProgressBar:Uninitialize()
     if self.progressBarBg then
         GUI.DestroyItem(self.progressBarBg)
         self.progressBarBg = nil
-    end    
-
-    if self.smokeyBackground then
-        GUI.DestroyItem(self.smokeyBackground)
-        self.smokeyBackground = nil
     end
-    
-end
-
-function GUIProgressBar:InitSmokeBg()
-
-    self.smokeyBackground = GUIManager:CreateGraphicItem()
-    self.smokeyBackground:SetAnchor(GUIItem.Middle, GUIItem.Bottom)
-    self.smokeyBackground:SetSize(kSmokeyBackgroundSize)
-    self.smokeyBackground:SetPosition(kSmokeyBackgroundPos)
-    self.smokeyBackground:SetShader("shaders/GUISmoke.surface_shader")
-    self.smokeyBackground:SetTexture("ui/alien_logout_smkmask.dds")
-    self.smokeyBackground:SetAdditionalTexture("noise", kBackgroundNoiseTexture)
-    self.smokeyBackground:SetFloatParameter("correctionX", 0.6)
-    self.smokeyBackground:SetFloatParameter("correctionY", 0.4)
-    self.smokeyBackground:SetLayer(kGUILayerPlayerHUDBackground)
-    
-    self.smokeyBackground:SetInheritsParentAlpha(true)
-    
-    self.shine = GUIManager:CreateGraphicItem()
-    self.shine:SetAnchor(GUIItem.Middle, GUIItem.Center)
-    self.shine:SetSize(kShineSize)
-    self.shine:SetPosition(kShinePos)
-    self.shine:SetTexture(kProgressBarAlienShine)
-    self.shine:SetInheritsParentAlpha(true)
-    self.shine:SetBlendTechnique(GUIItem.Add)
-    
-    self.smokeyBackground:AddChild(self.shine)
     
 end
 
@@ -162,7 +122,8 @@ function GUIProgressBar:InitCircleMask()
     self.borderMask = GUIManager:CreateGraphicItem()
     self.borderMask:SetAnchor(GUIItem.Left, GUIItem.Top)
     self.borderMask:SetSize(GUIProgressBar.kBgSize)
-    self.borderMask:SetTexture(kProgressBarMarineMask)
+    self.borderMask:SetTexture( kProgressBarMarineMask )
+    self.borderMask:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.borderMask:SetTexturePixelCoordinates(unpack(kBackgroundPixelCoords))
     self.borderMask:SetIsStencil(true)
     
@@ -183,29 +144,50 @@ function GUIProgressBar:InitCircleMask()
 
 end
 
+
+function GUIProgressBar:UpdateTeamColors()
+
+	self.teamNumber = PlayerUI_GetTeamNumber()
+	
+	local ui_baseColor = ConditionalValue( self.teamNumber == kTeam1Index, kGUI_Team1_BaseColor, kGUI_Team2_BaseColor )
+	local ui_accentColor = ConditionalValue( self.teamNumber == kTeam1Index, kGUI_Team1_AccentColor, kGUI_Team2_AccentColor )
+	
+	self.borderMask:SetFloatParameter( "teamBaseColorR", ui_accentColor.r )
+	self.borderMask:SetFloatParameter( "teamBaseColorG", ui_accentColor.g )
+	self.borderMask:SetFloatParameter( "teamBaseColorB", ui_accentColor.b )
+
+	self.progressBar:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+    self.progressBar:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+    self.progressBar:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+    
+    self.progressBarBg:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+    self.progressBarBg:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+    self.progressBarBg:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+
+end
+
+
 function GUIProgressBar:Update(deltaTime)
     
     PROFILE("GUIProgressBar:Update")
 
-    local objectiveFraction, objectiveText, teamType = PlayerUI_GetObjectiveInfo()
+    local objectiveFraction, objectiveText, teamNumber = PlayerUI_GetObjectiveInfo()
     local showProgressBar = not PlayerUI_GetIsDead() and PlayerUI_GetIsPlaying() and not PlayerUI_IsACommander() and not PlayerUI_GetBuyMenuDisplaying()
-
+	
+	self:UpdateTeamColors()
+	
     if showProgressBar and objectiveFraction then
 
         self.progressBarBg:SetColor(kWhiteColor) 
-
-        if self.teamType == kAlienTeamType then
-            self.smokeyBackground:SetColor(kWhiteColor)
-        elseif self.teamType == kMarineTeamType then
-            self.circle:SetColor(kWhiteColor)
-        end
+		
+        self.circle:SetColor(kWhiteColor)
         
         local textColor = Color(1,1,1,1)        
-        if teamType ~= self.teamType then
+        if teamNumber ~= self.teamNumber then
             textColor = Color(1, 0.3, 0.3, 1)
         end
         
-        self.objectiveText:SetColor(textColor)
+        self.objectiveText:SetColor( textColor )
         
         self.timeLastProgress = Shared.GetTime()
     
@@ -243,13 +225,7 @@ function GUIProgressBar:Update(deltaTime)
         
     end
     
-    if self.teamType == kAlienTeamType then
-        self.shine:SetColor(Color(1,1,1, 0.5 + 0.25 * (1 + math.cos(Shared.GetTime() * 6))  ))
-    elseif self.teamType == kMarineTeamType then
-        
-        self.circleRotation.z = ( (Shared.GetTime() % kRotationDuration) / kRotationDuration ) * math.pi * -2
-        self.circle:SetRotation(self.circleRotation)
-        
-    end    
+    self.circleRotation.z = ( (Shared.GetTime() % kRotationDuration) / kRotationDuration ) * math.pi * -2
+	self.circle:SetRotation( self.circleRotation)   
     
 end

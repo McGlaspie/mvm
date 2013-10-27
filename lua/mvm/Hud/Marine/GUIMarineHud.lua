@@ -11,7 +11,8 @@
 Script.Load("lua/GUIUtility.lua")
 Script.Load("lua/GUIAnimatedScript.lua")
 
-Script.Load("lua/Hud/Marine/GUIMarineHUDStyle.lua")
+Script.Load("lua/mvm/GUIMarineHUDStyle.lua")
+Script.Load("lua/mvm/GUIColorGlobals.lua")
 
 Script.Load("lua/mvm/Hud/GUIPlayerResource.lua")
 Script.Load("lua/mvm/Hud/Marine/GUIMarineStatus.lua")
@@ -620,8 +621,8 @@ function GUIMarineHUD:UpdateHudColors()
 	local playerTeam = PlayerUI_GetTeamNumber()
 	local ui_baseColor = ConditionalValue(
 		playerTeam == kTeam1Index,
-		kTeam1_BaseColor,
-		kTeam2_BaseColor
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
 	)
 	
 	self.minimapFrame:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
@@ -999,7 +1000,7 @@ end
 // A global function anyone can call
 function SafeRefreshMinimapZoom()
 
-    local marineHUDScript = ClientUI.GetScript("Hud/Marine/GUIMarineHUD")
+    local marineHUDScript = ClientUI.GetScript("mvm/Hud/Marine/GUIMarineHUD")
     if marineHUDScript then
         marineHUDScript:RefreshMinimapZoom()
     end

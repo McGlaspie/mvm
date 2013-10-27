@@ -6,7 +6,7 @@ emissiveMap = "models/marine/mac/mac_illum.dds"
 specularMap = "models/marine/mac/mac_spec.dds"
 
 modelColorMap = "models/marine/mac/mac_colorMap.dds"
-colorizeModel = 1
-
+numColumns = 1
+numRows = 1
 
 surface = "metal"

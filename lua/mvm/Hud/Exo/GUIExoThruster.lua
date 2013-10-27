@@ -29,12 +29,20 @@ function GUIExoThruster:Initialize()
     self.background = GetGUIManager():CreateGraphicItem()
     self.pads = {}
     
+    local playerTeam = PlayerUI_GetTeamNumber()
+    local uiBaseColor = ConditionalValue(
+		playerTeam == kTeam1Index,
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
+    )
+    
     local backgroundSize = Vector(kNumPads * kPadWidth + (kNumPads - 1) * kPadding + 2 * kBackgroundPadding, 2 * kBackgroundPadding + kPadHeight, 0)
     
     self.background:SetAnchor(GUIItem.Middle, GUIItem.Bottom)
     self.background:SetSize(backgroundSize)
     self.background:SetPosition(-backgroundSize * 0.5 + kBackgroundOffset)
-    self.background:SetColor(kBackgroundColor)
+    
+    self.background:SetColor( Color( uiBaseColor.r, uiBaseColor.g, uiBaseColor.b, 0.1 ) )
     
     self.thrusterFraction = 1
     

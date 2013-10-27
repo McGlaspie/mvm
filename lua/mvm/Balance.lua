@@ -17,10 +17,10 @@ Script.Load("lua/BalanceMisc.lua")
 //-----------------------------------------------------------------------------
 // MARINE DAMAGE
 
-kRifleDamage = 10
+kRifleDamage = 12	//10
 kRifleDamageType = kDamageType.Normal
-kRifleClipSize = 50
-kRifleMeleeDamage = 35	//NS2 - 20
+kRifleClipSize = 50		//Note: changing this is can break rifle animation timing
+kRifleMeleeDamage = 36	//NS2 - 20
 kRifleMeleeDamageType = kDamageType.Normal
 
 kPistolDamage = 26	//NS2 - 25
@@ -53,9 +53,9 @@ kFlamethrowerDamageType = kDamageType.Flame
 kFlamethrowerClipSize = 30
 
 kBurnDamagePerStackPerSecond = 3
-kFlamethrowerMaxStacks = 20
-kFlamethrowerBurnDuration = 6
-kFlamethrowerStackRate = 0.4
+kFlamethrowerMaxStacks = 25	//20
+kFlamethrowerBurnDuration = 7	//6
+kFlamethrowerStackRate = 0.5	//0.4
 kFlameRadius = 1.75
 kFlameDamageStackWeight = 0.2
 
@@ -141,7 +141,7 @@ kCommandStationCost = 15
 kExtractorCost = 10
 kInfantryPortalCost = 15
 kArmoryCost = 10
-kObservatoryCost = 15
+kObservatoryCost = 10
 kPhaseGateCost = 15
 kRoboticsFactoryCost = 15
 kSentryCost = 5
@@ -177,7 +177,7 @@ kMedPackCost = 1
 kCatPackCost = 2
 
 kNanoShieldCost = 6
-kNanoShieldCooldown = 12
+kNanoShieldCooldown = 10	//12
 kNanoShieldDuration = 8
 
 kEMPCost = 2

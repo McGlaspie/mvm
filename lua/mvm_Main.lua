@@ -18,6 +18,8 @@ local renderCamera = nil
 //MenuManager.SetMenuCinematic("cinematics/main_menu.cinematic")
 MenuManager.SetMenuCinematic("cinematics/mvmmenu.cinematic")
 
+Print("\t MVM MAIN")
+
 local function OnUpdateRender()
 
     local cullingMode = RenderCamera.CullingMode_Occlusion
@@ -46,7 +48,7 @@ local function OnLoadComplete(message)
     Render_SyncRenderOptions()
     OptionsDialogUI_SyncSoundVolumes()
     
-    MenuMenu_PlayMusic("sound/NS2.fev/Main Menu")
+    MenuMenu_PlayMusic("sound/NS2.fev/abient/docking/docking_music")
     MainMenu_Open()
     
     if message then

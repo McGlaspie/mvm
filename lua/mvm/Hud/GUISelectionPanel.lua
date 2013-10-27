@@ -9,6 +9,8 @@
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 Script.Load("lua/GUIIncrementBar.lua")
+Script.Load("lua/mvm/GUIColorGlobals.lua")
+
 
 class 'GUISelectionPanel' (GUIScript)
 
@@ -24,7 +26,6 @@ GUISelectionPanel.kFontColor = Color(0.8, 0.8, 1)
 GUISelectionPanel.kStatusFontColor = Color(0.9, 1, 0.7)
 
 GUISelectionPanel.kSelectionTextureMarines = "ui/marine_commander_textures.dds"
-GUISelectionPanel.kSelectionTextureAliens = "ui/alien_commander_textures.dds"
 
 GUISelectionPanel.kSelectionTextureCoordinates = { X1 = 466, Y1 = 0, X2 = 466 + 312, Y2 = 250 }
 GUISelectionPanel.kHealthIconCoordinates = { X1 = 0, Y1 = 363, X2 = 48, Y2 = 363 + 48 }
@@ -91,37 +92,35 @@ GUISelectionPanel.kBarBGXPos = -4 * kCommanderGUIsGlobalScale
 
 local kInfoBarTexture = "ui/commanderbar.dds"
 
-local kBackgroundNoiseTexture = "ui/alien_commander_bg_smoke.dds"
-local kSmokeyBackgroundSize = GUIScale(Vector(300, 380, 0))
+
+GUISelectionPanel.kHealthBarColors = { 
+	[kTeam1Index] = Color(0.725, 1, 1, 1),
+	[kTeam2Index] = Color(1, 197 / 255, 71 / 255, 1),
+	[kTeamReadyRoom] = Color(1, 1, 1, 1) 
+}
+
+GUISelectionPanel.kArmorBarColors = { 
+	[kTeam1Index] = Color(0.078, 0.9, 1, 1),
+	[kTeam2Index] = Color(1, 143 / 255, 34 / 255, 1),
+	[kTeamReadyRoom] = Color(0.5, 0.5, 0.5, 1) 
+}
 
 
-GUISelectionPanel.kHealthBarColors = { [kMarineTeamType] = Color(0.725, 1, 1, 1),
-                     [kAlienTeamType] = Color(1, 197 / 255, 71 / 255, 1),
-                     [kNeutralTeamType] = Color(1, 1, 1, 1) }
-                     
-GUISelectionPanel.kArmorBarColors = { [kMarineTeamType] = Color(0.078, 0.9, 1, 1),
-                    [kAlienTeamType] = Color(1, 143 / 255, 34 / 255, 1),
-                    [kNeutralTeamType] = Color(0.5, 0.5, 0.5, 1) }
 
 function GUISelectionPanel:Initialize()
 
     self.teamType = PlayerUI_GetTeamType()
+    self.teamNumber = PlayerUI_GetTeamNumber()
 
     self.textureName = GUISelectionPanel.kSelectionTextureMarines
-    if self.teamType == kAlienTeamType then
-        self.textureName = GUISelectionPanel.kSelectionTextureAliens
-    end
     
     self.background = GUIManager:CreateGraphicItem()
     self.background:SetAnchor(GUIItem.Left, GUIItem.Bottom)
     self.background:SetTexture(self.textureName)
+    self.background:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.background:SetSize(Vector(GUISelectionPanel.kPanelWidth, GUISelectionPanel.kPanelHeight, 0))
     self.background:SetPosition(Vector(-GUISelectionPanel.kPanelWidth + 36 * kCommanderGUIsGlobalScale, -GUISelectionPanel.kPanelHeight, 0))
     GUISetTextureCoordinatesTable(self.background, GUISelectionPanel.kSelectionTextureCoordinates)
-    
-    if PlayerUI_GetTeamType() == kAlienTeamType then    
-        self:InitSmokeyBackground()
-    end
     
     self:InitializeSingleSelectionItems()
     self:InitializeMultiSelectionItems()
@@ -137,21 +136,22 @@ function GUISelectionPanel:InitializeSingleSelectionItems()
     local useColor = Color(1,1,1,1)
     
     local teamType = PlayerUI_GetTeamType()
+    local teamNumber = PlayerUI_GetTeamNumber()
     
-    if teamType == kMarineTeamType then
-        useColor = kMarineFontColor
-    elseif teamType == kAlienTeamType then
-        useColor = kAlienFontColor
-    end
+    useColor = ConditionalValue(
+		teamNumber == kTeam1Index,
+		kMarineFontColor,
+		kAlienFontColor
+    )
     
     self.selectedIcon = GUIManager:CreateGraphicItem()
     self.selectedIcon:SetAnchor(GUIItem.Left, GUIItem.Top)
     self.selectedIcon:SetSize(Vector(GUISelectionPanel.kSelectedIconSize, GUISelectionPanel.kSelectedIconSize, 0))
     self.selectedIcon:SetPosition(Vector(GUISelectionPanel.kSelectedIconXOffset, GUISelectionPanel.kSelectedIconYOffset, 0))
     self.selectedIcon:SetTexture("ui/buildmenu.dds")
-    self.selectedIcon:SetColor(kIconColors[teamType])
+    self.selectedIcon:SetColor( kIconColors[teamNumber] )
     self.selectedIcon:SetIsVisible(false)
-    table.insert(self.singleSelectionItems, teamType)
+    table.insert(self.singleSelectionItems, teamNumber)
     self.background:AddChild(self.selectedIcon)
     
     self.selectedName = GUIManager:CreateTextItem()
@@ -181,6 +181,7 @@ function GUISelectionPanel:InitializeSingleSelectionItems()
     self.healthIcon:SetSize(Vector(GUISelectionPanel.kResourceIconSize, GUISelectionPanel.kResourceIconSize, 0))
     self.healthIcon:SetPosition(GUISelectionPanel.kHealthIconPos)
     self.healthIcon:SetTexture(self.textureName)
+    self.healthIcon:SetShader("shaders/GUI_TeamThemed.surface_shader")
     GUISetTextureCoordinatesTable(self.healthIcon, GUISelectionPanel.kHealthIconCoordinates)
     self.background:AddChild(self.healthIcon)
     
@@ -191,7 +192,7 @@ function GUISelectionPanel:InitializeSingleSelectionItems()
     self.healthText:SetPosition(Vector(GUISelectionPanel.kResourceTextXOffset, GUISelectionPanel.kResourceTextYOffset, 0))
     self.healthText:SetTextAlignmentX(GUIItem.Align_Min)
     self.healthText:SetTextAlignmentY(GUIItem.Align_Center)
-    self.healthText:SetColor(GUISelectionPanel.kHealthBarColors[teamType])
+    self.healthText:SetColor( GUISelectionPanel.kHealthBarColors[teamNumber] )
     table.insert(self.singleSelectionItems, self.healthText)
     self.healthIcon:AddChild(self.healthText)
     
@@ -200,6 +201,7 @@ function GUISelectionPanel:InitializeSingleSelectionItems()
     self.armorIcon:SetSize(Vector(GUISelectionPanel.kResourceIconSize, GUISelectionPanel.kResourceIconSize, 0))
     self.armorIcon:SetPosition(GUISelectionPanel.kArmorIconPos)
     self.armorIcon:SetTexture(self.textureName)
+    self.armorIcon:SetShader("shaders/GUI_TeamThemed.surface_shader")
     GUISetTextureCoordinatesTable(self.armorIcon, GUISelectionPanel.kArmorIconCoordinates)
     self.background:AddChild(self.armorIcon)
     
@@ -210,7 +212,7 @@ function GUISelectionPanel:InitializeSingleSelectionItems()
     self.armorText:SetPosition(Vector(GUISelectionPanel.kResourceTextXOffset, GUISelectionPanel.kResourceTextYOffset, 0))
     self.armorText:SetTextAlignmentX(GUIItem.Align_Min)
     self.armorText:SetTextAlignmentY(GUIItem.Align_Center)
-    self.armorText:SetColor(GUISelectionPanel.kArmorBarColors[teamType])
+    self.armorText:SetColor( GUISelectionPanel.kArmorBarColors[teamNumber] )
     table.insert(self.singleSelectionItems, self.armorText)
     self.armorIcon:AddChild(self.armorText)
     
@@ -219,6 +221,7 @@ function GUISelectionPanel:InitializeSingleSelectionItems()
     self.energyIcon:SetSize(Vector(GUISelectionPanel.kResourceIconSize, GUISelectionPanel.kResourceIconSize, 0))
     self.energyIcon:SetPosition(GUISelectionPanel.kEnergyIconPos)
     self.energyIcon:SetTexture(self.textureName)
+    self.energyIcon:SetShader("shaders/GUI_TeamThemed.surface_shader")
     GUISetTextureCoordinatesTable(self.energyIcon, GUISelectionPanel.kEnergyIconCoordinates)
     self.background:AddChild(self.energyIcon)
     
@@ -232,7 +235,7 @@ function GUISelectionPanel:InitializeSingleSelectionItems()
     self.energyText:SetColor(useColor)
     table.insert(self.singleSelectionItems, self.energyText)
     self.energyIcon:AddChild(self.energyText)
-    
+    //*
     self.maturity = GUIManager:CreateTextItem()
     self.maturity:SetAnchor(GUIItem.Left, GUIItem.Top)
     self.maturity:SetTextAlignmentX(GUIItem.Align_Min)
@@ -251,16 +254,18 @@ function GUISelectionPanel:InitializeSingleSelectionItems()
     self.maturityPercentage:SetScale(GUISelectionPanel.kStatusFontScale)
     self.maturityPercentage:SetFontName(GUISelectionPanel.kFontName)
     self.background:AddChild(self.maturityPercentage)
-    
+    //*/
     self.statusIcon = GUIManager:CreateGraphicItem()
     self.statusIcon:SetAnchor(GUIItem.Left, GUIItem.Top)
     self.statusIcon:SetSize(Vector(GUISelectionPanel.kStatusIconSize, GUISelectionPanel.kStatusIconSize, 0))
     self.statusIcon:SetPosition(GUISelectionPanel.kStatusIconPos)
     self.statusIcon:SetTexture("ui/buildmenu.dds")
+    self.statusIcon:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.background:AddChild(self.statusIcon)
     
     self.researchBarBg = GUIManager:CreateGraphicItem()
     self.researchBarBg:SetTexture(self.textureName)
+    self.researchBarBg:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.researchBarBg:SetAnchor(GUIItem.Left, GUIItem.Center)
     self.researchBarBg:SetTexturePixelCoordinates(unpack(GUISelectionPanel.kBarBGPixelCoords))
     self.researchBarBg:SetPosition(Vector(GUISelectionPanel.kBarBGXPos, -GUISelectionPanel.kBarBGSize.y * .5, 0))
@@ -299,27 +304,13 @@ function GUISelectionPanel:InitializeSingleSelectionItems()
 
 end
 
+
 function GUISelectionPanel:InitializeMultiSelectionItems()
 
     self.multiSelectionIcons = { }
     
 end
 
-function GUISelectionPanel:InitSmokeyBackground()
-
-    self.smokeyBackground = GUIManager:CreateGraphicItem()
-    self.smokeyBackground:SetAnchor(GUIItem.Middle, GUIItem.Center)
-    self.smokeyBackground:SetSize(kSmokeyBackgroundSize)
-    self.smokeyBackground:SetPosition(-kSmokeyBackgroundSize * .5)
-    self.smokeyBackground:SetShader("shaders/GUISmoke.surface_shader")
-    self.smokeyBackground:SetTexture("ui/alien_logout_smkmask.dds")
-    self.smokeyBackground:SetAdditionalTexture("noise", kBackgroundNoiseTexture)
-    self.smokeyBackground:SetFloatParameter("correctionX", 1)
-    self.smokeyBackground:SetFloatParameter("correctionY", 1.5)
-    
-    self.background:AddChild(self.smokeyBackground)
-
-end
 
 function GUISelectionPanel:Uninitialize()
     
@@ -334,9 +325,50 @@ function GUISelectionPanel:Uninitialize()
     
 end
 
+
+function GUISelectionPanel:UpdateTeamColors()
+
+	PROFILE("GUISelectionPanel:UpdateTeamColors")
+	
+	local ui_baseColor = ConditionalValue(
+		self.teamNumber == kTeam1Index,
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
+	)
+	//FIXME Background too bright/strong for Team 1
+	//FIXME Selection Label color should change per team# (I.e. enemy in Red?)
+	self.background:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+	self.background:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+	self.background:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+	
+	self.researchBarBg:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+	self.researchBarBg:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+	self.researchBarBg:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+	
+	self.statusIcon:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+	self.statusIcon:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+	self.statusIcon:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+	
+	self.healthIcon:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+	self.healthIcon:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+	self.healthIcon:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+	
+	self.armorIcon:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+	self.armorIcon:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+	self.armorIcon:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+	
+	self.energyIcon:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+	self.energyIcon:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+	self.energyIcon:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+
+end
+
+
 function GUISelectionPanel:Update(deltaTime)
 
     PROFILE("GUISelectionPanel:Update")
+    
+    self:UpdateTeamColors()
     
     self:UpdateSelected()
     
@@ -489,7 +521,7 @@ function GUISelectionPanel:UpdateMultiSelection(selectedEntities)
         end
         selectedIcon:SetIsVisible(true)
         self:SetIconTextureCoordinates(selectedIcon, selectedEntity)
-        selectedIcon:SetColor(kIconColors[self.teamType])
+        selectedIcon:SetColor(kIconColors[self.teamNumber])
         
         local xOffset = -(GUISelectionPanel.kMultiSelectedIconSize * currentIconIndex)
         selectedIcon:SetPosition(Vector(xOffset, -GUISelectionPanel.kMultiSelectedIconSize, 0))

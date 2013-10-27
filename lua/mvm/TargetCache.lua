@@ -7,10 +7,10 @@ Script.Load("lua/TargetCache.lua")
 
 
 function TeamTargetFilter( attackerTeam )
-
+    
 	return
 		function(target, targetPoint)
-			return HasMixin(target, "Team") and attackerTeam ~= target:GetTeamNumber() and target:GetTeamType() ~= kNeutralTeamType
+			return HasMixin(target, "Team") and GetAreEnemies( attackerTeam, target ) and target:GetTeamType() ~= kNeutralTeamType
 		end
 	
 end

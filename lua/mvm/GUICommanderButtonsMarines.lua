@@ -10,6 +10,7 @@
 
 Script.Load("lua/mvm/GUICommanderButtons.lua")
 
+
 class 'GUICommanderButtonsMarines' (GUICommanderButtons)
 
 GUICommanderButtonsMarines.kBackgroundTexture = "ui/marine_commander_textures.dds"

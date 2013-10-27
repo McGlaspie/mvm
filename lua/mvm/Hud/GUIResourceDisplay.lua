@@ -9,6 +9,8 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
+Script.Load("lua/mvm/GuIColorGlobals.lua")
+
 Script.Load("lua/GUIScript.lua")
 
 class 'GUIResourceDisplay' (GUIScript)
@@ -53,8 +55,8 @@ function GUIResourceDisplay:Initialize(settingsTable)
     local playerTeam = PlayerUI_GetTeamNumber()
     local ui_baseColor = ConditionalValue(
 		playerTeam == kTeam1Index,
-		kTeam1_BaseColor,
-		kTeam2_BaseColor
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
     )
     
     // Background, only used for positioning
@@ -160,8 +162,8 @@ function GUIResourceDisplay:UpdateTeamColors()
 	local playerTeam = PlayerUI_GetTeamNumber()
     local ui_baseColor = ConditionalValue(
 		playerTeam == kTeam1Index,
-		kTeam1_BaseColor,
-		kTeam2_BaseColor
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
     )
     
     self.teamIcon:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )

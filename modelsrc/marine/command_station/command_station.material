@@ -6,5 +6,7 @@ emissiveMap = "models/marine/command_station/command_station_illum.dds"
 specularMap = "models/marine/command_station/command_station_spec.dds"
 
 modelColorMap = "models/marine/command_station/command_station_colorMap.dds"
+numColumns = 1
+numRows = 1
 
 surface = "metal"

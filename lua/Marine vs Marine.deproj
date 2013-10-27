@@ -40,6 +40,9 @@
     <filename>mvm\Commander.lua</filename>
   </file>
   <file>
+    <filename>mvm\Commander_Buttons.lua</filename>
+  </file>
+  <file>
     <filename>mvm\Commander_Client.lua</filename>
   </file>
   <file>
@@ -50,6 +53,9 @@
   </file>
   <file>
     <filename>mvm\DamageMixin.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\DetectableMixin.lua</filename>
   </file>
   <file>
     <filename>mvm\EmpMixin.lua</filename>
@@ -79,7 +85,7 @@
     <filename>mvm\GUIColorGlobals.lua</filename>
   </file>
   <file>
-    <filename>mvm\GUICommanderAlerts.lua</filename>
+    <filename>mvm\Hud\GUICommanderAlerts.lua</filename>
   </file>
   <file>
     <filename>mvm\GUICommanderButtons.lua</filename>
@@ -133,6 +139,18 @@
     <filename>mvm\Hud\Marine\GUIJetpackFuel.lua</filename>
   </file>
   <file>
+    <filename>mvm\Hud\Exo\GUILeftMinigunDisplay.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\Exo\GUILeftRailgunDisplay.lua</filename>
+  </file>
+  <file>
+    <filename>menu\GUIMainMenu.lua</filename>
+  </file>
+  <file>
+    <filename>menu\GUIMainMenuNews.lua</filename>
+  </file>
+  <file>
     <filename>mvm\GUIMarineHUDStyle.lua</filename>
   </file>
   <file>
@@ -146,6 +164,9 @@
   </file>
   <file>
     <filename>mvm\Hud\GUIMineDisplay.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\Exo\GUIMinigun.lua</filename>
   </file>
   <file>
     <filename>mvm\GUIMinimap.lua</filename>
@@ -163,6 +184,9 @@
     <filename>mvm\GUINotifications.lua</filename>
   </file>
   <file>
+    <filename>mvm\Hud\GUIObjectiveDisplay.lua</filename>
+  </file>
+  <file>
     <filename>mvm\Hud\GUIPistolDisplay.lua</filename>
   </file>
   <file>
@@ -175,10 +199,22 @@
     <filename>mvm\Hud\GUIProgressBar.lua</filename>
   </file>
   <file>
+    <filename>mvm\Hud\Exo\GUIRailgun.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\GUIRequestMenu.lua</filename>
+  </file>
+  <file>
     <filename>mvm\Hud\GUIResourceDisplay.lua</filename>
   </file>
   <file>
     <filename>mvm\Hud\GUIRifleDisplay.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\Exo\GUIRightMinigunDisplay.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Hud\Exo\GUIRightRailgunDisplay.lua</filename>
   </file>
   <file>
     <filename>mvm\Hud\GUISelectionPanel.lua</filename>
@@ -238,7 +274,13 @@
     <filename>mvm\LiveMixin.lua</filename>
   </file>
   <file>
+    <filename>mvm\Location.lua</filename>
+  </file>
+  <file>
     <filename>mvm\MAC.lua</filename>
+  </file>
+  <file>
+    <filename>Main.lua</filename>
   </file>
   <file>
     <filename>mvm\MapBlip.lua</filename>
@@ -256,10 +298,19 @@
     <filename>mvm\MarineGhostModel.lua</filename>
   </file>
   <file>
+    <filename>mvm\MarineSpectator.lua</filename>
+  </file>
+  <file>
     <filename>mvm\MarineStructureEffects.lua</filename>
   </file>
   <file>
+    <filename>mvm\MarineTeam.lua</filename>
+  </file>
+  <file>
     <filename>mvm\Mine.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\Weapons\Marine\Minigun.lua</filename>
   </file>
   <file>
     <filename>mvm\MvMUtility.lua</filename>
@@ -269,6 +320,9 @@
   </file>
   <file>
     <filename>mvm\NS2GameRules.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\CommAbilities\Marine\NanoShield.lua</filename>
   </file>
   <file>
     <filename>mvm\NanoshieldMixin.lua</filename>
@@ -301,6 +355,12 @@
     <filename>mvm\Prototypelab.lua</filename>
   </file>
   <file>
+    <filename>mvm\Weapons\Marine\Railgun.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\ReadyRoomPlayer.lua</filename>
+  </file>
+  <file>
     <filename>mvm\ReadyRoomTeam.lua</filename>
   </file>
   <file>
@@ -314,6 +374,9 @@
   </file>
   <file>
     <filename>mvm\CommAbilities\Marine\Scan.lua</filename>
+  </file>
+  <file>
+    <filename>mvm\SelectableMixin.lua</filename>
   </file>
   <file>
     <filename>mvm\SensorBlip.lua</filename>
@@ -334,6 +397,9 @@
     <filename>mvm\TeamInfo.lua</filename>
   </file>
   <file>
+    <filename>mvm\TeamMessageMixin.lua</filename>
+  </file>
+  <file>
     <filename>mvm\TeamMixin.lua</filename>
   </file>
   <file>
@@ -346,6 +412,9 @@
     <filename>mvm\Weapons\Marine\Welder.lua</filename>
   </file>
   <file>
+    <filename>menu\main_menu.css</filename>
+  </file>
+  <file>
     <filename>mvm_Client.lua</filename>
   </file>
   <file>
@@ -356,9 +425,6 @@
   </file>
   <file>
     <filename>mvm_Loading.lua</filename>
-  </file>
-  <file>
-    <filename>mvm_Main.lua</filename>
   </file>
   <file>
     <filename>mvm_Predict.lua</filename>

@@ -5,6 +5,42 @@ Script.Load("lua/NS2ConsoleCommands_Server.lua")
 //-----------------------------------------------------------------------------
 
 
+local function MvM_OnCommandChangeClass(className, teamNumber, extraValues)
+
+    return function(client)
+    
+        local player = client:GetControllingPlayer()
+        local replaceTeam = 0
+        
+        if teamNumber == nil then
+			replaceTeam = player:GetTeamNumber()
+		else
+			replaceTeam = teamNumber
+        end
+        
+        if Shared.GetCheatsEnabled() then	//and player:GetTeamNumber() == teamNumber
+            player:Replace(className, teamNumber, false, nil, extraValues)
+        end
+        
+    end
+    
+end
+
+//Yes, you can be a skulk in MvM. Need aliens code available for future gametypes
+Event.Hook("Console_skulk", MvM_OnCommandChangeClass("skulk", nil))
+Event.Hook("Console_gorge", MvM_OnCommandChangeClass("gorge", nil))
+Event.Hook("Console_lerk", MvM_OnCommandChangeClass("lerk", nil))
+Event.Hook("Console_fade", MvM_OnCommandChangeClass("fade", nil))
+Event.Hook("Console_onos", MvM_OnCommandChangeClass("onos", nil))
+Event.Hook("Console_marine", MvM_OnCommandChangeClass("marine"))
+Event.Hook("Console_exo", MvM_OnCommandChangeClass("exo", nil, { layout = "ClawMinigun" }))
+Event.Hook("Console_dualminigun", MvM_OnCommandChangeClass("exo", nil, { layout = "MinigunMinigun" }))
+Event.Hook("Console_clawrailgun", MvM_OnCommandChangeClass("exo", nil, { layout = "ClawRailgun" }))
+Event.Hook("Console_dualrailgun", MvM_OnCommandChangeClass("exo", nil, { layout = "RailgunRailgun" }))
+
+
+//This is new function that behaves just like the old spawn, but some extra params are
+//available to spawn marine variants. 
 local function MvM_OnCommandSpawn(client, itemName, teamnum, marineVariant, useLastPos)
 
     local player = client:GetControllingPlayer()
@@ -53,6 +89,10 @@ local function MvM_OnCommandSpawn(client, itemName, teamnum, marineVariant, useL
 					newItem.variant = kMarineVariant.green
 				end
 				
+				if not marineVariant then
+					newItem.variant = kMarineVariant.green
+				end
+				
 				newItem:SetModel( newItem:GetVariantModel() , MarineVariantMixin.kMarineAnimationGraph )
 				
 			end
@@ -68,4 +108,3 @@ end
 
 
 Event.Hook("Console_spawnd", MvM_OnCommandSpawn)
-

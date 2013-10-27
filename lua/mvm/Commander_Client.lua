@@ -1,6 +1,41 @@
 
 
+Script.Load("lua/mvm/Commander_Buttons.lua")
 Script.Load("lua/mvm/Commander_Ping.lua")
+
+
+//-----------------------------------------------------------------------------
+
+
+
+function CommanderUI_MenuButtonRequiresTarget(index)
+
+	//Print("CommanderUI_MenuButtonRequiresTarget()")
+
+    local techId = GetTechIdFromButtonIndex(index)
+    //Print(" \t techId = " .. tostring( techId ) )
+    
+    local techTree = GetTechTree()
+    local requiresTarget = false
+    
+    if(tech ~= 0 and techTree) then
+    
+        local techNode = techTree:GetTechNode(techId)
+        
+        if(techNode ~= nil) then
+        
+            // Buy nodes require a target for the commander
+            requiresTarget = techNode:GetRequiresTarget() or techNode:GetIsBuy() or techNode:GetIsEnergyBuild()
+            
+        end
+        
+    end
+	
+	//Print("\t requiresTarget = " .. tostring(requiresTarget))
+	
+    return requiresTarget
+    
+end
 
 
 
@@ -12,11 +47,11 @@ local function MvM_SetupHud(self)
     
     self.entityIdUnderCursor = Entity.invalidId
     
-    local alertsScript = GetGUIManager():CreateGUIScriptSingle("mvm/GUICommanderAlerts")
+    local alertsScript = GetGUIManager():CreateGUIScriptSingle("mvm/Hud/GUICommanderAlerts")
     // Every Player already has a GUIMinimap.
     local minimapScript = ClientUI.GetScript("mvm/GUIMinimapFrame")
     
-    local selectionPanelScript = GetGUIManager():CreateGUIScriptSingle("GUISelectionPanel")
+    local selectionPanelScript = GetGUIManager():CreateGUIScriptSingle("mvm/Hud/GUISelectionPanel")
     
     self.buttonsScript = GetGUIManager():CreateGUIScript( "mvm/GUICommanderButtonsMarines" )
     self.buttonsScript:GetBackground():AddChild(selectionPanelScript:GetBackground())
@@ -50,7 +85,7 @@ local function MvM_SetupHud(self)
     self.managerScript:AddChildScript(minimapButtons)
     //self.managerScript:AddChildScript(worldbuttons)
     
-    self.commanderTooltip = GetGUIManager():CreateGUIScriptSingle("GUICommanderTooltip")
+    self.commanderTooltip = GetGUIManager():CreateGUIScriptSingle("mvm/Hud/GUICommanderTooltip")
     
     self.commanderTooltip:Register(self.buttonsScript)
     //self.commanderTooltip:Register(worldbuttons)
@@ -72,9 +107,9 @@ function Commander:OnDestroy()
     Player.OnDestroy(self)
     
     if self.hudSetup == true then
-    
-        GetGUIManager():DestroyGUIScriptSingle("mvm/GUICommanderAlerts")
-        GetGUIManager():DestroyGUIScriptSingle("GUISelectionPanel")
+		
+        GetGUIManager():DestroyGUIScriptSingle("mvm/Hud/GUICommanderAlerts")
+        GetGUIManager():DestroyGUIScriptSingle("mvm/Hud/GUISelectionPanel")
         GetGUIManager():DestroyGUIScriptSingle("mvm/GUIMinimapButtons")
         
         GetGUIManager():DestroyGUIScript(self.buttonsScript)
@@ -91,7 +126,7 @@ function Commander:OnDestroy()
         
         //GetGUIManager():DestroyGUIScriptSingle("GUICommanderHelpWidget")
         
-        GetGUIManager():DestroyGUIScriptSingle("GUICommanderTooltip")
+        GetGUIManager():DestroyGUIScriptSingle("mvm/Hud/GUICommanderTooltip")
         
         self:DestroyGhostGuides()
         
@@ -110,3 +145,5 @@ end
 ReplaceLocals( Commander.OnInitLocalClient, {
 	SetupHud = MvM_SetupHud
 })
+
+Class_Reload( "Commander", {})

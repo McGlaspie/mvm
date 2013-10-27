@@ -1,6 +1,6 @@
 
 
-Script.Load("lua/DetectableMixin.lua")
+Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
@@ -60,6 +60,7 @@ function Sentry:OnInitialized()
 	end
 	
 	if Server then
+		self.targetSelector = nil
 		
 		self.targetSelector = TargetSelector():Init(
 			self,

@@ -24,7 +24,7 @@ kShowOnTeam["all"] = {
 	GUICommunicationStatusIcons = true, 
 	["mvm/GUIUnitStatus"] = true, 
 	GUIDeathScreen = true,
-	GUITipVideo = true, 
+	GUITipVideo = false, 
 	GUIVoteMenu = true, 
 	GUIStartVoteMenu = true
 }
@@ -64,7 +64,7 @@ kShowAsClass["Marine"] = {
 	["mvm/Hud/GUISensorBlips"] = true, 
 	["mvm/Hud/GUIObjectiveDisplay"] = true, 
 	["mvm/Hud/GUIProgressBar"] = true, 
-	GUIRequestMenu = true,
+	["mvm/Hud/GUIRequestMenu"] = true,
 	["mvm/GUIWaypoints"] = true 
 }
 
@@ -77,7 +77,7 @@ kShowAsClass["Exo"] = {
 	["mvm/Hud/Marine/GUIMarineHUD"] = true, 
 	["mvm/Hud/Exo/GUIExoHUD"] = true, 
 	["mvm/Hud/GUIProgressBar"] = true, 
-	GUIRequestMenu = true, 
+	["mvm/Hud/GUIRequestMenu"] = true, 
 	["mvm/GUIWaypoints"] = true, 
 	["mvm/Hud/Exo/GUIExoEject"] = true
 }
@@ -93,7 +93,7 @@ kShowAsClass["MarineCommander"] = {
 	["mvm/Hud/GUIDistressBeacon"] = true 
 }
 
-/*
+
 kShowAsClass["Alien"] = { 
 	GUIObjectiveDisplay = false, 
 	GUIProgressBar = false, 
@@ -114,7 +114,7 @@ kShowAsClass["AlienCommander"] = {
 	GUICommanderPheromoneDisplay = false, 
 	GUIBioMassDisplay = false 
 }
-*/
+
 
 
 kShowAsClass["ReadyRoomPlayer"] = { }

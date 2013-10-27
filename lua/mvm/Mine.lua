@@ -3,6 +3,7 @@
 Script.Load("lua/mvm/FireMixin.lua")
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
+//Script.Load("lua/mvm/DetectableMixin.lua")
 
 
 // The amount of time until the mine is detonated once armed.
@@ -54,6 +55,8 @@ if Client then
 		self.skinBaseColor = self:GetBaseSkinColor()
 		self.skinAccentColor = self:GetAccentSkinColor()
 		self.skinTrimColor = self:GetTrimSkinColor()
+		//self.skinAtlasIndex = self:GetTeamNumber() - 1
+		self.skinAtlasIndex = 0
 	end
 
 	function Mine:GetBaseSkinColor()

@@ -10,6 +10,7 @@
 
 Shared.PrecacheSurfaceShader("shaders/GUI_TeamThemed.surface_shader")
 
+Script.Load("lua/mvm/GUIColorGlobals.lua")
 
 Script.Load("lua/mvm/GUIMinimap.lua")
 
@@ -95,8 +96,8 @@ function GUIMinimapFrame:InitFrame()
 	
 	local ui_baseColor = ConditionalValue(
 		PlayerUI_GetTeamNumber() == kTeam1Index,
-		kTeam1_BaseColor,
-		kTeam2_BaseColor
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
 	)
 	
     self.minimapFrame = GUIManager:CreateGraphicItem()
@@ -181,8 +182,8 @@ function GUIMinimapFrame:Update(deltaTime)
 
 	local ui_baseColor = ConditionalValue(
 		PlayerUI_GetTeamNumber() == kTeam1Index,
-		kTeam1_BaseColor,
-		kTeam2_BaseColor
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
 	)
 	self.minimapFrame:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
     self.minimapFrame:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )

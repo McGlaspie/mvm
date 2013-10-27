@@ -1,5 +1,11 @@
-shader = "shaders/Emissive.surface_shader"
+shader = "shaders/ColoredSkins_Emissive.surface_shader"
+
 
 emissiveMap = "models/marine/male/male_visor.dds"
+modelColorMap = "models/marine/male/male_visor.dds"
+
+modelColorAccentR = 1
+modelColorAccentG = 0
+modelColorAccentR = 0
 
 surface = "organic"

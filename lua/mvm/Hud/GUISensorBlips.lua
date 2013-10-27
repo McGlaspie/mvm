@@ -9,6 +9,7 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
+Script.Load("lua/mvm/GuIColorGlobals.lua")
 
 class 'GUISensorBlips' (GUIScript)
 
@@ -65,7 +66,11 @@ function GUISensorBlips:UpdateAnimations(deltaTime)
         self.timeLastImpulse = Shared.GetTime()
     end  
 	
-	local ui_baseColor = ConditionalValue( PlayerUI_GetTeamNumber() == kTeam1Index, kTeam1_BaseColor, kTeam2_BaseColor )
+	local ui_baseColor = ConditionalValue( 
+		PlayerUI_GetTeamNumber() == kTeam1Index, 
+		kGUI_Team1_BaseColor, 
+		kGUI_Team2_BaseColor 
+	)
 
     local destAlpha = math.max(0, 1 - (Shared.GetTime() - self.timeLastImpulse) * GUISensorBlips.kAlphaPerSecond)  
     

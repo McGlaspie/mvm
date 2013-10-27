@@ -11,6 +11,7 @@
 Script.Load("lua/GUIScript.lua")
 Script.Load("lua/MarineTechMap.lua")
 Script.Load("lua/AlienTechMap.lua")
+Script.Load("lua/mvm/GuIColorGlobals.lua")
 
 local kTechStatus = enum({'Available', 'Allowed', 'NotAvailable'})
 

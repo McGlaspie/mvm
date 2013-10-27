@@ -6,5 +6,7 @@ emissiveMap = "models/marine/arc/arc_illum.dds"
 specularMap = "models/marine/arc/arc_spec.dds"
 
 modelColorMap = "models/marine/arc/arc_colorMap.dds"
+numColumns = 1
+numRows = 1
 
 surface = "metal"

@@ -6,6 +6,7 @@ emissiveMap = "models/marine/observatory/observatory_illum.dds"
 specularMap = "models/marine/observatory/observatory_spec.dds"
 
 modelColorMap = "models/marine/observatory/observatory_colorMap.dds"
-colorizeModel = 1
+numColumns = 1
+numRows = 1
 
 surface = "metal"

@@ -9,6 +9,9 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
+Script.Load("lua/mvm/GuIColorGlobals.lua")
+
+
 class 'GUICommanderLogout' (GUIScript)
 
 GUICommanderLogout.kBackgroundWidth = 208 * kCommanderGUIsGlobalScale
@@ -50,8 +53,8 @@ function GUICommanderLogout:Initialize()
 	local playerTeam = PlayerUI_GetTeamNumber()
 	local ui_baseColor = ConditionalValue(
 		playerTeam == kTeam1Index,
-		kTeam1_BaseColor,
-		kTeam2_BaseColor
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
 	)
 
     self.background = GUIManager:CreateGraphicItem()
@@ -128,8 +131,8 @@ function GUICommanderLogout:UpdateTeamColors()
 	
 	local ui_baseColor = ConditionalValue(
 		PlayerUI_GetTeamNumber() == kTeam1Index,
-		kTeam1_BaseColor,
-		kTeam2_BaseColor
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
 	)
 	
 	self.tooltip:SetColor( GetLogoutFontColor() )

@@ -28,7 +28,7 @@ function ReadyRoomTeam:GetRespawnMapName(player)
 end
 
 function ReadyRoomTeam:ReplaceRespawnPlayer(player, origin, angles)
-
+	
 	local mapName = self:GetRespawnMapName(player)
     
     // We do not support Commanders in the ready room. The ready room is chaos!
@@ -36,10 +36,15 @@ function ReadyRoomTeam:ReplaceRespawnPlayer(player, origin, angles)
         mapName = ReadyRoomPlayer.kMapName
     end
     
+    Print("ReadyRoomTeam:ReplaceRespawnPlayer() - player.previousTeamNumber=" .. player.previousTeamNumber)
+    
     local newPlayer = player:Replace(mapName, self:GetTeamNumber(), false, origin)
     
-    //TODO Add support for skinned marine models
-    // - Will need to know what team player was on
+    if newPlayer.previousTeamNumber ~= kTeam1Index and newPlayer.previousTeamNumber ~= kTeam2Index then
+		newPlayer.previousTeamNumber = self:GetTeamNumber()
+    end
+    
+    Print("\t newPlayer.previousTeamNumber=" .. newPlayer.previousTeamNumber)
     
     self:RespawnPlayer(newPlayer, origin, angles)
     

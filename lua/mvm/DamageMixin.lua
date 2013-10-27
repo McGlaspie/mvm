@@ -1,10 +1,16 @@
+// ======= Copyright (c) 2012, Unknown Worlds Entertainment, Inc. All rights reserved. ============
+//    
+// lua\DamageMixin.lua    
+//    
+//    Created by:   Andreas Urwalek (andi@unknownworlds.com)  
+//    
+// ========= For more information, visit us at http://www.unknownworlds.com =====================    
 
+DamageMixin = CreateMixin(DamageMixin)
+DamageMixin.type = "Damage"
 
-Script.Load("lua/DamageMixin.lua")
-
-
-//-----------------------------------------------------------------------------
-
+function DamageMixin:__initmixin()
+end
 
 // damage type, doer and attacker don't need to be passed. that info is going to be fetched here. pass optional surface name
 // pass surface "none" for not hit/flinch effect
@@ -17,24 +23,23 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
     
     local killedFromDamage = false
     local doer = self
-	
+
     // attacker is always a player, doer is 'self'
     local attacker = nil
     local parentVortexed = false
     
-    if target and target:isa("Ragdoll") then	//exclude this when marine? Nothing like shooting corpses...?
-        return false
+    if target and target:isa("Ragdoll") then
+        return true	//experimental - check damageType, if explodsive, continue...
     end
     
     if self:isa("Player") then
         attacker = self
     else
-		/*
+		
         if self:GetParent() and self:GetParent():isa("Player") then
             attacker = self:GetParent()
-            parentVortexed = GetIsVortexed(attacker)
-        else  */
-		if HasMixin(self, "Owner") and self:GetOwner() and self:GetOwner():isa("Player") then
+            //parentVortexed = GetIsVortexed(attacker)
+        elseif HasMixin(self, "Owner") and self:GetOwner() and self:GetOwner():isa("Player") then
             attacker = self:GetOwner()
         end  
 
@@ -56,10 +61,11 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
         
         local armorUsed = 0
         local healthUsed = 0
+        local damageDone = 0
         
         if target and HasMixin(target, "Live") and damage > 0 then  
 
-            damage, armorUsed, healthUsed = GetDamageByType(target, attacker, doer, damage, damageType)
+            damage, armorUsed, healthUsed = GetDamageByType(target, attacker, doer, damage, damageType, point)
 
             // check once the damage
             if damage > 0 then
@@ -67,25 +73,36 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
                 if not direction then
                     direction = Vector(0, 0, 1)
                 end
-				
+                
+                killedFromDamage, damageDone = target:TakeDamage(damage, attacker, doer, point, direction, armorUsed, healthUsed, damageType)
+                                
                 // Many types of damage events are server-only, such as grenades.
                 // Send the player a message so they get feedback about what damage they've done.
                 // We use messages to handle multiple-hits per frame, such as splash damage from grenades.
-                if Server and attacker:isa("Player") and (not doer.GetShowHitIndicator or doer:GetShowHitIndicator()) then
-                    
-					local showNumbers = GetAreEnemies(attacker,target) and target:GetIsAlive()
-                    
+                if Server and attacker:isa("Player") then
+                
+                    local showNumbers = GetAreEnemies(attacker,target) and target:GetIsAlive() and damageDone > 0
                     if showNumbers then
-                        local msg = BuildDamageMessage(target, damage, point)
+                    
+                        local msg = BuildDamageMessage(target, damageDone, point)
                         Server.SendNetworkMessage(attacker, "Damage", msg, false)
+                        
+                        for _, spectator in ientitylist( Shared.GetEntitiesWithClassname("Spectator") ) do
+                        
+                            if attacker == Server.GetOwner(spectator):GetSpectatingPlayer() then
+                                Server.SendNetworkMessage(spectator, "Damage", msg, false)
+                            end
+                            
+                        end
+                        
                     end
                     
                     // This makes the cross hair turn red. Show it when hitting anything
-                    attacker.giveDamageTime = Shared.GetTime()
+                    if not doer.GetShowHitIndicator or doer:GetShowHitIndicator() then
+                        attacker.giveDamageTime = Shared.GetTime()
+                    end
                     
                 end
-                
-                killedFromDamage = target:TakeDamage(damage, attacker, doer, point, direction, armorUsed, healthUsed, damageType)
                 
                 if self.OnDamageDone then
                     self:OnDamageDone(doer, target)
@@ -106,14 +123,12 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
             armorMultiplier = ConditionalValue(damageType == kDamageType.Heavy, 1, armorMultiplier)
         
             local playArmorEffect = armorUsed * armorMultiplier > healthUsed
-            
             /*
             if parentVortexed or GetIsVortexed(self) or GetIsVortexed(target) then            
                 surface = "ethereal"
                 
             else
-            */
-            
+			*/
 			if HasMixin(target, "NanoShieldAble") and target:GetIsNanoShielded() then    
                 surface = "nanoshield"
                 
@@ -131,12 +146,17 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
                 end
             
             elseif not surface or surface == "" then
-            
-                surface = "metal"
-
+				
+                //surface = GetIsAlienUnit(target) and "organic" or "metal"
+				surface = "metal"
+				
                 // define metal_thin, rock, or other
                 if target.GetSurfaceOverride then
-                    surface = target:GetSurfaceOverride()
+                    surface = target:GetSurfaceOverride(damageDone) or surface
+                    
+                    if surface == "none" then
+                        return killedFromDamage
+                    end
                     
                 elseif GetAreEnemies(self, target) then
 					/*
@@ -149,10 +169,10 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
                     else
                     
                         if HasMixin(target, "Team") then
-                        
-                            //if target:GetTeamType() == kAlienTeamType then
-                                //surface = "organic"
-                            //else
+                        /*
+                            if target:GetTeamType() == kAlienTeamType then
+                                surface = "organic"
+                            else*/
                                 surface = "metal"
                             //end
                             
@@ -185,7 +205,12 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
                         
                     end
                     
-                    table.removevalue(toPlayers, attacker)
+                    -- No need to send to the attacker if this is a child of the attacker.
+                    -- Children such as weapons are simulated on the Client as well so they will
+                    -- already see the hit effect.
+                    if attacker and self:GetParent() == attacker then
+                        table.removevalue(toPlayers, attacker)
+                    end
                     
                     for _, player in ipairs(toPlayers) do
                         Server.SendNetworkMessage(player, "HitEffect", message, false) 
@@ -194,14 +219,14 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
                 end
 
             elseif Client then
-				
+            
                 HandleHitEffect(point, doer, surface, target, showtracer, altMode, damage, direction)
                 
                 // If we are far away from our target, trigger a private sound so we can hear we hit something
                 if target then
                 
                     if (point - attacker:GetOrigin()):GetLength() > 5 then
-                        attacker:TriggerEffects("hit_effect_local", tableParams)
+                        attacker:TriggerEffects("hit_effect_local")
                     end
                     
                 end

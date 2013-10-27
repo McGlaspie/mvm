@@ -5,7 +5,6 @@
 //
 
 
-
 Script.Load("lua/PreLoadMod.lua")
 
 
@@ -33,6 +32,8 @@ Script.Load("lua/mvm/GhostStructureMixin.lua")
 Script.Load("lua/mvm/PickupableWeaponMixin.lua")
 Script.Load("lua/mvm/NanoShieldMixin.lua")
 Script.Load("lua/mvm/MapBlipMixin.lua")
+Script.Load("lua/mvm/SelectableMixin.lua")
+
 
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
@@ -40,6 +41,8 @@ end
 
 
 Script.Load("lua/mvm/ResourceTower.lua")
+
+Script.Load("lua/mvm/Location.lua")
 
 Script.Load("lua/mvm/NS2Gamerules.lua")
 
@@ -67,9 +70,9 @@ Script.Load("lua/mvm/SentryBattery.lua")
 
 
 Script.Load("lua/mvm/CommAbilities/Marine/Scan.lua")
+Script.Load("lua/mvm/CommAbilities/Marine/Nanoshield.lua")
 
-//Script.Load("lua/mvm/ReadyRoomPlayer.lua")
-//Script.Load("lua/mvm/ReadyRoomTeam.lua")
+Script.Load("lua/mvm/ReadyRoomPlayer.lua")
 
 Script.Load("lua/mvm/Marine.lua")
 Script.Load("lua/mvm/JetpackMarine.lua")
@@ -83,8 +86,8 @@ Script.Load("lua/mvm/Weapons/Marine/Rifle.lua")
 Script.Load("lua/mvm/Weapons/Marine/Pistol.lua")
 Script.Load("lua/mvm/Weapons/Marine/Shotgun.lua")
 //Script.Load("lua/mvm/Weapons/Marine/Axe.lua")
-//Script.Load("lua/mvm/Weapons/Marine/Minigun.lua")
-//Script.Load("lua/mvm/Weapons/Marine/Railgun.lua")
+Script.Load("lua/mvm/Weapons/Marine/Minigun.lua")
+Script.Load("lua/mvm/Weapons/Marine/Railgun.lua")
 //Script.Load("lua/mvm/Weapons/Marine/Claw.lua")
 Script.Load("lua/mvm/Weapons/Marine/GrenadeLauncher.lua")
 Script.Load("lua/mvm/Weapons/Marine/Flamethrower.lua")

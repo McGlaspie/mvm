@@ -13,16 +13,23 @@ function PowerConsumerMixin:OnUpdate(deltaTime)
 	self.powerSurge = self.timePowerSurgeEnds > Shared.GetTime()
 	
 	if Client then
-		if HasMixin(self, "ColoredSkin") and ( not self:isa("Sentry") and not self:isa("SentryBattery") ) then
+		
+		if HasMixin(self, "ColoredSkin") and self:isa("Structure") then
 			
-			self.skinAccentColor = ConditionalValue(
-				self:GetIsPowered(),
-				self:GetAccentSkinColor(),
-				unpoweredColor
-			)
+			if not self:isa("Sentry") and not self:isa("SentryBattery") then
+			
+				self.skinAccentColor = ConditionalValue(
+					self:GetIsPowered(),
+					self:GetAccentSkinColor(),
+					unpoweredColor
+				)
+				
+			end
 		
 		end
+		
 	end
+	
 
 end
 

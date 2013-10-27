@@ -8,9 +8,14 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
+Script.Load("lua/mvm/GUIColorGlobals.lua")
+
 Script.Load("lua/GUIBorderBackground.lua")
 Script.Load("lua/GUICommanderTooltip.lua")
 Script.Load("lua/GUIDial.lua")
+
+
+
 
 class 'GUICommanderButtons' (GUIScript)
 
@@ -31,61 +36,29 @@ GUICommanderButtons.kButtonStatusData[GUICommanderButtons.kButtonStatusRed.Id] =
 GUICommanderButtons.kButtonStatusData[GUICommanderButtons.kButtonStatusOff.Id] = GUICommanderButtons.kButtonStatusOff
 GUICommanderButtons.kButtonStatusData[GUICommanderButtons.kButtonStatusPassive.Id] = GUICommanderButtons.kButtonStatusPassive
 
-local kButtonBackgroundTextures =
-{
-    [kMarineTeamType] = "ui/marine_buildmenu_buttonbg.dds",
-    [kAlienTeamType] = "ui/alien_buildmenu_buttonbg.dds"
-}
+local kButtonBackgroundTextures = "ui/marine_buildmenu_buttonbg.dds"
 
-local kHighlightTexture =
-{
-    [kMarineTeamType] = "ui/marine_buildmenu_highlight.dds",
-    [kAlienTeamType] = "ui/alien_buildmenu_highlight.dds"
-}
+local kHighlightTexture = "ui/marine_buildmenu_highlight.dds"
 
-local kHealthCircleSettings =
-{
-    [kMarineTeamType] = {
-        BackgroundWidth = GUICommanderButtons.kButtonWidth,
-        BackgroundHeight = GUICommanderButtons.kButtonHeight,
-        BackgroundAnchorX = GUIItem.Left,
-        BackgroundAnchorY = GUIItem.Bottom,
-        BackgroundOffset = Vector(0, 0, 0),
-        BackgroundTextureName = "ui/marine_command_cooldown.dds",
-        BackgroundTextureX1 = 0,
-        BackgroundTextureY1 = 0,
-        BackgroundTextureX2 = 128,
-        BackgroundTextureY2 = 128,
-        ForegroundTextureName = "ui/marine_command_cooldown.dds",
-        ForegroundTextureWidth = 128,
-        ForegroundTextureHeight = 128,
-        ForegroundTextureX1 = 128,
-        ForegroundTextureY1 = 0,
-        ForegroundTextureX2 = 256,
-        ForegroundTextureY2 = 128,
-        InheritParentAlpha = false,
-    },
-
-    [kAlienTeamType] = {
-        BackgroundWidth = GUICommanderButtons.kButtonWidth,
-        BackgroundHeight = GUICommanderButtons.kButtonHeight,
-        BackgroundAnchorX = GUIItem.Left,
-        BackgroundAnchorY = GUIItem.Bottom,
-        BackgroundOffset = Vector(0, 0, 0),
-        BackgroundTextureName = "ui/alien_command_cooldown.dds",
-        BackgroundTextureX1 = 0,
-        BackgroundTextureY1 = 0,
-        BackgroundTextureX2 = 128,
-        BackgroundTextureY2 = 128,
-        ForegroundTextureName = "ui/alien_command_cooldown.dds",
-        ForegroundTextureWidth = 128,
-        ForegroundTextureHeight = 128,
-        ForegroundTextureX1 = 128,
-        ForegroundTextureY1 = 0,
-        ForegroundTextureX2 = 256,
-        ForegroundTextureY2 = 128,
-        InheritParentAlpha = false,
-    }  
+local kHealthCircleSettings = {
+	BackgroundWidth = GUICommanderButtons.kButtonWidth,
+	BackgroundHeight = GUICommanderButtons.kButtonHeight,
+	BackgroundAnchorX = GUIItem.Left,
+	BackgroundAnchorY = GUIItem.Bottom,
+	BackgroundOffset = Vector(0, 0, 0),
+	BackgroundTextureName = "ui/marine_command_cooldown.dds",
+	BackgroundTextureX1 = 0,
+	BackgroundTextureY1 = 0,
+	BackgroundTextureX2 = 128,
+	BackgroundTextureY2 = 128,
+	ForegroundTextureName = "ui/marine_command_cooldown.dds",
+	ForegroundTextureWidth = 128,
+	ForegroundTextureHeight = 128,
+	ForegroundTextureX1 = 128,
+	ForegroundTextureY1 = 0,
+	ForegroundTextureX2 = 256,
+	ForegroundTextureY2 = 128,
+	InheritParentAlpha = false
 }
 
 
@@ -97,7 +70,7 @@ GUICommanderButtons.kBackgroundHeight = 363 * kCommanderGUIsGlobalScale
 GUICommanderButtons.kBackgroundTextureCoords = { X1 = 0, Y1 = 0, X2 = 466, Y2 = 363 }
 
 GUICommanderButtons.kMarineTabBackgroundTexture = "ui/marine_commander_tabs.dds"
-GUICommanderButtons.kAlienTabBackgroundTexture = "ui/alien_commander_tabs.dds"
+//GUICommanderButtons.kAlienTabBackgroundTexture = "ui/alien_commander_tabs.dds"
 
 GUICommanderButtons.kFrameTextureCoords = { 0, 0, 466, 363 }
 
@@ -188,15 +161,15 @@ function GUICommanderButtons:InitializeMarineBackground()
     local posX = -GUICommanderButtons.kBackgroundWidth - GUICommanderButtons.kBackgroundOffset
     local posY = -GUICommanderButtons.kBackgroundHeight - GUICommanderButtons.kBackgroundOffset - GUICommanderButtons.kExtraYOffset
     self.background:SetPosition(Vector(posX, posY, 0))
-    self.background:SetTexture(self.backgroundTextureName)
+    self.background:SetTexture( self.backgroundTextureName )
+    self.background:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.background:SetTexturePixelCoordinates( unpack(GUICommanderButtons.kFrameTextureCoords) )
-    //TODO Add colorizer shader
     
     self.tabBackground = GUIManager:CreateGraphicItem()
     self.tabBackground:SetAnchor(GUIItem.Left, GUIItem.Top)
     self.tabBackground:SetSize(Vector(GUICommanderButtons.kBackgroundWidth, GUICommanderButtons.kBackgroundHeight, 0))
     self.tabBackground:SetTexture(GUICommanderButtons.kMarineTabBackgroundTexture)
-    //TODO Add colorizer shader
+    self.tabBackground:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.background:AddChild(self.tabBackground)
 
 end
@@ -207,8 +180,8 @@ function GUICommanderButtons:InitializeHighlighter()
     self.highlightItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     self.highlightItem:SetSize(Vector(GUICommanderButtons.kButtonWidth, GUICommanderButtons.kButtonHeight, 0))
     
-    self.highlightItem:SetTexture( kHighlightTexture[self.teamType] )
-    //TODO Add colorizer shader
+    self.highlightItem:SetTexture( kHighlightTexture )
+    self.highlightItem:SetShader("shaders/GUI_TeamThemed.surface_shader")
     
     local textureWidth, textureHeight = CommanderUI_MenuImageSize()
     local buttonWidth = CommanderUI_MenuButtonWidth()
@@ -332,9 +305,15 @@ function GUICommanderButtons:SharedInitializeButtons(settingsTable)
     
     UpdateTabs(self)
     
+    local uiBaseColor = ConditionalValue(
+		self.teamNumber == kTeam1Index,
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
+    )
+    
     // Button rows.
     for i = 1, settingsTable.NumberOfButtons do
-    
+		
         local backgroundItem = GUIManager:CreateGraphicItem()
         backgroundItem:SetAnchor(GUIItem.Left, GUIItem.Top)
         backgroundItem:SetSize(Vector(GUICommanderButtons.kButtonWidth, GUICommanderButtons.kButtonHeight, 0))
@@ -342,9 +321,13 @@ function GUICommanderButtons:SharedInitializeButtons(settingsTable)
         local yPos = math.floor(((i - 1) / settingsTable.NumberOfColumns)) * GUICommanderButtons.kButtonHeight
         yPos = yPos + settingsTable.ButtonYOffset + settingsTable.TabTopHeight + settingsTable.TabBottomHeight
         backgroundItem:SetPosition(Vector(xPos + GUICommanderButtons.kButtonXOffset, yPos + GUICommanderButtons.kButtonYOffset, 0))
-        backgroundItem:SetTexture(kButtonBackgroundTextures[self.teamType])
+        backgroundItem:SetTexture( kButtonBackgroundTextures )
+        backgroundItem:SetShader("shaders/GUI_TeamThemed.surface_shader")
+        backgroundItem:SetFloatParameter( "teamBaseColorR", uiBaseColor.r)
+        backgroundItem:SetFloatParameter( "teamBaseColorG", uiBaseColor.g)
+        backgroundItem:SetFloatParameter( "teamBaseColorB", uiBaseColor.b)
         self.background:AddChild(backgroundItem)
-    
+		
         local buttonItem = GUIManager:CreateGraphicItem()
         buttonItem:SetAnchor(GUIItem.Left, GUIItem.Top)
         buttonItem:SetSize(Vector(GUICommanderButtons.kButtonWidth, GUICommanderButtons.kButtonHeight, 0))
@@ -362,7 +345,7 @@ function GUICommanderButtons:SharedInitializeButtons(settingsTable)
         self:UpdateButtonStatus(i + self.numberOfTabs)
         
         local cooldown = GUIDial()
-        cooldown:Initialize(kHealthCircleSettings[self.teamType])
+        cooldown:Initialize( kHealthCircleSettings )
         cooldown:GetLeftSide():SetBlendTechnique(GUIItem.Add)
         cooldown:GetRightSide():SetBlendTechnique(GUIItem.Add)
         
@@ -380,6 +363,7 @@ function GUICommanderButtons:InitializeIdleWorkersIcon()
     self.idleWorkers:SetPosition(Vector(-GUICommanderButtons.kIdleWorkersSize - GUICommanderButtons.kIdleWorkersXOffset, 0, 0))
     self.idleWorkers:SetColor(kIconColors[self.teamNumber])
     self.idleWorkers:SetTexture("ui/buildmenu.dds")
+    self.idleWorkers:SetShader("shaders/GUI_TeamThemed.surface_shader")
     
     local coordinates = ConditionalValue(self.teamType == kMarineTeamType, GetTextureCoordinatesForIcon(kTechId.MAC), GetTextureCoordinatesForIcon(kTechId.Drifter))
     self.idleWorkers:SetTexturePixelCoordinates(unpack(coordinates))
@@ -403,6 +387,7 @@ function GUICommanderButtons:InitializePlayerAlertIcon()
     self.playerAlerts:SetAnchor(GUIItem.Left, GUIItem.Top)
     self.playerAlerts:SetPosition(Vector(GUICommanderButtons.kPlayerAlertX, 0, 0))
     self.playerAlerts:SetTexture("ui/buildmenu.dds")
+    self.playerAlerts:SetShader("shaders/GUI_TeamThemed.surface_shader")
     
     local coordinates = CommanderUI_GetPlayerAlertOffset()
     local x1 = GUICommanderButtons.kBuildMenuTextureWidth * coordinates[1]
@@ -433,6 +418,7 @@ function GUICommanderButtons:InitializeSelectAllPlayersIcon()
         self.selectAllPlayers:SetAnchor(GUIItem.Left, GUIItem.Top)
         self.selectAllPlayers:SetPosition(Vector(GUICommanderButtons.kSelectAllPlayersX, GUICommanderButtons.kSelectAllPlayersY, 0))
         self.selectAllPlayers:SetTexture("ui/buildmenu.dds")
+        self.selectAllPlayers:SetShader("shaders/GUI_TeamThemed.surface_shader")
         
         local coordinates = GetTextureCoordinatesForIcon(kTechId.Marine)
         self.selectAllPlayers:SetTexturePixelCoordinates(unpack(coordinates))
@@ -517,6 +503,44 @@ local function UpdateHighlight(self)
 
 end
 
+
+function GUICommanderButtons:UpdateTeamColors()
+	
+	
+	local uiBaseColor = ConditionalValue(
+		self.teamNumber == kTeam1Index,
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
+	)
+	
+	
+	self.selectAllPlayers:SetFloatParameter( "teamBaseColorR", uiBaseColor.r )
+	self.selectAllPlayers:SetFloatParameter( "teamBaseColorG", uiBaseColor.g )
+	self.selectAllPlayers:SetFloatParameter( "teamBaseColorB", uiBaseColor.b )
+	
+	self.playerAlerts:SetFloatParameter( "teamBaseColorR", uiBaseColor.r )
+	self.playerAlerts:SetFloatParameter( "teamBaseColorG", uiBaseColor.g )
+	self.playerAlerts:SetFloatParameter( "teamBaseColorB", uiBaseColor.b )
+	
+	self.idleWorkers:SetFloatParameter( "teamBaseColorR", uiBaseColor.r )
+	self.idleWorkers:SetFloatParameter( "teamBaseColorG", uiBaseColor.g )
+	self.idleWorkers:SetFloatParameter( "teamBaseColorB", uiBaseColor.b )
+	
+	self.highlightItem:SetFloatParameter( "teamBaseColorR", uiBaseColor.r )
+	self.highlightItem:SetFloatParameter( "teamBaseColorG", uiBaseColor.g )
+	self.highlightItem:SetFloatParameter( "teamBaseColorB", uiBaseColor.b )
+	
+	self.background:SetFloatParameter( "teamBaseColorR", uiBaseColor.r )
+	self.background:SetFloatParameter( "teamBaseColorG", uiBaseColor.g )
+	self.background:SetFloatParameter( "teamBaseColorB", uiBaseColor.b )
+	
+	self.tabBackground:SetFloatParameter( "teamBaseColorR", uiBaseColor.r )
+	self.tabBackground:SetFloatParameter( "teamBaseColorG", uiBaseColor.g )
+	self.tabBackground:SetFloatParameter( "teamBaseColorB", uiBaseColor.b )
+	
+end
+
+
 function GUICommanderButtons:Update(deltaTime)
 
     PROFILE("GUICommanderButtons:Update")
@@ -538,6 +562,8 @@ function GUICommanderButtons:Update(deltaTime)
     self:UpdateButtonHotkeys()
     
     UpdateHighlight(self)
+    
+    self:UpdateTeamColors()
     
 end
 

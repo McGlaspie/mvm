@@ -1,12 +1,12 @@
 //=============================================================================
 //
-// Colored Skins Mixin
+// ColoredSkinsMixin (Skinning System)
 // 		Author: Brock 'McGlaspie' Gillespie
 //		@McGlaspie  -  mcglaspie@gmail.com		
 //
-//	This Mixin is only applicable to Clients and should not be loaded in any
-//	other Lua VM (I.e. Server or Predict). The expectedCallbacks should be
-//	wrapped in a "if Client" condition as a result.
+// This Mixin is only applicable to Clients and should not be loaded in any
+// other Lua VM (I.e. Server or Predict). The expectedCallbacks should be
+// wrapped in a "if Client" condition as a result.
 //
 // Note: This does NOT apply a material to a given model. It REQUIRES that a
 // material with the Color Skins shader program is already being used by the
@@ -18,25 +18,32 @@
 // or skin toggle should be based on game rules/data that get propogated over
 // the network. Otherwise, skin-state or color values won't be synchronized for
 // all players. It is strongly advised that the skin state and color values NOT
-// be set as network variables. This would significantly increase network traffic
-// and slow down rendering, and introduce server side lag.
+// be set as network variables. This would significantly increase network traffic,
+// slow down rendering, and introduce server side lag.
+// 
+// TODO Explain usage of atlas textures
+// http://en.wikipedia.org/wiki/Texture_atlas
 //
 //=============================================================================
 
 if Client then
-	Shared.PrecacheSurfaceShader("shaders/colored_skins.surface_shader")
-	Shared.PrecacheSurfaceShader("shaders/colored_skins_noemissive.surface_shader")
+	Shared.PrecacheSurfaceShader("shaders/ColoredSkins.surface_shader")
+	Shared.PrecacheSurfaceShader("shaders/ColoredSkins_noemissive.surface_shader")
 	//TODO Add additional shaders needed for all models
 end
 
-//TODO Move below and create additional utility functions
-//Debugging and/or for when "complex" material parameter values allowed
-local function ColorAsParam( color )
-	return string.format("(%0.3f, %0.3f, %0.3f)", color.r, color.g, color.b )
-end
 
-
-local gColoredSkinsToggle = true	//global to specify if colored skins are Active
+gColoredSkinsToggle = true	//global to specify if colored skins are Active
+gColorMapIndexOverrideEnabled = false
+gColorMapIndexOverride = 0
+gColorMapMaxIndex = 4		//Ideally, this should be defined per Class member
+//Above value only allows for 4x4 sized color map texture...which should be ample
+gColorOverridesEnabled = false
+gSkinColorOverrides = {
+	["base"] = nil,
+	["accent"] = nil,
+	["trim"] = nil
+}
 
 
 //-----------------------------------------------------------------------------
@@ -51,13 +58,21 @@ ColoredSkinsMixin.expectedMixins = {
 }
 
 ColoredSkinsMixin.expectedCallbacks = {
+
 	GetBaseSkinColor = "Should return a Color object. This is applied to albedo textures",
 	GetAccentSkinColor = "Should return a Color object. This is applied to emissive textures",
 	GetTrimSkinColor = "Should return Color object",
 	InitializeSkin = "Setup routine for any customization of skin colors applied to material"
+	//IntializeSkin() should ALWAYS be called in an Entity's OnInitialize() method within a "is Client" check
+	//This is required in order for the color values to correctly propogate to the shader(s). If not, the entity
+	//will appear black due to the default Colors variables being initialized that way.
+	
 }
 
+//TODO Add GetXYZ Override optional methods and update logic to support them
+// - will provide single classes or other mixins easy way to provide finer control
 ColoredSkinsMixin.optionalCallbacks = {}
+
 
 //-----------------------------------------------------------------------------
 
@@ -73,12 +88,25 @@ function ColoredSkinsMixin:__initmixin()
 	self.skinAccentColor = Color(0, 0, 0, 0)
 	self.skinTrimColor = Color(0, 0, 0, 0)
 	
-	self._coloredSkinEnabled = true	//Allows for colored skins to be toggled on per-entity basis
+	self.skinAtlasIndex = 0
+	
+	self.skinColoringEnabled = true	//Allows for colored skins to be toggled on per-entity basis
 	
 end
-//IntializeSkin() should ALWAYS be called in an Entity's OnInitialize() method within a "is Client" check
-//This is required in order for the color values to correctly propogate to the shader(s). If not, the entity
-//will appear black due to the default Colors variables being initialized that way.
+
+
+function ColoredSkinsMixin:GetAtlasIndex()
+	return self.skinAtlasIndex
+end
+
+
+function ColoredSkinsMixin:SetAtlasIndex( newIdx )
+    assert(  )  //TODO Add type check/numeric
+
+	if newIdx ~= nil and newIdx >= 0 then
+		self.skinAtlasIndex = newIdx
+	end
+end
 
 
 function ColoredSkinsMixin:OnUpdateRender()
@@ -86,7 +114,33 @@ function ColoredSkinsMixin:OnUpdateRender()
 	PROFILE("ColoredSkinsMixin:OnUpdateRender()")
 	
 	local model = self:GetRenderModel()
-	local enabled = ConditionalValue( gColoredSkinsToggle and self._coloredSkinEnabled, 1, 0 )
+	local enabled = ConditionalValue( gColoredSkinsToggle and self.skinColoringEnabled, 1, 0 )
+	
+	local baseColor = self.skinBaseColor
+	local accentColor = self.skinAccentColor
+	local trimColor = self.skinTrimColor
+	
+	if gColorOverridesEnabled then
+		
+		if gSkinColorOverrides["base"] ~= nil then
+			baseColor = gSkinColorOverrides["base"]
+		end
+		
+		if gSkinColorOverrides["accent"] ~= nil then
+			accentColor = gSkinColorOverrides["accent"]
+		end
+		
+		if gSkinColorOverrides["trim"] ~= nil then
+			trimColor = gSkinColorOverrides["trim"]
+		end
+		
+	end
+	
+	local colorMapAtlasIndex = ConditionalValue(
+		gColorMapIndexOverrideEnabled,
+		gColorMapIndexOverride,
+		self.skinAtlasIndex
+	)
 	
 	if model then
 		
@@ -94,9 +148,8 @@ function ColoredSkinsMixin:OnUpdateRender()
 		//Example of how color layers can be set via code
 		// - This could easily be done in an entity's update routine(s)
 		//Just be sure and wrap any changes in a HasMixin(entity, "ColoredSkin") condition
-		
 		local ts = math.floor( Shared.GetTime() )
-		if math.fmod( ts , 5 ) == 0 and ts < 90 then
+		if math.fmod( ts , 3 ) == 0 and ts < 240 then
 			
 			local rc = {
 				[1] = Color(1, 1, 0),
@@ -113,14 +166,15 @@ function ColoredSkinsMixin:OnUpdateRender()
 			
 		else
 			
-			self.skinBaseColor = LerpColor( self.skinBaseColor, kTeam2_BaseColor, 0.001 )
-			self.skinAccentColor = LerpColor( self.skinAccentColor, kTeam2_AccentColor , 0.01 )
-			self.skinTrimColor = LerpColor( self.skinTrimColor, kTeam2_TrimColor , 0.005 )
+			self.skinBaseColor = LerpColor( self.skinBaseColor, self:GetBaseSkinColor(), 0.001 )
+			self.skinAccentColor = LerpColor( self.skinAccentColor, self:GetAccentSkinColor() , 0.01 )
+			self.skinTrimColor = LerpColor( self.skinTrimColor, self:GetTrimSkinColor() , 0.005 )
 			
 		end
 		*/
 		
-		//Note: This will apply to all child materials
+		//Note: This will apply to all child materials, but ONLY IF they are
+		//		all using the same Material Shader.
 		//		That means for players (I.e. A marine) the male_face.material 
 		//		and male_visor.material need the colored_skins.surface_shader)
 		//		set as the shader file in said materials. Each entity needs to
@@ -134,20 +188,21 @@ function ColoredSkinsMixin:OnUpdateRender()
 		//If these values do NOT have a distinct color. The implementing Entity WILL appear black
 		//Because no color specified will amount to setting Color(0,0,0) as the material parameter
 		
-		model:SetMaterialParameter( "modelColorBaseR", self.skinBaseColor.r )
-		model:SetMaterialParameter( "modelColorBaseG", self.skinBaseColor.g )
-		model:SetMaterialParameter( "modelColorBaseB", self.skinBaseColor.b )
-		
-		model:SetMaterialParameter( "modelColorAccentR", self.skinAccentColor.r )
-		model:SetMaterialParameter( "modelColorAccentG", self.skinAccentColor.g )
-		model:SetMaterialParameter( "modelColorAccentB", self.skinAccentColor.b )
-		
-		model:SetMaterialParameter( "modelColorTrimR", self.skinTrimColor.r )
-		model:SetMaterialParameter( "modelColorTrimG", self.skinTrimColor.g )
-		model:SetMaterialParameter( "modelColorTrimB", self.skinTrimColor.b )
+		model:SetMaterialParameter( "modelColorBaseR", baseColor.r )
+		model:SetMaterialParameter( "modelColorBaseG", baseColor.g )
+		model:SetMaterialParameter( "modelColorBaseB", baseColor.b )
+		model:SetMaterialParameter( "modelColorAccentR", accentColor.r )
+		model:SetMaterialParameter( "modelColorAccentG", accentColor.g )
+		model:SetMaterialParameter( "modelColorAccentB", accentColor.b )
+		model:SetMaterialParameter( "modelColorTrimR", trimColor.r )
+		model:SetMaterialParameter( "modelColorTrimG", trimColor.g )
+		model:SetMaterialParameter( "modelColorTrimB", trimColor.b )
 		
 		//Set enabled state
 		model:SetMaterialParameter( "colorizeModel", enabled )
+		
+		//Set Color Map Index of atlas texture
+		model:SetMaterialParameter( "colorMapIndex", colorMapAtlasIndex )
 		
 	end		
 	
@@ -168,20 +223,21 @@ function ColoredSkinsMixin:OnUpdateRender()
 				
 				if jpModel then
 					
-					jpModel:SetMaterialParameter( "modelColorBaseR", self.skinBaseColor.r )
-					jpModel:SetMaterialParameter( "modelColorBaseG", self.skinBaseColor.g )
-					jpModel:SetMaterialParameter( "modelColorBaseB", self.skinBaseColor.b )
-					
-					jpModel:SetMaterialParameter( "modelColorAccentR", self.skinAccentColor.r )
-					jpModel:SetMaterialParameter( "modelColorAccentG", self.skinAccentColor.g )
-					jpModel:SetMaterialParameter( "modelColorAccentB", self.skinAccentColor.b )
-					
-					jpModel:SetMaterialParameter( "modelColorTrimR", self.skinTrimColor.r )
-					jpModel:SetMaterialParameter( "modelColorTrimG", self.skinTrimColor.g )
-					jpModel:SetMaterialParameter( "modelColorTrimB", self.skinTrimColor.b )
+					jpModel:SetMaterialParameter( "modelColorBaseR", baseColor.r )
+					jpModel:SetMaterialParameter( "modelColorBaseG", baseColor.g )
+					jpModel:SetMaterialParameter( "modelColorBaseB", baseColor.b )
+					jpModel:SetMaterialParameter( "modelColorAccentR", accentColor.r )
+					jpModel:SetMaterialParameter( "modelColorAccentG", accentColor.g )
+					jpModel:SetMaterialParameter( "modelColorAccentB", accentColor.b )
+					jpModel:SetMaterialParameter( "modelColorTrimR", trimColor.r )
+					jpModel:SetMaterialParameter( "modelColorTrimG", trimColor.g )
+					jpModel:SetMaterialParameter( "modelColorTrimB", trimColor.b )
 					
 					//Set enabled state
 					jpModel:SetMaterialParameter( "colorizeModel", enabled )
+					
+					//Set Color Map Index of atlas texture
+					jpModel:SetMaterialParameter( "colorMapIndex", colorMapAtlasIndex )
 					
 				end
 				
@@ -190,6 +246,7 @@ function ColoredSkinsMixin:OnUpdateRender()
 		end
 		
 	end
+	
 	
 	if ( self:isa("Marine") or self:isa("Exo") ) and self == Client.GetLocalPlayer() then	//Don't run on World objects
 	
@@ -201,20 +258,21 @@ function ColoredSkinsMixin:OnUpdateRender()
 			
 			if viewModel then
 				
-				viewModel:SetMaterialParameter( "modelColorBaseR", self.skinBaseColor.r )
-				viewModel:SetMaterialParameter( "modelColorBaseG", self.skinBaseColor.g )
-				viewModel:SetMaterialParameter( "modelColorBaseB", self.skinBaseColor.b )
-				
-				viewModel:SetMaterialParameter( "modelColorAccentR", self.skinAccentColor.r )
-				viewModel:SetMaterialParameter( "modelColorAccentG", self.skinAccentColor.g )
-				viewModel:SetMaterialParameter( "modelColorAccentB", self.skinAccentColor.b )
-				
-				viewModel:SetMaterialParameter( "modelColorTrimR", self.skinTrimColor.r )
-				viewModel:SetMaterialParameter( "modelColorTrimG", self.skinTrimColor.g )
-				viewModel:SetMaterialParameter( "modelColorTrimB", self.skinTrimColor.b )
+				viewModel:SetMaterialParameter( "modelColorBaseR", baseColor.r )
+				viewModel:SetMaterialParameter( "modelColorBaseG", baseColor.g )
+				viewModel:SetMaterialParameter( "modelColorBaseB", baseColor.b )
+				viewModel:SetMaterialParameter( "modelColorAccentR", accentColor.r )
+				viewModel:SetMaterialParameter( "modelColorAccentG", accentColor.g )
+				viewModel:SetMaterialParameter( "modelColorAccentB", accentColor.b )
+				viewModel:SetMaterialParameter( "modelColorTrimR", trimColor.r )
+				viewModel:SetMaterialParameter( "modelColorTrimG", trimColor.g )
+				viewModel:SetMaterialParameter( "modelColorTrimB", trimColor.b )
 				
 				//Set enabled state
-				jpModel:SetMaterialParameter( "colorizeModel", enabled )
+				viewModel:SetMaterialParameter( "colorizeModel", enabled )
+				
+				//Set Color Map Index of atlas texture
+				viewModel:SetMaterialParameter( "colorMapIndex", colorMapAtlasIndex )
 				
 			end
 			
@@ -222,29 +280,170 @@ function ColoredSkinsMixin:OnUpdateRender()
 		
 	end
 	
-	//That's it (for now). Simple eh? The heavy lifting is done in the shader(s).
-	
 end
+//End ColoredSkinsMixin -------------------------------------------------------
+
 
 
 
 //-----------------------------------------------------------------------------
+//Debugging & Texture Development Tools ---------------------------------------
+//	Note: All of these utiliy function assume Utility.lua is in scope
 
 
-local function OnCommandToggleColoredSkins()
-	
-	if Shared.GetCheatsEnabled() then
-		
-		gColoredSkinsToggle = ConditionalValue(
-			gColoredSkinsToggle == true,
-			false,
-			true
-		)
-		
-	end
+//TODO Move below and create additional utility functions
+//Debugging and/or for when "complex" material parameter values allowed
+local function ColorAsParam( color )
+	return string.format("(%0.3f, %0.3f, %0.3f)", color.r, color.g, color.b )
+end
 
+local function ColorAsParamInt( color )
+	//return string.format("(%0.3f, %0.3f, %0.3f)", color.r, color.g, color.b )	//TODO adjust for returning Int vals
 end
 
 
-Event.Hook("Console_coloredskins", OnCommandToggleColoredSkins)
+if Client then
+
+	local function OnCommandGetEntityColorInfo()
+		
+		if Shared.GetCheatsEnabled() then
+			
+			local player = Client.GetLocalPlayer()
+			if player then
+				
+				local viewCoords = player:GetViewAngles():GetCoords()	//FIXME This is not working in this context
+				
+				local trace = Shared.TraceRay(player:GetOrigin(), player:GetOrigin() + viewCoords.zAxis * 1000, CollisionRep.Damage, PhysicsMask.Bullets, EntityFilterOne(player))
+				if trace.fraction < 1 then
+					
+					if trace.entity and HasMixin(trace.entity, "ColoredSkin") then
+						
+						Print( trace.entity:GetClassName() .. " ColoredSkinsMixin Info" )
+						Print("\t ColorMap Atlas Index: " .. tostring( trace.entity.skinAtlasIndex ) )
+						Print("\t BaseColor = " .. ColorAsParam( trace.entity.skinBaseColor ) )
+						Print("\t AccentColor = " .. ColorAsParam( trace.entity.skinBaseColor ) )
+						Print("\t TrimColor = " .. ColorAsParam( trace.entity.skinBaseColor ) )
+						Print("\t SkinEnabled = " .. tostring( trace.entity.skinColoringEnabled ) )
+						
+					end
+				
+				end
+				
+			end
+		
+		end
+
+	end
+
+
+	local function OnCommandToggleColoredSkins()
+		
+		if Shared.GetCheatsEnabled() then
+			
+			gColoredSkinsToggle = ConditionalValue(
+				gColoredSkinsToggle == true,
+				false,
+				true
+			)
+			
+		end
+
+	end
+
+
+	local function OnCommandChangeColorMapIndex(enable)
+
+		if Shared.GetCheatsEnabled() then
+			
+			//Toggle flipping through indicies
+			if enable == "true" or enable == "1" then
+				gColorMapIndexOverrideEnabled = true
+			elseif enable == "0" or enable == "false" then
+				gColorMapIndexOverrideEnabled = false
+			end
+			
+			if gColorMapIndexOverrideEnabled then
+				
+				if gColorMapIndexOverride + 1 > gColorMapMaxIndex then
+					gColorMapIndexOverride = 0	//Roll back to begining of atlas
+				else
+					gColorMapIndexOverride = gColorMapIndexOverride + 1
+				end
+				
+			end
+		
+		end
+
+	end
+
+
+	local function OnCommandOverrideSkinColor(layer, color)
+		
+		if Shared.GetCheatsEnabled() then
+		
+			if not layer and not color and not team then
+			//toggle color override state
+				gColorOverridesEnabled = ConditionalValue( gColorOverridesEnabled, false, true )
+			end
+			
+			if layer and color then	//Require both params
+				
+				if layer == "base" or layer == "accent" or layer == "trim" then
+					
+					//Color values override all colorized model in world for specified layer
+					local red, green, blue = 0
+					local validColor = true
+					local colorValues = StringSplit( color, ",", 3)
+					
+					for i, cval in ipairs(colorValues) do
+						
+						local colorIntVal = tonumber( cval )
+						
+						if colorIntVal == nil then
+							validColor = false
+							break
+						end
+						
+						if colorIntVal >= 0 and colorIntVal <= 255 then
+							
+							if i == 1 then
+								red = colorIntVal
+							elseif i == 2 then
+								green = colorIntVal
+							elseif i == 3 then
+								blue = colorIntVal
+							end
+							
+						else
+							Print("ColoredSkinsMixin: Color(" .. color .. "), a channel value is invalid. Only 0-255 allowed")
+							validColor = false
+							break
+						end
+						
+					end
+					
+					if validColor then
+						gSkinColorOverrides[layer] = Color( ColorValue(red), ColorValue(green), ColorValue(blue), 1 )	//alpha ignored
+						Print("ColoredSkinsMixin: Set global color override: Layer[" .. layer .. "] as " .. ColorAsParam( gSkinColorOverrides[layer] ) )
+					else
+						Print("ColoredSkinsMixin: Invalid color parameter supplied")
+					end
+				
+				end
+				
+			end
+			
+		end
+		
+	end
+	
+	
+	
+	Event.Hook( "Console_skins", OnCommandToggleColoredSkins )			//Toggle
+	Event.Hook( "Console_skinsindex", OnCommandChangeColorMapIndex )	//Toggle/Cycler
+	Event.Hook( "Console_skins_colors", OnCommandOverrideSkinColor )	//Toggle and value setter
+
+	Event.Hook( "Console_skins_entinfo", OnCommandGetEntityColorInfo )	//FIXME not getting player or performing trace...
+	
+end	//end Client
 

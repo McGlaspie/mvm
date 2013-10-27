@@ -70,7 +70,11 @@ local function SharedUpdate_MvM(self, deltaTime)
 					elseif self:GetTeamNumber() == kTeam2Index then
 					
 						self.ghostStructureMaterial = AddMaterial(model, "cinematics/vfx_materials/ghoststructure_team2.material")
+					
+					else
 						
+						self.ghostStructureMaterial = AddMaterial(model, "cinematics/vfx_materials/ghoststructure.material")
+					
 					end
 					
                 end

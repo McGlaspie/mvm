@@ -45,6 +45,14 @@ local function MvM_GetHealViewMaterialName(self)
 
 end
 
+//Below solves PN selection bug, but MAC still cannot repair
+function LiveMixin:OnGetIsSelectable(result, byTeamNumber)
+    result.selectable = (
+		result.selectable 
+		and self:GetIsAlive() or self:isa("PowerPoint")
+	)
+end
+
 
 function LiveMixin:OnUpdateRender()
 
@@ -110,10 +118,10 @@ function LiveMixin:OnUpdateRender()
         self.clientTimeLastHealed = self.timeLastHealed
         
         if showHeal and (not self:isa("Player") or not self:GetIsLocalPlayer()) then        
-            self:TriggerEffects("heal", { isalien = GetIsAlienUnit(self) })             
+            self:TriggerEffects("heal", { false }) //isalien = GetIsAlienUnit(self)
         end
         
-        self:TriggerEffects("heal_sound", { isalien = GetIsAlienUnit(self) })
+        self:TriggerEffects("heal_sound", { false }) //isalien = GetIsAlienUnit(self)
     
     end
 

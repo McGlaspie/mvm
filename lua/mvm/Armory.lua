@@ -5,7 +5,7 @@
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
 Script.Load("lua/mvm/PowerConsumerMixin.lua")
-Script.Load("lua/DetectableMixin.lua")
+Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
 
 //-----------------------------------------------------------------------------

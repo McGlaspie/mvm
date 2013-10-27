@@ -21,7 +21,7 @@ local function CreateBuildEffect_MvM(self)
     
         local material = Client.CreateRenderMaterial()
         
-        if HasMixin("Team", self) then
+        if HasMixin(self, "Team") then
 			
 			if self:GetTeamNumber() == kTeam2Index then
 				material:SetMaterial("cinematics/vfx_materials/build_team2.material")

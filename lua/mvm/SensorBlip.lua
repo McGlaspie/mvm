@@ -39,12 +39,31 @@ end
 function SensorBlip:UpdateRelevancy()
 
     self:SetRelevancyDistance(Math.infinity)
-	self:SetExcludeRelevancyMask( 
-		ConditionalValue( 
-			self.teamNumber == kTeam2Index, kRelevantToTeam1, kRelevantToTeam2
-		) 
-	)
+    
+    if self.teamNumber == kTeam1Index then
+		self:SetExcludeRelevancyMask( kRelevantToTeam2 )
+	elseif self.teamNumber == kTeam2Index then
+		self:SetExcludeRelevancyMask( kRelevantToTeam1 )
+	else
+		//????
+	end
 	
+end
+
+
+function SensorBlip:Update(entity)
+
+    if entity.GetEngagementPoint then
+        self:SetOrigin(entity:GetEngagementPoint())
+    else
+        self:SetOrigin(entity:GetModelOrigin())
+    end
+    
+    self.teamNumber = entity:GetTeamNumber()
+    self.entId = entity:GetId()
+    
+    self:UpdateRelevancy()	//hacky
+    
 end
 
 

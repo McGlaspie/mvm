@@ -6,6 +6,10 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
+
+Script.Load("lua/mvm/GuIColorGlobals.lua")
+
+
 class 'GUIWorldText' (GUIScript)
 
 GUIWorldText.kFont = "fonts/AgencyFB_small.fnt"
