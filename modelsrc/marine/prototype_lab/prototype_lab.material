@@ -1,8 +1,0 @@
-shader = "models/marine/marine.surface_shader"
-
-albedoMap = "models/marine/prototype_lab/prototype_lab.dds"
-normalMap = "models/marine/prototype_lab/prototype_lab_normal.dds"
-emissiveMap = "models/marine/prototype_lab/prototype_lab_illum.dds"
-specularMap = "models/marine/prototype_lab/prototype_lab_spec.dds"
-
-surface = "metal"

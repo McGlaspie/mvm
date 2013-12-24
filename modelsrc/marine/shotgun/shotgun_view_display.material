@@ -1,5 +1,0 @@
-shader = "shaders/Emissive.surface_shader"
-
-normalMap = "materials/dev/dev_normal.dds"
-
-emissiveMap = "lua/GUIShotgunDisplay.lua"

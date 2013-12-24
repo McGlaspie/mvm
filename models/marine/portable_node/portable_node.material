@@ -1,0 +1,12 @@
+shader = "shaders/ColoredSkins.surface_shader"
+
+albedoMap = "models/marine/portable_node/portable_node.dds"
+normalMap = "models/marine/portable_node/portable_node_normal.dds"
+emissiveMap = "models/marine/portable_node/portable_node_illum.dds"
+specularMap = "models/marine/portable_node/portable_node_spec.dds"
+
+modelColorMap = "models/marine/portable_node/portable_node_colorMap.dds"
+numRows = 1
+numColumns = 1
+
+surface = "metal"

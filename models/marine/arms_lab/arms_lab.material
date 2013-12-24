@@ -1,0 +1,13 @@
+shader = "shaders/ColoredSkins.surface_shader"
+
+albedoMap = "models/marine/arms_lab/arms_lab.dds"
+normalMap = "models/marine/arms_lab/arms_lab_normal.dds"
+emissiveMap = "models/marine/arms_lab/arms_lab_illum.dds"
+specularMap = "models/marine/arms_lab/arms_lab_spec.dds"
+
+modelColorMap = "models/marine/arms_lab/arms_lab_colorMap.dds"
+numRows = 1
+numColumns = 1
+
+
+surface = "metal"

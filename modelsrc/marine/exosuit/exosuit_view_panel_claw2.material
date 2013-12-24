@@ -1,3 +1,0 @@
-shader = "shaders/Emissive.surface_shader"
-emissiveMap = "models/marine/exosuit/exosuit_view_panel_claw2.dds"
-normalMap = "materials/dev/dev_normal.dds"

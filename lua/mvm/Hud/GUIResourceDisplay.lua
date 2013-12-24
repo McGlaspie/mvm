@@ -9,32 +9,33 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
-Script.Load("lua/mvm/GuIColorGlobals.lua")
+Script.Load("lua/mvm/GUIColorGlobals.lua")
 
 Script.Load("lua/GUIScript.lua")
 
 class 'GUIResourceDisplay' (GUIScript)
 
-GUIResourceDisplay.kBackgroundTextureMarine = "ui/marine_commander_textures.dds"
+//GUIResourceDisplay.kBackgroundTextureMarine = "ui/marine_commander_textures.dds"
+GUIResourceDisplay.kBackgroundTextureMarine = "ui/marine_commander_resources_icons.dds"
 
-GUIResourceDisplay.kBackgroundTextureCoords = { X1 = 755, Y1 = 342, X2 = 990, Y2 = 405 }
+GUIResourceDisplay.kBackgroundTextureCoords = { X1 = 0, Y1 = 0, X2 = 256, Y2 = 64 }
 GUIResourceDisplay.kBackgroundWidth = GUIScale(128)
-GUIResourceDisplay.kBackgroundHeight = GUIScale(63)
-GUIResourceDisplay.kBackgroundYOffset = 10
+GUIResourceDisplay.kBackgroundHeight = GUIScale(64)
+GUIResourceDisplay.kBackgroundYOffset = 0
 
-GUIResourceDisplay.kPersonalResourceIcon = { Width = 0, Height = 0, X = 0, Y = 0, Coords = { X1 = 144, Y1 = 363, X2 = 192, Y2 = 411} }
+GUIResourceDisplay.kPersonalResourceIcon = { Width = 0, Height = 0, X = 0, Y = 0, Coords = { X1 = 0, Y1 = 0, X2 = 64, Y2 = 64} }
 GUIResourceDisplay.kPersonalResourceIcon.Width = GUIScale(48)
 GUIResourceDisplay.kPersonalResourceIcon.Height = GUIScale(48)
 
-GUIResourceDisplay.kTeamResourceIcon = { Width = 0, Height = 0, X = 0, Y = 0, Coords = { X1 = 192, Y1 = 363, X2 = 240, Y2 = 411} }
+GUIResourceDisplay.kTeamResourceIcon = { Width = 0, Height = 0, X = 0, Y = 0, Coords = { X1 = 64, Y1 = 0, X2 = 128, Y2 = 64} }
 GUIResourceDisplay.kTeamResourceIcon.Width = GUIScale(48)
 GUIResourceDisplay.kTeamResourceIcon.Height = GUIScale(48)
 
-GUIResourceDisplay.kResourceTowerIcon = { Width = 0, Height = 0, X = 0, Y = 0, Coords = { X1 = 240, Y1 = 363, X2 = 280, Y2 = 411} }
+GUIResourceDisplay.kResourceTowerIcon = { Width = 0, Height = 0, X = 0, Y = 0, Coords = { X1 = 128, Y1 = 0, X2 = 192, Y2 = 64} }
 GUIResourceDisplay.kResourceTowerIcon.Width = GUIScale(48)
 GUIResourceDisplay.kResourceTowerIcon.Height = GUIScale(48)
 
-GUIResourceDisplay.kWorkerIcon = { Width = 0, Height = 0, X = 0, Y = 0, Coords = { X1 = 280, Y1 = 363, X2 = 320, Y2 = 411} }
+GUIResourceDisplay.kWorkerIcon = { Width = 0, Height = 0, X = 0, Y = 0, Coords = { X1 = 192, Y1 = 0, X2 = 256, Y2 = 64} }
 GUIResourceDisplay.kWorkerIcon.Width = GUIScale(48)
 GUIResourceDisplay.kWorkerIcon.Height = GUIScale(48)
 
@@ -205,8 +206,8 @@ function GUIResourceDisplay:Update(deltaTime)
     local numHarvesters = CommanderUI_GetTeamHarvesterCount()
     self.towerText:SetText(ToString(numHarvesters))
     
-    local supplyUsed = GetSupplyUsedByTeam(Client.GetLocalPlayer():GetTeamNumber())
-    local maxSupply = GetMaxSupplyForTeam(Client.GetLocalPlayer():GetTeamNumber())
+    local supplyUsed = MvM_GetSupplyUsedByTeam(Client.GetLocalPlayer():GetTeamNumber())
+    local maxSupply = MvM_GetMaxSupplyForTeam(Client.GetLocalPlayer():GetTeamNumber())
     
     local useColor = ConditionalValue( supplyUsed < maxSupply, kWhite, kRed)
     

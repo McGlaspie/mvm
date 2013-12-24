@@ -1,8 +1,0 @@
-shader = "models/marine/marine.surface_shader"
-
-albedoMap = "models/marine/jetpack/jetpack.dds"
-normalMap = "models/marine/jetpack/jetpack_normal.dds"
-emissiveMap = "models/marine/jetpack/jetpack_illum.dds"
-specularMap = "models/marine/jetpack/jetpack_spec.dds"
-
-surface = "metal"

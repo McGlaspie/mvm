@@ -1,0 +1,12 @@
+shader = "shaders/ColoredSkins.surface_shader"
+
+albedoMap = "models/marine/phase_gate/phase_gate.dds"
+normalMap = "models/marine/phase_gate/phase_gate_normal.dds"
+emissiveMap = "models/marine/phase_gate/phase_gate_illum.dds"
+specularMap = "models/marine/phase_gate/phase_gate_spec.dds"
+
+modelColorMap = "models/marine/phase_gate/phase_gate_colorMap.dds"
+numRows = 1
+numColumns = 1
+
+surface = "metal"

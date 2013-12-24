@@ -1,4 +1,0 @@
-shader = "shaders/Model.surface_shader"
-albedoMap = "models/marine/flamethrower/flamethrowerammo.dds"
-specularMap = "materials/dev/black.dds"
-normalMap = "materials/dev/dev_normal.dds"

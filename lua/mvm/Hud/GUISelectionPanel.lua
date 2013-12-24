@@ -26,6 +26,7 @@ GUISelectionPanel.kFontColor = Color(0.8, 0.8, 1)
 GUISelectionPanel.kStatusFontColor = Color(0.9, 1, 0.7)
 
 GUISelectionPanel.kSelectionTextureMarines = "ui/marine_commander_textures.dds"
+GUISelectionPanel.kResourceIconsTextureMarines = "ui/marine_commander_resources_icons.dds"	//For Supply Icon
 
 GUISelectionPanel.kSelectionTextureCoordinates = { X1 = 466, Y1 = 0, X2 = 466 + 312, Y2 = 250 }
 GUISelectionPanel.kHealthIconCoordinates = { X1 = 0, Y1 = 363, X2 = 48, Y2 = 363 + 48 }

@@ -52,12 +52,18 @@ function NanoShieldMixin:OnDestroy()
     
 end
 
-function NanoShieldMixin:ActivateNanoShield()
+function NanoShieldMixin:ActivateNanoShield( shieldLifetime )
 
     if self:GetCanBeNanoShielded() then
-    
+		
         self.timeNanoShieldInit = Shared.GetTime()
         self.nanoShielded = true
+        
+        if shieldLifeTime ~= nil and shieldLifeTime > 0 then
+			self.tempShieldLifeTime = shieldLifeTime
+		else
+			self.tempShieldLifeTime = 0
+		end
         
         if Server then
         

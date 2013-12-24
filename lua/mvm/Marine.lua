@@ -301,25 +301,37 @@ end
 
 
 
-if Server then
-
-	function Marine:OnTakeDamage(damage, attacker, doer, point)
-		/*
-		if doer and doer:isa("Gore") then	//and not self:GetIsVortexed() 
-			self.interruptAim = true
-			self.interruptStartTime = Shared.GetTime()
+if Server then	
+	
+	local orgMarineKill = Marine.OnKill
+	function Marine:OnKill( attacker, doer, point, direction )
+	
+		orgMarineKill(self, attacker, doer, point, direction )
+		
+		if doer then
+			
+			if doer:isa("Railgun") then
+			
+				Print("\t Marine:OnKill() - Trigger railgun_death effect")
+				GetEffectManager():TriggerEffects(
+					"railgun_death", 
+					{ 
+						effecthostcoords = Coords.GetTranslation( self:GetOrigin()) 
+					} 
+				)
+				
+			end
+			
 		end
 		
-		if damage > 50 and (not self.timeLastDamageKnockback or self.timeLastDamageKnockback + 1 < Shared.GetTime()) then    
-			self:AddPushImpulse(GetNormalizedVectorXZ(self:GetOrigin() - point) * damage * 0.1 * self:GetSlowSpeedModifier())
-			self.timeLastDamageKnockback = Shared.GetTime()
-		end
-		*/
 	end
+	
 
 end	//Server
 
+
 //-------------------------------------
+
 
 if Client then
 	

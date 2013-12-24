@@ -1,8 +1,0 @@
-shader = "models/marine/marine.surface_shader"
-
-albedoMap = "models/marine/phase_gate/phase_gate.dds"
-normalMap = "models/marine/phase_gate/phase_gate_normal.dds"
-emissiveMap = "models/marine/phase_gate/phase_gate_illum.dds"
-specularMap = "models/marine/phase_gate/phase_gate_spec.dds"
-
-surface = "metal"

@@ -1,3 +1,0 @@
-shader = "shaders/Emissive.surface_shader"
-emissiveMap = "lua/GUIRightMinigunDisplay.lua"
-normalMap = "materials/dev/dev_normal.dds"

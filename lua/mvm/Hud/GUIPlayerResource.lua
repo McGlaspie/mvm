@@ -37,7 +37,7 @@ local kRTCountTextures = PrecacheAsset("ui/marine_HUD_rtcount.dds")
 GUIPlayerResource.kRTCountYOffset = -16
 
 GUIPlayerResource.kTeamTextPos = Vector(20, 360, 0)
-
+GUIPlayerResource.kTeamSupplyTextPos = Vector(140, 360, 0)
 GUIPlayerResource.kIconTextXOffset = -20
 
 GUIPlayerResource.kFontSizePersonal = 30
@@ -185,6 +185,24 @@ function GUIPlayerResource:Initialize(style)
     self.teamText:SetIsVisible(style.displayTeamRes)
     self.frame:AddChild(self.teamText)
     
+    // Team Supply.
+    self.teamSupplyText = self.script:CreateAnimatedTextItem()
+    self.teamSupplyText:SetAnchor(GUIItem.Left, GUIItem.Top)
+    self.teamSupplyText:SetTextAlignmentX(GUIItem.Align_Min)
+    self.teamSupplyText:SetTextAlignmentY(GUIItem.Align_Min)
+    self.teamSupplyText:SetColor(
+		ConditionalValue(
+			playerTeam == kTeam1Index,
+			kBrightColorTeam1,
+			kBrightColorTeam2
+		)
+	)
+    self.teamSupplyText:SetBlendTechnique(GUIItem.Add)
+    self.teamSupplyText:SetFontIsBold(true)
+    self.teamSupplyText:SetFontName(GUIPlayerResource.kTresTextFontName)
+    self.teamSupplyText:SetIsVisible(style.displayTeamRes)
+    self.frame:AddChild(self.teamSupplyText)
+    
     self.noResIcon = GetGUIManager():CreateGraphicItem()
     self.noResIcon:SetTexture(kNoResTexture)
     self.noResIcon:SetSize(kNoResSize)
@@ -229,6 +247,10 @@ function GUIPlayerResource:Reset(scale)
     self.teamText:SetScale(GetScaledVector())
     self.teamText:SetPosition(GUIPlayerResource.kTeamTextPos)
     
+    self.teamSupplyText:SetScale(Vector(1,1,1) * self.scale * 1.2)
+    self.teamSupplyText:SetScale( GetScaledVector() )
+    self.teamSupplyText:SetPosition( GUIPlayerResource.kTeamSupplyTextPos )
+    
     self.ResGainedText:SetUniformScale(self.scale)
     self.ResGainedText:SetPosition(GUIPlayerResource.kResGainedTextPos)
 
@@ -263,6 +285,7 @@ function GUIPlayerResource:UpdateTeamColors()
 	self.pResDescription:SetColor( ConditionalValue( playerTeam == kTeam1Index, kBrightColorTeam1, kBrightColorTeam2 ) )
 	
 	self.teamText:SetColor( ConditionalValue( playerTeam == kTeam1Index, kBrightColorTeam1, kBrightColorTeam2 ) )
+	self.teamSupplyText:SetColor( ConditionalValue( playerTeam == kTeam1Index, kBrightColorTeam1, kBrightColorTeam2 ) )
 
 end
 
@@ -274,7 +297,7 @@ function GUIPlayerResource:Update(deltaTime, parameters)
     self:UpdateTeamColors()
     local playerTeam = PlayerUI_GetTeamNumber()
     
-    local tRes, pRes, numRTs = unpack(parameters)
+    local tRes, pRes, numRTs, tSupply = unpack(parameters)
     
     self.rtCount:SetIsVisible(numRTs > 0)
     
@@ -294,6 +317,7 @@ function GUIPlayerResource:Update(deltaTime, parameters)
     
     self.personalText:SetText(ToString(math.floor(pRes * 10) / 10))
     self.teamText:SetText(string.format(Locale.ResolveString("TEAM_RES"), math.floor(tRes)))
+    self.teamSupplyText:SetText( tSupply )
     
     if pRes > self.lastPersonalResources then
 

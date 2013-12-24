@@ -1,4 +1,0 @@
-shader = "shaders/Model.surface_shader"
-albedoMap = "models/marine/shotgun/shotgun_view_shell_01.dds"
-normalMap = "models/marine/shotgun/shotgun_view_shell_01_normal.dds"
-specularMap = "models/marine/shotgun/shotgun_view_shell_01_spec.dds"
