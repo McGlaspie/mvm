@@ -53,15 +53,10 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
     
         // Get damage type from source
         local damageType = kDamageType.Normal
-        
         if self.GetDamageType then
-			
             damageType = self:GetDamageType()
-            
         elseif HasMixin(self, "Tech") then
-			
             damageType = LookupTechData(self:GetTechId(), kTechDataDamageType, kDamageType.Normal)
-            
         end
         
         local armorUsed = 0

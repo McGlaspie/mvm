@@ -356,22 +356,14 @@ kMarineStructureEffects =
             {sound = "sound/NS2.fev/marine/structures/infantry_portal_start_spin"},
         },
     },    
-	
+
     infantry_portal_stop_spin = 
     {
         ipStartSpinEffect =
         {
             {stop_cinematic = "cinematics/marine/infantryportal/spin.cinematic", done = true},
         },
-    },
-    
-    infantry_portal_stop_spin_team2 = 
-    {
-        ipStartSpinEffect =
-        {
-            {stop_cinematic = "cinematics/marine/infantryportal/spin_team2.cinematic", done = true},
-        },
-    },
+    },    
     
     infantry_portal_spawn = 
     {

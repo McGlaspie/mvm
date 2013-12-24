@@ -697,15 +697,7 @@ function GUIMarineHUD:Update(deltaTime)
     self.statusDisplay:Update(deltaTime, { PlayerUI_GetPlayerHealth(), PlayerUI_GetPlayerMaxHealth(), PlayerUI_GetPlayerArmor(), PlayerUI_GetPlayerMaxArmor(), PlayerUI_GetPlayerParasiteState() } )
     
     // Update resource display
-    self.resourceDisplay:Update(
-		deltaTime, 
-		{ 
-			PlayerUI_GetTeamResources(), 
-			PlayerUI_GetPersonalResources(), 
-			CommanderUI_GetTeamHarvesterCount(),
-			PlayerUI_GetTeamSupply()
-		} 
-	)
+    self.resourceDisplay:Update(deltaTime, { PlayerUI_GetTeamResources(), PlayerUI_GetPersonalResources(), CommanderUI_GetTeamHarvesterCount() } )
     
     // Update notifications and events
     if self.lastNotificationUpdate + GUIMarineHUD.kNotificationUpdateIntervall < Client.GetTime() then

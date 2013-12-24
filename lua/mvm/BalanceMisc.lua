@@ -32,8 +32,6 @@ kMinSupportedRTs = 0
 kRTsPerTechpoint = 3
 
 kEMPBlastEnergyDamage = 50	//??? Use as doing damage to structure?
-kElectrifiedDuration = 4	//5
-kElectrifiedMovementModifier = 0.05
 
 kEnzymeAttackSpeed = 1.25
 
@@ -51,7 +49,7 @@ kArmoryWeaponAttachRange = 10
 // Minimum distance that initial IP spawns away from team location
 kInfantryPortalMinSpawnDistance = 4
 
-kItemStayTime = 20	//30
+kItemStayTime = 30
 
 // For power points
 kMarineRepairHealthPerSecond = 600
@@ -196,16 +194,15 @@ kOnosMinActiveViewModelParam = .6
 kOnosBackBackwardSpeedScalar = .2
 
 
-kPistolWeight = 0.08
-kRifleWeight = 0.11				//.13
-kGrenadeLauncherWeight = 0.18
-kFlamethrowerWeight = 0.2		//.25
+kPistolWeight = 0.09
+kRifleWeight = 0.12				//.13
+kGrenadeLauncherWeight = 0.2
+kFlamethrowerWeight = 0.18		//.25
 kShotgunWeight = 0.14			
 
 
 // set to -1 to disable or a positive number
 kResourcesPerNode = -1
-
 
 // 200 inches in NS1 = 5 meters
 kBileBombSplashRadius = 6
@@ -214,5 +211,3 @@ kDropStructureEnergyCost = 20
 
 kMinWebLength = 0.5
 kMaxWebLength = 8
-
-

@@ -52,19 +52,13 @@
     <filename>mvm\ConstructMixin.lua</filename>
   </file>
   <file>
-    <filename>mvm\DamageEffects.lua</filename>
-  </file>
-  <file>
     <filename>mvm\DamageMixin.lua</filename>
-  </file>
-  <file>
-    <filename>mvm\DamageTypes.lua</filename>
   </file>
   <file>
     <filename>mvm\DetectableMixin.lua</filename>
   </file>
   <file>
-    <filename>mvm\ElectroMagneticMixin.lua</filename>
+    <filename>mvm\EmpMixin.lua</filename>
   </file>
   <file>
     <filename>mvm\Exo.lua</filename>
@@ -157,9 +151,6 @@
     <filename>menu\GUIMainMenuNews.lua</filename>
   </file>
   <file>
-    <filename>menu\GUIMainMenu_Web.lua</filename>
-  </file>
-  <file>
     <filename>mvm\GUIMarineHUDStyle.lua</filename>
   </file>
   <file>
@@ -250,12 +241,6 @@
     <filename>mvm\GUIWorldText.lua</filename>
   </file>
   <file>
-    <filename>mvm\Weapons\Marine\GasGrenade.lua</filename>
-  </file>
-  <file>
-    <filename>mvm\GeneralEffects.lua</filename>
-  </file>
-  <file>
     <filename>mvm\GhostStructureMixin.lua</filename>
   </file>
   <file>
@@ -304,9 +289,6 @@
     <filename>mvm\MapBlipMixin.lua</filename>
   </file>
   <file>
-    <filename>mvm\MapEntityLoader.lua</filename>
-  </file>
-  <file>
     <filename>mvm\Marine.lua</filename>
   </file>
   <file>
@@ -325,16 +307,10 @@
     <filename>mvm\MarineTeam.lua</filename>
   </file>
   <file>
-    <filename>mvm\MarineWeaponEffects.lua</filename>
-  </file>
-  <file>
     <filename>mvm\Mine.lua</filename>
   </file>
   <file>
     <filename>mvm\Weapons\Marine\Minigun.lua</filename>
-  </file>
-  <file>
-    <filename>mvm\MvMEffects.lua</filename>
   </file>
   <file>
     <filename>mvm\MvMUtility.lua</filename>
@@ -379,12 +355,6 @@
     <filename>mvm\Prototypelab.lua</filename>
   </file>
   <file>
-    <filename>mvm\Weapons\Marine\PulseGrenade.lua</filename>
-  </file>
-  <file>
-    <filename>mvm\RagdollMixin.lua</filename>
-  </file>
-  <file>
     <filename>mvm\Weapons\Marine\Railgun.lua</filename>
   </file>
   <file>
@@ -406,9 +376,6 @@
     <filename>mvm\CommAbilities\Marine\Scan.lua</filename>
   </file>
   <file>
-    <filename>mvm\ScriptActor.lua</filename>
-  </file>
-  <file>
     <filename>mvm\SelectableMixin.lua</filename>
   </file>
   <file>
@@ -424,9 +391,6 @@
     <filename>mvm\Weapons\Marine\Shotgun.lua</filename>
   </file>
   <file>
-    <filename>mvm\SupplyUserMixin.lua</filename>
-  </file>
-  <file>
     <filename>mvm\TargetCache.lua</filename>
   </file>
   <file>
@@ -437,9 +401,6 @@
   </file>
   <file>
     <filename>mvm\TeamMixin.lua</filename>
-  </file>
-  <file>
-    <filename>mvm\TechData.lua</filename>
   </file>
   <file>
     <filename>mvm\Weapons\Weapon.lua</filename>

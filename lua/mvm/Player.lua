@@ -1,6 +1,5 @@
 
 Script.Load("lua/PostLoadMod.lua")
-Script.Load("lua/mvm/TechData.lua")
 
 
 local newNetworkVars = {
@@ -353,7 +352,6 @@ if Client then
 		return false
 	end
 	
-	
 	function PlayerUI_GetTeamNumber()
 		local player = Client.GetLocalPlayer()
 		
@@ -494,17 +492,6 @@ if Client then
 		
 		return blipsData
 		
-	end
-
-
-	function PlayerUI_GetTeamSupply()
-	
-		local playerTeam = Client.GetLocalPlayer():GetTeamNumber()
-		local teamSupply = MvM_GetSupplyUsedByTeam( playerTeam )
-		local teamMaxSupply = MvM_GetMaxSupplyForTeam( playerTeam )
-		
-		return string.format("TEAM SUPPLY: %s of %s", teamSupply, teamMaxSupply)
-	
 	end
 
 

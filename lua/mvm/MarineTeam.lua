@@ -1,12 +1,12 @@
 
 
 Script.Load("lua/MarineTeam.lua")
-Script.Load("lua/mvm/Marine.lua")
+
 
 //-----------------------------------------------------------------------------
 
 
-function MarineTeam:OnResetComplete()	//FIXME This is NOT resetting nodes...
+function MarineTeam:OnResetComplete()
 
     //adjust first power node    
     local initialTechPoint = self:GetInitialTechPoint()
@@ -41,24 +41,6 @@ function MarineTeam:OnResetComplete()	//FIXME This is NOT resetting nodes...
     end
     */
 end
-
-
-//OVERRIDES PlayingTeam:GetSupplyUsed()
-function MarineTeam:GetSupplyUsed()
-    return Clamp(self.supplyUsed, 0, MvM_GetMaxSupplyForTeam( self.teamNumber ) )	//kMaxSupply
-end
-
-//OVERRIDES PlayingTeam:AddSupplyUsed()
-function MarineTeam:AddSupplyUsed(supplyUsed)
-    self.supplyUsed = self.supplyUsed + supplyUsed
-end
-
-//OVERRIDES PlayingTeam:RemoveSupplyUsed()
-function MarineTeam:RemoveSupplyUsed(supplyUsed)
-    self.supplyUsed = self.supplyUsed - supplyUsed
-end
-
-
 
 
 //-----------------------------------------------------------------------------

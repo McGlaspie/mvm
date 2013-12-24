@@ -84,27 +84,6 @@ local function AddBuildArmor(self, scalar)
 end
 
 
-if Server then
-/*
-	function ConstructMixin:OnKill()
-
-        if not self:GetIsBuilt() and not self:isa("PowerPoint") then
-        
-            local techTree = self:GetTeam():GetTechTree()
-            local techNode = techTree:GetTechNode(self:GetTechId())
-            
-            if techNode then
-                techNode:SetResearchProgress(0.0)
-                techTree:SetTechNodeChanged(techNode, "researchProgress = 1.0f")
-            end 
-            
-        end
-        
-    end
-*/
-end
-
-
 /**
  * Build structure by elapsedTime amount and play construction sounds. Pass custom construction sound if desired, 
  * otherwise use Gorge build sound or Marine sparking build sounds. Returns two values - whether the construct

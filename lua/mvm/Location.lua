@@ -72,7 +72,7 @@ if Server then
             
             if not entLocEnt or entLocEnt ~= self then
 				
-				//Print("Updating location for " .. entity:GetClassName() .. "[" .. entity:GetId() .. "]" )
+				Print("Updating location for " .. entity:GetClassName() .. "[" .. entity:GetId() .. "]" )
 				
                 entity:SetLocationName( triggerEnt:GetName() )
                 entity:SetLocationEntity(self)

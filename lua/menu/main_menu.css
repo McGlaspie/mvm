@@ -219,10 +219,9 @@ window.main_frame
 window.main_frame image.logo
 {
     height: 192px;
-    width: 600px;
-    horizontal-align: right;
-    right: 220px;
-    top: 60px;
+    width: 768px;
+    left: 45%;
+    top: 10px;
     background-image: path(ui/menu/logo.dds) coords(0.0,0.0,1.0,1.0);
 }
 
@@ -233,7 +232,7 @@ window.main_frame image.scanline
     width: 100%;
     top: -64px;
     bottom: -64px time(4);
-    background-color: rgba(0.756, 0.952, 0.988, 0);
+    background-color: rgba(0.756, 0.952, 0.988, 1);
     background-image: path(ui/menu/scanLine_big.dds) coords(0.0,0.0,1.0,1.0);
 }
 
@@ -438,34 +437,29 @@ link.play
     top: 120px;
 }
 
-link.news
+link.tutorial
 {
     top: 190px;
 }
 
-link.tutorial
+link.options
 {
     top: 260px;
 }
 
-link.options
+link.mods
 {
     top: 330px;
 }
 
-link.mods
+link.credits
 {
     top: 400px;
 }
 
-link.credits
-{
-    top: 470px;
-}
-
 link.exit
 {
-    top: 540px;
+    top: 470px;
 }
 
 link.resume_ingame font, link.readyroom_ingame font, link.vote_ingame font, link.play_ingame font, link.options_ingame font, link.tutorial_ingame font, link.disconnect_ingame font

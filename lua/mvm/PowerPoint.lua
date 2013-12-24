@@ -45,8 +45,6 @@ local kUnderAttackTeamMessageLimit = 4
 // max amount of "attack" the powerpoint has suffered (?)
 local kMaxAttackTime = 10
 
-local kDefaultUpdateRange = 100
-
 local kSightedUpdateRate = 2	//seconds
 //PowerPoint.kPowerState = enum( { "unsocketed", "socketed", "destroyed" } )
 
@@ -73,73 +71,16 @@ function PowerPoint:OnCreate()
 end
 
 
+local oldPowerPointInit = PowerPoint.OnInitialized
+function PowerPoint:OnInitialized()
+	
+	oldPowerPointInit(self)
 
-local function SetupWithInitialSettings(self)
+	if Server then
+		self:SetTeamNumber(kTeamReadyRoom)
+	end
 
-    if self.startSocketed then
-
-        self:SetInternalPowerState(PowerPoint.kPowerState.socketed)
-        self:SetConstructionComplete()
-        self:SetLightMode(kLightMode.Normal)
-        self:SetPoweringState(true)
-    
-    else
-
-        self:SetModel(kUnsocketedSocketModelName, kUnsocketedAnimationGraph)
-        
-        self.lightMode = kLightMode.Normal
-        self.powerState = PowerPoint.kPowerState.unsocketed
-        self.timeOfDestruction = 0
-        
-        if Server then
-        
-            self.startsBuilt = false
-            self.attackTime = 0.0
-            
-        elseif Client then 
-        
-            self.unchangingLights = { }
-            self.lightFlickers = { }
-            
-        end
-    
-    end
-    
 end
-
-
-function PowerPoint:OnInitialized()		//OVERRIDES
-
-    ScriptActor.OnInitialized(self)
-    
-    SetupWithInitialSettings(self)
-    
-    if Server then
-		
-       self:SetTeamNumber(kTeamReadyRoom)
-        
-        self:SetRelevancyDistance( kDefaultUpdateRange + 20 )	//????
-        
-        // This Mixin must be inited inside this OnInitialized() function.
-        if not HasMixin(self, "MapBlip") then
-            InitMixin(self, MapBlipMixin)
-        end
-        
-        //InitMixin(self, StaticTargetMixin)
-        //InitMixin(self, InfestationTrackerMixin)
-        
-    elseif Client then
-		
-        InitMixin(self, UnitStatusMixin)
-        //InitMixin(self, HiveVisionMixin)
-        
-    end
-    
-    InitMixin(self, IdleMixin)
-    
-end
-
-
 
 function PowerPoint:GetIsFlameAble()
 	return false
@@ -392,16 +333,15 @@ if Server then
         self:PlaySound(kDestroyedPowerDownSound)
         
         self:SetInternalPowerState(PowerPoint.kPowerState.destroyed)
-        //self.constructionComplete = false
+        
         self:SetLightMode(kLightMode.NoPower)
         
         // Remove effects such as parasite when destroyed.
         self:ClearGameEffects()
         
-        //No scoring from neutral PNs
-        //if attacker and attacker:isa("Player") and GetEnemyTeamNumber(self:GetTeamNumber()) == attacker:GetTeamNumber() then
-        //    attacker:AddScore(self:GetPointValue())
-        //end
+        if attacker and attacker:isa("Player") and GetEnemyTeamNumber(self:GetTeamNumber()) == attacker:GetTeamNumber() then
+            attacker:AddScore(self:GetPointValue())
+        end
         
         // Let the team know the power is down.
         //SendTeamMessage(self:GetTeam(), kTeamMessageTypes.PowerLost, self:GetLocationId())	//Removed - no pointing sending msg to RR "team"

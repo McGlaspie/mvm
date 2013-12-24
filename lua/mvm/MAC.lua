@@ -1,14 +1,9 @@
 
 
 Script.Load("lua/mvm/FireMixin.lua")
-Script.Load("lua/mvm/ElectroMagneticMixin.lua")
 Script.Load("lua/mvm/DetectableMixin.lua")
-//Script.Load("lua/mvm/RagdollMixin.lua")
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
-Script.Load("lua/MAC.lua")
-Script.Load("lua/ResearchMixin.lua")
-Script.Load("lua/RecycleMixin.lua")
 
 
 // Balance
@@ -37,16 +32,11 @@ MAC.kUseTime = 2.0
 
 MAC.kTurnSpeed = 3 * math.pi // a mac is nimble
 
-local kMAC_ChatterSoundAsset = PrecacheAsset("sound/NS2.fev/marine/structures/mac/chatter")
 
 local newNetworkVars = {}
 
-AddMixinNetworkVars(ResearchMixin, newNetworkVars)
-AddMixinNetworkVars(RecycleMixin, newNetworkVars)
-
 AddMixinNetworkVars(FireMixin, newNetworkVars)
 AddMixinNetworkVars(DetectableMixin, newNetworkVars)
-AddMixinNetworkVars(ElectroMagneticMixin, newNetworkVars)
 
 //-----------------------------------------------------------------------------
 
@@ -123,9 +113,9 @@ local function MvM_GetAutomaticOrder(self)
             // If there's a friendly entity nearby that needs constructing, constuct it.
             local constructables = GetEntitiesWithMixinForTeamWithinRange("Construct", self:GetTeamNumber(), self:GetOrigin(), kOrderScanRadius)
             for c = 1, #constructables do
-				
+            
                 local constructable = constructables[c]
-                if constructable:GetCanConstruct(self) then	//prevent auto-rebuild of PNs
+                if constructable:GetCanConstruct(self) then
                 
                     target = constructable
                     orderType = kTechId.Construct
@@ -135,30 +125,25 @@ local function MvM_GetAutomaticOrder(self)
                 
             end
             
-            
+            //TODO Ensure PNs are not auto-repaired, but only constructed
             if not target then
 			//Auto-Build Powernodes for a given location (not just nearby the MAC)
 				local locationName = GetLocationForPoint( self:GetOrigin() ):GetName()
 				
-				if locationName then
+				local locationPowerNode = GetPowerPointForLocation( locationName )
+				
+				if locationPowerNode then
 					
-					local locationPowerNode = GetPowerPointForLocation( locationName )
+					if locationPowerNode:GetCanConstruct( self ) then
+						
+						target = locationPowerNode
+						orderType = kTechId.Construct
 					
-					if locationPowerNode then
-						
-						if locationPowerNode:GetCanConstruct( self ) then
-							
-							target = locationPowerNode
-							orderType = kTechId.Construct
-						
-						end
-						
 					end
 					
 				end
 				
 			end
-			
             
             //FIXME Below will not repair power nodes. This ight be a good thing, would prevent accidental repairs
             //when enemy structures still in a room. Pehapes add a weighted repair command? I.e. only repair when 
@@ -238,13 +223,8 @@ function MAC:OnCreate()		//OVERRIDES
     InitMixin(self, SoftTargetMixin)
     InitMixin(self, WebableMixin)
     InitMixin(self, ParasiteMixin)
-    
-    InitMixin(self, ResearchMixin)
-    InitMixin(self, RecycleMixin)
-    
     InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
-    InitMixin(self, ElectroMagneticMixin)
     
     if Server then
         InitMixin(self, RepositioningMixin)
@@ -252,9 +232,6 @@ function MAC:OnCreate()		//OVERRIDES
         InitMixin(self, CommanderGlowMixin)
         InitMixin(self, ColoredSkinsMixin)
     end
-    
-    self.playedEmpEffectedSound = false
-    self.empDelayedOrder = nil
     
     self:SetUpdates(true)
     self:SetLagCompensated(true)
@@ -300,30 +277,6 @@ function MAC:OnInitialized()
 end
 
 
-
-local function MvM_MAC_GetOrderTargetIsConstructTarget(order, doerTeamNumber)
-
-    if(order ~= nil) then
-    
-        local entity = Shared.GetEntity(order:GetParam())
-		
-        if entity and ( HasMixin(entity, "Construct") and (
-					( entity:GetTeamNumber() == doerTeamNumber ) or ( entity:GetTeamNumber() == kTeamReadyRoom )
-				) and not entity:GetIsBuilt() 
-			) 
-		then
-			
-			Print("\t MAC Construct Order target is a " .. entity:GetClassName() )
-            return entity
-            
-        end
-        
-    end
-    
-    return nil
-
-end
-
 local function MvM_MAC_GetOrderTargetIsWeldTarget(order, doerTeamNumber)
 
     if(order ~= nil) then
@@ -336,8 +289,6 @@ local function MvM_MAC_GetOrderTargetIsWeldTarget(order, doerTeamNumber)
             
             if entity ~= nil and HasMixin(entity, "Weldable") 
 					and ( entity:GetTeamNumber() == doerTeamNumber or entity:GetTeamNumber() == kTeamReadyRoom ) then
-				
-				Print("\t MAC Weld Order target is a " .. entity:GetClassName() )
 				
                 return entity
                 
@@ -363,10 +314,10 @@ function MAC:OnOverrideOrder(order)		//OVERRIDE
     
     // Default orders to unbuilt friendly structures should be construct orders
     if order:GetType() == kTechId.Default 
-		and MvM_MAC_GetOrderTargetIsConstructTarget( order, self:GetTeamNumber() ) 
+		and GetOrderTargetIsConstructTarget(order, self:GetTeamNumber()) 
 		and not isSelfOrder 
 		then
-		
+    
         order:SetType(kTechId.Construct)
 		
     elseif order:GetType() == kTechId.Default 
@@ -374,12 +325,8 @@ function MAC:OnOverrideOrder(order)		//OVERRIDE
 		and not isSelfOrder 
 		and not GetIsWeldedByOtherMAC(self, orderTarget) 
 		then
-		
-		if orderTarget:isa("PowerPoint") then
-			order:SetType(kTechId.Weld)
-		else
-			order:SetType(kTechId.FollowAndWeld)
-		end
+    
+        order:SetType(kTechId.FollowAndWeld)
 
     elseif (order:GetType() == kTechId.Default or order:GetType() == kTechId.Move) then
         
@@ -426,247 +373,6 @@ function MAC:GetIsFlameAble()
 end
 
 
-
-/*
-function MAC:ProcessWeldOrder(deltaTime, orderTarget, orderLocation, autoWeld)	//OVERRIDES
-
-    local time = Shared.GetTime()
-    local canBeWeldedNow = false
-    local orderStatus = kOrderStatus.InProgress
-
-    if self.timeOfLastWeld == 0 or time > self.timeOfLastWeld + kWeldRate then
-    
-        // Not allowed to weld after taking damage recently.
-        if Shared.GetTime() - self:GetTimeLastDamageTaken() <= 1.0 then
-        
-            TEST_EVENT("MAC cannot weld after taking damage")
-            return kOrderStatus.InProgress
-            
-        end
-    
-        // It is possible for the target to not be weldable at this point.
-        // This can happen if a damaged Marine becomes Commander for example.
-        // The Commander is not Weldable but the Order correctly updated to the
-        // new entity Id of the Commander. In this case, the order will simply be completed.
-        if orderTarget and HasMixin(orderTarget, "Weldable") then
-        
-            local toTarget = (orderLocation - self:GetOrigin())
-            local distanceToTarget = toTarget:GetLength()
-            canBeWeldedNow = orderTarget:GetCanBeWelded(self)
-            
-            local obstacleSize = 0
-            if HasMixin(orderTarget, "Extents") then
-                obstacleSize = orderTarget:GetExtents():GetLengthXZ()
-            end
-            
-            if autoWeld and distanceToTarget > 15 then
-                orderStatus = kOrderStatus.Cancelled
-            elseif not canBeWeldedNow then
-                orderStatus = kOrderStatus.Completed
-            else
-            
-                // If we're close enough to weld, weld
-                if distanceToTarget - obstacleSize < MAC.kWeldDistance and not GetIsVortexed(self) then
- 
-                    orderTarget:OnWeld(self, kWeldRate)
-                    self.timeOfLastWeld = time
-                    self.moving = false
-                    
-                else
-                
-                    // otherwise move towards it
-                    local hoverAdjustedLocation = GetHoverAt(self, orderTarget:GetOrigin())
-                    local doneMoving = self:MoveToTarget(PhysicsMask.AIMovement, hoverAdjustedLocation, self:GetMoveSpeed(), deltaTime)
-                    self.moving = not doneMoving
-                    
-                end
-                
-            end    
-            
-        else
-            orderStatus = kOrderStatus.Cancelled
-        end
-        
-    end
-    
-    // Continuously turn towards the target. But don't mess with path finding movement if it was done.
-    if not self.moving and orderLocation then
-    
-        local toOrder = (orderLocation - self:GetOrigin())
-        self:SmoothTurn(deltaTime, GetNormalizedVector(toOrder), 0)
-        
-    end
-    
-    return orderStatus
-    
-end
-*/
-
-
-function MAC:ProcessFollowAndWeldOrder(deltaTime, orderTarget, targetPosition)	//OVERRIDES
-
-    local currentOrder = self:GetCurrentOrder()
-    local orderStatus = kOrderStatus.InProgress
-    //or ( orderTarget:isa("PowerPoint") and not orderTarget:GetIsBuilt() )
-    if ( orderTarget and orderTarget:GetIsAlive() )  then
-        
-        local distance = (self:GetOrigin() - targetPosition):GetLengthXZ()
-        local target, orderType = MvM_GetAutomaticOrder(self)
-        
-        if target and orderType then
-        
-            self.secondaryOrderType = orderType
-            self.secondaryTargetId = target:GetId()
-            
-        end
-        
-        target = target ~= nil and target or ( self.secondaryTargetId ~= nil and Shared.GetEntity(self.secondaryTargetId) )
-        orderType = orderType ~= nil and orderType or self.secondaryOrderType
-        
-        local triggerMoveDistance = (self.welding or self.constructing or orderType) and 15 or 6	//15 or 6? wtf?
-        
-        if distance > triggerMoveDistance or self.moveToPrimary then
-        
-            if self:ProcessMove(deltaTime, target, targetPosition) == kOrderStatus.InProgress and (self:GetOrigin() - targetPosition):GetLengthXZ() > 3 then
-                self.moveToPrimary = true
-                self.secondaryTargetId = nil
-                self.secondaryOrderType = nil
-            else
-                self.moveToPrimary = false
-            end
-            
-        else
-            self.moving = false
-        end
-        
-        // when we attempt to follow the primary target, dont interrupt with auto orders
-        if not self.moveToPrimary then
-        
-            if target and orderType then
-            
-                local secondaryOrderStatus = nil
-            
-                if orderType == kTechId.AutoWeld then            
-                    secondaryOrderStatus = self:ProcessWeldOrder(deltaTime, target, target:GetOrigin(), true)        
-                elseif orderType == kTechId.Construct then
-                    secondaryOrderStatus = self:ProcessConstruct(deltaTime, target, target:GetOrigin())
-                end
-                
-                if secondaryOrderStatus == kOrderStatus.Completed or secondaryOrderStatus == kOrderStatus.Cancelled then
-                
-                    self.secondaryTargetId = nil
-                    self.secondaryOrderType = nil
-                    
-                end
-            
-            end
-        
-        end
-        
-    else
-        self.moveToPrimary = false
-        orderStatus = kOrderStatus.Cancelled
-    end
-    
-    return orderStatus
-
-end
-
-
-function MAC:GetIsVulnerableToEMP()
-	return true
-end
-
-function MAC:OnEmpDamaged()
-
-	//TODO Start cinematic via mixin
-	// - Reference FireMixin for handling this
-
-end
-
-
-local function SetOrderFromPrevious(self, order, clearExisting, insertFirst, giver)
-
-    if self.ignoreOrders or order:GetType() == kTechId.Default then
-        return false
-    end
-    
-    if clearExisting then
-        self:ClearOrders()
-    end
-    
-    // Always snap the location of the order to the ground.
-    local location = order:GetLocation()
-    if location then
-    
-        location = GetGroundAt(self, location, PhysicsMask.AIMovement)
-        order:SetLocation(location)
-        
-    end
-    
-    order:SetOwner(self)
-    
-    if insertFirst then
-        table.insert(self.orders, 1, order:GetId())
-    else
-        table.insert(self.orders, order:GetId())
-    end
-    
-    self.timeLastOrder = Shared.GetTime()
-    OrderChanged(self)
-    
-    return true
-    
-end
-
-
-local kEmpChatterSoundDelay = 0.75
-
-local orgMACupdate = MAC.OnUpdate
-function MAC:OnUpdate(deltaTime)
-	
-	if self:GetIsUnderEmpEffect() and self:GetIsAlive() then
-		
-		if Shared.GetTime() > self.timeEmpStarted + kEmpChatterSoundDelay and not self.playedEmpEffectedSound then
-			self:PlaySound( kMAC_ChatterSoundAsset )
-			self.playedEmpEffectedSound = true
-		end
-		
-		if Server then
-			
-			if self:GetHasOrder() and self.empDelayedOrder == nil then
-				self.empDelayedOrder = self:GetCurrentOrder():GetId()
-				self:ClearOrders()
-				self.ignoreOrders = true
-			end
-			
-		end
-		
-	else
-		
-		if Server then
-			
-			if self.empDelayedOrder ~= nil and self.empDelayedOrder ~= Entity.InvalidId then
-				local previousOrder = Shared.GetEntity( self.empDelayedOrder )
-				if previousOrder and previousOrder:isa("Order") then
-					SetOrderFromPrevious(self, previousOrder, true, true)
-				end
-				self.empDelayedOrder = nil
-			end
-			
-			self.ignoreOrders = false
-			
-		end
-		
-		self.playedEmpEffectedSound = false
-		
-	end
-	
-	orgMACupdate(self, deltaTime)
-
-end
-
-
 if Server then
 
 	// Required by ControllerMixin.
@@ -678,31 +384,13 @@ if Server then
 	function MAC:GetMovePhysicsMask()
 		return PhysicsMask.Movement
 	end
-	
-	
-	function MAC:GetMoveSpeed()		//OVERRIDES
-	
-		local maxSpeedTable = {}//{ maxSpeed = MAC.kMoveSpeed }
-		
-		if self:GetIsUnderEmpEffect() then
-			maxSpeedTable = { maxSpeed = MAC.kMoveSpeed * kElectrifiedMovementModifier }
-		else
-			maxSpeedTable = { maxSpeed = MAC.kMoveSpeed }
-		end
-		
-		self:ModifyMaxSpeed( maxSpeedTable )
 
-		return maxSpeedTable.maxSpeed
-		
-	end
-	
-
-end	//End Server
+end
 
 
 //-----------------------------------------------------------------------------
 
-//TODO Verify these actually work...
+
 ReplaceLocals( MAC.OnUpdate, { FindSomethingToDo = MvM_FindSomethingToDo } )
 ReplaceLocals( MAC.ProcessConstruct, { GetCanConstructTarget = MvM_GetCanConstructTarget } )
 

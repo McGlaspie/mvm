@@ -18,9 +18,9 @@ function GUIMainMenuNews:Initialize()
 
     local layer = kGUILayerMainMenuNews
 
-    self.logo = GUIManager:CreateGraphicItem()
-    self.logo:SetTexture("ui/menu/logo.dds")
-    self.logo:SetLayer(layer)
+    //self.logo = GUIManager:CreateGraphicItem()
+    //self.logo:SetTexture("ui/menu/logo.dds")
+    //self.logo:SetLayer(layer)
     
     local width = widthFraction * Client.GetScreenWidth()
     local newsHt = width/newsAspect
@@ -41,11 +41,6 @@ function GUIMainMenuNews:Initialize()
 
     self.isVisible = true
     
-    self.webContainer:SetIsVisible(false)
-    self.logo:SetIsVisible(true)
-    self.reinforceButton:SetIsVisible(false)
-    self.storeButton:SetIsVisible(false)
-    
 end
 
 function GUIMainMenuNews:Uninitialize()
@@ -56,8 +51,8 @@ function GUIMainMenuNews:Uninitialize()
     Client.DestroyWebView(self.webView)
     self.webView = nil
 
-    GUI.DestroyItem(self.logo)
-    self.logo = nil
+    //GUI.DestroyItem(self.logo)
+    //self.logo = nil
     GUI.DestroyItem(self.reinforceButton)
     self.reinforceButton = nil
     GUI.DestroyItem(self.storeButton)
@@ -154,9 +149,9 @@ function GUIMainMenuNews:Update(deltaTime)
 
     local logoAspect = 600/192
 
-    self.logo:SetSize( Vector(width, width/logoAspect, 0) )
-    self.logo:SetAnchor(GUIItem.Right, GUIItem.Top)
-    self.logo:SetPosition(Vector( -width-rightMargin, y, 0))
+    //self.logo:SetSize( Vector(width, width/logoAspect, 0) )
+    //self.logo:SetAnchor(GUIItem.Right, GUIItem.Top)
+    //self.logo:SetPosition(Vector( -width-rightMargin, y, 0))
     y = y + width/logoAspect
 
     local logoAspect = 300/100
@@ -184,7 +179,7 @@ end
 
 function GUIMainMenuNews:SetIsVisible(visible)
     self.webContainer:SetIsVisible(visible)
-    self.logo:SetIsVisible(true)
+    //self.logo:SetIsVisible(visible)
     self.reinforceButton:SetIsVisible(visible)
     self.storeButton:SetIsVisible(visible)
     self.isVisible = visible

@@ -4,66 +4,10 @@
 //
 
 Script.Load("lua/PostLoadMod.lua")
-Script.Load("lua/mvm/ElectroMagneticMixin.lua")
-Script.Load("lua/mvm/LiveMixin.lua")
-
-
-local newNetworkVars = {}
-
 
 Scan.kScanEffectTeam2 = PrecacheAsset("cinematics/marine/observatory/scan_team2.cinematic")
 
-Scan.kEmpResistanceHealth = 3
-
-AddMixinNetworkVars(ElectroMagneticMixin, newNetworkVars)
-AddMixinNetworkVars(LiveMixin, newNetworkVars)
-
 //-----------------------------------------------------------------------------
-
-
-//local orgScanCreate = Scan.OnCreate
-function Scan:OnCreate()	//OVERRIDES
-
-	CommanderAbility.OnCreate(self)
-    
-    InitMixin(self, LiveMixin)
-    
-    if Server then
-		
-        StartSoundEffectOnEntity(Scan.kScanSound, self)
-        
-        self:SetMaxHealth( Scan.kEmpResistanceHealth )
-        
-    end
-	
-end
-
-function Scan:GetSendDeathMessageOverride()
-	return false
-end
-
-function Scan:GetIsHealableOverride()
-	return false
-end
-
-function Scan:GetCanBeHealed()
-	return false
-end
-
-function Scan:AttemptToKill( damage, attacker, doer, point )
-	
-	if doer and doer:GetDamageType() == kDamageType.ElectroMagnetic then
-		return true
-	end
-	
-	return false
-	
-end
-
-
-function Scan:GetLifeSpan()
-    return kScanDuration
-end
 
 function Scan:GetRepeatCinematic()
 	return ConditionalValue( self:GetTeamNumber() == kTeam2Index, Scan.kScanEffectTeam2, Scan.kScanEffect )
@@ -72,19 +16,12 @@ end
 
 
 if Server then
-	
-	//function Scan:OnEmpDamaged()
-	//	Scan:OnDestroy()
-	//end
 
 	
 	function Scan:GetVisionRadius()
 		return Scan.kScanDistance
 	end
-	
-	function Scan:OnKill( attacker, doer, point, direction )
-		Scan:OnDestroy()
-	end
+
 	
     function Scan:Perform(deltaTime)
     
@@ -144,4 +81,4 @@ end	//End Server
 
 //-----------------------------------------------------------------------------
 
-Class_Reload("Scan", newNetworkVars)
+Class_Reload("Scan", {})

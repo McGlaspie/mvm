@@ -153,47 +153,16 @@ kTechDataBioMass = "biomasslevel"
 
 kTechDataShowOrderLine = "showorderline"
 
-//Probably don't need all the above crap...
-
-
-
-function BuildTechData()	//OVERRIDES
+function BuildTechData()
     
     local techData = { 
 
         // Orders
-        { 
-			[kTechDataId] = kTechId.Move,
-				[kTechDataDisplayName] = "MOVE",
-				[kTechDataHotkey] = Move.M,
-				[kTechDataTooltipInfo] = "MOVE_TOOLTIP",
-				[kTechDataOrderSound] = MarineCommander.kMoveToWaypointSoundName
-		},
-        { 
-			[kTechDataId] = kTechId.Patrol,
-				[kTechDataDisplayName] = "PATROL",
-				[kTechDataShowOrderLine] = true,
-				[kTechDataHotkey] = Move.M,
-				[kTechDataTooltipInfo] = "PATROL_TOOLTIP",
-				[kTechDataOrderSound] = MarineCommander.kMoveToWaypointSoundName
-		},
-        { 
-			[kTechDataId] = kTechId.Attack,
-				[kTechDataDisplayName] = "ATTACK",
-				[kTechDataHotkey] = Move.A,
-				[kTechDataTooltipInfo] = "ATTACK_TOOLTIP",
-				[kTechDataOrderSound] = MarineCommander.kAttackOrderSoundName
-		},
-        { 
-			[kTechDataId] = kTechId.Build,
-				[kTechDataDisplayName] = "BUILD",
-				[kTechDataTooltipInfo] = "BUILD_TOOLTIP"
-		},
-        { 
-			[kTechDataId] = kTechId.Construct,
-				[kTechDataDisplayName] = "CONSTRUCT",
-				[kTechDataOrderSound] = MarineCommander.kBuildStructureSound
-		},
+        { [kTechDataId] = kTechId.Move,                  [kTechDataDisplayName] = "MOVE", [kTechDataHotkey] = Move.M, [kTechDataTooltipInfo] = "MOVE_TOOLTIP", [kTechDataOrderSound] = MarineCommander.kMoveToWaypointSoundName},
+        { [kTechDataId] = kTechId.Patrol,                [kTechDataDisplayName] = "PATROL", [kTechDataShowOrderLine] = true, [kTechDataHotkey] = Move.M, [kTechDataTooltipInfo] = "PATROL_TOOLTIP", [kTechDataOrderSound] = MarineCommander.kMoveToWaypointSoundName},
+        { [kTechDataId] = kTechId.Attack,                [kTechDataDisplayName] = "ATTACK", [kTechDataHotkey] = Move.A, [kTechDataTooltipInfo] = "ATTACK_TOOLTIP", [kTechDataOrderSound] = MarineCommander.kAttackOrderSoundName},
+        { [kTechDataId] = kTechId.Build,                 [kTechDataDisplayName] = "BUILD", [kTechDataTooltipInfo] = "BUILD_TOOLTIP"},
+        { [kTechDataId] = kTechId.Construct,             [kTechDataDisplayName] = "CONSTRUCT", [kTechDataOrderSound] = MarineCommander.kBuildStructureSound},
         { [kTechDataId] = kTechId.AutoConstruct,         [kTechDataDisplayName] = "CONSTRUCT", [kTechDataOrderSound] = MarineCommander.kBuildStructureSound},
         { [kTechDataId] = kTechId.Grow,                  [kTechDataDisplayName] = "GROW", [kTechDataTooltipInfo] = "GROW_TOOLTIP" },
         { [kTechDataId] = kTechId.HoldPosition,          [kTechDataDisplayName] = "HOLD_POSITION" },
@@ -260,41 +229,11 @@ function BuildTechData()	//OVERRIDES
         { [kTechDataId] = kTechId.TwoShades, [kTechDataDisplayName] = "TWO_SHADES", [kTechIDShowEnables] = false},                
         
         // Misc.
-        { 
-			[kTechDataId] = kTechId.PowerPoint,
-				[kTechDataHint] = "POWERPOINT_HINT",
-				[kTechDataMapName] = PowerPoint.kMapName,
-				[kTechDataDisplayName] = "POWER_NODE",
-				[kTechDataCostKey] = 0,
-				[kTechDataMaxHealth] = kPowerPointHealth,
-				[kTechDataMaxArmor] = kPowerPointArmor,
-				[kTechDataBuildTime] = kPowerPointBuildTime,
-				[kTechDataPointValue] = kPowerPointPointValue,
-				[kTechDataTooltipInfo] = "POWERPOINT_TOOLTIP"
-		},        
-        { 
-			[kTechDataId] = kTechId.SocketPowerNode,
-				[kTechDataDisplayName] = "SOCKET_POWER_NODE",
-				[kTechDataCostKey] = kPowerNodeCost,
-				[kTechDataBuildTime] = 0.1,
-		},
+        { [kTechDataId] = kTechId.PowerPoint,    [kTechDataHint] = "POWERPOINT_HINT",        [kTechDataMapName] = PowerPoint.kMapName,            [kTechDataDisplayName] = "POWER_NODE",  [kTechDataCostKey] = 0,   [kTechDataMaxHealth] = kPowerPointHealth, [kTechDataMaxArmor] = kPowerPointArmor, [kTechDataBuildTime] = kPowerPointBuildTime, [kTechDataPointValue] = kPowerPointPointValue, [kTechDataTooltipInfo] = "POWERPOINT_TOOLTIP"},        
+        { [kTechDataId] = kTechId.SocketPowerNode,    [kTechDataDisplayName] = "SOCKET_POWER_NODE", [kTechDataCostKey] = kPowerNodeCost, [kTechDataBuildTime] = 0.1, },
 
-        { 
-			[kTechDataId] = kTechId.ResourcePoint,
-				[kTechDataHint] = "RESOURCE_NOZZLE_TOOLTIP",
-				[kTechDataMapName] = ResourcePoint.kPointMapName,
-				[kTechDataDisplayName] = "RESOURCE_NOZZLE",
-				[kTechDataModel] = ResourcePoint.kModelName,
-				[kTechDataObstacleRadius] = 1.0
-		},
-        { 
-			[kTechDataId] = kTechId.TechPoint,
-				[kTechDataHint] = "TECH_POINT_HINT",
-				[kTechDataTooltipInfo] = "TECH_POINT_TOOLTIP",
-				[kTechDataMapName] = TechPoint.kMapName,
-				[kTechDataDisplayName] = "TECH_POINT",
-				[kTechDataModel] = TechPoint.kModelName
-		},
+        { [kTechDataId] = kTechId.ResourcePoint,   [kTechDataHint] = "RESOURCE_NOZZLE_TOOLTIP",      [kTechDataMapName] = ResourcePoint.kPointMapName,    [kTechDataDisplayName] = "RESOURCE_NOZZLE", [kTechDataModel] = ResourcePoint.kModelName, [kTechDataObstacleRadius] = 1.0},
+        { [kTechDataId] = kTechId.TechPoint,     [kTechDataHint] = "TECH_POINT_HINT",        [kTechDataTooltipInfo] = "TECH_POINT_TOOLTIP", [kTechDataMapName] = TechPoint.kMapName,             [kTechDataDisplayName] = "TECH_POINT", [kTechDataModel] = TechPoint.kModelName},
         { [kTechDataId] = kTechId.Door,                  [kTechDataDisplayName] = "DOOR", [kTechDataTooltipInfo] = "DOOR_TOOLTIP", [kTechDataMapName] = Door.kMapName, [kTechDataMaxHealth] = kDoorHealth, [kTechDataMaxArmor] = kDoorArmor, [kTechDataPointValue] = kDoorPointValue },
         { [kTechDataId] = kTechId.DoorOpen,              [kTechDataDisplayName] = "OPEN_DOOR", [kTechDataHotkey] = Move.O, [kTechDataTooltipInfo] = "OPEN_DOOR_TOOLTIP"},
         { [kTechDataId] = kTechId.DoorClose,             [kTechDataDisplayName] = "CLOSE_DOOR", [kTechDataHotkey] = Move.C, [kTechDataTooltipInfo] = "CLOSE_DOOR_TOOLTIP"},
@@ -308,68 +247,32 @@ function BuildTechData()	//OVERRIDES
         { [kTechDataId] = kTechId.NanoShield,    [kTechDataCooldown] = kNanoShieldCooldown,      [kTechDataAllowStacking] = true, [kTechDataIgnorePathingMesh] = true, [kTechDataMapName] = NanoShield.kMapName,   [kTechDataDisplayName] = "NANO_SHIELD_DEFENSE", [kTechDataCostKey] = kNanoShieldCost, [kTechDataTooltipInfo] = "NANO_SHIELD_DEFENSE_TOOLTIP"},        
         { [kTechDataId] = kTechId.AmmoPack,              [kTechDataAllowStacking] = true, [kTechDataIgnorePathingMesh] = true, [kTechDataMapName] = AmmoPack.kMapName,  [kTechDataDisplayName] = "AMMO_PACK",      [kTechDataCostKey] = kAmmoPackCost,            [kTechDataModel] = AmmoPack.kModelName, [kTechDataTooltipInfo] = "AMMO_PACK_TOOLTIP", [kTechDataSpawnHeightOffset] = kCommanderDropSpawnHeight },
         { [kTechDataId] = kTechId.MedPack,    [kTechDataCooldown] = kMedPackCooldown,         [kTechDataAllowStacking] = true, [kTechDataIgnorePathingMesh] = true, [kTechDataMapName] = MedPack.kMapName,   [kTechDataDisplayName] = "MED_PACK",     [kTechDataCostKey] = kMedPackCost,             [kTechDataModel] = MedPack.kModelName,  [kTechDataTooltipInfo] = "MED_PACK_TOOLTIP", [kTechDataSpawnHeightOffset] = kCommanderDropSpawnHeight},
-        { [kTechDataId] = kTechId.CatPack, [kTechDataAllowStacking] = true, [kTechDataIgnorePathingMesh] = true, [kTechDataMapName] = CatPack.kMapName,   [kTechDataDisplayName] = "CAT_PACK",      [kTechDataCostKey] = kCatPackCost,             [kTechDataModel] = CatPack.kModelName,  [kTechDataTooltipInfo] = "CAT_PACK_TOOLTIP", [kTechDataSpawnHeightOffset] = kCommanderDropSpawnHeight},
-        { [kTechDataId] = kTechId.Scan, [kTechDataCooldown] = kScanCooldown,        [kTechDataAllowStacking] = true, [kTechDataCollideWithWorldOnly] = true, [kTechDataIgnorePathingMesh] = true, [kTechDataMapName] = Scan.kMapName,     [kTechDataDisplayName] = "SCAN",      [kTechDataHotkey] = Move.S,   [kTechDataCostKey] = kObservatoryScanCost, [kTechDataTooltipInfo] = "SCAN_TOOLTIP"},
+        { [kTechDataId] = kTechId.CatPack,               [kTechDataAllowStacking] = true, [kTechDataIgnorePathingMesh] = true, [kTechDataMapName] = CatPack.kMapName,   [kTechDataDisplayName] = "CAT_PACK",      [kTechDataCostKey] = kCatPackCost,             [kTechDataModel] = CatPack.kModelName,  [kTechDataTooltipInfo] = "CAT_PACK_TOOLTIP", [kTechDataSpawnHeightOffset] = kCommanderDropSpawnHeight},
+        { [kTechDataId] = kTechId.Scan,          [kTechDataCooldown] = kScanCooldown,        [kTechDataAllowStacking] = true, [kTechDataCollideWithWorldOnly] = true, [kTechDataIgnorePathingMesh] = true, [kTechDataMapName] = Scan.kMapName,     [kTechDataDisplayName] = "SCAN",      [kTechDataHotkey] = Move.S,   [kTechDataCostKey] = kObservatoryScanCost, [kTechDataTooltipInfo] = "SCAN_TOOLTIP"},
         // Command station and its buildables
         { [kTechDataId] = kTechId.CommandStation, [kTechDataIgnorePathingMesh] = true, [kTechDataSpawnBlock] = true, [kTechDataMaxExtents] = Vector(1.5, 1, 0.4), [kTechDataHint] = "COMMAND_STATION_HINT", [kTechDataAllowStacking] = true, [kStructureAttachClass] = "TechPoint", [kTechDataAttachOptional] = false, [kTechDataOverrideCoordsMethod] = OptionalAttachToFreeTechPoint, [kTechDataGhostModelClass] = "MarineGhostModel",  [kTechDataMapName] = CommandStation.kMapName,     [kTechDataDisplayName] = "COMMAND_STATION",  [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation,   [kTechDataBuildTime] = kCommandStationBuildTime, [kTechDataCostKey] = kCommandStationCost, [kTechDataModel] = CommandStation.kModelName,             [kTechDataMaxHealth] = kCommandStationHealth, [kTechDataMaxArmor] = kCommandStationArmor,      [kTechDataSpawnHeightOffset] = 0, [kTechDataEngagementDistance] = kCommandStationEngagementDistance, [kTechDataInitialEnergy] = kCommandStationInitialEnergy,      [kTechDataMaxEnergy] = kCommandStationMaxEnergy, [kTechDataPointValue] = kCommandStationPointValue, [kTechDataHotkey] = Move.C, [kTechDataTooltipInfo] = "COMMAND_STATION_TOOLTIP", [kTechDataObstacleRadius] = 2},       
 
-        { [kTechDataId] = kTechId.Recycle, [kTechDataDisplayName] = "RECYCLE", [kTechDataCostKey] = 0,    [kTechIDShowEnables] = false,       [kTechDataResearchTimeKey] = kRecycleTime, [kTechDataHotkey] = Move.R, [kTechDataTooltipInfo] =  "RECYCLE_TOOLTIP"},
+        { [kTechDataId] = kTechId.Recycle,               [kTechDataDisplayName] = "RECYCLE", [kTechDataCostKey] = 0,    [kTechIDShowEnables] = false,       [kTechDataResearchTimeKey] = kRecycleTime, [kTechDataHotkey] = Move.R, [kTechDataTooltipInfo] =  "RECYCLE_TOOLTIP"},
         { [kTechDataId] = kTechId.MAC,    [kTechDataSupply] = kMACSupply,    [kTechDataHint] = "MAC_HINT",           [kTechDataMapName] = MAC.kMapName,                      [kTechDataDisplayName] = "MAC",  [kTechDataMaxHealth] = MAC.kHealth, [kTechDataMaxArmor] = MAC.kArmor, [kTechDataCostKey] = kMACCost, [kTechDataResearchTimeKey] = kMACBuildTime, [kTechDataModel] = MAC.kModelName, [kTechDataDamageType] = kMACAttackDamageType, [kTechDataInitialEnergy] = kMACInitialEnergy, [kTechDataMaxEnergy] = kMACMaxEnergy, [kTechDataMenuPriority] = 1, [kTechDataPointValue] = kMACPointValue, [kTechDataHotkey] = Move.M, [kTechDataTooltipInfo] = "MAC_TOOLTIP"},
-        { [kTechDataId] = kTechId.CatPackTech, [kTechDataCostKey] = kCatPackTechResearchCost,          [kTechDataResearchTimeKey] = kCatPackTechResearchTime, [kTechDataDisplayName] = "CAT_PACKS", [kTechDataTooltipInfo] = "CAT_PACK_TECH_TOOLTIP"},
+        { [kTechDataId] = kTechId.CatPackTech,           [kTechDataCostKey] = kCatPackTechResearchCost,          [kTechDataResearchTimeKey] = kCatPackTechResearchTime, [kTechDataDisplayName] = "CAT_PACKS", [kTechDataTooltipInfo] = "CAT_PACK_TECH_TOOLTIP"},
 
         // Marine base structures
         { [kTechDataId] = kTechId.Extractor, [kTechDataIgnorePathingMesh] = true, [kTechDataSpawnBlock] = true, [kTechDataHint] = "EXTRACTOR_HINT", [kTechDataCollideWithWorldOnly] = true, [kTechDataAllowStacking] = true,    [kTechDataGhostModelClass] = "MarineGhostModel", [kTechDataRequiresPower] = true,       [kTechDataMapName] = Extractor.kMapName,                [kTechDataDisplayName] = "EXTRACTOR",           [kTechDataCostKey] = kExtractorCost,       [kTechDataBuildTime] = kExtractorBuildTime, [kTechDataEngagementDistance] = kExtractorEngagementDistance, [kTechDataModel] = Extractor.kModelName,            [kTechDataMaxHealth] = kExtractorHealth, [kTechDataMaxArmor] = kExtractorArmor, [kStructureAttachClass] = "ResourcePoint", [kTechDataPointValue] = kExtractorPointValue, [kTechDataHotkey] = Move.E, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataTooltipInfo] =  "EXTRACTOR_TOOLTIP"},
         { [kTechDataId] = kTechId.ExtractorArmor, [kTechDataCostKey] = kExtractorArmorCost, [kTechDataResearchTimeKey] = kExtractorArmorResearchTime, [kTechDataDisplayName] = "EXTRACTOR_ARMOR", [kTechDataTooltipInfo] = "EXTRACTOR_ARMOR_TOOLTIP", },
         { [kTechDataId] = kTechId.InfantryPortal, [kTechDataHint] = "INFANTRY_PORTAL_HINT", [kTechDataSupply] = kInfantryPortalSupply, [kTechDataGhostModelClass] = "MarineGhostModel", [kTechDataRequiresPower] = true, [kTechDataGhostGuidesMethod] = GetInfantryPortalGhostGuides, [kTechDataBuildRequiresMethod] = GetCommandStationIsBuilt,   [kTechDataMapName] = InfantryPortal.kMapName,           [kTechDataDisplayName] = "INFANTRY_PORTAL",     [kTechDataCostKey] = kInfantryPortalCost,   [kTechDataPointValue] = kInfantryPortalPointValue,   [kTechDataBuildTime] = kInfantryPortalBuildTime, [kTechDataMaxHealth] = kInfantryPortalHealth, [kTechDataMaxArmor] = kInfantryPortalArmor, [kTechDataModel] = InfantryPortal.kModelName, [kStructureBuildNearClass] = "CommandStation", [kStructureAttachId] = kTechId.CommandStation, [kStructureAttachRange] = kInfantryPortalAttachRange, [kTechDataEngagementDistance] = kInfantryPortalEngagementDistance, [kTechDataHotkey] = Move.P, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataTooltipInfo] = "INFANTRY_PORTAL_TOOLTIP"},
-        { 
-			[kTechDataId] = kTechId.Armory,
-				[kTechDataSupply] = kArmorySupply,
-				[kTechDataHint] = "ARMORY_HINT",
-				[kTechDataGhostModelClass] = "MarineGhostModel",
-				[kTechDataRequiresPower] = true,
-				[kTechDataMapName] = Armory.kMapName,
-				[kTechDataDisplayName] = "ARMORY",
-				[kTechDataCostKey] = kArmoryCost,
-				[kTechDataBuildTime] = kArmoryBuildTime,
-				[kTechDataMaxHealth] = kArmoryHealth,
-				[kTechDataMaxArmor] = kArmoryArmor,
-				[kTechDataEngagementDistance] = kArmoryEngagementDistance,
-				[kTechDataModel] = Armory.kModelName,
-				[kTechDataPointValue] = kArmoryPointValue,
-				[kTechDataInitialEnergy] = kArmoryInitialEnergy,
-				[kTechDataMaxEnergy] = kArmoryMaxEnergy,
-				[kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation,
-				[kTechDataTooltipInfo] = "ARMORY_TOOLTIP"
-		},
-        { [kTechDataId] = kTechId.ArmsLab, [kTechDataSupply] = kArmsLabSupply, [kTechDataHint] = "ARMSLAB_HINT", [kTechDataGhostModelClass] = "MarineGhostModel", [kTechDataRequiresPower] = true,       [kTechDataMapName] = ArmsLab.kMapName,                  [kTechDataDisplayName] = "ARMS_LAB",            [kTechDataCostKey] = kArmsLabCost,              [kTechDataBuildTime] = kArmsLabBuildTime, [kTechDataMaxHealth] = kArmsLabHealth, [kTechDataMaxArmor] = kArmsLabArmor, [kTechDataEngagementDistance] = kArmsLabEngagementDistance, [kTechDataModel] = ArmsLab.kModelName, [kTechDataPointValue] = kArmsLabPointValue, [kTechDataHotkey] = Move.A, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataTooltipInfo] = "ARMS_LAB_TOOLTIP", [kTechDataObstacleRadius] = 0.25},
+        { [kTechDataId] = kTechId.Armory,    [kTechDataSupply] = kArmorySupply,     [kTechDataHint] = "ARMORY_HINT", [kTechDataGhostModelClass] = "MarineGhostModel", [kTechDataRequiresPower] = true,      [kTechDataMapName] = Armory.kMapName,                   [kTechDataDisplayName] = "ARMORY",              [kTechDataCostKey] = kArmoryCost,              [kTechDataBuildTime] = kArmoryBuildTime, [kTechDataMaxHealth] = kArmoryHealth, [kTechDataMaxArmor] = kArmoryArmor, [kTechDataEngagementDistance] = kArmoryEngagementDistance, [kTechDataModel] = Armory.kModelName, [kTechDataPointValue] = kArmoryPointValue, [kTechDataInitialEnergy] = kArmoryInitialEnergy,   [kTechDataMaxEnergy] = kArmoryMaxEnergy, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataTooltipInfo] = "ARMORY_TOOLTIP"},
+        { [kTechDataId] = kTechId.ArmsLab,        [kTechDataHint] = "ARMSLAB_HINT", [kTechDataGhostModelClass] = "MarineGhostModel", [kTechDataRequiresPower] = true,       [kTechDataMapName] = ArmsLab.kMapName,                  [kTechDataDisplayName] = "ARMS_LAB",            [kTechDataCostKey] = kArmsLabCost,              [kTechDataBuildTime] = kArmsLabBuildTime, [kTechDataMaxHealth] = kArmsLabHealth, [kTechDataMaxArmor] = kArmsLabArmor, [kTechDataEngagementDistance] = kArmsLabEngagementDistance, [kTechDataModel] = ArmsLab.kModelName, [kTechDataPointValue] = kArmsLabPointValue, [kTechDataHotkey] = Move.A, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataTooltipInfo] = "ARMS_LAB_TOOLTIP", [kTechDataObstacleRadius] = 0.25},
         { [kTechDataId] = kTechId.Sentry,  [kTechDataSupply] = kSentrySupply, [kTechDataBuildMethodFailedMessage] = "COMMANDERERROR_TOO_MANY_SENTRIES",      [kTechDataHint] = "SENTRY_HINT", [kTechDataGhostModelClass] = "MarineGhostModel", [kTechDataMapName] = Sentry.kMapName,                   [kTechDataDisplayName] = "SENTRY_TURRET",       [kTechDataCostKey] = kSentryCost,         [kTechDataPointValue] = kSentryPointValue, [kTechDataModel] = Sentry.kModelName,            [kTechDataBuildTime] = kSentryBuildTime, [kTechDataMaxHealth] = kSentryHealth,  [kTechDataMaxArmor] = kSentryArmor, [kTechDataDamageType] = kSentryAttackDamageType, [kTechDataSpecifyOrientation] = true, [kTechDataHotkey] = Move.S, [kTechDataInitialEnergy] = kSentryInitialEnergy,      [kTechDataMaxEnergy] = kSentryMaxEnergy, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataEngagementDistance] = kSentryEngagementDistance, [kTechDataTooltipInfo] = "SENTRY_TOOLTIP", [kStructureBuildNearClass] = "SentryBattery", [kStructureAttachRange] = SentryBattery.kRange, [kTechDataBuildRequiresMethod] = GetCheckSentryLimit, [kTechDataGhostGuidesMethod] = GetBatteryInRange, [kTechDataObstacleRadius] = 0.25 },
-        { [kTechDataId] = kTechId.SentryBattery, [kTechDataSupply] = kSentryBatterySupply, [kTechDataBuildRequiresMethod] = GetRoomHasNoSentryBattery, [kTechDataBuildMethodFailedMessage] = "COMMANDERERROR_ONLY_ONE_BATTERY_PER_ROOM",  [kTechDataHint] = "SENTRY_BATTERY_HINT", [kTechDataGhostModelClass] = "MarineGhostModel", [kTechDataMapName] = SentryBattery.kMapName,                [kTechDataDisplayName] = "SENTRY_BATTERY",          [kTechDataCostKey] = kSentryBatteryCost,      [kTechDataPointValue] = kSentryBatteryPointValue, [kTechDataModel] = SentryBattery.kModelName,  [kTechDataEngagementDistance] = 2,   [kTechDataBuildTime] = kSentryBatteryBuildTime, [kTechDataMaxHealth] = kSentryBatteryHealth,  [kTechDataMaxArmor] = kSentryBatteryArmor, [kTechDataTooltipInfo] = "SENTRY_BATTERY_TOOLTIP", [kTechDataHotkey] = Move.S, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kVisualRange] = SentryBattery.kRange, [kTechDataObstacleRadius] = 0.25},
+        { [kTechDataId] = kTechId.SentryBattery, [kTechDataBuildRequiresMethod] = GetRoomHasNoSentryBattery, [kTechDataBuildMethodFailedMessage] = "COMMANDERERROR_ONLY_ONE_BATTERY_PER_ROOM",  [kTechDataHint] = "SENTRY_BATTERY_HINT", [kTechDataGhostModelClass] = "MarineGhostModel", [kTechDataMapName] = SentryBattery.kMapName,                [kTechDataDisplayName] = "SENTRY_BATTERY",          [kTechDataCostKey] = kSentryBatteryCost,      [kTechDataPointValue] = kSentryBatteryPointValue, [kTechDataModel] = SentryBattery.kModelName,  [kTechDataEngagementDistance] = 2,   [kTechDataBuildTime] = kSentryBatteryBuildTime, [kTechDataMaxHealth] = kSentryBatteryHealth,  [kTechDataMaxArmor] = kSentryBatteryArmor, [kTechDataTooltipInfo] = "SENTRY_BATTERY_TOOLTIP", [kTechDataHotkey] = Move.S, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kVisualRange] = SentryBattery.kRange, [kTechDataObstacleRadius] = 0.25},
 
         // MACs 
         { [kTechDataId] = kTechId.MACEMP,   [kTechDataDisplayName] = "MAC_EMP", [kTechDataTooltipInfo] = "MAC_EMP_TOOLTIP", [kTechDataCostKey] = kEMPCost },        
         { [kTechDataId] = kTechId.MACEMPTech,       [kTechDataDisplayName] = "MAC_EMP_RESEARCH", [kTechDataTooltipInfo] = "MAC_EMP_RESEARCH_TOOLTIP", [kTechDataCostKey] = kTechEMPResearchCost,             [kTechDataResearchTimeKey] = kTechEMPResearchTime, },
         { [kTechDataId] = kTechId.MACSpeedTech,     [kTechDataDisplayName] = "MAC_SPEED",  [kTechDataCostKey] = kTechMACSpeedResearchCost,  [kTechDataResearchTimeKey] = kTechMACSpeedResearchTime, [kTechDataHotkey] = Move.S, [kTechDataTooltipInfo] = "MAC_SPEED_TOOLTIP"},
-		
+
         // Marine advanced structures
-        { 
-			[kTechDataId] = kTechId.AdvancedArmory, 
-				[kTechDataSupply] = kAdvancedArmorySupply, 
-				[kTechDataHint] = "ADVANCED_ARMORY_HINT", 
-				[kTechDataTooltipInfo] =  "ADVANCED_ARMORY_TOOLTIP", 
-				[kTechDataGhostModelClass] = "MarineGhostModel",
-				[kTechIDShowEnables] = false,
-				[kTechDataRequiresPower] = true,
-				[kTechDataMapName] = AdvancedArmory.kMapName,
-				[kTechDataDisplayName] = "ADVANCED_ARMORY",
-				[kTechDataCostKey] = kAdvancedArmoryUpgradeCost,
-				[kTechDataModel] = Armory.kModelName,
-				[kTechDataMaxHealth] = kAdvancedArmoryHealth,
-				[kTechDataMaxArmor] = kAdvancedArmoryArmor,
-				[kTechDataEngagementDistance] = kArmoryEngagementDistance,
-				[kTechDataUpgradeTech] = kTechId.Armory,
-				[kTechDataPointValue] = kAdvancedArmoryPointValue
-		},
-        { [kTechDataId] = kTechId.Observatory, [kTechDataSupply] = kObservatorySupply, [kTechDataHint] = "OBSERVATORY_HINT", [kTechDataGhostModelClass] = "MarineGhostModel",  [kTechDataRequiresPower] = true,        [kTechDataMapName] = Observatory.kMapName,    [kTechDataDisplayName] = "OBSERVATORY",  [kVisualRange] = Observatory.kDetectionRange, [kTechDataCostKey] = kObservatoryCost,       [kTechDataModel] = Observatory.kModelName,            [kTechDataBuildTime] = kObservatoryBuildTime, [kTechDataMaxHealth] = kObservatoryHealth,   [kTechDataEngagementDistance] = kObservatoryEngagementDistance, [kTechDataMaxArmor] = kObservatoryArmor,   [kTechDataInitialEnergy] = kObservatoryInitialEnergy,      [kTechDataMaxEnergy] = kObservatoryMaxEnergy, [kTechDataPointValue] = kObservatoryPointValue, [kTechDataHotkey] = Move.O, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataTooltipInfo] = "OBSERVATORY_TOOLTIP", [kTechDataObstacleRadius] = 0.25},
+        { [kTechDataId] = kTechId.AdvancedArmory, [kTechDataHint] = "ADVANCED_ARMORY_HINT", [kTechDataTooltipInfo] =  "ADVANCED_ARMORY_TOOLTIP", [kTechDataGhostModelClass] = "MarineGhostModel",   [kTechIDShowEnables] = false, [kTechDataRequiresPower] = true,     [kTechDataMapName] = AdvancedArmory.kMapName,                   [kTechDataDisplayName] = "ADVANCED_ARMORY",     [kTechDataCostKey] = kAdvancedArmoryUpgradeCost,  [kTechDataModel] = Armory.kModelName,                     [kTechDataMaxHealth] = kAdvancedArmoryHealth,   [kTechDataMaxArmor] = kAdvancedArmoryArmor,  [kTechDataEngagementDistance] = kArmoryEngagementDistance,  [kTechDataUpgradeTech] = kTechId.Armory, [kTechDataPointValue] = kAdvancedArmoryPointValue},
+        { [kTechDataId] = kTechId.Observatory, [kTechDataHint] = "OBSERVATORY_HINT", [kTechDataGhostModelClass] = "MarineGhostModel",  [kTechDataRequiresPower] = true,        [kTechDataMapName] = Observatory.kMapName,    [kTechDataDisplayName] = "OBSERVATORY",  [kVisualRange] = Observatory.kDetectionRange, [kTechDataCostKey] = kObservatoryCost,       [kTechDataModel] = Observatory.kModelName,            [kTechDataBuildTime] = kObservatoryBuildTime, [kTechDataMaxHealth] = kObservatoryHealth,   [kTechDataEngagementDistance] = kObservatoryEngagementDistance, [kTechDataMaxArmor] = kObservatoryArmor,   [kTechDataInitialEnergy] = kObservatoryInitialEnergy,      [kTechDataMaxEnergy] = kObservatoryMaxEnergy, [kTechDataPointValue] = kObservatoryPointValue, [kTechDataHotkey] = Move.O, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataTooltipInfo] = "OBSERVATORY_TOOLTIP", [kTechDataObstacleRadius] = 0.25},
         { [kTechDataId] = kTechId.DistressBeacon,    [kTechDataBuildTime] = 0.1,    [kTechDataDisplayName] = "DISTRESS_BEACON",   [kTechDataHotkey] = Move.B, [kTechDataCostKey] = kObservatoryDistressBeaconCost, [kTechDataTooltipInfo] =  "DISTRESS_BEACON_TOOLTIP"},
 
         { [kTechDataId] = kTechId.RoboticsFactory, [kTechDataSupply] = kRoboticsFactorySupply, [kTechDataHint] = "ROBOTICS_FACTORY_HINT", [kTechDataGhostModelClass] = "MarineGhostModel",    [kTechDataRequiresPower] = true,   [kTechDataDisplayName] = "ROBOTICS_FACTORY",  [kTechDataMapName] = RoboticsFactory.kMapName, [kTechDataCostKey] = kRoboticsFactoryCost,       [kTechDataModel] = RoboticsFactory.kModelName,    [kTechDataEngagementDistance] = kRoboticsFactorEngagementDistance,        [kTechDataSpecifyOrientation] = true, [kTechDataBuildTime] = kRoboticsFactoryBuildTime, [kTechDataMaxHealth] = kRoboticsFactoryHealth,    [kTechDataMaxArmor] = kRoboticsFactoryArmor, [kTechDataPointValue] = kRoboticsFactoryPointValue, [kTechDataHotkey] = Move.R, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataTooltipInfo] = "ROBOTICS_FACTORY_TOOLTIP", [kTechDataObstacleRadius] = 2},        
@@ -381,10 +284,10 @@ function BuildTechData()	//OVERRIDES
         { [kTechDataId] = kTechId.ARCArmorTech,         [kTechDataCostKey] = kARCArmorTechResearchCost,             [kTechDataResearchTimeKey] = kARCArmorTechResearchTime, [kTechDataDisplayName] = "ARC_ARMOR", [kTechDataImplemented] = false },
         
         // Upgrades
-        { [kTechDataId] = kTechId.PhaseTech, [kTechDataCostKey] = kPhaseTechResearchCost, [kTechDataDisplayName] = "PHASE_TECH", [kTechDataResearchTimeKey] = kPhaseTechResearchTime, [kTechDataTooltipInfo] = "PHASE_TECH_TOOLTIP" },
+        { [kTechDataId] = kTechId.PhaseTech,             [kTechDataCostKey] = kPhaseTechResearchCost,                [kTechDataDisplayName] = "PHASE_TECH", [kTechDataResearchTimeKey] = kPhaseTechResearchTime, [kTechDataTooltipInfo] = "PHASE_TECH_TOOLTIP" },
         { [kTechDataId] = kTechId.PhaseGate, [kTechDataHint] = "PHASE_GATE_HINT", [kTechDataGhostModelClass] = "MarineGhostModel",   [kTechDataSupply] = kPhaseGateSupply, [kTechDataRequiresPower] = true,    [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation,    [kTechDataMapName] = PhaseGate.kMapName,                    [kTechDataDisplayName] = "PHASE_GATE",  [kTechDataCostKey] = kPhaseGateCost,       [kTechDataModel] = PhaseGate.kModelName, [kTechDataBuildTime] = kPhaseGateBuildTime, [kTechDataMaxHealth] = kPhaseGateHealth,   [kTechDataEngagementDistance] = kPhaseGateEngagementDistance, [kTechDataMaxArmor] = kPhaseGateArmor,   [kTechDataPointValue] = kPhaseGatePointValue, [kTechDataHotkey] = Move.P, [kTechDataSpecifyOrientation] = true, [kTechDataBuildRequiresMethod] = CheckSpaceForPhaseGate, [kTechDataTooltipInfo] = "PHASE_GATE_TOOLTIP", [kTechDataObstacleRadius] = 0.5},
         { [kTechDataId] = kTechId.AdvancedArmoryUpgrade, [kTechDataCostKey] = kAdvancedArmoryUpgradeCost,  [kTechIDShowEnables] = false,          [kTechDataResearchTimeKey] = kAdvancedArmoryResearchTime,  [kTechDataHotkey] = Move.U, [kTechDataDisplayName] = "ADVANCED_ARMORY_UPGRADE", [kTechDataTooltipInfo] =  "ADVANCED_ARMORY_TOOLTIP"},
-        { [kTechDataId] = kTechId.PrototypeLab, [kTechDataSupply] = kPrototypeLabSupply, [kTechDataHint] = "PROTOTYPE_LAB_HINT", [kTechDataGhostModelClass] = "MarineGhostModel",  [kTechDataRequiresPower] = true,  [kTechDataMapName] = PrototypeLab.kMapName,  [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation,   [kTechDataCostKey] = kPrototypeLabCost,                     [kTechDataResearchTimeKey] = kPrototypeLabBuildTime,       [kTechDataDisplayName] = "PROTOTYPE_LAB", [kTechDataModel] = PrototypeLab.kModelName, [kTechDataMaxHealth] = kPrototypeLabHealth, [kTechDataPointValue] = kPrototypeLabPointValue, [kTechDataTooltipInfo] = "PROTOTYPE_LAB_TOOLTIP", [kTechDataObstacleRadius] = 0.5},
+        { [kTechDataId] = kTechId.PrototypeLab, [kTechDataHint] = "PROTOTYPE_LAB_HINT", [kTechDataGhostModelClass] = "MarineGhostModel",  [kTechDataRequiresPower] = true,  [kTechDataMapName] = PrototypeLab.kMapName,  [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation,   [kTechDataCostKey] = kPrototypeLabCost,                     [kTechDataResearchTimeKey] = kPrototypeLabBuildTime,       [kTechDataDisplayName] = "PROTOTYPE_LAB", [kTechDataModel] = PrototypeLab.kModelName, [kTechDataMaxHealth] = kPrototypeLabHealth, [kTechDataPointValue] = kPrototypeLabPointValue, [kTechDataTooltipInfo] = "PROTOTYPE_LAB_TOOLTIP", [kTechDataObstacleRadius] = 0.5},
        
         // Weapons
         
@@ -725,7 +628,7 @@ function BuildTechData()	//OVERRIDES
       
         { [kTechDataId] = kTechId.AlienAlertNeedMist,   [kTechDataAlertIgnoreInterval] = true, [kTechDataAlertSound] = AlienCommander.kSoldierNeedsMistSoundName,       [kTechDataAlertType] = kAlertType.Request,  [kTechDataAlertText] = "ALIEN_ALERT_NEED_MIST"},
         { [kTechDataId] = kTechId.AlienAlertNeedHarvester,   [kTechDataAlertIgnoreInterval] = true, [kTechDataAlertSound] = AlienCommander.kSoldierNeedsHarvesterSoundName,       [kTechDataAlertType] = kAlertType.Request,  [kTechDataAlertText] = "ALIEN_ALERT_NEED_HARVESTER"},
-//        { [kTechDataId] = kTechId.AlienAlertNeedEnzyme,   [kTechDataAlertIgnoreInterval] = true, [kTechDataAlertSound] = AlienCommander.kSoldierNeedsEnzymeSoundName,       [kTechDataAlertType] = kAlertType.Request,  [kTechDataAlertText] = "ALIEN_ALERT_NEED_ENZYME"},
+        { [kTechDataId] = kTechId.AlienAlertNeedEnzyme,   [kTechDataAlertIgnoreInterval] = true, [kTechDataAlertSound] = AlienCommander.kSoldierNeedsEnzymeSoundName,       [kTechDataAlertType] = kAlertType.Request,  [kTechDataAlertText] = "ALIEN_ALERT_NEED_ENZYME"},
         { [kTechDataId] = kTechId.AlienAlertHiveUnderAttack,                    [kTechDataAlertSound] = Hive.kUnderAttackSound,                             [kTechDataAlertType] = kAlertType.Info,   [kTechDataAlertPriority] = 2, [kTechDataAlertText] = "ALIEN_ALERT_HIVE_UNDERATTACK",             [kTechDataAlertTeam] = true, [kTechDataAlertIgnoreDistance] = true, [kTechDataAlertSendTeamMessage] = kTeamMessageTypes.HiveUnderAttack},
         { [kTechDataId] = kTechId.AlienAlertStructureUnderAttack,               [kTechDataAlertSound] = AlienCommander.kStructureUnderAttackSound,          [kTechDataAlertType] = kAlertType.Info,     [kTechDataAlertPriority] = 0, [kTechDataAlertText] = "ALIEN_ALERT_STRUCTURE_UNDERATTACK",        [kTechDataAlertTeam] = true},
         { [kTechDataId] = kTechId.AlienAlertHarvesterUnderAttack,               [kTechDataAlertSound] = AlienCommander.kHarvesterUnderAttackSound,          [kTechDataAlertType] = kAlertType.Info,   [kTechDataAlertPriority] = 1, [kTechDataAlertText] = "ALIEN_ALERT_HARVESTER_UNDERATTACK",        [kTechDataAlertTeam] = true, [kTechDataAlertIgnoreDistance] = true},

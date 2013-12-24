@@ -2,22 +2,10 @@
 
 Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
-Script.Load("lua/mvm/ElectroMagneticMixin.lua")
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
-Script.Load("lua/mvm/SupplyUserMixin.lua")
 
 //-----------------------------------------------------------------------------
-
-local kSpinUpSoundName = PrecacheAsset("sound/NS2.fev/marine/structures/sentry_spin_up")
-local kSpinDownSoundName = PrecacheAsset("sound/NS2.fev/marine/structures/sentry_spin_down")
-
-local kAnimationGraph = PrecacheAsset("models/marine/sentry/sentry.animation_graph")
-
-local kAttackSoundName = PrecacheAsset("sound/NS2.fev/marine/structures/sentry_fire_loop")
-
-local kSentryScanSoundName = PrecacheAsset("sound/NS2.fev/marine/structures/sentry_scan")
-
 
 // Balance
 Sentry.kPingInterval = 6			//5
@@ -29,12 +17,12 @@ Sentry.kBaseROF = kSentryAttackBaseROF
 Sentry.kRandROF = kSentryAttackRandROF
 Sentry.kSpread = Math.Radians(6)
 Sentry.kBulletsPerSalvo = kSentryAttackBulletsPerSalvo
-Sentry.kBarrelScanRate = 90      		// Degrees per second to scan back and forth with no target
-Sentry.kBarrelMoveRate = 180			//150    // Degrees per second to move sentry orientation towards target or back to flat when targeted
+Sentry.kBarrelScanRate = 60      		// Degrees per second to scan back and forth with no target
+Sentry.kBarrelMoveRate = 160			//150    // Degrees per second to move sentry orientation towards target or back to flat when targeted
 Sentry.kRange = 38.5					//NS2 - 20
-Sentry.kReorientSpeed = .5	//0.05
+Sentry.kReorientSpeed = .05
 
-Sentry.kTargetAcquireTime = 0.25
+Sentry.kTargetAcquireTime = 0.15
 Sentry.kConfuseDuration = 4
 Sentry.kAttackEffectIntervall = 0.2
 Sentry.kConfusedAttackEffectInterval = kConfusedSentryBaseROF
@@ -43,152 +31,48 @@ local newNetworkVars = {}
 
 AddMixinNetworkVars(DetectableMixin, newNetworkVars)
 AddMixinNetworkVars(FireMixin, newNetworkVars)
-AddMixinNetworkVars(ElectroMagneticMixin, newNetworkVars)
 
 
 //-----------------------------------------------------------------------------
 
 
-//local oldSentryCreate = Sentry.OnCreate
-function Sentry:OnCreate()		//OVERRIDES
+local oldSentryCreate = Sentry.OnCreate
+function Sentry:OnCreate()
 
-    ScriptActor.OnCreate(self)
-    
-    InitMixin(self, BaseModelMixin)
-    InitMixin(self, ClientModelMixin)
-    InitMixin(self, LiveMixin)
-    InitMixin(self, GameEffectsMixin)
-    InitMixin(self, FlinchMixin)
-    InitMixin(self, TeamMixin)
-    InitMixin(self, PointGiverMixin)
-    InitMixin(self, SelectableMixin)
-    InitMixin(self, EntityChangeMixin)
-    InitMixin(self, LOSMixin)
-    //InitMixin(self, CorrodeMixin)
-    InitMixin(self, ConstructMixin)
-    InitMixin(self, ResearchMixin)
-    InitMixin(self, RecycleMixin)
-    InitMixin(self, CombatMixin)
-    InitMixin(self, RagdollMixin)
-    InitMixin(self, DamageMixin)
-    InitMixin(self, StunMixin)
-    InitMixin(self, ObstacleMixin)
-    InitMixin(self, OrdersMixin, { kMoveOrderCompleteDistance = kAIMoveOrderCompleteDistance })
-    InitMixin(self, DissolveMixin)
-    InitMixin(self, GhostStructureMixin)
-    //InitMixin(self, VortexAbleMixin)
-    //InitMixin(self, ParasiteMixin)
+	oldSentryCreate(self)
 	
 	InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
-    InitMixin(self, ElectroMagneticMixin)
     
     if Client then
-        InitMixin(self, CommanderGlowMixin)
-        InitMixin(self, ColoredSkinsMixin)
-    end
-    
-    self.desiredYawDegrees = 0
-    self.desiredPitchDegrees = 0
-    self.barrelYawDegrees = 0
-    self.barrelPitchDegrees = 0
-
-    self.confused = false
-    self.attachedToBattery = false
-    
-    if Server then
-
-        self.attackSound = Server.CreateEntity(SoundEffect.kMapName)
-        self.attackSound:SetParent(self)
-        self.attackSound:SetAsset(kAttackSoundName)
-        
-    elseif Client then
-    
-        self.timeLastAttackEffect = Shared.GetTime()
-        
-        // Play a "ping" sound effect every Sentry.kPingInterval while scanning.
-        local function PlayScanPing(sentry)
-        
-            if GetIsUnitActive(self) and not self.attacking and self.attachedToBattery then
-                local player = Client.GetLocalPlayer()
-                Shared.PlayPrivateSound(player, kSentryScanSoundName, nil, 1, sentry:GetModelOrigin())
-            end
-            return true
-            
-        end
-        
-        self:AddTimedCallback(PlayScanPing, Sentry.kPingInterval)
-        
-    end
-    
-    self:SetLagCompensated(false)
-    self:SetPhysicsType(PhysicsType.Kinematic)
-    self:SetPhysicsGroup(PhysicsGroup.MediumStructuresGroup)
+		InitMixin(self, ColoredSkinsMixin)
+	end
 	
 end
 
+local orgSentryInit = Sentry.OnInitialized
+function Sentry:OnInitialized()
 
-
-
-//local orgSentryInit = Sentry.OnInitialized
-function Sentry:OnInitialized()			//OVERRIDES
+	orgSentryInit(self)
 	
-    ScriptActor.OnInitialized(self)
-    
-    InitMixin(self, NanoShieldMixin)
-    InitMixin(self, WeldableMixin)
-    
-    //InitMixin(self, LaserMixin)
-    
-    self:SetModel(Sentry.kModelName, kAnimationGraph)
-    
-    self:SetUpdates(true)
-    
-    if Server then 
-    
-        InitMixin(self, SleeperMixin)
-        
-        self.timeLastTargetChange = Shared.GetTime()
-        
-        // This Mixin must be inited inside this OnInitialized() function.
-        if not HasMixin(self, "MapBlip") then
-            InitMixin(self, MapBlipMixin)
-        end
-        
-        InitMixin(self, SupplyUserMixin)
-        
-        // TargetSelectors require the TargetCacheMixin for cleanup.
-        InitMixin(self, TargetCacheMixin)
-        
-        
-        // configure how targets are selected and validated
-        self.targetSelector = TargetSelector():Init(
+	if Client then
+		self:InitializeSkin()
+	end
+	
+	if Server then
+		self.targetSelector = nil
+		
+		self.targetSelector = TargetSelector():Init(
 			self,
 			Sentry.kRange, 
 			true,
-			ConditionalValue(
-				self:GetTeamNumber() == kTeam1Index,
-				{ kMarineTeam2MobileTargets, kMarineTeam2StaticTargets },
-				{ kMarineTeam1MobileTargets, kMarineTeam1StaticTargets }
-			),
+			{ kMarineStaticTargets, kMarineMobileTargets },
 			{ 
 				PitchTargetFilter(self,  -Sentry.kMaxPitch, Sentry.kMaxPitch), 
-				CloakTargetFilter()
-			},
-			{
-				IsaPrioritizer("Marine"), HarmfulPrioritizer(), AllPrioritizer()
+				CloakTargetFilter(),
+				TeamTargetFilter( self:GetTeamNumber() )
 			}
 		)
-		
-        InitMixin(self, StaticTargetMixin)
-        //InitMixin(self, InfestationTrackerMixin)
-        
-    elseif Client then
-    
-        InitMixin(self, UnitStatusMixin)   
-        //InitMixin(self, HiveVisionMixin)
-		
-		self:InitializeSkin()
 		
 	end
 
@@ -201,7 +85,6 @@ if Client then
 		self.skinBaseColor = self:GetBaseSkinColor()
 		self.skinAccentColor = self:GetAccentSkinColor()
 		self.skinTrimColor = self:GetTrimSkinColor()
-		self.skinAtlasIndex = 0
 	end
 
 	function Sentry:GetBaseSkinColor()
@@ -241,14 +124,13 @@ function Sentry:OnWeldOverride(entity, elapsedTime)
     
 end
 
+if Client then
 
-local orgSentryUpdate = Sentry.OnUpdate
-function Sentry:OnUpdate(time)
-
-	orgSentryUpdate(self, time)
+	local orgSentryUpdate = Sentry.OnUpdate
+	function Sentry:OnUpdate(time)
 	
-	if Client then
-	
+		orgSentryUpdate(self, time)
+		
 		if HasMixin(self, "ColoredSkin") then
 		
 			self.skinAccentColor = ConditionalValue(
@@ -258,36 +140,18 @@ function Sentry:OnUpdate(time)
 			)
 		
 		end
-		
-	end
 	
+	end
+
 end
-
-
-function Sentry:GetIsAffectedByWeaponUpgrades()	//"seems" to work
-	return true
-end
-
-
-function Sentry:GetIsVulnerableToEMP()
-	return true
-end
-
 
 if Server then
-	
-	function Sentry:OnEmpDamaged()
-		self:Confuse( Sentry.kConfuseDuration )
-	end
-	
-	
-	//FIXME Crouching marine seems to destroy accuracy
-	//TODO Add weapon damage upgrades
-	function Sentry:FireBullets()	//OVERRIDES (Removed Umbra check)
+
+	function Sentry:FireBullets()	//Removed Umbra checking
 
         local fireCoords = Coords.GetLookIn(Vector(0,0,0), self.targetDirection)     
         local startPoint = self:GetBarrelPoint()
-		
+
         for bullet = 1, Sentry.kBulletsPerSalvo do
 			
             local spreadDirection = CalculateSpread( fireCoords, Sentry.kSpread, math.random )
@@ -295,7 +159,7 @@ if Server then
             local trace = Shared.TraceRay( startPoint, endPoint, CollisionRep.Damage, PhysicsMask.Bullets, EntityFilterOne(self) )
             
             if trace.fraction < 1 then
-				
+            
                 local damage = kSentryDamage
                 local surface = trace.surface
                 
@@ -315,30 +179,27 @@ if Server then
     end
     
     
+    // check for spores in our way every 0.3 seconds
     local function UpdateConfusedState(self, target)
 		
-        if not self.confused then	//and target 
-			
+        if not self.confused and target then
             if self:GetIsOnFire() then
 				self:Confuse( Sentry.kConfuseDuration )
 			else
 				self.confused = false
 			end
-			
+			//TODO Add EMP temp shutdown (like powered down)
             
         elseif self.confused then
-			
             if self.timeConfused < Shared.GetTime() then
                 self.confused = false
             end
-            
         end
 
     end
     
     
     local function UpdateBatteryState(self)
-		
         local time = Shared.GetTime()
         
         if self.lastBatteryCheckTime == nil or (time > self.lastBatteryCheckTime + 0.5) then
