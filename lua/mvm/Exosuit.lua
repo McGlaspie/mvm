@@ -17,6 +17,7 @@ function Exosuit:OnCreate()
 
 	oldExosuitCreate(self)
 	
+	InitMixin(self, EntityChangeMixin)
 	InitMixin(self, LOSMixin)
 	
 	if Client then
@@ -73,6 +74,7 @@ end
 
 
 //-----------------------------------------------------------------------------
+
 
 Class_Reload("Exosuit", newNetworkVars)
 

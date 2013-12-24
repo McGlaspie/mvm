@@ -1,0 +1,10 @@
+shader = "shaders/ColoredSkins_Emissive_noColorMap.surface_shader"
+
+emissiveMap = "models/props/generic/marine_join.dds"
+normalMap = "materials/dev/dev_normal.dds"
+
+modelColorAccentR = 0.15
+modelColorAccentG = 0.075
+modelColorAccentB = 0.01
+
+surface = "thin_metal"

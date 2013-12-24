@@ -5,7 +5,7 @@ Script.Load("lua/mvm/FireMixin.lua")
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/mvm/PowerConsumerMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
-
+Script.Load("lua/mvm/SupplyUserMixin.lua")
 
 local newNetworkVars = {}
 

@@ -29,7 +29,8 @@
 if Client then
 	Shared.PrecacheSurfaceShader("shaders/ColoredSkins.surface_shader")
 	Shared.PrecacheSurfaceShader("shaders/ColoredSkins_noemissive.surface_shader")
-	//TODO Add additional shaders needed for all models
+	Shared.PrecacheSurfaceShader("shaders/ColoredSkinsViewModel.surface_shader")
+	Shared.PrecacheSurfaceShader("shaders/ColoredSkinsViewModel_emissive.surface_shader")
 end
 
 

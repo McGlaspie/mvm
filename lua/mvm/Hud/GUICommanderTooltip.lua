@@ -16,6 +16,8 @@ Script.Load("lua/mvm/GUIColorGlobals.lua")
 class 'GUICommanderTooltip' (GUIScript)
 
 GUICommanderTooltip.kMarineBackgroundTexture = "ui/marine_commander_textures.dds"
+GUICommanderTooltip.kMarineResourcesTexture = "ui/marine_commander_resources_icons.dds"
+
 
 GUICommanderTooltip.kBackgroundTopCoords = { X1 = 0, Y1 = 411, X2 = 461, Y2 = 478 }
 GUICommanderTooltip.kBackgroundTopHeight = GUICommanderTooltip.kBackgroundTopCoords.Y2 - GUICommanderTooltip.kBackgroundTopCoords.Y1
@@ -26,7 +28,7 @@ GUICommanderTooltip.kBackgroundBottomHeight = GUICommanderTooltip.kBackgroundBot
 GUICommanderTooltip.kBackgroundExtraXOffset = GUIScale(26)
 GUICommanderTooltip.kBackgroundExtraYOffset = GUIScale(28)
 
-GUICommanderTooltip.WorkerIconCoords = {280, 363, 320, 411}
+GUICommanderTooltip.WorkerIconCoords = {192, 0, 256, 64}
 
 GUICommanderTooltip.kTextFontSize = 16
 GUICommanderTooltip.kTextXOffset = 30
@@ -72,6 +74,7 @@ GUICommanderTooltip.kInfoYOffset = 10
 function GUICommanderTooltip:Initialize()
 
     self.textureName = GUICommanderTooltip.kMarineBackgroundTexture
+    self.resourcesTextureName = GUICommanderTooltip.kMarineResourcesTexture
     
     self.tooltipWidth = 466 * kCommanderGUIsGlobalScale
     self.tooltipHeight = 40
@@ -131,7 +134,7 @@ function GUICommanderTooltip:Initialize()
     self.supplyIcon:SetSize(Vector(GUICommanderTooltip.kResourceIconSize, GUICommanderTooltip.kResourceIconSize, 0))
     self.supplyIcon:SetAnchor(GUIItem.Right, GUIItem.Top)
     self.supplyIcon:SetPosition(Vector(-GUICommanderTooltip.kResourceIconSize * 3 + GUICommanderTooltip.kResourceIconXOffset, GUICommanderTooltip.kResourceIconYOffset, 0))
-    self.supplyIcon:SetTexture(self.textureName)
+    self.supplyIcon:SetTexture(self.resourcesTextureName)
     self.supplyIcon:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.supplyIcon:SetTexturePixelCoordinates(unpack(GUICommanderTooltip.WorkerIconCoords))
     self.supplyIcon:SetIsVisible(false)

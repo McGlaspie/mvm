@@ -1,8 +1,13 @@
-shader = "models/marine/marine.surface_shader"
+shader = "shaders/ColoredSkins.surface_shader"
+
 
 albedoMap = "models/marine/jetpack/jetpack.dds"
 normalMap = "models/marine/jetpack/jetpack_normal.dds"
 emissiveMap = "models/marine/jetpack/jetpack_illum.dds"
 specularMap = "models/marine/jetpack/jetpack_spec.dds"
+
+modelColorMap = "models/marine/jetpack/jetpack_colorMap.dds"
+numRows = 1
+numColumns = 1
 
 surface = "metal"

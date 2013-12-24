@@ -106,6 +106,12 @@ function GUIMarineStatus:Initialize()
     
     self.teamNumber = PlayerUI_GetTeamNumber()
     
+    local ui_baseColor = ConditionalValue(
+		playerTeam == kTeam1Index,
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
+    )
+    
     self.statusbackground = self.script:CreateAnimatedGraphicItem()
     self.statusbackground:SetAnchor( GUIItem.Left, GUIItem.Bottom )
     self.statusbackground:SetTexture( GUIMarineStatus.kStatusTexture )
@@ -120,6 +126,15 @@ function GUIMarineStatus:Initialize()
     self.statusStencil:SetIsStencil(true)
     self.statusStencil:SetClearsStencilBuffer(false)
     self.statusbackground:AddChild(self.statusStencil)
+    
+    self.statusbackground:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+    self.statusbackground:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+    self.statusbackground:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+    
+    self.statusStencil:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+    self.statusStencil:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+    self.statusStencil:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+    
     
     self.healthText = self.script:CreateAnimatedTextItem()
     self.healthText:SetNumberTextAccuracy(1)

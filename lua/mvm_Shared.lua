@@ -10,7 +10,13 @@ Script.Load("lua/PreLoadMod.lua")
 
 Script.Load("lua/mvm_Globals.lua")
 
+Script.Load("lua/mvm/DamageTypes.lua")
+
+Script.Load("lua/mvm/MvMEffects.lua")
+
 Script.Load("lua/mvm/NetworkMessages.lua")
+Script.Load("lua/mvm/TechData.lua")
+Script.Load("lua/mvm/ScriptActor.lua")	//Yup...even had to modify this...fuckn-a
 
 Script.Load("lua/mvm/MapBlip.lua")
 Script.Load("lua/mvm/SensorBlip.lua")
@@ -33,6 +39,7 @@ Script.Load("lua/mvm/PickupableWeaponMixin.lua")
 Script.Load("lua/mvm/NanoShieldMixin.lua")
 Script.Load("lua/mvm/MapBlipMixin.lua")
 Script.Load("lua/mvm/SelectableMixin.lua")
+Script.Load("lua/mvm/SupplyUserMixin.lua")
 
 
 if Client then
@@ -97,6 +104,10 @@ Script.Load("lua/mvm/Weapons/Marine/Welder.lua")
 //Script.Load("lua/mvm/Weapons/Marine/Grenade.lua")
 Script.Load("lua/mvm/Jetpack.lua")
 
+Script.Load("lua/mvm/Weapons/Marine/GasGrenade.lua")
+Script.Load("lua/mvm/Weapons/Marine/PulseGrenade.lua")
+//Script.Load("lua/mvm/Weapons/Marine/ClusterGrenade.lua")
+
 
 Script.Load("lua/mvm/MvMUtility.lua")
 
@@ -111,7 +122,6 @@ Script.Load("lua/mvm/MarineStructureEffects.lua")
 if Client then
 	
 	Script.Load("lua/mvm/GUIMarineHUDStyle.lua")
-	
 
 end
 

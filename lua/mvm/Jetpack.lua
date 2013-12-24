@@ -1,6 +1,7 @@
 
 
 Script.Load("lua/mvm/LOSMixin.lua")
+Script.Load("lua/EntityChangeMixin.lua")
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
 
@@ -15,6 +16,8 @@ local oldJetpackCreate = Jetpack.OnCreate
 function Jetpack:OnCreate()
 	
 	oldJetpackCreate(self)
+	
+	InitMixin(self, EntityChangeMixin)
 	
 	InitMixin(self, LOSMixin)
 	

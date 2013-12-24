@@ -49,18 +49,18 @@ function GetIsArcConstructionAllowed(teamNumber)
 
 end
 
-//Override
+//OVERRIDES
 function GetIsMarineUnit(entity)
     return entity and HasMixin(entity, "Team") and entity:GetTeamType() == kMarineTeamType
 end
 
-//Override
+//OVERRIDES
 function GetIsAlienUnit(entity)
     return entity and HasMixin(entity, "Team") and entity:GetTeamNumber() == kTeam2Index
 end
 
 
-//Override
+//OVERRIDES
 function GetAreEnemies(entityOne, entityTwo)
 	
     return 
@@ -74,6 +74,79 @@ function GetAreEnemies(entityOne, entityTwo)
 		)
 	
 end
+
+
+
+//OVERRIDES
+function MvM_GetMaxSupplyForTeam(teamNumber)	//Would it not make more sense to make this part of the
+												//OnUpdate tick for team objects?
+												
+//FIXME When looking at ANY captured(enemy) point (Tech or Res) max supply is lowered by 5	
+	
+    local maxSupply = 0
+	
+    if Server then
+    
+        local team = GetGamerules():GetTeam(teamNumber)
+        if team and team.GetNumCapturedTechPoints then
+            maxSupply = team:GetNumCapturedTechPoints() * kSupplyPerTechpoint
+        end
+        
+    else
+        
+        local teamInfoEnt = GetTeamInfoEntity(teamNumber)
+        if teamInfoEnt and teamInfoEnt.GetNumCapturedTechPoints then
+            maxSupply = teamInfoEnt:GetNumCapturedTechPoints() * kSupplyPerTechpoint
+        end
+
+    end
+    
+    
+    if kSupplyPerResourceNode > 0 then
+	//Add extra supply per captured resource node
+		
+		local capturedResNodes = GetEntitiesForTeam("Extractor", teamNumber)
+		
+		for _, node in ipairs(capturedResNodes) do
+			maxSupply = maxSupply + kSupplyPerResourceNode
+		end
+		
+	end
+	
+	
+    return maxSupply
+
+end
+
+//OVERRIDES
+function MvM_GetSupplyUsedByTeam( teamNumber )
+	
+    assert(teamNumber)
+
+    local supplyUsed = 0
+    
+    if Server then
+		
+        local team = GetGamerules():GetTeam(teamNumber)
+        if team and team.GetSupplyUsed then
+            supplyUsed = team:GetSupplyUsed() 
+        end
+		
+    else
+        
+        local teamInfoEnt = GetTeamInfoEntity(teamNumber)
+        if teamInfoEnt and teamInfoEnt.GetSupplyUsed then
+            supplyUsed = teamInfoEnt:GetSupplyUsed()
+        end
+    
+    end    
+
+    return supplyUsed
+
+end
+
+
+
 
 
 //Copy of original

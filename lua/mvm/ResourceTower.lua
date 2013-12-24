@@ -12,13 +12,15 @@ if Server then
 
 		for _, player in ipairs(GetEntitiesForTeam("Player", self:GetTeamNumber())) do
 			if not player:isa("Commander") then
-				player:AddResources(kPlayerResPerInterval)
+				player:AddResources( kPlayerResPerInterval )
 			end
 		end
 		
 		local team = self:GetTeam()
 		if team then
+			
 			team:AddTeamResources( kTeamResourcePerTick, true )
+			
 		end
 		
 		self:TriggerEffects("extractor_collect")

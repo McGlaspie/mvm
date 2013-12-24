@@ -5,6 +5,7 @@ Script.Load("lua/mvm/FireMixin.lua")
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/mvm/PowerConsumerMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
+Script.Load("lua/mvm/SupplyUserMixin.lua")
 
 
 Observatory.kDistressBeaconTime = kDistressBeaconTime
@@ -64,6 +65,10 @@ local orgObsInit = Observatory.OnInitialized
 function Observatory:OnInitialized()
 
 	orgObsInit(self)
+	
+	if Server then
+		InitMixin(self, SupplyUserMixin)
+	end
 	
 	if Client then
 		self:InitializeSkin()
