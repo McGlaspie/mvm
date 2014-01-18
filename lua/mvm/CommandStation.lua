@@ -57,7 +57,11 @@ if Client then
 	end
 
 	function CommandStation:GetAccentSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
+		if self:GetIsBuilt() then
+			return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
+		else
+			return Color( 0,0,0 )
+		end
 	end
 	
 	function CommandStation:GetTrimSkinColor()

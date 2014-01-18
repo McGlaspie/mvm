@@ -28,7 +28,7 @@ kPistolDamageType = kDamageType.Light
 kPistolClipSize = 10
 kPistolAltDamage = 40
 
-kWelderDamagePerSecond = 40	//NS2 - 30
+kWelderDamagePerSecond = 45	//NS2 - 30
 kWelderDamageType = kDamageType.Structural
 kWelderFireDelay = 0.2		//.2	Does this affect repair rates?
 kWelderWeldDelay = 0.3
@@ -56,7 +56,7 @@ kClusterFragmentDamage = 25		//20
 kClusterGrenadeDamageType = kDamageType.Flame
 
 kNerveGasDamagePerSecond = 15	//50
-kNerveGasDamageType = kDamageType.Gas
+kNerveGasDamageType = kDamageType.Gas	//I.e. Lerk Spores, HP only
 
 
 kShotgunDamage = 17
@@ -76,9 +76,14 @@ kFlamethrowerStackRate = 0.75	//0.4
 kFlameRadius = 1.75
 kFlameDamageStackWeight = 0.1	//0.2
 
-kWhileBurningWeldEffectReduction = 0.25		//0.5
+kWhileBurningWeldEffectReduction = 0.5
 kBurnDamageMarineStructureReduction = 1	//0.15
 kBurnDamageExoReduction = 0.1	//.05
+
+
+// affects dual minigun and dual railgun damage output
+kExoDualMinigunModifier = 1
+kExoDualRailgunModifier = 1
 
 kMinigunDamage = 25
 kMinigunDamageType = kDamageType.Heavy
@@ -89,36 +94,45 @@ kClawDamage = 60
 kClawDamageType = kDamageType.Structural
 kClawWeight = 0.05
 
-kRailgunDamage = 50
-kRailgunChargeDamage = 150
+kRailgunDamage = 30
+kRailgunChargeDamage = 130
 kRailgunDamageType = kDamageType.Structural
-kRailgunWeight = 0.0
+kRailgunWeight = 0.08
+
+
 
 kMACAttackDamage = 5
 kMACAttackDamageType = kDamageType.Normal	//Light?
 kMACAttackFireDelay = 0.6
 
+
 kMineDamage = 150	//NS2 - 125
 kMineDamageType = kDamageType.Light
 
-kSentryDamage = 7.5	//NS2 - 5
+
+kSentryDamage = 7.75	//NS2 - 5
 kSentryAttackDamageType = kDamageType.Normal
 kSentryAttackBaseROF = .15
 kSentryAttackRandROF = 0.0
 kSentryAttackBulletsPerSalvo = 1
-kConfusedSentryBaseROF = 2.0
-kElectrifiedSentryBaseROF = 4.0
+kConfusedSentryBaseROF = 2.5
+kElectrifiedSentryBaseROF = 2.5
+
 
 kARCDamage = 450
 kARCDamageType = kDamageType.Splash // splash damage hits friendlies (that take structural dmg) as well
 kARCRange = 24
 kARCMinRange = 8
 
+
+
 kWeapons1DamageScalar = 1.1
 kWeapons2DamageScalar = 1.2
 kWeapons3DamageScalar = 1.3
 
 kNanoShieldDamageReductionDamage = 0.75	//0.5
+
+kInfestationCorrodeDamagePerSecond = 15
 
 
 //-----------------------------------------------------------------------------
@@ -134,6 +148,8 @@ kResourceTowerResourceInterval = 7	//NS2 - 6
 kTeamResourcePerTick = 1
 
 kPlayerResPerInterval = 0.25	//0.125
+
+kCommanderResourceBlockTime = 60
 
 kKillRewardMin = 0
 kKillRewardMax = 0
@@ -156,11 +172,11 @@ kAdvancedArmorySupply = 5
 kARCSupply = 20
 kSentrySupply = 5
 kSentryBatterySupply = 5
-kRoboticsFactorySupply = 5
+kRoboticsFactorySupply = 5	//ARCFact?
 kInfantryPortalSupply = 5
 kPhaseGateSupply = 10
 kArmsLabSupply = 10
-kPrototypeLabSupply = 5
+kPrototypeLabSupply = 10
 kObservatorySupply = 5
 
 
@@ -182,8 +198,6 @@ kArmoryCost = 10
 kObservatoryCost = 10
 kPhaseGateCost = 15
 kRoboticsFactoryCost = 15
-kSentryCost = 5
-kSentryBatteryCost = 5
 kArmsLabCost = 20
 kPrototypeLabCost = 40
 kPowerNodeCost = 0
@@ -191,18 +205,58 @@ kPowerNodeCost = 0
 kMACCost = 5
 kARCCost = 15
 
+kSentryCost = 5
+kSentryBatteryCost = 5
+
 kWelderCost = 5
+
+kClusterGrenadeCost = 4
+kGasGrenadeCost = 4
+kPulseGrenadeCost = 4
+
 kMineCost = 10
 kShotgunCost = 20
 kFlamethrowerCost = 20
 kGrenadeLauncherCost = 25
 
+
 kJetpackCost = 15
 
-kExosuitCost = 50
+kExosuitCost = 40
+kExosuitDropCost = 50
+
+kClawRailgunExosuitCost = 40
+kDualExosuitCost = 60
+kDualRailgunExosuitCost = 60
+
+kUpgradeToDualMinigunCost = 25
+kUpgradeToDualRailgunCost = 20
+
+kDualMinigunTechResearchCost = 30
+kClawRailgunTechResearchCost = 30
+kDualRailgunTechResearchCost = 30
+
 kClawRailgunExosuitCost = 50
 kDualExosuitCost = 75
 kDualRailgunExosuitCost = 75
+
+
+kExosuitTechResearchCost = 20
+kExosuitLockdownTechResearchCost = 20
+
+kExosuitCost = 40
+kExosuitDropCost = 50
+kClawRailgunExosuitCost = 40
+kDualExosuitCost = 60
+kDualRailgunExosuitCost = 60
+
+kUpgradeToDualMinigunCost = 20
+kUpgradeToDualRailgunCost = 20
+
+kDualMinigunTechResearchCost = 30
+kClawRailgunTechResearchCost = 30
+kDualRailgunTechResearchCost = 30
+
 
 kMinigunCost = 30
 kRailgunCost = 30
@@ -235,17 +289,17 @@ kRecycleTime = 12
 
 kCommandStationBuildTime = 25	//NS2 - 15
 kInfantryPortalBuildTime = 7
-kArmoryBuildTime = 14	//12
+kArmoryBuildTime = 15	//12
 
-kSentryBuildTime = 4.5			//NS2 - 3
-kSentryBatteryBuildTime = 6		//NS2 - 5
+kSentryBuildTime = 4			//NS2 - 3
+kSentryBatteryBuildTime = 5
 
 kWeaponsModuleAddonTime = 40
-kPrototypeLabBuildTime = 25		//NS2 - 20
+kPrototypeLabBuildTime = 30		//NS2 - 20
 kArmsLabBuildTime = 20			//NS2 - 17
 
 kMACBuildTime = 5
-kExtractorBuildTime = 18		//NS2 - 12
+kExtractorBuildTime = 16		//NS2 - 12
 
 kRoboticsFactoryBuildTime = 15	//NS2 - 13
 kARCBuildTime = 16				//NS2 - 10
@@ -262,6 +316,8 @@ kWelderTechResearchCost = 10
 kShotgunTechResearchCost = 15
 kGrenadeLauncherTechResearchCost = 25
 kFlamethrowerTechResearchCost = 20
+
+kGrenadeTechResearchCost = 15
 
 kAdvancedArmoryUpgradeCost = 20
 
@@ -306,14 +362,15 @@ kRifleUpgradeTechResearchTime = 20
 kShotgunTechResearchTime = 30
 kWelderTechResearchTime = 20				//NS2 - 15
 kAdvancedArmoryResearchTime = 90
-	kFlamethrowerTechResearchTime = 30
-	kGrenadeLauncherTechResearchTime = 40
+kFlamethrowerTechResearchTime = 30
+kGrenadeLauncherTechResearchTime = 40
+kGrenadeTechResearchTime = 45
 
 kTechEMPResearchTime = 60
 kTechMACSpeedResearchTime = 15
 kUpgradeRoboticsFactoryTime = 40
-	kARCSplashTechResearchTime = 30
-	kARCArmorTechResearchTime = 30
+kARCSplashTechResearchTime = 30
+kARCArmorTechResearchTime = 30
 
 kJetpackTechResearchTime = 90
 kJetpackFuelTechResearchTime = 60

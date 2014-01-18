@@ -5,7 +5,6 @@ Script.Load("lua/PostLoadMod.lua")
 
 //-----------------------------------------------------------------------------
 
-Print("\t\t MVM WEAPON.LUA")
 
 //local orgWeaponRender = Weapon.OnUpdateRender
 function Weapon:OnUpdateRender()	//Overrides

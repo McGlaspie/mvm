@@ -14,12 +14,15 @@ local kHaloAttachPoint = "ArmsLab_hologram"
 
 //-----------------------------------------------------------------------------
 
+
 local newNetworkVars = {}
 
 AddMixinNetworkVars(FireMixin, newNetworkVars)
 AddMixinNetworkVars(DetectableMixin, newNetworkVars)
 
+
 //-----------------------------------------------------------------------------
+
 
 local orgArmsLabCreate = ArmsLab.OnCreate
 function ArmsLab:OnCreate()
@@ -64,7 +67,11 @@ if Client then
 	end
 
 	function ArmsLab:GetAccentSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+		if self:GetIsBuilt() then
+			return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+		else
+			return Color( 0,0,0 )
+		end
 	end
 
 	function ArmsLab:GetTrimSkinColor()
@@ -91,6 +98,8 @@ if Client then
         end
         
         self.haloCinematic:SetIsVisible( self.deployed and self:GetIsPowered() )
+        
+        //ColoredSkinsMixin:OnUpdateRender(self, deltaTime)	//??
         
     end
 	

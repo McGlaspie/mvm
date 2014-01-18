@@ -5,11 +5,21 @@ Script.Load("lua/mvm/ElectroMagneticMixin.lua")
 Script.Load("lua/mvm/DetectableMixin.lua")
 //Script.Load("lua/mvm/RagdollMixin.lua")
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+Script.Load("lua/mvm/SupplyUserMixin.lua")
 Script.Load("lua/PostLoadMod.lua")
 Script.Load("lua/MAC.lua")
 Script.Load("lua/ResearchMixin.lua")
 Script.Load("lua/RecycleMixin.lua")
 
+
+local kJetsCinematic = PrecacheAsset("cinematics/marine/mac/jet.cinematic")
+local kJetsSound = PrecacheAsset("sound/NS2.fev/marine/structures/mac/thrusters")
+
+local kTeam1LightCinematic = PrecacheAsset("cinematics/marine/mac/mac_light_team1.cinematic")
+local kTeam2LightCinematic = PrecacheAsset("cinematics/marine/mac/mac_light_team2.cinematic")
+
+local kRightJetNode = "fxnode_jet1"
+local kLeftJetNode = "fxnode_jet2"
 
 // Balance
 local kConstructRate = 0.4
@@ -39,7 +49,9 @@ MAC.kTurnSpeed = 3 * math.pi // a mac is nimble
 
 local kMAC_ChatterSoundAsset = PrecacheAsset("sound/NS2.fev/marine/structures/mac/chatter")
 
-local newNetworkVars = {}
+local newNetworkVars = {
+	headlightActive = "boolean"
+}
 
 AddMixinNetworkVars(ResearchMixin, newNetworkVars)
 AddMixinNetworkVars(RecycleMixin, newNetworkVars)
@@ -47,6 +59,7 @@ AddMixinNetworkVars(RecycleMixin, newNetworkVars)
 AddMixinNetworkVars(FireMixin, newNetworkVars)
 AddMixinNetworkVars(DetectableMixin, newNetworkVars)
 AddMixinNetworkVars(ElectroMagneticMixin, newNetworkVars)
+
 
 //-----------------------------------------------------------------------------
 
@@ -160,7 +173,7 @@ local function MvM_GetAutomaticOrder(self)
 			end
 			
             
-            //FIXME Below will not repair power nodes. This ight be a good thing, would prevent accidental repairs
+            //FIXME Below will not repair power nodes. This might be a good thing, would prevent accidental repairs
             //when enemy structures still in a room. Pehapes add a weighted repair command? I.e. only repair when 
             //friendly (ghost)structures and no enemy buildings?
             // - above "fix" is tricky since power nodes are neutral....
@@ -216,7 +229,7 @@ function MAC:OnCreate()		//OVERRIDES
     ScriptActor.OnCreate(self)
     
     InitMixin(self, BaseModelMixin)
-    InitMixin(self, ModelMixin)
+    InitMixin(self, ClientModelMixin)
     InitMixin(self, DoorMixin)
     InitMixin(self, BuildingMixin)
     InitMixin(self, LiveMixin)
@@ -256,24 +269,53 @@ function MAC:OnCreate()		//OVERRIDES
     self.playedEmpEffectedSound = false
     self.empDelayedOrder = nil
     
+    self.headlightActive = false
+    
     self:SetUpdates(true)
     self:SetLagCompensated(true)
     self:SetPhysicsType(PhysicsType.Kinematic)
-    self:SetPhysicsGroup(PhysicsGroup.WhipGroup)	//FIXME Still not triggering Location trigger updates
+    self:SetPhysicsGroup(PhysicsGroup.WhipGroup)
+    //self:SetPhysicsGroup(PhysicsGroup.SmallStructuresGroup)
     
 end
 
 
-local orgMacInit = MAC.OnInitialized
-function MAC:OnInitialized()
+function MAC:OnInitialized()	//OVERRIDES
+    
+    ScriptActor.OnInitialized(self)
 
-	orgMacInit(self)
-	
-	if Client then
-	
-	/*
-		//TODO Colorize jet effects?
-		// Setup movement effects
+    InitMixin(self, WeldableMixin)
+    InitMixin(self, NanoShieldMixin)
+
+    if Server then
+    
+        self:UpdateIncludeRelevancyMask()
+        
+        InitMixin(self, SleeperMixin)
+        InitMixin(self, MobileTargetMixin)
+        InitMixin(self, SupplyUserMixin)
+        InitMixin(self, InfestationTrackerMixin)
+        
+        // This Mixin must be inited inside this OnInitialized() function.
+        if not HasMixin(self, "MapBlip") then
+            InitMixin(self, MapBlipMixin)
+        end
+        
+        self.jetsSound = Server.CreateEntity(SoundEffect.kMapName)
+        self.jetsSound:SetAsset(kJetsSound)
+        self.jetsSound:SetParent(self)
+
+		InitMixin(self, ControllerMixin)
+		self:CreateController(PhysicsGroup.WhipGroup)
+
+    elseif Client then
+    
+        InitMixin(self, UnitStatusMixin)     
+        //InitMixin(self, HiveVisionMixin)
+        
+        self:InitializeSkin()
+
+        // Setup movement effects
         self.jetsCinematics = {}
         for index,attachPoint in ipairs({ kLeftJetNode, kRightJetNode }) do
             self.jetsCinematics[index] = Client.CreateCinematic(RenderScene.Zone_Default)
@@ -284,21 +326,47 @@ function MAC:OnInitialized()
             self.jetsCinematics[index]:SetAttachPoint(self:GetAttachPointIndex(attachPoint))
             self.jetsCinematics[index]:SetIsActive(false)
         end
-	*/
+        
+        
+        self.headlightCinematic = nil
+        self.headlightCinematic = Client.CreateCinematic(RenderScene.Zone_Default)
+        if self:GetTeamNumber() == kTeam2Index then
+			self.headlightCinematic:SetCinematic( kTeam2LightCinematic )
+		else
+			self.headlightCinematic:SetCinematic( kTeam1LightCinematic )
+		end
+		self.headlightCinematic:SetRepeatStyle(Cinematic.Repeat_Endless)
+		self.headlightCinematic:SetParent(self)
+		self.headlightCinematic:SetCoords(Coords.GetIdentity())
+		self.headlightCinematic:SetAttachPoint( self:GetAttachPointIndex( MAC.kLightNode ) )
+		self.headlightCinematic:SetIsActive(false)
+		
+    end
+    
+    self.timeOfLastGreeting = 0
+    self.timeOfLastGreetingCheck = 0
+    self.timeOfLastChatterSound = 0
+    self.timeOfLastWeld = 0
+    self.timeOfLastConstruct = 0
+    self.moving = false
+    self.headlightActive = false
+    self:SetModel(MAC.kModelName, MAC.kAnimationGraph)
+    
+    InitMixin(self, IdleMixin)
+    
+end
+
+
+local orgMacDestroy = MAC.OnDestroy
+function MAC:OnDestroy()
 	
-		self:InitializeSkin()
-	end
+	orgMacDestroy( self )
 	
-	if Server then
-	    
-	    InitMixin(self, ControllerMixin)
-		//self:CreateController(PhysicsGroup.SmallStructuresGroup)
-		self:CreateController(PhysicsGroup.WhipGroup)	//FIXME Still not triggering Location trigger updates
-	    
+	if Client then
+		Client.DestroyCinematic( self.headlightCinematic )
 	end
 
 end
-
 
 
 local function MvM_MAC_GetOrderTargetIsConstructTarget(order, doerTeamNumber)
@@ -313,7 +381,7 @@ local function MvM_MAC_GetOrderTargetIsConstructTarget(order, doerTeamNumber)
 			) 
 		then
 			
-			Print("\t MAC Construct Order target is a " .. entity:GetClassName() )
+			//Print("\t MAC Construct Order target is a " .. entity:GetClassName() )
             return entity
             
         end
@@ -337,7 +405,7 @@ local function MvM_MAC_GetOrderTargetIsWeldTarget(order, doerTeamNumber)
             if entity ~= nil and HasMixin(entity, "Weldable") 
 					and ( entity:GetTeamNumber() == doerTeamNumber or entity:GetTeamNumber() == kTeamReadyRoom ) then
 				
-				Print("\t MAC Weld Order target is a " .. entity:GetClassName() )
+				//Print("\t MAC Weld Order target is a " .. entity:GetClassName() )
 				
                 return entity
                 
@@ -635,9 +703,11 @@ function MAC:OnUpdate(deltaTime)
 		if Server then
 			
 			if self:GetHasOrder() and self.empDelayedOrder == nil then
+				
 				self.empDelayedOrder = self:GetCurrentOrder():GetId()
 				self:ClearOrders()
 				self.ignoreOrders = true
+				
 			end
 			
 		end
@@ -647,11 +717,15 @@ function MAC:OnUpdate(deltaTime)
 		if Server then
 			
 			if self.empDelayedOrder ~= nil and self.empDelayedOrder ~= Entity.InvalidId then
+				
 				local previousOrder = Shared.GetEntity( self.empDelayedOrder )
+				
 				if previousOrder and previousOrder:isa("Order") then
 					SetOrderFromPrevious(self, previousOrder, true, true)
 				end
+				
 				self.empDelayedOrder = nil
+				
 			end
 			
 			self.ignoreOrders = false
@@ -660,6 +734,23 @@ function MAC:OnUpdate(deltaTime)
 		
 		self.playedEmpEffectedSound = false
 		
+	end
+	
+	//FIXME This is NOT toggling MAC light per location powered status
+	if Server then
+		
+		local location = GetLocationForPoint( self:GetOrigin() )
+		local locationPower = GetPowerPointForLocation( location:GetName() )
+		if locationPower and locationPower:isa("PowerPoint") then
+			self.headlightActive = locationPower:GetIsDisabled() or not locationPower:GetIsBuilt()
+		else
+			self.headlightActive = false
+		end
+		
+	end
+	
+	if Client and self.headlightCinematic then
+		self.headlightCinematic:SetIsActive( self.headlightActive )
 	end
 	
 	orgMACupdate(self, deltaTime)

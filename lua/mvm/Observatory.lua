@@ -20,8 +20,10 @@ AddMixinNetworkVars(DetectableMixin, newNetworkVars)
 local kDistressBeaconSoundMarine = PrecacheAsset("sound/NS2.fev/marine/common/distress_beacon_marine")
 local kDistressBeaconSoundAlien = PrecacheAsset("sound/NS2.fev/marine/common/distress_beacon_alien")
 
-local kObservatoryTechButtons = { kTechId.Scan, kTechId.DistressBeacon, kTechId.Detector, kTechId.None,
-                                   kTechId.PhaseTech, kTechId.None, kTechId.None, kTechId.None }
+local kObservatoryTechButtons = { 
+	kTechId.Scan, kTechId.DistressBeacon, kTechId.Detector, kTechId.None,
+	kTechId.PhaseTech, kTechId.None, kTechId.None, kTechId.None 
+}
                                    
 
 
@@ -90,7 +92,11 @@ if Client then
 	end
 
 	function Observatory:GetAccentSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+		if self:GetIsBuilt() then
+			return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+		else
+			return Color( 0,0,0 )
+		end
 	end
 
 	function Observatory:GetTrimSkinColor()

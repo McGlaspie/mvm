@@ -23,9 +23,11 @@ function ReadyRoomTeam:GetRespawnMapName(player)
     if mapName == JetpackMarine.kMapName then
 		mapName = ReadyRoomPlayer.kMapName
     end
+    
     return mapName
 
 end
+
 
 function ReadyRoomTeam:ReplaceRespawnPlayer(player, origin, angles)
 	
@@ -36,26 +38,45 @@ function ReadyRoomTeam:ReplaceRespawnPlayer(player, origin, angles)
         mapName = ReadyRoomPlayer.kMapName
     end
     
-    Print("ReadyRoomTeam:ReplaceRespawnPlayer() - player.previousTeamNumber=" .. player.previousTeamNumber)
+    //Print("ReadyRoomTeam:ReplaceRespawnPlayer() - player.previousTeamNumber=" .. player.previousTeamNumber)
     
     local newPlayer = player:Replace(mapName, self:GetTeamNumber(), false, origin)
     
-    if newPlayer.previousTeamNumber ~= kTeam1Index and newPlayer.previousTeamNumber ~= kTeam2Index then
-		newPlayer.previousTeamNumber = self:GetTeamNumber()
-    end
-    
-    Print("\t newPlayer.previousTeamNumber=" .. newPlayer.previousTeamNumber)
+    //Print("\t newPlayer.previousTeamNumber=" .. newPlayer.previousTeamNumber )
     
     self:RespawnPlayer(newPlayer, origin, angles)
     
     newPlayer:ClearGameEffects()
+    newPlayer:SetUpdates(true)
     
     return (newPlayer ~= nil), newPlayer
 
 end
 
+
+
+function ReadyRoomTeam:RespawnPlayer(player, origin, angles)
+	
+	//Print("ReadyRoomTeam:RespawnPlayer() - player.previousTeamNumber = " .. tostring(player.previousTeamNumber) )
+	
+	Team.RespawnPlayer( self, player, origin, angles )
+    
+end
+
+
 function ReadyRoomTeam:OnConstructionComplete(structure)
 end
+
+
+function ReadyRoomTeam:AddPlayer( player )
+
+	//Print("ReadyRoomTeam:AddPlayer()")
+	//Print("\t player.previousTeamNumber = " .. tostring( player.previousTeamNumber ) )
+	
+	Team.AddPlayer( self, player )
+
+end
+
 
 //-----------------------------------------------------------------------------
 

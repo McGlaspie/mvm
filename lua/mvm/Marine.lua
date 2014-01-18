@@ -3,6 +3,7 @@
 Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+//Script.Load("lua/mvm/SprintMixin.lua")	Future use
 Script.Load("lua/PostLoadMod.lua")
 
 
@@ -22,7 +23,7 @@ Marine.kPlayerPhaseDelay = 1.5	//2		Move to BalanceMisc?
 
 //Move below to BalanceMisc?
 Marine.kWalkMaxSpeed = 5                // Four miles an hour = 6,437 meters/hour = 1.8 meters/second (increase for FPS tastes)
-Marine.kRunMaxSpeed = 6.0               // 10 miles an hour = 16,093 meters/hour = 4.4 meters/second (increase for FPS tastes)
+Marine.kRunMaxSpeed = 6               // 10 miles an hour = 16,093 meters/hour = 4.4 meters/second (increase for FPS tastes)
 Marine.kRunInfestationMaxSpeed = 5.2    // 10 miles an hour = 16,093 meters/hour = 4.4 meters/second (increase for FPS tastes)
 
 // How fast does our armor get repaired by welders
@@ -30,10 +31,10 @@ Marine.kArmorWeldRate = 25		//Move to BalanceHealth?
 Marine.kWeldedEffectsInterval = .5
 
 //Marine.kSpitSlowDuration = 3
-Marine.kWalkBackwardSpeedScalar = 0.9
-Marine.kAcceleration = 100	
-Marine.kSprintAcceleration = 120 // 70
-Marine.kGroundFrictionForce = 15	//16
+Marine.kWalkBackwardSpeedScalar = 0.85
+Marine.kAcceleration = 90	//100
+Marine.kSprintAcceleration = 190 // 70
+Marine.kGroundFrictionForce = 16
 Marine.kAirStrafeWeight = 0		//May need to add back in for JP - Can stop on a dime with JP...
 
 
@@ -82,23 +83,30 @@ function Marine:OnCreate()	//OVERRIDE
         self.timeLastUnitPercentageUpdate = 0
         
     elseif Client then
-	
+		
+		InitMixin(self, TeamMessageMixin, { kGUIScriptName = "mvm/Hud/Marine/GUIMarineTeamMessage" })
+        InitMixin(self, DisorientableMixin)
+		InitMixin(self, ColoredSkinsMixin)
+		
+		if self.flashlight ~= nil then
+			Client.DestroyRenderLight(self.flashlight)
+		end
+		
         self.flashlight = Client.CreateRenderLight()
         
         self.flashlight:SetType( RenderLight.Type_Spot )
-        self.flashlight:SetColor( Color(.8, .8, 1) )	//TODO Theme per teamNumber
-        self.flashlight:SetInnerCone( math.rad(30) )
-        self.flashlight:SetOuterCone( math.rad(35) )
+        if self:GetTeamNumber() == kTeam2Index then
+			self.flashlight:SetColor( Color(1, 0.5, 0.5) )
+		else
+			self.flashlight:SetColor( Color(0.5, 0.5, 1) )
+		end
+        self.flashlight:SetInnerCone( math.rad(12) )
+        self.flashlight:SetOuterCone( math.rad(32) )
         self.flashlight:SetIntensity( 10 )
         self.flashlight:SetRadius( 16 ) 	//15
         self.flashlight:SetGoboTexture("models/marine/male/flashlight.dds")
         self.flashlight:SetIsVisible(false)
-        
-        InitMixin(self, TeamMessageMixin, { kGUIScriptName = "mvm/Hud/Marine/GUIMarineTeamMessage" })
-
-        InitMixin(self, DisorientableMixin)
-        
-        InitMixin(self, ColoredSkinsMixin)
+        self.flashlight:SetAtmosphericDensity( 0.015 )
         
     end
 

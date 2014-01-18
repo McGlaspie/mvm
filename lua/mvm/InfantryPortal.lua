@@ -19,8 +19,8 @@ local kHoloMarineMaterialname = "cinematics/vfx_materials/marine_ip_spawn.materi
 AddMixinNetworkVars(FireMixin, newNetworkVars)
 AddMixinNetworkVars(DetectableMixin, newNetworkVars)
 
-//-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
 
 
 local function MvMCreateSpinEffect(self)
@@ -40,6 +40,7 @@ local function MvMCreateSpinEffect(self)
     
     end
     
+    //FIXME change to pull from what a player is (variant)
     if not self.fakeMarineModel and not self.fakeMarineMaterial then
     
         self.fakeMarineModel = Client.CreateRenderModel(RenderScene.Zone_Default)
@@ -201,7 +202,11 @@ if Client then
 	end
 	
 	function InfantryPortal:GetAccentSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+		if self:GetIsBuilt() then
+			return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+		else
+			return Color( 0,0,0 )
+		end
 	end
 
 	function InfantryPortal:GetTrimSkinColor()

@@ -58,6 +58,21 @@ kIconColors = {
 }
 
 
+kMinimapBlipType = enum( 
+	{
+		'Undefined', 'TechPoint', 'ResourcePoint', 'Scan', 'EtherealGate', 'HighlightWorld',
+		'Sentry', 'CommandStation',
+        'Extractor', 'InfantryPortal', 'Armory', 'AdvancedArmory', 'PhaseGate', 'Observatory',
+        'RoboticsFactory', 'ArmsLab', 'PrototypeLab',
+        'Hive', 'Harvester', 'Hydra', 'Egg', 'Embryo', 'Crag', 'Whip', 'Shade', 'Shift', 'Shell', 'Veil', 'Spur', 'TunnelEntrance',
+        'Marine', 'JetpackMarine', 'Exo', 'Skulk', 'Lerk', 'Onos', 'Fade', 'Gorge',
+        'Door', 'PowerPoint', 'DestroyedPowerPoint',
+        'ARC', 'Drifter', 'MAC', 'Infestation', 'InfestationDying', 'MoveOrder', 'AttackOrder', 'BuildOrder', 'SensorBlip', 'SentryBattery' 
+	} 
+)
+
+
+
 
 // 
 // ColorSkinMixin Globals
@@ -74,6 +89,7 @@ kTeam2_AccentColor = Color(1.0, 0.0, 0.0, 1)
 kTeam2_TrimColor = Color(0.576, 0.194, 0.011, 1)
 */
 kTeam1_BaseColor = Color(0.040, 0.058, 0.087, 1)
+//kTeam1_BaseColor = Color(0.048, 0.178, 0.484, 1)
 kTeam1_AccentColor = Color(0.756, 0.982, 1, 1)
 kTeam1_TrimColor = Color(0.725, 0.921, 0.949, 1)
 

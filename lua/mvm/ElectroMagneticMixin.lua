@@ -16,7 +16,7 @@ ElectroMagneticMixin.networkVars =
 }
 
 ElectroMagneticMixin.expectedCallbacks = {
-	GetIsVulnerableToEMP = "Boolean. Unit received extra damage if true and ElectroMagnetic damage type dealt"
+	GetIsVulnerableToEMP = "Boolean. Unit receives extra damage if true and ElectroMagnetic damage type dealt"
 }
 
 ElectroMagneticMixin.optionalCallbacks = {
@@ -38,7 +38,7 @@ kEmpEffectCinematicTable["SentryBattery"] = kEmpEffectSmall
 local function GetElectrifiedCinematic(ent, firstPerson)
 	
     //if firstPerson then	//TODO Add this
-    //    return kBurn1PCinematic
+    //    return kEmp1PCinematic
     //end
     
     return kEmpEffectCinematicTable[ent:GetClassName()] or kEmpEffectSmall
@@ -98,7 +98,7 @@ function ElectroMagneticMixin:OnUpdate( deltaTime )
 	elseif self.isEmpAffected then
 		
 		if Client and self:GetIsVisible() then
-			//self:_UpdateElectrifiedEffects()	//insuficient atm
+			//self:_UpdateElectrifiedEffects()	//insufficient atm
 		end
 		
 	end

@@ -17,23 +17,69 @@ AddMixinNetworkVars(DetectableMixin, newNetworkVars)
 //-----------------------------------------------------------------------------
 
 
-local orgArmoryCreate = Armory.OnCreate
-function Armory:OnCreate()
-	
-	orgArmoryCreate(self)
+function Armory:OnCreate()	//OVERRIDES
 
-	InitMixin(self, FireMixin)
+    ScriptActor.OnCreate(self)
+    
+    InitMixin(self, BaseModelMixin)
+    InitMixin(self, ClientModelMixin)
+    InitMixin(self, LiveMixin)
+    InitMixin(self, GameEffectsMixin)
+    InitMixin(self, FlinchMixin)
+    InitMixin(self, TeamMixin)
+    InitMixin(self, PointGiverMixin)
+    InitMixin(self, SelectableMixin)
+    InitMixin(self, EntityChangeMixin)
+    InitMixin(self, LOSMixin)
+    InitMixin(self, CorrodeMixin)
+    InitMixin(self, ConstructMixin)
+    InitMixin(self, ResearchMixin)
+    InitMixin(self, RecycleMixin)
+    InitMixin(self, RagdollMixin)
+    InitMixin(self, ObstacleMixin)
+    InitMixin(self, DissolveMixin)
+    InitMixin(self, GhostStructureMixin)
+    InitMixin(self, VortexAbleMixin)
+    InitMixin(self, CombatMixin)
+    InitMixin(self, PowerConsumerMixin)
+    InitMixin(self, ParasiteMixin)
+    InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
-	
-	if Client then
-		InitMixin(self, ColoredSkinsMixin)
-	end
-	
-	if Server then
+    
+    
+    if Client then
+        InitMixin(self, CommanderGlowMixin)
+        InitMixin(self, ColoredSkinsMixin)
+    end
+    
+
+    self:SetLagCompensated(false)
+    self:SetPhysicsType(PhysicsType.Kinematic)
+    self:SetPhysicsGroup(PhysicsGroup.BigStructuresGroup)
+    
+    // False if the player that's logged into a side is only nearby, true if
+    // the pressed their key to open the menu to buy something. A player
+    // must use the armory once "logged in" to be able to buy anything.
+    self.loginEastAmount = 0
+    self.loginNorthAmount = 0
+    self.loginWestAmount = 0
+    self.loginSouthAmount = 0
+    
+    self.timeScannedEast = 0
+    self.timeScannedNorth = 0
+    self.timeScannedWest = 0
+    self.timeScannedSouth = 0
+    
+    self.deployed = false
+    
+    
+    if Server then
 		self.advancedArmoryUpgrade = false
 	end
-
+	
+    
 end
+
 
 
 local orgArmoryInit = Armory.OnInitialized
@@ -62,12 +108,33 @@ if Client then
 	end
 
 	function Armory:GetAccentSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+		if self:GetIsBuilt() then
+			return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+		else
+			return Color( 0,0,0 )
+		end
 	end
 
 	function Armory:GetTrimSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
 	end
+
+end
+
+
+function Armory:GetTechButtons(techId)
+
+	local techButtons = nil
+
+    techButtons = { kTechId.ShotgunTech, kTechId.MinesTech, kTechId.GrenadeTech, kTechId.None,
+                    kTechId.None, kTechId.GrenadeLauncherTech, kTechId.None, kTechId.None }
+	
+    // Show button to upgraded to advanced armory
+    if self:GetTechId() == kTechId.Armory and self:GetResearchingId() ~= kTechId.AdvancedArmoryUpgrade then
+        techButtons[kMarineUpgradeButtonIndex] = kTechId.AdvancedArmoryUpgrade
+    end
+	
+    return techButtons
 
 end
 
@@ -91,9 +158,9 @@ if Server then
 			// Create visual add-on
 			local advancedArmoryModule = AddChildModel(self)
 			
-			self.advancedArmoryUpgrade = true
 			local team = self:GetTeam()
 			if team then
+				self.advancedArmoryUpgrade = true
 				team:AddSupplyUsed( kAdvancedArmorySupply )
 			end
 			

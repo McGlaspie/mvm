@@ -11,17 +11,5 @@ modelColorMap = "models/marine/male/male_assault_colorMap.dds"
 
 numColumns = 1
 numRows = 4
-colorMapIndex = 0
 
-modelColorBaseR = 0.040
-modelColorBaseG = 0.058
-modelColorBaseB = 0.087
-
-modelColorAccentR = 0.756
-modelColorAccentG = 0.982
-modelColorAccentB = 1
-
-modelColorTrimR = 0.725
-modelColorTrimG = 0.921
-modelColorTrimB = 0.949
 

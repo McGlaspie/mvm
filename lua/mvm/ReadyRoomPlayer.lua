@@ -7,60 +7,82 @@ end
 //-----------------------------------------------------------------------------
 
 
-local orgRRplayerCreate = ReadyRoomPlayer.OnCreate
-function ReadyRoomPlayer:OnCreate()
+function ReadyRoomPlayer:OnCreate()	//OVERRIDES
 
-	orgRRplayerCreate(self)
-
-	if Client then
+    InitMixin(self, BaseMoveMixin, { kGravity = Player.kGravity })
+    InitMixin(self, GroundMoveMixin)
+    InitMixin(self, JumpMoveMixin)
+    InitMixin(self, CrouchMoveMixin)
+    InitMixin(self, LadderMoveMixin)
+    InitMixin(self, CameraHolderMixin, { kFov = kDefaultFov })
+    InitMixin(self, ScoringMixin, { kMaxScore = kMaxScore })
+    
+    Player.OnCreate(self)
+    
+    InitMixin(self, MarineVariantMixin )
+    
+    if Client then
 		InitMixin(self, ColoredSkinsMixin)
 	end
-
+    
 end
 
 
-local orgRRplayerInit = ReadyRoomPlayer.OnInitialized
-function ReadyRoomPlayer:OnInitialized()
-	
-	orgRRplayerInit(self)
+function ReadyRoomPlayer:OnInitialized()	//OVERRIDES
+
+    Player.OnInitialized(self)
+    
+    self:SetModel( MarineVariantMixin.kDefaultModelName, MarineVariantMixin.kMarineAnimationGraph )
+    
+    if Client then
+		self:InitializeSkin()
+    end
+    
+end
+
+/*
+function ReadyRoomPlayer:OnUpdateRender()
+	Print("ReadyRoomPlayer:OnUpdateRender()")
+end
+*/
+
+function ReadyRoomPlayer:OnUpdatePlayer(deltaTime)
 	
 	if Client then
-		self:InitializeSkin()
-	end
+		//self:InitializeSkin()
+    end
+
+	Player.OnUpdatePlayer( self, deltaTime )
 
 end
-
 
 if Client then
 	
+	
 	function ReadyRoomPlayer:InitializeSkin()
 		
-		Print("ReadyRoomPlayer:InitializeSkin() - self.previousTeamNumber =" .. self.previousTeamNumber )
+		//Print("ReadyRoomPlayer:InitializeSkin() - self.previousTeamNumber =" .. self.previousTeamNumber )
 		
 		self.skinBaseColor = self:GetBaseSkinColor()
 		self.skinAccentColor = self:GetAccentSkinColor()
 		self.skinTrimColor = self:GetTrimSkinColor()
-		self.skinAtlasIndex = 0
+		self.skinAtlasIndex = self:GetSkinAtlasIndex()
 		
-		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
-			self.skinColoringEnabled = true
-		else
-			self.skinColoringEnabled = false
-		end
+		self.skinColoringEnabled = false
 		
 	end
 	
+	
 	function ReadyRoomPlayer:GetSkinAtlasIndex()
 		
-		if self.previousTeamNumber == kTeam1Index then
-			return 1
-		elseif self.previousTeamNumber == kTeam2Index then
-			return 2
+		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
+			return self.previousTeamNumber - 1
 		else
 			return 0
 		end
 		
 	end
+	
 	
 	function ReadyRoomPlayer:GetBaseSkinColor()
 	
@@ -76,6 +98,7 @@ if Client then
 		
 	end
 	
+	
 	function ReadyRoomPlayer:GetAccentSkinColor()
 		
 		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
@@ -90,6 +113,7 @@ if Client then
 		
 	end
 	
+	
 	function ReadyRoomPlayer:GetTrimSkinColor()
 		
 		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
@@ -103,12 +127,6 @@ if Client then
 		return kNeutral_TrimColor
 		
 	end
-	
-	
-	function ReadyRoomPlayer:OnTeamChange()
-		self:InitializeSkin()
-	end
-	
 
 end	//End Client
 

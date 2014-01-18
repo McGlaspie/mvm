@@ -5,7 +5,8 @@ Script.Load("lua/mvm/FireMixin.lua")
 
 local newNetworkVars = {
     scoutedForTeam1 = "boolean",
-    scoutedForTeam2 = "boolean"
+    scoutedForTeam2 = "boolean",
+    isStartingPoint = "boolean"
 }
 
 
@@ -13,8 +14,35 @@ AddMixinNetworkVars(FireMixin, newNetworkVars)
 
 
 if Client then
-	PowerPoint.kDisabledColor = Color(0.013, 0.013, 0.013)		//Move to globals.lua? Balance?
-	PowerPoint.kDisabledCommanderColor = Color(0.15, 0.15, 0.15)
+	
+	PowerPoint.kDisabledColor = Color(0.005, 0.005, 0.005)		//Move to globals.lua? Balance?
+	PowerPoint.kDisabledCommanderColor = Color(0.1, 0.1, 0.1)
+	
+	// chance of a aux light flickering when powering up
+	PowerPoint.kAuxFlickerChance = 0
+	// chance of a full light flickering when powering up
+	PowerPoint.kFullFlickerChance = 0.30
+	
+	// determines if aux lights will randomly fail after they have come on for a certain amount of time
+	PowerPoint.kAuxLightsFail = true
+
+	// max varying delay to turn on full lights
+	PowerPoint.kMaxFullLightDelay = 4
+	// min 2 seconds from repairing the node till the light goes on
+	PowerPoint.kMinFullLightDelay = 2
+	// how long time for the light to reach full power (PowerOnTime was a bit brutal and give no chance for the flicker to work)
+	PowerPoint.kFullPowerOnTime = 4
+
+	// max varying delay to turn on aux lights
+	PowerPoint.kMaxAuxLightDelay = 0
+	
+	// minimum time that aux lights are on before they start going out
+	PowerPoint.kAuxLightSafeTime = 20 // short for testing, should be like 300 (5 minutes)
+	// maximum time for a power point to stay on after the safe time
+	PowerPoint.kAuxLightFailTime = 20 // short .. should be like 600 (10 minues)
+	// how long time a light takes to go from full aux power to dead (last 1/3 of that time is spent flickering)
+	PowerPoint.kAuxLightDyingTime = 20
+	
 end
 
 
@@ -45,28 +73,55 @@ local kUnderAttackTeamMessageLimit = 4
 // max amount of "attack" the powerpoint has suffered (?)
 local kMaxAttackTime = 10
 
-local kDefaultUpdateRange = 100
+local kDefaultUpdateRange = 200
 
-local kSightedUpdateRate = 2	//seconds
+local kSightedUpdateRate = 1.5	//seconds	//2
 //PowerPoint.kPowerState = enum( { "unsocketed", "socketed", "destroyed" } )
 
 
 //-----------------------------------------------------------------------------
 
 
-local orgPowerPointCreate = PowerPoint.OnCreate
-function PowerPoint:OnCreate()
+if Client then
+
+	Script.Load("lua/mvm/PowerPointLightHandler.lua")
 	
-	orgPowerPointCreate(self)
+
+	// The default update range; if the local player is inside this range from the powerpoint, the
+	// lights will update. As the lights controlled by a powerpoint can be located quite far from the powerpoint,
+	// and the area lit by the light even further, this needs to be set quite high.
+	// The powerpoint cycling is also very efficient, so there is no need to keep it low from a performance POV.
+	local kDefaultUpdateRangeSq = kDefaultUpdateRange * kDefaultUpdateRange
 	
-	if Server then
+	
+	function UpdatePowerPointLights()	//OVERRIDES - Called in Client.lua
+	
+		PROFILE("PowerPoint:UpdatePowerPointLights")
 		
-		self.scoutedForTeam1 = false
-		self.scoutedForTeam2 = false
+		// Now update the lights every frame
+		local player = Client.GetLocalPlayer()
+		if player then
 		
-		self:SetUpdates(true)
-		self:SetPropagate(Entity.Propagate_Mask)
-		self:UpdateRelevancy()
+			local playerPos = player:GetOrigin()
+			local powerPoints = Shared.GetEntitiesWithClassname("PowerPoint")
+			
+			for index, powerPoint in ientitylist(powerPoints) do
+				
+				// PowerPoints are always loaded but in order to avoid running the light modification stuff
+				// for all of them at all times, we restrict it to powerpoints inside the updateRange. The
+				// updateRange should be long enough that players can't see the lights being updated by the
+				// powerpoint when outside this range, and short enough not to waste too much cpu.
+				local inRange = (powerPoint:GetOrigin() - playerPos):GetLengthSquared() < kDefaultUpdateRangeSq
+				
+				// Ignore range check if the player is a commander since they are high above
+				// the lights in a lot of cases and see through ceilings and some walls.
+				if inRange or player:isa("Commander") then
+					powerPoint:UpdatePoweredLights()
+				end
+				
+			end
+			
+		end
 		
 	end
 	
@@ -74,20 +129,39 @@ end
 
 
 
-local function SetupWithInitialSettings(self)
+local orgPowerPointCreate = PowerPoint.OnCreate
+function PowerPoint:OnCreate()
+	
+	orgPowerPointCreate(self)
+	
+	self.scoutedForTeam1 = false
+	self.scoutedForTeam2 = false
+	self.isStartingPoint = false
+	
+	if Server then
+		
+		self:SetUpdates(true)
+		self:SetPropagate(Entity.Propagate_Mask)
+		
+	end
+	
+end
+
+
+local function SetupWithInitialSettings(self)	//Called in Reset()
 
     if self.startSocketed then
-
-        self:SetInternalPowerState(PowerPoint.kPowerState.socketed)
+		
+        self:SetInternalPowerState( PowerPoint.kPowerState.socketed )
         self:SetConstructionComplete()
-        self:SetLightMode(kLightMode.Normal)
+        self:SetLightMode( kLightMode.Normal )
         self:SetPoweringState(true)
     
     else
-
+		
         self:SetModel(kUnsocketedSocketModelName, kUnsocketedAnimationGraph)
         
-        self.lightMode = kLightMode.Normal
+        self:SetLightMode( kLightMode.NoPower )
         self.powerState = PowerPoint.kPowerState.unsocketed
         self.timeOfDestruction = 0
         
@@ -109,36 +183,60 @@ end
 
 
 function PowerPoint:OnInitialized()		//OVERRIDES
-
+	
     ScriptActor.OnInitialized(self)
     
     SetupWithInitialSettings(self)
     
     if Server then
 		
-       self:SetTeamNumber(kTeamReadyRoom)
+		self:SetTeamNumber( kTeamReadyRoom )
         
-        self:SetRelevancyDistance( kDefaultUpdateRange + 20 )	//????
+        self:SetRelevancyDistance( kDefaultUpdateRange )
         
         // This Mixin must be inited inside this OnInitialized() function.
         if not HasMixin(self, "MapBlip") then
             InitMixin(self, MapBlipMixin)
         end
         
-        //InitMixin(self, StaticTargetMixin)
-        //InitMixin(self, InfestationTrackerMixin)
-        
     elseif Client then
 		
         InitMixin(self, UnitStatusMixin)
-        //InitMixin(self, HiveVisionMixin)
         
     end
     
     InitMixin(self, IdleMixin)
     
+    self:UpdateRelevancy()
+    
 end
 
+function PowerPoint:OnResetComplete()
+end
+
+function PowerPoint:Reset()		//OVERRIDES
+
+	if Server then
+	
+		Print("PowerPoint:Reset()")
+		ScriptActor.Reset(self)
+		
+		SetupWithInitialSettings(self)
+		self:MarkBlipDirty()
+		
+		self:UpdateRelevancy()
+		
+	end
+	
+	self.scoutedForTeam1 = false
+	self.scoutedForTeam2 = false
+	self.isStartingPoint = false
+	
+	if Client then
+		self.lightHandler:Run( self:GetLightMode() )
+	end
+
+end
 
 
 function PowerPoint:GetIsFlameAble()
@@ -146,11 +244,13 @@ function PowerPoint:GetIsFlameAble()
 end
 
 function PowerPoint:GetCanBeNanoShieldedOverride(resultTable)
+	
     resultTable.shieldedAllowed = (
 		resultTable.shieldedAllowed 
 		and self:GetPowerState() == PowerPoint.kPowerState.socketed
 		and self:GetIsBuilt()
 	)
+	
 end
 
 function PowerPoint:GetReceivesStructuralDamage()
@@ -159,7 +259,7 @@ function PowerPoint:GetReceivesStructuralDamage()
 end
 
 function PowerPoint:GetCanConstructOverride(player)
-    return not self:GetIsBuilt() and self:GetPowerState() ~= PowerPoint.kPowerState.unsocketed --and GetAreFriends(player,self)
+    return not self:GetIsBuilt() and self:GetPowerState() ~= PowerPoint.kPowerState.unsocketed
 end
 
 
@@ -177,11 +277,9 @@ function PowerPoint:GetTechAllowed(techId, techNode, player)
 			for _, entity in ipairs(locationCommUnits) do
 			    
 				if entity:GetTeamNumber() == playerTeam then
-					//MAC still not being detected by this...
-					if entity:isa("Marine") or entity:isa("MAC") or entity:isa("Exo") then
+					if not entity:isa("Structure") and not entity:isa("ARC") then	//won't this allow scans?
 						return true, true
-					end
-					
+					end					
 				end
 				
 			end
@@ -199,18 +297,58 @@ function PowerPoint:OverrideVisionRadius()
 end
 
 
-local orgPowerPointReset = PowerPoint.Reset
-function PowerPoint:Reset()
+
+if Client then
 	
-	orgPowerPointReset(self)
-	
-	if Server then
+	function PowerPoint:GetIsVisible()	//This makes the dark magic happen
 		
-		self.scoutedForTeam1 = false
-		self.scoutedForTeam2 = false
-		self:UpdateRelevancy()
+		local player = Client.GetLocalPlayer()
+		
+		if player and HasMixin( player, "Team" ) and player:isa("Commander") then
+			
+			local playerTeam = player:GetTeamNumber()
+			if not self:IsScouted( playerTeam ) then
+				return false
+			end
+			
+		end
+		
+		return ScriptActor.GetIsVisible(self)
 		
 	end
+	
+end
+
+
+function PowerPoint:UpdateRelevancy()
+	
+	local mask = 0
+	mask = bit.bor( mask, kRelevantToTeam1, kRelevantToTeam2 )
+	/*
+	if self.scoutedForTeam1 then
+		mask = bit.bor( mask, kRelevantToTeam1Unit, kRelevantToTeam1Commander )
+	else
+		mask = bit.bor( mask, kRelevantToTeam1Unit )
+	end
+	
+	if self.scoutedForTeam2 then
+		mask = bit.bor( mask, kRelevantToTeam2Unit, kRelevantToTeam2Commander )
+	else
+		mask = bit.bor( mask, kRelevantToTeam2Unit )
+	end
+	*/
+	self:SetExcludeRelevancyMask( mask )
+
+end
+
+
+function PowerPoint:IsScouted( byTeamNumber )
+
+	return ConditionalValue(
+		byTeamNumber == kTeam2Index,
+		self.scoutedForTeam2,
+		self.scoutedForTeam1
+	)
 
 end
 
@@ -218,33 +356,38 @@ end
 if Server then	
 	
 	
-	function PowerPoint:UpdateRelevancy()
+	function PowerPoint:SetIsSightedOverride( seen, viewer )
 		
-		//FIXME below fixes switching teams not updating PN visibility, but Location powered effect not correct now...
-		local mask = bit.bor(kRelevantToTeam1, kRelevantToTeam2, kRelevantToReadyRoom)
+		if seen and viewer and HasMixin( viewer, "Team") then
 		
-		if self:GetIsSighted() then
-		
-			if self.scoutedForTeam1 then
-				mask = bit.bor(mask, kRelevantToTeam1Commander)
+			if not viewer:isa("ARC") and not viewer:isa("Structure") and not viewer:isa("Commander") then
+			//Only players, scans, and MACs can scout things
+				
+				if viewer:GetTeamNumber() == kTeam1Index then
+					self.scoutedForTeam1 = true
+				elseif viewer:GetTeamNumber() == kTeam2Index then
+					self.scoutedForTeam2 = true
+				end
+				
 			end
 			
-			if self.scoutedForTeam2 then
-				mask = bit.bor(mask, kRelevantToTeam2Commander)
-			end
-		
+			//Force LOS checks to be run again
+			//Required so BOTH teams have LOS checks performed on sighted event(s)
+			self.lastSightedState = false
+			self.updateLOS = true
+			self.dirtyLOS = true
+			
 		end
 		
-		self:SetExcludeRelevancyMask(mask)
+		return seen
 	
 	end
 	
-	
 	local function PowerUp(self)
-    
-        self:SetInternalPowerState(PowerPoint.kPowerState.socketed)
-        self:SetLightMode(kLightMode.Normal)
-        self:StopSound(kAuxPowerBackupSound)
+		
+        self:SetInternalPowerState( PowerPoint.kPowerState.socketed )
+        self:SetLightMode( kLightMode.Normal )
+        self:StopSound( kAuxPowerBackupSound )
         self:TriggerEffects("fixed_power_up")
         self:SetPoweringState(true)
         
@@ -325,13 +468,14 @@ if Server then
 			
 			end
             
-            // Only send the message if there was a CommandStation found at this same location.
+            // Only send the message if there is a CommandStation found at this same location.
             if foundStation and targetCommandStation ~= nil then
                 SendTeamMessage( targetCommandStation:GetTeam(), kTeamMessageTypes.PowerPointUnderAttack, self:GetLocationId() )
                 targetCommandStation:GetTeam():TriggerAlert( kTechId.MarineAlertStructureUnderAttack, self, true )
             end
             
             self.timePowerNodeAttackAlertSent = Shared.GetTime()
+            
         end
         
     end
@@ -372,9 +516,9 @@ if Server then
     
     
     local function PlayAuxSound(self)
-    
+	//FIXME Need way to prevent this from being played if not scouted
         if not self:GetIsDisabled() then
-            self:PlaySound(kAuxPowerBackupSound)
+			self:PlaySound(kAuxPowerBackupSound)
         end
         
     end
@@ -393,7 +537,7 @@ if Server then
         
         self:SetInternalPowerState(PowerPoint.kPowerState.destroyed)
         //self.constructionComplete = false
-        self:SetLightMode(kLightMode.NoPower)
+        self:SetLightMode( kLightMode.NoPower )
         
         // Remove effects such as parasite when destroyed.
         self:ClearGameEffects()
@@ -404,56 +548,141 @@ if Server then
         //end
         
         // Let the team know the power is down.
-        //SendTeamMessage(self:GetTeam(), kTeamMessageTypes.PowerLost, self:GetLocationId())	//Removed - no pointing sending msg to RR "team"
+        //FIXME Do lookup for CSs and notify accordingly
+        //SendTeamMessage(self:GetTeam(), kTeamMessageTypes.PowerLost, self:GetLocationId())
         
         // A few seconds later, switch on aux power.
         self:AddTimedCallback(PlayAuxSound, 4)
         self.timeOfDestruction = Shared.GetTime()
         
     end
-    
-    
 
 end //Server
 
 
 
-/*
-FIXME ALL of below "state" crap would be MUCH easier if the "node" was
-just an attachment to the base socket...then attachment visiblity could
-be toggled, instead of swapping the damn model...need new model for this
-however...yay.
-	PowerPoint.kPowerState = enum( { "unsocketed", "socketed", "destroyed" } )
-*/
-function PowerPoint:OnSighted(sighted)
-	
-	local lastViewer = self:GetLastViewer()
-	
-	if lastViewer ~= nil and HasMixin(lastViewer, "Team") then
-		
-		if not lastViewer:isa("ARC") and not lastViewer:isa("Structure") and not lastViewer:isa("Commander") then
-		//Only players, scans, and MACs can scout things
-			
-			if lastViewer:GetTeamNumber() == kTeam1Index then
-				self.scoutedForTeam1 = true
-			elseif lastViewer:GetTeamNumber() == kTeam2Index then
-				self.scoutedForTeam2 = true
-			end
-			
-		end
-		
-	end
-	
+
+local function CreateEffects(self)
+
+    // Create looping cinematics if we're low power or no power
+    local lightMode = self:GetLightMode() 
+    
+    if lightMode == kLightMode.LowPower and not self.lowPowerEffect then
+    
+        self.lowPowerEffect = Client.CreateCinematic(RenderScene.Zone_Default)
+        self.lowPowerEffect:SetCinematic(kDamagedEffect)        
+        self.lowPowerEffect:SetRepeatStyle(Cinematic.Repeat_Endless)
+        self.lowPowerEffect:SetCoords(self:GetCoords())
+        self.timeCreatedLowPower = Shared.GetTime()
+        
+    elseif lightMode == kLightMode.NoPower and not self.noPowerEffect then
+    
+        self.noPowerEffect = Client.CreateCinematic(RenderScene.Zone_Default)
+        self.noPowerEffect:SetCinematic(kOfflineEffect)
+        self.noPowerEffect:SetRepeatStyle(Cinematic.Repeat_Endless)
+        self.noPowerEffect:SetCoords(self:GetCoords())
+        self.timeCreatedNoPower = Shared.GetTime()
+        
+    end
+    
+    if self:GetPowerState() == PowerPoint.kPowerState.socketed and self:GetIsBuilt() and self:GetIsVisible() then
+    
+        if self.lastImpulseEffect == nil then
+            self.lastImpulseEffect = Shared.GetTime() - PowerPoint.kImpulseEffectFrequency
+        end
+        
+        if self.lastImpulseEffect + PowerPoint.kImpulseEffectFrequency < Shared.GetTime() then
+        
+            self:CreateImpulseEffect()
+            self.createStructureImpulse = true
+            
+        end
+        
+        if self.lastImpulseEffect + 1 < Shared.GetTime() and self.createStructureImpulse == true then
+        
+            self:CreateImpulseStructureEffect()
+            self.createStructureImpulse = false
+            
+        end
+        
+    end
+    
+end
+
+local function DeleteEffects(self)
+
+    local lightMode = self:GetLightMode() 
+    
+    // Delete old effects when they shouldn't be played any more, and also every three seconds
+    local kReplayInterval = 3
+    
+    if (lightMode ~= kLightMode.LowPower and self.lowPowerEffect) or (self.timeCreatedLowPower and (Shared.GetTime() > self.timeCreatedLowPower + kReplayInterval)) then
+    
+        Client.DestroyCinematic(self.lowPowerEffect)
+        self.lowPowerEffect = nil
+        self.timeCreatedLowPower = nil
+        
+    end
+    
+    if (lightMode ~= kLightMode.NoPower and self.noPowerEffect) or (self.timeCreatedNoPower and (Shared.GetTime() > self.timeCreatedNoPower + kReplayInterval)) then
+    
+        Client.DestroyCinematic(self.noPowerEffect)
+        self.noPowerEffect = nil
+        self.timeCreatedNoPower = nil
+        
+    end
+    
 end
 
 
-local orgPowerPointOnUpdate = PowerPoint.OnUpdate
-function PowerPoint:OnUpdate(deltaTime)
+function PowerPoint:OnUpdate(deltaTime)	//OVERRIDES
 	
-	orgPowerPointOnUpdate(self, deltaTime)
+	ScriptActor.OnUpdate(self, deltaTime)
+    
+	if Client then
+		
+		local player = Client.GetLocalPlayer()
+		
+		if HasMixin( player, "Team") then
+			local playerTeam = player:GetTeamNumber()
+			if playerTeam == kTeam1Index or playerTeam == kTeam2Index then
+				if self:IsScouted( playerTeam ) then
+					CreateEffects(self)
+				end
+			else
+				CreateEffects(self)	//For spectators, etc
+			end
+		end
+	    
+	    DeleteEffects(self)
+	    
+	else
 	
-	if Server and self.sighted then
+	    self:AddAttackTime(-0.1)
+	    
+	    if self:GetLightMode() == kLightMode.Damaged and self:GetAttackTime() == 0 then
+	        self:SetLightMode( kLightMode.Normal )
+	    end
+	    
+	end
+	
+	if Server then
+		
+		if self.mapBlipId and self.mapBlipId ~= Entity.invalidId and GetGamerules():GetGameStarted() then
+			
+			local mapBlip = Shared.GetEntity( self.mapBlipId )
+			
+			if mapBlip then
+				
+				//Required to ensure scouted relevancy is propogated to mapblip, per team
+				mapBlip:Update()	//this "should" reflect destroyed state back into blip via mixin
+				
+			end
+			
+		end
+	
 		self:UpdateRelevancy()
+		
 	end
 
 end
@@ -463,7 +692,30 @@ end
 if Client then
 	
 	
-	function PowerPoint:OnUpdateRender()
+	function PowerPoint:UpdatePoweredLights()	//OVERRIDES
+		
+		PROFILE("PowerPoint:UpdatePoweredLights") 
+		
+		if not self.lightHandler then    
+			
+			self.lightHandler = PowerPointLightHandler():Init( self )
+	   
+		end
+		
+		
+		local time = Shared.GetTime()
+		// max 20 updates per second 
+		if self.lastUpdatedTime == nil or time - self.lastUpdatedTime > 0.05 then   
+			
+			self.lastUpdatedTime = time			
+			self.lightHandler:Run( self:GetLightMode() )
+			
+		end
+
+	end
+	
+	
+	function PowerPoint:OnUpdateRender()	//OVERRIDES
 
 		PROFILE("PowerPoint:OnUpdateRender")		
 		
@@ -513,11 +765,11 @@ if Client then
 		
 	end
 
-end
+end	//End Client
 
 
 //-----------------------------------------------------------------------------
 
 
-Class_Reload("PowerPoint", newNetworkVars)
+Class_Reload( "PowerPoint", newNetworkVars )
 

@@ -117,6 +117,9 @@ function GUIMarineStatus:Initialize()
     self.statusbackground:SetTexture( GUIMarineStatus.kStatusTexture )
     self.statusbackground:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.statusbackground:SetTexturePixelCoordinates(unpack(GUIMarineStatus.kBackgroundCoords))
+    self.statusbackground:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+    self.statusbackground:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+    self.statusbackground:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
     self.statusbackground:AddAsChildTo(self.frame)
     
     self.statusStencil = GetGUIManager():CreateGraphicItem()
@@ -125,16 +128,10 @@ function GUIMarineStatus:Initialize()
     self.statusStencil:SetTexturePixelCoordinates(unpack(GUIMarineStatus.kStencilCoords))
     self.statusStencil:SetIsStencil(true)
     self.statusStencil:SetClearsStencilBuffer(false)
-    self.statusbackground:AddChild(self.statusStencil)
-    
-    self.statusbackground:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
-    self.statusbackground:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
-    self.statusbackground:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
-    
     self.statusStencil:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
     self.statusStencil:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
     self.statusStencil:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
-    
+    self.statusbackground:AddChild(self.statusStencil)    
     
     self.healthText = self.script:CreateAnimatedTextItem()
     self.healthText:SetNumberTextAccuracy(1)
@@ -171,18 +168,22 @@ function GUIMarineStatus:Initialize()
     )
     self.statusbackground:AddChild(self.armorText)
     
+    
+    local scaneLinesColor = ConditionalValue(
+		self.teamNumber == kTeam1Index,
+		kGUI_Team1_BaseColor,
+		kGUI_Team2_BaseColor
+	)
+    
     self.scanLinesForeground = self.script:CreateAnimatedGraphicItem()
     self.scanLinesForeground:SetTexture(kScanLinesBigTexture)
     self.scanLinesForeground:SetShader("shaders/GUI_TeamThemed.surface_shader")
+    self.scanLinesForeground:SetFloatParameter( "teamBaseColorR", scaneLinesColor.r )
+    self.scanLinesForeground:SetFloatParameter( "teamBaseColorG", scaneLinesColor.g )
+    self.scanLinesForeground:SetFloatParameter( "teamBaseColorB", scaneLinesColor.b )
+    //self.scanLinesForeground:SetFloatParameter( "teamBaseColorA", scaneLinesColor.a )
     self.scanLinesForeground:SetTexturePixelCoordinates(unpack(kScanLinesBigCoords))
-    self.scanLinesForeground:SetColor( 
-		ConditionalValue(
-			self.teamNumber == kTeam1Index,
-			kBrightColorTeam1Transparent,
-			kBrightColorTeam2Transparent
-		)
-	)
-    self.scanLinesForeground:SetIsVisible(true)
+    self.scanLinesForeground:SetIsVisible(false)
     self.scanLinesForeground:SetLayer(self.hudLayer + 2)
     self.scanLinesForeground:SetAnchor(GUIItem.Right, GUIItem.Top)
     self.statusbackground:AddChild(self.scanLinesForeground)

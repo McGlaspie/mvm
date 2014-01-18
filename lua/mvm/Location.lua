@@ -11,6 +11,7 @@
 Script.Load("lua/Trigger.lua")
 
 Shared.PrecacheSurfaceShader("materials/power/powered_decal.surface_shader")
+//TODO Need colorized per team
 
 class 'Location' (Trigger)
 
@@ -59,52 +60,65 @@ function Location:GetShowOnMinimap()
     return self.showOnMinimap
 end
 
-if Server then
+
 	
     function Location:OnTriggerEntered( entity, triggerEnt )
         ASSERT(self == triggerEnt)
         
-        if entity.SetLocationName then
-            //Log("%s enter loc %s ('%s') from '%s'", entity, self, self:GetName(), entity:GetLocationName())
-            // only if we have no location do we set the location here
-            // otherwise we wait until we exit the location to set it
-            local entLocEnt = entity:GetLocationEntity()
-            
-            if not entLocEnt or entLocEnt ~= self then
+        if Server then
+			
+			if entity.SetLocationName then
+				//Log("%s enter loc %s ('%s') from '%s'", entity, self, self:GetName(), entity:GetLocationName())
+				// only if we have no location do we set the location here
+				// otherwise we wait until we exit the location to set it
+				local entLocEnt = entity:GetLocationEntity()
 				
-				//Print("Updating location for " .. entity:GetClassName() .. "[" .. entity:GetId() .. "]" )
+				if not entLocEnt or entLocEnt ~= self then
+					
+					//Print("Updating location for " .. entity:GetClassName() .. "[" .. entity:GetId() .. "]" )
+					
+					entity:SetLocationName( triggerEnt:GetName() )
+					entity:SetLocationEntity(self)
+					
+				end
 				
-                entity:SetLocationName( triggerEnt:GetName() )
-                entity:SetLocationEntity(self)
-                
-            end
-            
-        end
-            
+			end
+			
+		end
+		
     end
     
     function Location:OnTriggerExited( entity, triggerEnt )
         ASSERT(self == triggerEnt)
         
-        if entity.SetLocationName then
+        if Server then
+        
+			if entity.SetLocationName then
+				
+				local enteredLoc = GetLocationForPoint( entity:GetOrigin(), self )
+				local name = ( enteredLoc and enteredLoc:GetName() or "" )
+				
+				//Log("%s exited location %s('%s'), entered '%s'", entity, self, self:GetName(), name)
+				entity:SetLocationName(name)
+				entity:SetLocationEntity(enteredLoc)
+				
+			end
 			
-            local enteredLoc = GetLocationForPoint( entity:GetOrigin(), self )
-            local name = ( enteredLoc and enteredLoc:GetName() or "" )
-            
-            //Log("%s exited location %s('%s'), entered '%s'", entity, self, self:GetName(), name)
-            entity:SetLocationName(name)
-            entity:SetLocationEntity(enteredLoc)
-            
         end
-         
+
+		
+ 
     end
-    
+
+if Server then
 end
+
 
 // used for marine commander to show/hide power status in a location
 if Client then
 	
-    function Location:ShowPowerStatus(powered)
+	
+    function Location:ShowPowerStatus( powered )
 
         if not self.powerDecal then
             self.materialLoaded = nil  
@@ -160,7 +174,8 @@ if Client then
         end
         
     end
-
+	
+	
     function Location:HidePowerStatus()
 
         if self.powerDecal then
@@ -172,63 +187,60 @@ if Client then
 
     end
     
+    
     function Location:OnUpdateRender()
     
         PROFILE("Location:OnUpdateRender")
-        /*
-        local player = Client.GetLocalPlayer()      
-		local playerTeam = player:GetTeamNumber()
-        local showPowerStatus = player and player.GetShowPowerIndicator and player:GetShowPowerIndicator()
-        local powerPoint
-		
-        if showPowerStatus then
+        
+        
+        local player = Client.GetLocalPlayer()
+        local showPowerStatus = false
+        
+        if player and player:isa("MarineCommander") then
+        
+			local playerTeam = player:GetTeamNumber()
 			
-            powerPoint = GetPowerPointForLocation(self.name)
-            showPowerStatus = powerPoint ~= nil
-            
-            if powerPoint then
+			if player.GetShowPowerIndicator then
+			
+				local powerNode = GetPowerPointForLocation(self.name)
 				
-				showPowerStatus = (
-					( powerPoint.scoutedForTeam1 and playerTeam == kTeam1Index )
-					or
-					( powerPoint.scoutedForTeam2 and playerTeam == kTeam2Index )
-				)
+				showPowerStatus = player:GetShowPowerIndicator( powerNode )
+				
+				if showPowerStatus then
+					
+					self:ShowPowerStatus( powerNode:GetIsPowering() )
+					
+					if self.powerDecal then
+					
+						// TODO: Doesn't need to be updated every frame, only setup on creation.
+					
+						local origin = self:GetOrigin()
+						local extents = self.scale * 0.23
+						extents.y = 10
+						origin.y = powerNode:GetOrigin().y - 2
+
+						local coords = Coords.GetTranslation(origin)
+						
+						// Get the origin in the object space of the decal.
+						local osOrigin = coords:GetInverse():TransformPoint( powerNode:GetOrigin() )
+						self.powerMaterial:SetParameter("osOrigin", osOrigin)
+
+						self.powerDecal:SetCoords(coords)
+						self.powerDecal:SetExtents(extents)
+						
+					end
+				else
+					self:HidePowerStatus()
+				end
 				
 			end
 			
-        end  
+        end
         
+        if showPowerStatus == false then
+			self:HidePowerStatus()
+        end
         
-        if showPowerStatus then
-			
-            self:ShowPowerStatus( powerPoint:GetIsPowering() )
-            
-            if self.powerDecal then
-            
-                // TODO: Doesn't need to be updated every frame, only setup on creation.
-            
-                local origin = self:GetOrigin()
-                local extents = self.scale * 0.23
-                extents.y = 10
-                origin.y = powerPoint:GetOrigin().y - 2
-
-                local coords = Coords.GetTranslation(origin)
-                
-                // Get the origin in the object space of the decal.
-                local osOrigin = coords:GetInverse():TransformPoint( powerPoint:GetOrigin() )
-                self.powerMaterial:SetParameter("osOrigin", osOrigin)
-
-                self.powerDecal:SetCoords(coords)
-                self.powerDecal:SetExtents(extents)
-                
-            end
-            
-        else
-			
-            self:HidePowerStatus()
-            
-        end   
-        */
     end
     
 end

@@ -56,7 +56,7 @@ GUIUnitStatus.kStatusBgNoHintSize = GUIScale( Vector(168, 56, 0) )
 GUIUnitStatus.kStatusBgOffset= GUIScale( Vector(0, -16, 0) )
 GUIUnitStatus.kStatusBackgroundPixelCoords = { 256, 896 , 256 + 178, 896 + 53}
 
-GUIUnitStatus.kUnpoweredColor = Color(1,0.2,0.2,1)
+GUIUnitStatus.kUnpoweredColor = Color( 0 , 1 , 1 , 1 )
 GUIUnitStatus.kEnemyColor = Color(1,0.3,0.3,1)
 
 GUIUnitStatus.kFontScale = GUIScale( Vector(1,1,1) ) * 1.2
@@ -112,7 +112,7 @@ end
 local function GetColorForUnitState(unitStatus)
 
     local color = Color(1,1,1,1)
-
+	
     if unitStatus == kUnitStatus.Unpowered then
         color = GUIUnitStatus.kUnpoweredColor
     //elseif unitStatus == kUnitStatus.Researching then
@@ -120,8 +120,8 @@ local function GetColorForUnitState(unitStatus)
     elseif unitStatus == kUnitStatus.Damaged then
         color = Color(1, 227/255, 69/255, 0.75)
     end
-
-    return color    
+	
+    return color
 
 end
 
@@ -180,7 +180,6 @@ end
 local function CreateBlipItem(self)
 
     local newBlip = { }
-    //local teamType = PlayerUI_GetTeamType()
     local neutralTexture = "ui/unitstatus_neutral.dds"
     
     newBlip.ScreenX = 0
@@ -226,7 +225,7 @@ local function CreateBlipItem(self)
     newBlip.OverLayGraphic:SetBlendTechnique(GUIItem.Add)
     newBlip.OverLayGraphic:SetSize(GUIUnitStatus.kUnitStatusSize)
     newBlip.OverLayGraphic:SetIsScaling(false)
-    newBlip.OverLayGraphic:SetColor(Color(1,1,1,0.4))
+    newBlip.OverLayGraphic:SetColor(Color(1,1,1,1))
     newBlip.OverLayGraphic:SetTexture(texture)
     newBlip.OverLayGraphic:SetLayer(kGUILayerPlayerNameTags)
     newBlip.OverLayGraphic:SetShader("shaders/GUI_TeamThemed.surface_shader")

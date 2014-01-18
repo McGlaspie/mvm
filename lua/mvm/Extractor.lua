@@ -54,11 +54,24 @@ if Client then
 	end
 	
 	function Extractor:GetAccentSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+		if self:GetIsBuilt() then
+			return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+		else
+			return Color( 0,0,0 )
+		end
 	end
 
 	function Extractor:GetTrimSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
+	end
+
+end
+
+
+function Extractor:OverrideAddSupply( team )
+	
+	if self:GetIsBuilt() then
+		team:AddSupplyUsed( LookupTechData( self:GetTechId(), kTechDataSupply, 0) )
 	end
 
 end

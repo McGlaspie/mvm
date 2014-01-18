@@ -1,7 +1,4 @@
-/**
- *
- */
-//=============================================================================
+
 
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
@@ -18,7 +15,9 @@ AddMixinNetworkVars(FireMixin, newNetworkVars)
 AddMixinNetworkVars(DetectableMixin, newNetworkVars)
 AddMixinNetworkVars(ElectroMagneticMixin, newNetworkVars)
 
+
 //-----------------------------------------------------------------------------
+
 
 local orgArcCreate = ARC.OnCreate
 function ARC:OnCreate()
@@ -34,10 +33,9 @@ function ARC:OnCreate()
 	end
 	
 	self:SetPhysicsType(PhysicsType.Kinematic)
-    self:SetPhysicsGroup(PhysicsGroup.WhipGroup)
+    self:SetPhysicsGroup(PhysicsGroup.WhipGroup)	//So it triggers mines
  
 end
-
 
 
 local orgArcInit = ARC.OnInitialized
@@ -67,8 +65,7 @@ function ARC:OnInitialized()
 		
 		
 		InitMixin(self, ControllerMixin)
-        
-		self:CreateController(PhysicsGroup.WhipGroup)
+        self:CreateController(PhysicsGroup.WhipGroup)
 		
 	end
 	
@@ -85,8 +82,7 @@ if Client then
 		self.skinBaseColor = self:GetBaseSkinColor()
 		self.skinAccentColor = self:GetAccentSkinColor()
 		self.skinTrimColor = self:GetTrimSkinColor()
-		//self.skinAtlasIndex = self:GetTeamNumber() - 1
-		self.skinAtlasIndex = 0 //TEMP
+		self.skinAtlasIndex = 0	//Static
 	end
 	
 	function ARC:GetBaseSkinColor()
@@ -113,7 +109,9 @@ function ARC:OnEmpDamaged()
 	
 	if Client then
 		self:_UpdateElectrifiedEffects()
-	elseif Server then
+	end
+	
+	if Server then
 		self:TriggerEffects("arc_stop_charge")
 	end
 
@@ -124,7 +122,8 @@ end
 
 
 if Server then
-
+	
+	
 	// Required by ControllerMixin.
 	function ARC:GetControllerSize()
 		return GetTraceCapsuleFromExtents( self:GetExtents() )    

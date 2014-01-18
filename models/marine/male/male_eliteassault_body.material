@@ -1,4 +1,5 @@
 shader = "shaders/ColoredSkins.surface_shader"
+
 albedoMap = "models/marine/male/male_eliteassault_body.dds"
 normalMap = "models/marine/male/male_assault_body_normal.dds"
 emissiveMap = "models/marine/male/male_assault_body_illum.dds"

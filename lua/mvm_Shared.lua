@@ -17,7 +17,7 @@ Script.Load("lua/mvm/MvMEffects.lua")
 Script.Load("lua/mvm/NetworkMessages.lua")
 Script.Load("lua/mvm/TechData.lua")
 Script.Load("lua/mvm/ScriptActor.lua")	//Yup...even had to modify this...fuckn-a
-
+										//Going to be surprising if this doesn't cause big bugs
 Script.Load("lua/mvm/MapBlip.lua")
 Script.Load("lua/mvm/SensorBlip.lua")
 
@@ -52,6 +52,8 @@ Script.Load("lua/mvm/ResourceTower.lua")
 Script.Load("lua/mvm/Location.lua")
 
 Script.Load("lua/mvm/NS2Gamerules.lua")
+
+Script.Load("lua/mvm/TechPoint.lua")
 
 Script.Load("lua/mvm/Player.lua")
 
@@ -104,6 +106,9 @@ Script.Load("lua/mvm/Weapons/Marine/Welder.lua")
 //Script.Load("lua/mvm/Weapons/Marine/Grenade.lua")
 Script.Load("lua/mvm/Jetpack.lua")
 
+
+Script.Load("lua/mvm/Weapons/Marine/GasGrenadeThrower.lua")
+Script.Load("lua/mvm/Weapons/Marine/PulseGrenadeThrower.lua")
 Script.Load("lua/mvm/Weapons/Marine/GasGrenade.lua")
 Script.Load("lua/mvm/Weapons/Marine/PulseGrenade.lua")
 //Script.Load("lua/mvm/Weapons/Marine/ClusterGrenade.lua")

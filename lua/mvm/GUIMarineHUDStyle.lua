@@ -16,7 +16,7 @@ kScanLinesBigHeight = kScanLinesBigCoords[4] - kScanLinesBigCoords[2]
 
 kBrightestColorTeam1 = Color( kMarineFontColor.r, kMarineFontColor.g, kMarineFontColor.b, 1)
 kBrightColorTeam1 = Color(147/255, 206/255, 1, 1)
-kBrightColorTeam1Transparent = Color(kBrightColorTeam1.r, kBrightColorTeam1.g, kBrightColorTeam1.b, 0.3)
+kBrightColorTeam1Transparent = Color( kBrightColorTeam1.r, kBrightColorTeam1.g, kBrightColorTeam1.b, 0.3)
 
 kBrightestColorTeam2 = Color( kAlienTeamColorFloat.r, kAlienTeamColorFloat.g, kAlienTeamColorFloat.b, 1)
 kBrightColorTeam2 = kAlienFontColor

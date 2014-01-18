@@ -27,7 +27,7 @@ Sentry.kMaxYaw = Sentry.kFov / 2
 
 Sentry.kBaseROF = kSentryAttackBaseROF
 Sentry.kRandROF = kSentryAttackRandROF
-Sentry.kSpread = Math.Radians(6)
+Sentry.kSpread = Math.Radians(5)	//6
 Sentry.kBulletsPerSalvo = kSentryAttackBulletsPerSalvo
 Sentry.kBarrelScanRate = 90      		// Degrees per second to scan back and forth with no target
 Sentry.kBarrelMoveRate = 180			//150    // Degrees per second to move sentry orientation towards target or back to flat when targeted
@@ -35,7 +35,7 @@ Sentry.kRange = 38.5					//NS2 - 20
 Sentry.kReorientSpeed = .5	//0.05
 
 Sentry.kTargetAcquireTime = 0.25
-Sentry.kConfuseDuration = 4
+Sentry.kConfuseDuration = 3	//4
 Sentry.kAttackEffectIntervall = 0.2
 Sentry.kConfusedAttackEffectInterval = kConfusedSentryBaseROF
 
@@ -209,7 +209,11 @@ if Client then
 	end
 
 	function Sentry:GetAccentSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+		if self:GetIsBuilt() then
+			return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+		else
+			return Color( 0,0,0 )
+		end
 	end
 	
 	function Sentry:GetTrimSkinColor()
@@ -249,7 +253,7 @@ function Sentry:OnUpdate(time)
 	
 	if Client then
 	
-		if HasMixin(self, "ColoredSkin") then
+		if HasMixin(self, "ColoredSkins") then
 		
 			self.skinAccentColor = ConditionalValue(
 				self.attachedToBattery,

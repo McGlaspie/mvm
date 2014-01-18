@@ -37,6 +37,8 @@ function Exo:OnCreate()
 	
 	if Client then
 		
+		InitMixin(self, ColoredSkinsMixin)
+		
 		if self.flashlight ~= nil then
 			Client.DestroyRenderLight(self.flashlight)
 		end
@@ -44,16 +46,19 @@ function Exo:OnCreate()
 		self.flashlight = Client.CreateRenderLight()
         
         self.flashlight:SetType(RenderLight.Type_Spot)
-        self.flashlight:SetColor(Color(.8, .8, 1))
-        self.flashlight:SetInnerCone(math.rad(30))
-        self.flashlight:SetOuterCone(math.rad(45))
+        if self:GetTeamNumber() == kTeam2Index then
+			self.flashlight:SetColor( Color(1, 0.5, 0.5) )
+		else
+			self.flashlight:SetColor( Color(0.5, 0.5, 1) )
+		end
+        self.flashlight:SetInnerCone(math.rad(32))
+        self.flashlight:SetOuterCone(math.rad(48))
         self.flashlight:SetIntensity(10)
         self.flashlight:SetRadius(25)
-        //self.flashlight:SetGoboTexture("models/marine/male/flashlight.dds")
+        self.flashlight:SetGoboTexture("models/marine/male/flashlight.dds")
+        self.flashlight:SetAtmosphericDensity( 0.015 )
         
         self.flashlight:SetIsVisible(false)
-	
-		InitMixin(self, ColoredSkinsMixin)
 		
 	end
 	

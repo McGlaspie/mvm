@@ -109,7 +109,7 @@ function MapBlipMixin:OnSighted(sighted)
     // what the previous value was so we don't mark it dirty unnecessarily
     if self.previousSighted ~= sighted then
         self.previousSighted = sighted
-        mapBlipMixinDirtyTable[self:GetId()] = true
+        mapBlipMixinDirtyTable[ self:GetId() ] = true
     end
     
 end
@@ -119,14 +119,12 @@ function MapBlipMixin:GetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined
     //local blipTeam = -1
-    local blipTeam = kTeamReadyRoom
+    local blipTeam = -1 //kTeamReadyRoom
     local isAttacked = false
     
     if HasMixin(self, "Combat") then
         isAttacked = self:GetIsInCombat()
     end
-    
-    //Print( tostring(self:GetClassName()) .. "MapBlipMixin:GetMapBlipInfo()")
     
     // World entities
     if self:isa("Door") then
@@ -137,12 +135,12 @@ function MapBlipMixin:GetMapBlipInfo()
         blipType = kMinimapBlipType.TechPoint
     // Don't display PowerPoints unless they are in an unpowered state.
     elseif self:isa("PowerPoint") then
-        blipType = ConditionalValue( self:GetIsDisabled(), kMinimapBlipType.DestroyedPowerPoint, kMinimapBlipType.PowerPoint)
+        blipType = ConditionalValue( self:GetIsDisabled(), kMinimapBlipType.DestroyedPowerPoint, kMinimapBlipType.PowerPoint )
     // Everything else that is supported by kMinimapBlipType.
     elseif self:GetIsVisible() then
-    
-        if kMinimapBlipType[self:GetClassName()] ~= nil then
-            blipType = kMinimapBlipType[self:GetClassName()]
+		
+        if kMinimapBlipType[ self:GetClassName() ] ~= nil then
+            blipType = kMinimapBlipType[ self:GetClassName() ]
         end
         
         blipTeam = HasMixin(self, "Team") and self:GetTeamNumber() or kTeamReadyRoom  
@@ -157,6 +155,7 @@ function MapBlipMixin:GetMapBlipInfo()
     
 end
 
+
 function MapBlipMixin:DestroyBlip()
 
     if self.mapBlipId and Shared.GetEntity(self.mapBlipId) then
@@ -168,13 +167,21 @@ function MapBlipMixin:DestroyBlip()
     
 end
 
+
 function MapBlipMixin:OnKill()
-    self:DestroyBlip()
+	
+	//PowerNodes are never "killed", accomodate for such
+	if not self:isa("PowerPoint") then
+		self:DestroyBlip()
+	end
+    
 end
+
 
 function MapBlipMixin:OnDestroy()
     self:DestroyBlip()
 end
+
 
 Event.Hook("UpdateServer", MapBlipMixinOnUpdateServer)
 

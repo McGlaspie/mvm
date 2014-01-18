@@ -17,6 +17,7 @@ function Exosuit:OnCreate()
 
 	oldExosuitCreate(self)
 	
+	InitMixin(self, EntityChangeMixin)
 	InitMixin(self, LOSMixin)
 	
 	if Client then
@@ -25,7 +26,7 @@ function Exosuit:OnCreate()
 
 end
 
-local orgExoSuitInit = Exosuit.OnInitialized
+local orgExosuitInit = Exosuit.OnInitialized
 function Exosuit:OnInitialized()
 
 	orgExosuitInit(self)
@@ -72,7 +73,12 @@ function Exosuit:GetIsValidRecipient(recipient)
 end
 
 
+function Exosuit:OnEntityChange( oldId, newId )
+	//ScriptActor.OnEntityChange( oldId, newId )
+end
+
 //-----------------------------------------------------------------------------
+
 
 Class_Reload("Exosuit", newNetworkVars)
 

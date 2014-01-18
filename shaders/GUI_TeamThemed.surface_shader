@@ -6,10 +6,12 @@
 		<input name="teamBaseColorR" type="float">0.0</input>
 		<input name="teamBaseColorG" type="float">0.0</input>
 		<input name="teamBaseColorB" type="float">0.0</input>
+		<input name="teamBaseColorA" type="float">1.0</input>
 		
 		<input name="teamAccentColorR" type="float">0.0</input>
 		<input name="teamAccentColorG" type="float">0.0</input>
 		<input name="teamAccentColorB" type="float">0.0</input>
+		<input name="teamAccentColorA" type="float">1.0</input>
 		
 	</inputs>
 	
@@ -181,8 +183,8 @@
 		
 		void MaterialShader(bool textured, float2 texCoord, float4 color, inout Material material) {
 			
-			float4 uiBaseColor = float4( teamBaseColorR, teamBaseColorG, teamBaseColorB, 1.0 );
-			float4 uiAccentColor = float4( teamAccentColorR, teamAccentColorG, teamAccentColorB, 1.0 );
+			float4 uiBaseColor = float4( teamBaseColorR, teamBaseColorG, teamBaseColorB, teamBaseColorA );
+			float4 uiAccentColor = float4( teamAccentColorR, teamAccentColorG, teamAccentColorB, teamAccentColorA );
 			
 			if (textured) {
 				

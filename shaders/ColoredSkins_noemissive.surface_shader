@@ -13,6 +13,11 @@
 		
 		<input name="modelColorMap" type="texture" address="wrap" />
 		
+		<!-- Atlas texture behavior data -->
+		<input name="colorMapIndex" type="float">0</input>
+		<input name="numColumns" type="float">1</input>
+		<input name="numRows" type="float">4</input>
+		
 		<input name="modelColorBaseR" type="float">0.0</input>
 		<input name="modelColorBaseG" type="float">0.0</input>
 		<input name="modelColorBaseB" type="float">0.0</input>
@@ -127,7 +132,18 @@
 			float3 modelColorTrim = float3( modelColorTrimR, modelColorTrimG, modelColorTrimB );
 			
 			float3 albedoTex = tex2D( albedoMap, input.texCoord ).rgb;	//No Alpha channel due to Deferred.hlsl - struct Material{}
-			float4 modelColorMapTex = tex2D( modelColorMap, input.texCoord ).rgba;
+			
+			float2 colorMapUV = input.texCoord;
+			if( colorMapIndex >= 0 ) {
+				float row = floor( colorMapIndex / numColumns );
+				float col = colorMapIndex - row * numColumns;
+			
+				colorMapUV.x = ( col + colorMapUV.x ) / numColumns;
+				colorMapUV.y = ( row + colorMapUV.y ) / numRows;
+			}
+			
+			float4 modelColorMapTex = tex2D( modelColorMap, colorMapUV ).rgba;
+			//float4 modelColorMapTex = tex2D( modelColorMap, input.texCoord ).rgba;
 			
 			float4 tmpColor = float4(0.0, 0.0, 0.0, 0.0);
 			

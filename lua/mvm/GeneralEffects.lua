@@ -422,7 +422,7 @@ kGeneralEffectData =
             
             // Note: PowerPoints are in game script
             
-            {sound = "sound/NS2.fev/marine/power_node/destroyed_powerdown", classname = "SentryBattery"},
+            //{sound = "sound/NS2.fev/marine/power_node/destroyed_powerdown", classname = "SentryBattery"},
             {sound = "sound/NS2.fev/marine/power_node/destroyed", classname = "SentryBattery", done = true},
         },
         

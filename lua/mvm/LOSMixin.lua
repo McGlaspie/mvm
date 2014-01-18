@@ -31,7 +31,7 @@ local function MvM_UpdateLOS(self)
     self.visibleClient = self.sighted
     
     if self.lastSightedState ~= self.sighted then
-    
+		
         if self.OnSighted then
             self:OnSighted(self.sighted)
         end
@@ -49,12 +49,23 @@ if Server then
 
 	
 	local function GetCanSee(viewer, entity)
-    
-        // SA: We now allow marines to build ghosts anywhere - so make sure they're blind. Otherwise they can sorta scout.
+		
+		if viewer:isa("Commander") and entity:isa("PowerPoint") then
+			local viewerTeam = viewer:GetTeamNumber()
+			if not entity:IsScouted( viewerTeam ) then
+				return false
+			end
+        end
+			
+		if viewer:isa("PowerPoint") and entity:isa("Commander") then
+			return false
+		end
+		
+		// SA: We now allow marines to build ghosts anywhere - so make sure they're blind. Otherwise they can sorta scout.
         if HasMixin(viewer, "GhostStructure") then
             return false
         end
-    
+		
         // If the other entity is not visible then we cannot see it.
         if not entity:GetIsVisible() then
             return false
@@ -127,15 +138,17 @@ if Server then
         
             local otherEntity = entities[e]
             
-            if not otherEntity.sighted then
+            if not otherEntity.sighted or otherEntity:isa("PowerPoint") then	//Hacky, so hacky...
 				
                 // Only check sight for enemy entities.
                 local areEnemies = otherEntity:GetTeamNumber() == GetEnemyTeamNumber( self:GetTeamNumber() )
                 
                 if otherEntity:isa("PowerPoint") and GetCanSee(self, otherEntity) then
+					
 					otherEntity:SetIsSighted(true, self)
 					
                 elseif areEnemies and GetCanSee(self, otherEntity) then
+					
                     otherEntity:SetIsSighted(true, self)
                     
                 end
@@ -166,7 +179,11 @@ if Server then
             
         end
         
-        self:SetIsSighted(seen, lastViewer)
+        if self.SetIsSightedOverride then
+			self:SetIsSightedOverride( seen, lastViewer )
+		else
+			self:SetIsSighted( seen, lastViewer )
+		end
         
     end
 	
@@ -257,12 +274,16 @@ if Server then
     end
 
 
-
+	
 	function LOSMixin:SetIsSighted(sighted, viewer)
     
         PROFILE("LOSMixin:SetIsSighted")
         
-        self.sighted = sighted
+        if self.SetIsSightedOverride then
+			self.sighted = self:SetIsSightedOverride( sighted, viewer )
+		else
+			self.sighted = sighted
+		end
         
         if viewer then
 			

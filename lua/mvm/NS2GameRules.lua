@@ -19,13 +19,13 @@ if Server then
     Script.Load("lua/mvm/NS2ConsoleCommands_Server.lua")
 	
 	
-	function NS2Gamerules:BuildTeam(teamType)
+	function NS2Gamerules:BuildTeam(teamType)	//OVERRIDES
         return MarineTeam()
     end
     
     
     
-    function NS2Gamerules:UpdateTechPoints()
+    function NS2Gamerules:UpdateTechPoints()	//OVERRIDES
     
         if self.timeToSendTechPoints == nil or Shared.GetTime() > self.timeToSendTechPoints then
         
@@ -70,8 +70,8 @@ if Server then
         
             local commandStations = Shared.GetEntitiesWithClassname("CommandStructure")
             for _, ent in ientitylist(commandStations) do
-            
-                local enemyPlayers = GetEntitiesForTeam("Player", GetEnemyTeamNumber(ent:GetTeamNumber()))
+				
+                local enemyPlayers = GetEntitiesForTeam( "Player", GetEnemyTeamNumber( ent:GetTeamNumber() ) )
                 for e = 1, #enemyPlayers do
                 
                     local enemy = enemyPlayers[e]
@@ -244,6 +244,350 @@ if Server then
     end
         
     
+    
+    
+    function NS2Gamerules:OnEntityCreate(entity)
+		
+        self:OnEntityChange( nil, entity:GetId() )
+		
+        if entity.GetTeamNumber then
+        
+            local team = self:GetTeam( entity:GetTeamNumber() )
+            
+            if team then
+            
+                if entity:isa("Player") then
+					
+					//Print("\t entity.previousTeamNumber = " .. tostring(entity.previousTeamNumber) )
+					entity:SetUpdates(true)
+					
+                    if team:AddPlayer(entity) then
+
+                        // Tell team to send entire tech tree on team change
+                        entity.sendTechTreeBase = true           
+                        
+                    end
+                   
+                    // Send scoreboard changes to everyone    
+                    entity:SetScoreboardChanged(true)
+                
+                end
+                
+            end
+            
+        end
+        
+    end
+    
+    
+    /**
+     * Returns two return codes: success and the player on the new team. This player could be a new
+     * player (the default respawn type for that team) or it will be the original player if the team 
+     * wasn't changed (false, original player returned). Pass force = true to make player change team 
+     * no matter what and to respawn immediately.
+     */
+    function NS2Gamerules:JoinTeam(player, newTeamNumber, force)
+    
+        local success = false
+        local oldPlayerWasSpectating = false
+        if player then
+        
+            local ownerClient = Server.GetOwner(player)
+            oldPlayerWasSpectating = ownerClient ~= nil and ownerClient:GetSpectatingPlayer() ~= nil
+            
+        end
+        
+        // Join new team
+        if player and player:GetTeamNumber() ~= newTeamNumber or force then        
+            
+            if player:isa("Commander") then
+                OnCommanderLogOut(player)
+            end        
+            
+            if not Shared.GetCheatsEnabled() and self:GetGameStarted() and newTeamNumber ~= kTeamReadyRoom then
+                player.spawnBlockTime = Shared.GetTime() + kSuicideDelay
+            end
+        
+            local team = self:GetTeam(newTeamNumber)
+            local oldTeam = self:GetTeam(player:GetTeamNumber())
+            
+            
+            player.previousTeamNumber = player:GetTeamNumber()
+            
+            
+            // Remove the player from the old queue if they happen to be in one
+            if oldTeam ~= nil then
+                oldTeam:RemovePlayerFromRespawnQueue(player)
+            end
+            
+            // Spawn immediately if going to ready room, game hasn't started, cheats on, or game started recently
+            if newTeamNumber == kTeamReadyRoom or self:GetCanSpawnImmediately() or force then
+            
+                success, newPlayer = team:ReplaceRespawnPlayer(player, nil, nil)
+                
+                local teamTechPoint = team.GetInitialTechPoint and team:GetInitialTechPoint()
+                if teamTechPoint then
+                    newPlayer:OnInitialSpawn(teamTechPoint:GetOrigin())
+                end
+                
+            else
+            
+                // Destroy the existing player and create a spectator in their place.
+                newPlayer = player:Replace(team:GetSpectatorMapName(), newTeamNumber)
+                
+                // Queue up the spectator for respawn.
+                team:PutPlayerInRespawnQueue(newPlayer)
+                
+                success = true
+                
+            end
+            
+            // Update frozen state of player based on the game state and player team.
+            if team == self.team1 or team == self.team2 then
+            
+                local devMode = Shared.GetDevMode()
+                local inCountdown = self:GetGameState() == kGameState.Countdown
+                if not devMode and inCountdown then
+                    newPlayer.frozen = true
+                end
+                
+            else
+            
+                // Ready room or spectator players should never be frozen
+                newPlayer.frozen = false
+                
+            end
+            
+            local newPlayerClient = Server.GetOwner(newPlayer)
+            local clientUserId = newPlayerClient and newPlayerClient:GetUserId() or 0
+            local disconnectedPlayerRes = self.disconnectedPlayerResources[clientUserId]
+            if disconnectedPlayerRes then
+            
+                newPlayer:SetResources(disconnectedPlayerRes)
+                self.disconnectedPlayerResources[clientUserId] = nil
+                
+            elseif not player:isa("Commander") then
+            
+                // Give new players starting resources. Mark players as "having played" the game (so they don't get starting res if
+                // they join a team again, etc.) Also, don't award initial resources to any client marked as blockPersonalResources (previous Commanders).
+                local success, played = GetUserPlayedInGame(self, newPlayer)
+                if success and not played and not newPlayerClient.blockPersonalResources then
+                    newPlayer:SetResources(kPlayerInitialIndivRes)
+                end
+                
+            end
+            
+            if self:GetGameStarted() then
+                SetUserPlayedInGame(self, newPlayer)
+            end
+            
+            newPlayer:TriggerEffects("join_team")
+            
+            if success then
+            
+                self.sponitor:OnJoinTeam(newPlayer, team)
+                
+                if oldPlayerWasSpectating then
+                    newPlayerClient:SetSpectatingPlayer(nil)
+                end
+                
+                if newPlayer.OnJoinTeam then
+                    newPlayer:OnJoinTeam()
+                end    
+                
+                Server.SendNetworkMessage(newPlayerClient, "SetClientTeamNumber", { teamNumber = newPlayer:GetTeamNumber() }, true)
+                
+            end
+
+            return success, newPlayer
+            
+        end
+        
+        // Return old player
+        return success, player
+        
+    end
+    
+    
+    /**
+     * Starts a new game by resetting the map and all of the players. Keep everyone on current teams (readyroom, playing teams, etc.) but 
+     * respawn playing players.
+     */
+    function NS2Gamerules:ResetGame()
+    
+        TournamentModeOnReset()
+    
+        // save commanders for later re-login
+        local team1CommanderClientIndex = self.team1:GetCommander() and self.team1:GetCommander().clientIndex or nil
+        local team2CommanderClientIndex = self.team2:GetCommander() and self.team2:GetCommander().clientIndex or nil
+        
+        // Cleanup any peeps currently in the commander seat by logging them out
+        // have to do this before we start destroying stuff.
+        self:LogoutCommanders()
+        
+        // Destroy any map entities that are still around
+        DestroyLiveMapEntities()
+        
+        // Track which clients have joined teams so we don't 
+        // give them starting resources again if they switch teams
+        self.userIdsInGame = {}
+        
+        self:SetGameState(kGameState.NotStarted)
+        
+        // Reset all players, delete other not map entities that were created during 
+        // the game (hives, command structures, initial resource towers, etc)
+        // We need to convert the EntityList to a table since we are destroying entities
+        // within the EntityList here.
+        for index, entity in ientitylist(Shared.GetEntitiesWithClassname("Entity")) do
+        
+            // Don't reset/delete NS2Gamerules or TeamInfo.
+            // NOTE!!!
+            // MapBlips are destroyed by their owner which has the MapBlipMixin.
+            // There is a problem with how this reset code works currently. A map entity such as a Hive creates
+            // it's MapBlip when it is first created. Before the entity:isa("MapBlip") condition was added, all MapBlips
+            // would be destroyed on map reset including those owned by map entities. The map entity Hive would still reference
+            // it's original MapBlip and this would cause problems as that MapBlip was long destroyed. The right solution
+            // is to destroy ALL entities when a game ends and then recreate the map entities fresh from the map data
+            // at the start of the next game, including the NS2Gamerules. This is how a map transition would have to work anyway.
+            // Do not destroy any entity that has a parent. The entity will be destroyed when the parent is destroyed or
+            // when the owner manually destroyes the entity.
+            local shieldTypes = { "GameInfo", "MapBlip", "NS2Gamerules" }
+            local allowDestruction = true
+            for i = 1, #shieldTypes do
+                allowDestruction = allowDestruction and not entity:isa(shieldTypes[i])
+            end
+            
+            if allowDestruction and entity:GetParent() == nil then
+            
+                local isMapEntity = entity:GetIsMapEntity()
+                local mapName = entity:GetMapName()
+                
+                // Reset all map entities and all player's that have a valid Client (not ragdolled players for example).
+                local resetEntity = entity:isa("TeamInfo") or entity:GetIsMapEntity() or (entity:isa("Player") and entity:GetClient() ~= nil)
+                if resetEntity then
+                
+                    if entity.Reset then
+                        entity:Reset()
+                    end
+                    
+                else
+                    DestroyEntity(entity)
+                end
+                
+            end       
+            
+        end
+        
+        // Clear out obstacles from the navmesh before we start repopualating the scene
+        RemoveAllObstacles()
+        
+        // Build list of tech points
+        local techPoints = EntityListToTable(Shared.GetEntitiesWithClassname("TechPoint"))
+        if table.maxn(techPoints) < 2 then
+            Print("Warning -- Found only %d %s entities.", table.maxn(techPoints), TechPoint.kMapName)
+        end
+        
+        local resourcePoints = Shared.GetEntitiesWithClassname("ResourcePoint")
+        if resourcePoints:GetSize() < 2 then
+            Print("Warning -- Found only %d %s entities.", resourcePoints:GetSize(), ResourcePoint.kPointMapName)
+        end
+        
+        // add obstacles for resource points back in
+        for index, resourcePoint in ientitylist(resourcePoints) do        
+            resourcePoint:AddToMesh()        
+        end
+        
+        local team1TechPoint = nil
+        local team2TechPoint = nil
+        if Server.spawnSelectionOverrides then
+        
+            local selectedSpawn = self.techPointRandomizer:random(1, #Server.spawnSelectionOverrides)
+            selectedSpawn = Server.spawnSelectionOverrides[selectedSpawn]
+            
+            for t = 1, #techPoints do
+            
+                local techPointName = string.lower(techPoints[t]:GetLocationName())
+                if techPointName == selectedSpawn.marineSpawn then
+                    team1TechPoint = techPoints[t]
+                elseif techPointName == selectedSpawn.alienSpawn then
+                    team2TechPoint = techPoints[t]
+                end
+                
+            end
+            
+        else
+        
+            // Reset teams (keep players on them)
+            team1TechPoint = self:ChooseTechPoint(techPoints, kTeam1Index)
+            team2TechPoint = self:ChooseTechPoint(techPoints, kTeam2Index)
+            
+        end
+        
+        self.team1:ResetPreservePlayers(team1TechPoint)
+        self.team2:ResetPreservePlayers(team2TechPoint)
+        
+        assert(self.team1:GetInitialTechPoint() ~= nil)
+        assert(self.team2:GetInitialTechPoint() ~= nil)
+        
+        // Save data for end game stats later.
+        self.startingLocationNameTeam1 = team1TechPoint:GetLocationName()
+        self.startingLocationNameTeam2 = team2TechPoint:GetLocationName()
+        self.startingLocationsPathDistance = GetPathDistance(team1TechPoint:GetOrigin(), team2TechPoint:GetOrigin())
+        self.initialHiveTechId = nil
+        
+        self.worldTeam:ResetPreservePlayers(nil)
+        self.spectatorTeam:ResetPreservePlayers(nil)    
+        
+        // Replace players with their starting classes with default loadouts at spawn locations
+        self.team1:ReplaceRespawnAllPlayers()
+        self.team2:ReplaceRespawnAllPlayers()
+        
+        // Create team specific entities
+        local commandStructure1 = self.team1:ResetTeam()
+        local commandStructure2 = self.team2:ResetTeam()
+        
+        // login the commanders again
+        local function LoginCommander(commandStructure, team, clientIndex)
+            if commandStructure and clientIndex then
+                for i,player in ipairs(team:GetPlayers()) do
+                    if player.clientIndex == clientIndex then
+                        // make up for not manually moving to CS and using it
+                        commandStructure.occupied = true
+                        player:SetOrigin(commandStructure:GetDefaultEntryOrigin())
+                        player:SetResources(kCommanderInitialIndivRes)
+                        commandStructure:LoginPlayer(player)
+                        break
+                    end
+                end 
+            end
+        end
+        
+        LoginCommander(commandStructure1, self.team1, team1CommanderClientIndex)
+        LoginCommander(commandStructure2, self.team2, team2CommanderClientIndex)
+        
+        // Create living map entities fresh
+        CreateLiveMapEntities()
+        
+        self.forceGameStart = false
+        self.losingTeam = nil
+        self.preventGameEnd = nil
+        // Reset banned players for new game
+        self.bannedPlayers = {}
+        
+        // Send scoreboard update, ignoring other scoreboard updates (clearscores resets everything)
+        for index, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do
+            Server.SendCommand(player, "onresetgame")
+            //player:SetScoreboardChanged(false)
+        end
+        
+        for index, powerNode in ientitylist( Shared.GetEntitiesWithClassname("PowerPoint") ) do
+			powerNode:OnResetComplete()
+        end
+        
+        self.team1:OnResetComplete()
+        self.team2:OnResetComplete()
+        
+    end
     
     
     function NS2Gamerules:OnUpdate(timePassed)

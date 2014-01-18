@@ -247,15 +247,22 @@ function GUIMarineHUD:Initialize()
     self.scanRight:SetAnchor(GUIItem.Right, GUIItem.Top)
     self.scanRight:SetBlendTechnique(GUIItem.Add)
     self.scanRight:AddAsChildTo(self.background)
-    
-    //self.gameTimeText = self:CreateAnimatedTextItem()
-    //self.gameTimeText:SetLayer(kGUILayerPlayerHUDForeground2)
-    //self.gameTimeText:SetFontName(GUIMarineHUD.kTextFontName)
-    //self.gameTimeText:SetAnchor(GUIItem.Left, GUIItem.Bottom)
+    /*
+    self.gameTimeText = self:CreateAnimatedTextItem()
+    self.gameTimeText:SetLayer(kGUILayerPlayerHUDForeground2)
+    self.gameTimeText:SetFontName(GUIMarineHUD.kTextFontName)
+    self.gameTimeText:SetAnchor(GUIItem.Left, GUIItem.Bottom)
     //self.gameTimeText:SetColor(kBrightColor)
-    //self.gameTimeText:SetTextAlignmentX(GUIItem.Align_Center)
-    //self.gameTimeText:AddAsChildTo(self.background)
-    
+    self.gameTimeText:SetColor(
+		ConditionalValue(
+			PlayerUI_GetTeamNumber() == kTeam1Index,
+			kBrightColorTeam1,
+			kBrightColorTeam2
+		)
+	)
+    self.gameTimeText:SetTextAlignmentX(GUIItem.Align_Center)
+    self.gameTimeText:AddAsChildTo(self.background)
+    */
     if self.minimapEnabled then
         self:InitializeMinimap()
     end
@@ -674,6 +681,10 @@ function GUIMarineHUD:UpdateHudColors()
     self.weaponLevel:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
     
     self.nanoshieldText:SetColor( kNameTagFontColors[playerTeam] )
+    
+    self.locationText:SetColor( kNameTagFontColors[playerTeam] )
+    
+    //self.gameTimeText:SetColor( kNameTagFontColors[playerTeam] )
 
 end
 
@@ -779,11 +790,11 @@ function GUIMarineHUD:Update(deltaTime)
     end
     
     if self.lastLocationText ~= locationName then
-    
+		
         // Delete current string and start write animation
         self.locationText:DestroyAnimations()
         self.locationText:SetText("")
-        self.locationText:SetText(string.format(Locale.ResolveString("IN_LOCATION"), locationName), 0.8)
+        self.locationText:SetText( string.format( Locale.ResolveString("IN_LOCATION"), locationName ), 0.8 )
         
         self.lastLocationText = locationName
         
@@ -878,20 +889,37 @@ function GUIMarineHUD:Update(deltaTime)
     
 end
 
+
+local kPowerNodeColor = Color( 0.2, 0.85, 0.3, 1 )
+local kPowerNodeUnSocketedColor = Color( 0.7, 0.75, 0.7, 1 )
+local kDamagedPowerNodeColor = Color( 1, 1, 0, 1 )
+local kDestroyedPowerNodeColor = Color( 1, 0, 0, 1 )
+
 function GUIMarineHUD:UpdatePowerIcon(powerState)
 
     self.minimapPower:DestroyAnimations()
-
+	
     if powerState == POWER_OFF then
-        self.minimapPower:SetColor(Color(1,1,1,0))
+		
+        self.minimapPower:SetColor( Color(1,1,1,0) )
+        
     elseif powerState == POWER_ON then
-        self.minimapPower:SetColor(Color(30/255, 150/255, 151/255, 0.8))
+		
+        //self.minimapPower:SetColor( Color( 0 , 150/255, 151/255, 0.8) )
+        self.minimapPower:SetColor( kPowerNodeColor )
+        
     elseif powerState == POWER_DAMAGED then
-        self.minimapPower:SetColor(Color(30/255, 150/255, 151/255, 0.8))
-        self.minimapPower:Pause(1, "POWER_ANIM")
+		
+        //self.minimapPower:SetColor( Color( 0, 150/255, 151/255, 0.8) )
+        self.minimapPower:SetColor( kDamagedPowerNodeColor )
+        self.minimapPower:Pause(0, "POWER_ANIM")
+        
     elseif powerState == POWER_DESTROYED then
-        self.minimapPower:SetColor(Color(0.6, 0, 0, 0.5))
-        self.minimapPower:Pause(1, "POWER_ANIM")
+		
+        //self.minimapPower:SetColor(Color(0.6, 0, 0, 0.5))
+        self.minimapPower:SetColor( kDestroyedPowerNodeColor )
+        self.minimapPower:Pause(0.1, "POWER_ANIM")
+        
     end
 
 end

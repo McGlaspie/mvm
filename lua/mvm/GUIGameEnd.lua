@@ -125,8 +125,9 @@ function GUIGameEnd:SetGameEnded(playerWon, playerIsMarine)
 end
 
 local function OnGameEnd(message)
-
+	
     local localPlayer = Client.GetLocalPlayer()
+    
     if localPlayer then
     
         if localPlayer:GetTeamType() == kNeutralTeamType then

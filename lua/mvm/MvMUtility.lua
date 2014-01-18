@@ -1,10 +1,3 @@
-//=============================================================================
-// 
-// 
-// 
-// 
-//=============================================================================
-
 
 
 function GetEntitiesForTeamByLocation( location, teamNumber )
@@ -13,14 +6,10 @@ function GetEntitiesForTeamByLocation( location, teamNumber )
 	
 	if location and teamNumber then
 		
-		//Print("GetEntitiesForTeamByLocation( " .. location:GetName() .. ", " .. tostring(teamNumber) .. ")")
-		
 		local locationEnts = location:GetEntitiesInTrigger()
 		local entities = {}
 		
 		for _, entity in ipairs(locationEnts) do
-		    
-			Print("\t entity:isa(" .. entity:GetClassName() .. ")")
 			
 			if HasMixin(entity, "Team") and entity:GetTeamNumber() == teamNumber then
 				table.insert(entities, entity)
@@ -37,22 +26,11 @@ function GetEntitiesForTeamByLocation( location, teamNumber )
 end
 
 
-
-function GetIsArcConstructionAllowed(teamNumber)
-
-    local teamInfo = GetTeamInfoEntity(teamNumber)
-    if teamInfo then
-        return teamInfo:GetNumArcs() < teamInfo:GetNumCapturedTechPoints() * kArcsPerTechpoint
-    end
-    
-    return false
-
-end
-
 //OVERRIDES
 function GetIsMarineUnit(entity)
     return entity and HasMixin(entity, "Team") and entity:GetTeamType() == kMarineTeamType
 end
+
 
 //OVERRIDES
 function GetIsAlienUnit(entity)
@@ -76,70 +54,43 @@ function GetAreEnemies(entityOne, entityTwo)
 end
 
 
-
-//OVERRIDES
-function MvM_GetMaxSupplyForTeam(teamNumber)	//Would it not make more sense to make this part of the
+function MvM_GetMaxSupplyForTeam( teamNumber )	//Would it not make more sense to make this part of the
 												//OnUpdate tick for team objects?
-												
-//FIXME When looking at ANY captured(enemy) point (Tech or Res) max supply is lowered by 5	
-	
+
     local maxSupply = 0
 	
-    if Server then
-    
-        local team = GetGamerules():GetTeam(teamNumber)
-        if team and team.GetNumCapturedTechPoints then
-            maxSupply = team:GetNumCapturedTechPoints() * kSupplyPerTechpoint
-        end
-        
-    else
-        
-        local teamInfoEnt = GetTeamInfoEntity(teamNumber)
-        if teamInfoEnt and teamInfoEnt.GetNumCapturedTechPoints then
-            maxSupply = teamInfoEnt:GetNumCapturedTechPoints() * kSupplyPerTechpoint
-        end
-
-    end
-    
-    
-    if kSupplyPerResourceNode > 0 then
-	//Add extra supply per captured resource node
+	local teamInfo = GetTeamInfoEntity( teamNumber )
+	
+	if teamInfo and teamInfo.numCapturedTechPoint then
 		
-		local capturedResNodes = GetEntitiesForTeam("Extractor", teamNumber)
+		maxSupply = teamInfo.numCapturedTechPoint * kSupplyPerTechpoint
 		
-		for _, node in ipairs(capturedResNodes) do
-			maxSupply = maxSupply + kSupplyPerResourceNode
+		if kSupplyPerResourceNode > 0 and teamInfo.numCapturedResPoints then
+		//Add extra supply per captured resource node
+			
+			//FIXME This should only be working
+			maxSupply = maxSupply + ( teamInfo.numResourceTowers * kSupplyPerResourceNode )
+			
 		end
 		
 	end
-	
-	
+    
     return maxSupply
 
 end
 
-//OVERRIDES
+
 function MvM_GetSupplyUsedByTeam( teamNumber )
 	
     assert(teamNumber)
 
     local supplyUsed = 0
     
-    if Server then
-		
-        local team = GetGamerules():GetTeam(teamNumber)
-        if team and team.GetSupplyUsed then
-            supplyUsed = team:GetSupplyUsed() 
-        end
-		
-    else
-        
-        local teamInfoEnt = GetTeamInfoEntity(teamNumber)
-        if teamInfoEnt and teamInfoEnt.GetSupplyUsed then
-            supplyUsed = teamInfoEnt:GetSupplyUsed()
-        end
+    local teamInfo = GetTeamInfoEntity( teamNumber )
     
-    end    
+	if teamInfo and teamInfo.GetSupplyUsed then
+		supplyUsed = teamInfo:GetSupplyUsed()
+	end
 
     return supplyUsed
 
@@ -237,3 +188,96 @@ function HandleHitEffect(position, doer, surface, target, showtracer, altMode, d
     HandleImpactDecal(position, doer, surface, target, showtracer, altMode, damage, direction, tableParams)
 
 end
+
+
+
+function BuildClassToGrid()	//Overrides
+
+    local ClassToGrid = { }
+    
+    ClassToGrid["Undefined"] = { 5, 8 }
+
+    ClassToGrid["TechPoint"] = { 1, 1 }
+    ClassToGrid["ResourcePoint"] = { 2, 1 }
+    ClassToGrid["Door"] = { 3, 1 }
+    ClassToGrid["DoorLocked"] = { 4, 1 }
+    ClassToGrid["DoorWelded"] = { 5, 1 }
+    ClassToGrid["Grenade"] = { 6, 1 }
+    ClassToGrid["PowerPoint"] = { 7, 1 }
+    //ClassToGrid["DestroyedPowerPoint"] = { 7, 1 }
+    
+    ClassToGrid["Scan"] = { 6, 8 }
+    ClassToGrid["HighlightWorld"] = { 4, 6 }
+
+    ClassToGrid["ReadyRoomPlayer"] = { 1, 2 }
+    ClassToGrid["Marine"] = { 1, 2 }
+    ClassToGrid["Exo"] = { 2, 2 }
+    ClassToGrid["JetpackMarine"] = { 3, 2 }
+    
+    ClassToGrid["MAC"] = { 4, 2 }
+    ClassToGrid["CommandStationOccupied"] = { 5, 2 }
+    ClassToGrid["CommandStationL2Occupied"] = { 6, 2 }
+    ClassToGrid["CommandStationL3Occupied"] = { 7, 2 }
+    ClassToGrid["Death"] = { 8, 2 }
+
+    ClassToGrid["Skulk"] = { 1, 3 }
+    ClassToGrid["Gorge"] = { 2, 3 }
+    ClassToGrid["Lerk"] = { 3, 3 }
+    ClassToGrid["Fade"] = { 4, 3 }
+    ClassToGrid["Onos"] = { 5, 3 }
+    ClassToGrid["Drifter"] = { 6, 3 }
+    ClassToGrid["HiveOccupied"] = { 7, 3 }
+    ClassToGrid["Kill"] = { 8, 3 }
+
+    ClassToGrid["CommandStation"] = { 1, 4 }
+    ClassToGrid["Extractor"] = { 4, 4 }
+    ClassToGrid["Sentry"] = { 5, 4 }
+    ClassToGrid["ARC"] = { 6, 4 }
+    ClassToGrid["ARCDeployed"] = { 7, 4 }
+    ClassToGrid["SentryBattery"] = { 8, 4 }
+
+    ClassToGrid["InfantryPortal"] = { 1, 5 }
+    ClassToGrid["Armory"] = { 2, 5 }
+    ClassToGrid["AdvancedArmory"] = { 3, 5 }
+    ClassToGrid["AdvancedArmoryModule"] = { 4, 5 }
+    ClassToGrid["PhaseGate"] = { 5, 5 }
+    ClassToGrid["Observatory"] = { 6, 5 }
+    ClassToGrid["RoboticsFactory"] = { 7, 5 }
+    ClassToGrid["ArmsLab"] = { 8, 5 }
+    ClassToGrid["PrototypeLab"] = { 4, 5 }
+
+    ClassToGrid["HiveBuilding"] = { 1, 6 }
+    ClassToGrid["Hive"] = { 2, 6 }
+    ClassToGrid["Infestation"] = { 4, 6 }
+    ClassToGrid["Harvester"] = { 5, 6 }
+    ClassToGrid["Hydra"] = { 6, 6 }
+    ClassToGrid["Egg"] = { 7, 6 }
+    ClassToGrid["Embryo"] = { 7, 6 }
+    
+    ClassToGrid["Shell"] = { 8, 6 }
+    ClassToGrid["Spur"] = { 7, 7 }
+    ClassToGrid["Veil"] = { 8, 7 }
+
+    ClassToGrid["Crag"] = { 1, 7 }
+    ClassToGrid["Whip"] = { 3, 7 }
+    ClassToGrid["Shade"] = { 5, 7 }
+    ClassToGrid["Shift"] = { 6, 7 }
+
+    ClassToGrid["WaypointMove"] = { 1, 8 }
+    ClassToGrid["WaypointDefend"] = { 2, 8 }
+    ClassToGrid["TunnelEntrance"] = { 3, 8 }
+    ClassToGrid["PlayerFOV"] = { 4, 8 }
+    
+    ClassToGrid["MoveOrder"] = { 1, 8 }
+    ClassToGrid["BuildOrder"] = { 2, 8 }
+    ClassToGrid["AttackOrder"] = { 2, 8 }
+    
+    ClassToGrid["SensorBlip"] = { 5, 8 }
+    ClassToGrid["EtherealGate"] = { 8, 1 }
+    
+    ClassToGrid["Player"] = { 7, 8 }
+    
+    return ClassToGrid
+    
+end
+

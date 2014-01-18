@@ -18,7 +18,6 @@ local renderCamera = nil
 //MenuManager.SetMenuCinematic("cinematics/main_menu.cinematic")
 MenuManager.SetMenuCinematic("cinematics/preview_mockup.cinematic")
 
-Print("\t MVM MAIN")
 
 local function OnUpdateRender()
 

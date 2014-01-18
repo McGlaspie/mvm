@@ -37,6 +37,7 @@ GUIJetpackFuel.kFuelBarOpacity = 0.8
 function GUIJetpackFuel:Initialize()    
     
     // jetpack fuel display background
+    self.teamNumber = Client.GetLocalPlayer():GetTeamNumber()
     
     self.background = GUIManager:CreateGraphicItem()
     self.background:SetSize( Vector(GUIJetpackFuel.kBackgroundWidth, GUIJetpackFuel.kBackgroundHeight, 0) )
@@ -53,20 +54,42 @@ function GUIJetpackFuel:Initialize()
     self.fuelBar:SetPosition( Vector(-GUIJetpackFuel.kBarWidth / 2, -10, 0))
     self.fuelBar:SetTexture(GUIJetpackFuel.kJetpackFuelTexture)
     self.fuelBar:SetTexturePixelCoordinates(unpack(GUIJetpackFuel.kBarCoords))
- 
+	
     self.background:AddChild(self.fuelBar)
     self:Update(0)
 
 end
 
 function GUIJetpackFuel:SetFuel(fraction)
-
+	
     self.fuelBar:SetSize( Vector(GUIJetpackFuel.kBarWidth, -GUIJetpackFuel.kBarHeight * fraction, 0) )
+    
+    local fuelBarColor = Color()
+    if self.teamNumber == kTeam2Index then
+		local red = ConditionalValue( (1 - fraction) == 0 , 1, (1 - fraction) )
+		fuelBarColor = Color(
+			Clamp( fraction + red, 0.75, 1) , 
+			fraction * 0.72 , 
+			fraction * 0.2 ,
+			GUIJetpackFuel.kFuelBarOpacity
+		)
+    else
+		fuelBarColor = Color(
+			1 - fraction * GUIJetpackFuel.kFuelBlueIntensity, 
+			GUIJetpackFuel.kFuelBlueIntensity * fraction * 0.8 , 
+			GUIJetpackFuel.kFuelBlueIntensity * fraction ,
+			GUIJetpackFuel.kFuelBarOpacity
+		)
+    end
+    
+    self.fuelBar:SetColor( fuelBarColor )
+    /*
     self.fuelBar:SetColor( Color(1 - fraction * GUIJetpackFuel.kFuelBlueIntensity, 
                                  GUIJetpackFuel.kFuelBlueIntensity * fraction * 0.8 , 
                                  GUIJetpackFuel.kFuelBlueIntensity * fraction ,
                                  GUIJetpackFuel.kFuelBarOpacity) )
-
+	*/
+	
 end
 
 

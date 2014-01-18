@@ -4,8 +4,9 @@ Script.Load("lua/mvm/TechData.lua")
 
 
 local newNetworkVars = {
-	previousTeamNumber	= string.format("integer (%d to %d)", kTeamInvalid,kSpectatorIndex )
+	previousTeamNumber	= string.format("integer (%d to %d)", kTeamInvalid, kSpectatorIndex )
 }
+
 
 //-----------------------------------------------------------------------------
 
@@ -28,6 +29,39 @@ function Player:AddResources(amount)
     
     return resReward
     
+end
+
+
+//Previous team member for RR skinning (on game ends)
+//????: Add game-end check also? If player explicity joins RR, then RR model should not skin
+if Server then
+	
+	local oldPlayerCopyData = Player.CopyPlayerDataFrom
+	function Player:CopyPlayerDataFrom( player )
+	
+		oldPlayerCopyData( self, player )
+		
+		self.previousTeamNumber = player.previousTeamNumber
+		
+	end
+	
+	/*
+	local oldReplacePlayer = Player.Replace
+	function Player:Replace( mapName, newTeamNumber, preserveWeapons, atOrigin, extraValues )
+		
+		local player = oldReplacePlayer( self, mapName, newTeamNumber, preserveWeapons, atOrigin, extraValues )
+		
+		player.previousTeamNumber = ConditionalValue(
+			self.previousTeamNumber ~= kTeamInvalid,
+			self.previousTeamNumber,
+			kTeamInvalid
+		)
+		
+		return player
+		
+	end	
+	*/
+
 end
 
 
@@ -336,7 +370,7 @@ if Client then
 		
 		local player = Client.GetLocalPlayer()
 		if player and HasMixin(player, "Team") then
-			return player:GetTeamNumber() == kMarineTeamType
+			return player:GetTeamNumber() == kTeam1Index
 		end
 		
 		return false    
@@ -380,6 +414,7 @@ if Client then
 	local kMinimapBlipTeamEnemy = kMinimapBlipTeam.Enemy
 	local kMinimapBlipTeamNeutral = kMinimapBlipTeam.Neutral
 	
+	
 	function PlayerUI_GetStaticMapBlips()
 
 		PROFILE("PlayerUI_GetStaticMapBlips")
@@ -396,6 +431,7 @@ if Client then
 			local playerId = player:GetId()
 			
 			local mapBlipList = Shared.GetEntitiesWithClassname("MapBlip")
+			
 			local GetEntityAtIndex = mapBlipList.GetEntityAtIndex
 			local GetMapBlipTeamNumber = MapBlip.GetTeamNumber
 			local GetMapBlipOrigin = MapBlip.GetOrigin
@@ -427,16 +463,43 @@ if Client then
 					
 					local i = numBlips * 8
 					local blipOrig = GetMapBlipOrigin(blip)
-					blipsData[i + 1] = blipOrig.x
-					blipsData[i + 2] = blipOrig.z
-					blipsData[i + 3] = GetMapBlipRotation(blip)
-					blipsData[i + 4] = 0
-					blipsData[i + 5] = 0
-					blipsData[i + 6] = GetMapBlipType(blip)
-					blipsData[i + 7] = blipTeam
-					blipsData[i + 8] = GetMapBlipIsInCombat(blip)
 					
-					numBlips = numBlips + 1
+					//FIXME This is a seriously shitty way to do this...
+					if GetMapBlipType(blip) == kMinimapBlipType.DestroyedPowerPoint then
+						
+						local powerNode = Shared.GetEntity( blip.ownerEntityId )
+						if powerNode then
+							if powerNode:IsScouted( playerTeam ) then
+								
+								blipsData[i + 1] = blipOrig.x
+								blipsData[i + 2] = blipOrig.z
+								blipsData[i + 3] = GetMapBlipRotation(blip)
+								blipsData[i + 4] = 0
+								blipsData[i + 5] = 0
+								blipsData[i + 6] = GetMapBlipType(blip)
+								blipsData[i + 7] = blipTeam
+								blipsData[i + 8] = GetMapBlipIsInCombat(blip)
+								
+								numBlips = numBlips + 1
+								
+							end
+							
+						end
+						
+					else
+						
+						blipsData[i + 1] = blipOrig.x
+						blipsData[i + 2] = blipOrig.z
+						blipsData[i + 3] = GetMapBlipRotation(blip)
+						blipsData[i + 4] = 0
+						blipsData[i + 5] = 0
+						blipsData[i + 6] = GetMapBlipType(blip)
+						blipsData[i + 7] = blipTeam
+						blipsData[i + 8] = GetMapBlipIsInCombat(blip)
+						
+						numBlips = numBlips + 1
+						
+					end
 					
 				end
 				
@@ -511,50 +574,8 @@ if Client then
 end	//Client
 
 
-//-------------------------------------
-
-//Previous team member for RR skinning (on game ends)
-//????: Add game-end check also? If player explicity joins RR, then RR model should not skin
-if Server then
-
-	local oldPlayerCreate = Player.OnCreate
-	function Player:OnCreate()
-		
-		oldPlayerCreate(self)
-		self.previousTeamNumber = kTeamInvalid
-		
-	end
-	
-	
-	local oldReplacePlayer = Player.Replace
-	function Player:Replace(mapName, newTeamNumber, preserveWeapons, atOrigin, extraValues)
-		
-		local team = self:GetTeam()
-		if team == nil then
-			return self
-		end
-		
-		local oldTeamNumber = team:GetTeamNumber()
-		local player = oldReplacePlayer(self, mapName, newTeamNumber, preserveWeapons, atOrigin, extraValues)
-		
-		if newTeamNumber == kTeamReadyRoom then	//wrap in game-state?
-		//Only time an update of previous means anything
-			player.previousTeamNumber = oldTeamNumber
-		else
-			player.previousTeamNumber = kTeamReadyRoom
-		end
-		
-		if newTeamNumber ~= nil then
-			Print("\t Player:Replace() - newTeamNumber=" .. newTeamNumber .. ", previousTeamNumber=".. player.previousTeamNumber)
-		end
-		
-		return player
-		
-	end	
-
-end
-
 //-----------------------------------------------------------------------------
+
 
 Class_Reload("Player", newNetworkVars)
 

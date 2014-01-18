@@ -17,7 +17,7 @@ modelColorBaseB = 0.005
 
 modelColorAccentR = 1
 modelColorAccentG = 0
-modelColorAccentR = 0
+modelColorAccentB = 0
 
 modelColorTrimR = 0.179
 modelColorTrimG = 0.141

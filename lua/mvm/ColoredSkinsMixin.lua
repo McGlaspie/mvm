@@ -27,10 +27,12 @@
 //=============================================================================
 
 if Client then
+
 	Shared.PrecacheSurfaceShader("shaders/ColoredSkins.surface_shader")
 	Shared.PrecacheSurfaceShader("shaders/ColoredSkins_noemissive.surface_shader")
 	Shared.PrecacheSurfaceShader("shaders/ColoredSkinsViewModel.surface_shader")
 	Shared.PrecacheSurfaceShader("shaders/ColoredSkinsViewModel_emissive.surface_shader")
+	
 end
 
 
@@ -51,7 +53,7 @@ gSkinColorOverrides = {
 
 
 ColoredSkinsMixin = CreateMixin( ColoredSkinsMixin )
-ColoredSkinsMixin.type = "ColoredSkin"
+ColoredSkinsMixin.type = "ColoredSkins"
 
 
 ColoredSkinsMixin.expectedMixins = {
@@ -101,7 +103,7 @@ function ColoredSkinsMixin:GetAtlasIndex()
 end
 
 
-function ColoredSkinsMixin:SetAtlasIndex( newIdx )
+function ColoredSkinsMixin:SetAtlasIndex( newIdx )	//Incomplete, don't use
     assert(  )  //TODO Add type check/numeric
 
 	if newIdx ~= nil and newIdx >= 0 then
@@ -209,6 +211,9 @@ function ColoredSkinsMixin:OnUpdateRender()
 	
 	
 //Handle "Special" cases from here on -------------------------------------
+	
+	//TODO Devise cleaner more segregated way to handle below
+	// - Should be dependent upon the implementing class to handle
 	
 	//Attachment based equipment
 	if self.GetHasEquipment and self:GetHasEquipment() then

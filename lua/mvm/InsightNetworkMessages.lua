@@ -4,17 +4,19 @@ Script.Load("lua/InsightNetworkMessages.lua")
 
 
 
-function BuildTechPointsMessage(techPoint, powerNodes, eggs)
+function BuildTechPointsMessage( techPoint, powerNodes, eggs )
 
     local t = { }
     local techPointLocation = techPoint:GetLocationId()
     t.entityIndex = techPoint:GetId()
     t.location = techPointLocation
     t.teamNumber = techPoint.occupiedTeam
+    t.techId = kTechId.None
     
     local structure = Shared.GetEntity(techPoint.attachedId)
     
     if structure then
+		
 		/*
         local eggCount = 0
         for _, egg in ientitylist(eggs) do
@@ -45,6 +47,7 @@ function BuildTechPointsMessage(techPoint, powerNodes, eggs)
         
         t.teamNumber = structure:GetTeamNumber()
         t.techId = structure:GetTechId()
+                
         if structure:GetIsAlive() then
         
             -- Structure may not have a GetBuiltFraction() function (Hallucinations for example).

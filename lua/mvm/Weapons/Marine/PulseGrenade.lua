@@ -1,13 +1,12 @@
 
 
-//Script.Load("")
-
-
 local kLifeTime = 1.2
 
 local kGrenadeCameraShakeDistance = 15
 local kGrenadeMinShakeIntensity = 0.01
 local kGrenadeMaxShakeIntensity = 0.14
+
+local kGrenadeDetonationTriggerRange = 2.5
 
 
 //-----------------------------------------------------------------------------
@@ -87,7 +86,9 @@ if Server then
     
         PredictedProjectile.OnUpdate(self, deltaTime)
 
-        for _, enemy in ipairs( GetEntitiesWithMixinForTeamWithinRange("Live", GetEnemyTeamNumber(self:GetTeamNumber()), self:GetOrigin(), 3) ) do
+        for _, enemy in ipairs( GetEntitiesWithMixinForTeamWithinRange(
+				"Live", GetEnemyTeamNumber(self:GetTeamNumber()), self:GetOrigin(), kGrenadeDetonationTriggerRange
+			) ) do
         
             if enemy:GetIsAlive() then
                 self:Detonate()

@@ -47,18 +47,41 @@ end
 
 
 function MapBlip:UpdateRelevancy()
-
-    self:SetRelevancyDistance(Math.infinity)
-    
-    local mask = 0    
-    
-    if self.mapBlipTeam == kTeam1Index or self.mapBlipTeam == kTeamInvalid or self:GetIsSighted() then
-        mask = bit.bor(mask, kRelevantToTeam1)
-    end
 	
-    if self.mapBlipTeam == kTeam2Index or self.mapBlipTeam == kTeamInvalid or self:GetIsSighted() then
-        mask = bit.bor(mask, kRelevantToTeam2)
+    self:SetRelevancyDistance( Math.infinity )
+    
+    local mask = 0
+    
+    if self.mapBlipType == kMinimapBlipType.PowerPoint then
+	//Special case for PowerNodes, only propigate if scouted
+	
+		local powerNode = Shared.GetEntity( self.ownerEntityId )
+			
+		if powerNode and powerNode:isa("PowerPoint") then
+			
+			if powerNode.scoutedForTeam1 and powerNode.scoutedForTeam1 == true then
+				mask = bit.bor( mask, kRelevantToTeam1 )
+			end
+			
+			if powerNode.scoutedForTeam2 and powerNode.scoutedForTeam2 == true then
+				mask = bit.bor( mask, kRelevantToTeam2 )
+			end
+			
+		end
+		
+    else
+    //Proceed as normal
+		
+		if self.mapBlipTeam == kTeam1Index or self.mapBlipTeam == kTeamInvalid or self:GetIsSighted() then
+			mask = bit.bor( mask, kRelevantToTeam1 )
+		end
+	
+		if self.mapBlipTeam == kTeam2Index or self.mapBlipTeam == kTeamInvalid or self:GetIsSighted() then
+			mask = bit.bor( mask, kRelevantToTeam2 )
+		end
+    
     end
+    
     
     self:SetExcludeRelevancyMask( mask )
 
@@ -123,10 +146,12 @@ end
 function MapBlip:Update()
 
     PROFILE("MapBlip:Update")
-
-    if self.ownerEntityId and Shared.GetEntity(self.ownerEntityId) then
-    
-        local owner = Shared.GetEntity(self.ownerEntityId)
+	
+	local owner = Shared.GetEntity( self.ownerEntityId ) 
+	
+    if self.ownerEntityId and owner then
+		
+        //local owner = Shared.GetEntity(self.ownerEntityId)
         
         local fowardNormal = owner:GetCoords().zAxis
         local yaw = math.atan2(fowardNormal.x, fowardNormal.z)
@@ -143,16 +168,14 @@ function MapBlip:Update()
         if origin then
         
             // always use zero y-origin (for now, if you want to use it for long-range hivesight, add it back
-            self:SetOrigin(Vector(origin.x, 0, origin.z))      
+            self:SetOrigin(Vector(origin.x, 0, origin.z))
             
-            self:UpdateRelevancy()
-            
-            local owner = Shared.GetEntity(self.ownerEntityId)
+            //local owner = Shared.GetEntity(self.ownerEntityId)
             
             if HasMixin(owner, "MapBlip") then
             
                 local success, blipType, blipTeam, isInCombat = owner:GetMapBlipInfo()
-
+				
                 self.mapBlipType = blipType
                 self.mapBlipTeam = blipTeam
                 self.isInCombat = isInCombat    
@@ -160,6 +183,8 @@ function MapBlip:Update()
             end 
 
         end
+        
+        self:UpdateRelevancy()	//Has to always run for scouted flag on PPs
         
     end
     

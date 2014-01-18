@@ -302,16 +302,63 @@ function BuildTechData()	//OVERRIDES
         { [kTechDataId] = kTechId.DoorUnlock,            [kTechDataDisplayName] = "UNLOCK_DOOR", [kTechDataHotkey] = Move.U, [kTechDataTooltipInfo] = "UNLOCK_DOOR_TOOLTIP"},
         
         // Marine Commander abilities   
-        { [kTechDataId] = kTechId.NanoShieldTech,  [kTechDataDisplayName] = "NANO_SHIELD_TECH", [kTechDataTooltipInfo] = "NANO_SHIELD_DEFENSE_TOOLTIP", [kTechDataCostKey] = kNanoShieldResearchCost, [kTechDataResearchTimeKey] = kNanoSnieldResearchTime },
- 
-        { [kTechDataId] = kTechId.PowerSurge,    [kTechDataCooldown] = kPowerSurgeCooldown,      [kTechDataAllowStacking] = true, [kTechDataIgnorePathingMesh] = true,  [kTechDataDisplayName] = "POWER_SURGE", [kTechDataCostKey] = kPowerSurgeCost, [kTechDataTooltipInfo] = "POWER_SURGE_TOOLTIP"},        
-        { [kTechDataId] = kTechId.NanoShield,    [kTechDataCooldown] = kNanoShieldCooldown,      [kTechDataAllowStacking] = true, [kTechDataIgnorePathingMesh] = true, [kTechDataMapName] = NanoShield.kMapName,   [kTechDataDisplayName] = "NANO_SHIELD_DEFENSE", [kTechDataCostKey] = kNanoShieldCost, [kTechDataTooltipInfo] = "NANO_SHIELD_DEFENSE_TOOLTIP"},        
+        { [kTechDataId] = kTechId.NanoShieldTech,  
+			[kTechDataDisplayName] = "NANO_SHIELD_TECH", 
+			[kTechDataTooltipInfo] = "NANO_SHIELD_DEFENSE_TOOLTIP", 
+			[kTechDataCostKey] = kNanoShieldResearchCost, 
+			[kTechDataResearchTimeKey] = kNanoSnieldResearchTime 
+		},
+		
+        { [kTechDataId] = kTechId.PowerSurge,    
+			[kTechDataCooldown] = kPowerSurgeCooldown,      
+			[kTechDataAllowStacking] = true, 	
+			[kTechDataIgnorePathingMesh] = true,  
+			[kTechDataDisplayName] = "POWER_SURGE", 
+			[kTechDataCostKey] = kPowerSurgeCost, 
+			[kTechDataTooltipInfo] = "POWER_SURGE_TOOLTIP"
+		},
+        { [kTechDataId] = kTechId.NanoShield,    
+			[kTechDataCooldown] = kNanoShieldCooldown,      
+			[kTechDataAllowStacking] = true, 
+			[kTechDataIgnorePathingMesh] = true, 
+			[kTechDataMapName] = NanoShield.kMapName,   
+			[kTechDataDisplayName] = "NANO_SHIELD_DEFENSE", 
+			[kTechDataCostKey] = kNanoShieldCost, 
+			[kTechDataTooltipInfo] = "NANO_SHIELD_DEFENSE_TOOLTIP"
+		},
         { [kTechDataId] = kTechId.AmmoPack,              [kTechDataAllowStacking] = true, [kTechDataIgnorePathingMesh] = true, [kTechDataMapName] = AmmoPack.kMapName,  [kTechDataDisplayName] = "AMMO_PACK",      [kTechDataCostKey] = kAmmoPackCost,            [kTechDataModel] = AmmoPack.kModelName, [kTechDataTooltipInfo] = "AMMO_PACK_TOOLTIP", [kTechDataSpawnHeightOffset] = kCommanderDropSpawnHeight },
         { [kTechDataId] = kTechId.MedPack,    [kTechDataCooldown] = kMedPackCooldown,         [kTechDataAllowStacking] = true, [kTechDataIgnorePathingMesh] = true, [kTechDataMapName] = MedPack.kMapName,   [kTechDataDisplayName] = "MED_PACK",     [kTechDataCostKey] = kMedPackCost,             [kTechDataModel] = MedPack.kModelName,  [kTechDataTooltipInfo] = "MED_PACK_TOOLTIP", [kTechDataSpawnHeightOffset] = kCommanderDropSpawnHeight},
         { [kTechDataId] = kTechId.CatPack, [kTechDataAllowStacking] = true, [kTechDataIgnorePathingMesh] = true, [kTechDataMapName] = CatPack.kMapName,   [kTechDataDisplayName] = "CAT_PACK",      [kTechDataCostKey] = kCatPackCost,             [kTechDataModel] = CatPack.kModelName,  [kTechDataTooltipInfo] = "CAT_PACK_TOOLTIP", [kTechDataSpawnHeightOffset] = kCommanderDropSpawnHeight},
         { [kTechDataId] = kTechId.Scan, [kTechDataCooldown] = kScanCooldown,        [kTechDataAllowStacking] = true, [kTechDataCollideWithWorldOnly] = true, [kTechDataIgnorePathingMesh] = true, [kTechDataMapName] = Scan.kMapName,     [kTechDataDisplayName] = "SCAN",      [kTechDataHotkey] = Move.S,   [kTechDataCostKey] = kObservatoryScanCost, [kTechDataTooltipInfo] = "SCAN_TOOLTIP"},
-        // Command station and its buildables
-        { [kTechDataId] = kTechId.CommandStation, [kTechDataIgnorePathingMesh] = true, [kTechDataSpawnBlock] = true, [kTechDataMaxExtents] = Vector(1.5, 1, 0.4), [kTechDataHint] = "COMMAND_STATION_HINT", [kTechDataAllowStacking] = true, [kStructureAttachClass] = "TechPoint", [kTechDataAttachOptional] = false, [kTechDataOverrideCoordsMethod] = OptionalAttachToFreeTechPoint, [kTechDataGhostModelClass] = "MarineGhostModel",  [kTechDataMapName] = CommandStation.kMapName,     [kTechDataDisplayName] = "COMMAND_STATION",  [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation,   [kTechDataBuildTime] = kCommandStationBuildTime, [kTechDataCostKey] = kCommandStationCost, [kTechDataModel] = CommandStation.kModelName,             [kTechDataMaxHealth] = kCommandStationHealth, [kTechDataMaxArmor] = kCommandStationArmor,      [kTechDataSpawnHeightOffset] = 0, [kTechDataEngagementDistance] = kCommandStationEngagementDistance, [kTechDataInitialEnergy] = kCommandStationInitialEnergy,      [kTechDataMaxEnergy] = kCommandStationMaxEnergy, [kTechDataPointValue] = kCommandStationPointValue, [kTechDataHotkey] = Move.C, [kTechDataTooltipInfo] = "COMMAND_STATION_TOOLTIP", [kTechDataObstacleRadius] = 2},       
+			
+// Command station and its buildables
+        { [kTechDataId] = kTechId.CommandStation, 
+			[kTechDataIgnorePathingMesh] = true, 
+			[kTechDataSpawnBlock] = true, 
+			[kTechDataMaxExtents] = Vector(1.5, 1, 0.4), 
+			[kTechDataHint] = "COMMAND_STATION_HINT", 
+			[kTechDataAllowStacking] = true, 
+			[kStructureAttachClass] = "TechPoint", 
+			[kTechDataAttachOptional] = false, 
+			[kTechDataOverrideCoordsMethod] = OptionalAttachToFreeTechPoint, 
+			[kTechDataGhostModelClass] = "MarineGhostModel",  
+			[kTechDataMapName] = CommandStation.kMapName,     
+			[kTechDataDisplayName] = "COMMAND_STATION",  
+			[kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation,   
+			[kTechDataBuildTime] = kCommandStationBuildTime, 
+			[kTechDataCostKey] = kCommandStationCost, 
+			[kTechDataModel] = CommandStation.kModelName,             
+			[kTechDataMaxHealth] = kCommandStationHealth, 	
+			[kTechDataMaxArmor] = kCommandStationArmor,      
+			[kTechDataSpawnHeightOffset] = 0, 
+			[kTechDataEngagementDistance] = kCommandStationEngagementDistance, 
+			[kTechDataInitialEnergy] = kCommandStationInitialEnergy,      
+			[kTechDataMaxEnergy] = kCommandStationMaxEnergy, 
+			[kTechDataPointValue] = kCommandStationPointValue, 
+			[kTechDataHotkey] = Move.C, 
+			[kTechDataTooltipInfo] = "COMMAND_STATION_TOOLTIP", 
+			[kTechDataObstacleRadius] = 2
+		},       
 
         { [kTechDataId] = kTechId.Recycle, [kTechDataDisplayName] = "RECYCLE", [kTechDataCostKey] = 0,    [kTechIDShowEnables] = false,       [kTechDataResearchTimeKey] = kRecycleTime, [kTechDataHotkey] = Move.R, [kTechDataTooltipInfo] =  "RECYCLE_TOOLTIP"},
         { [kTechDataId] = kTechId.MAC,    [kTechDataSupply] = kMACSupply,    [kTechDataHint] = "MAC_HINT",           [kTechDataMapName] = MAC.kMapName,                      [kTechDataDisplayName] = "MAC",  [kTechDataMaxHealth] = MAC.kHealth, [kTechDataMaxArmor] = MAC.kArmor, [kTechDataCostKey] = kMACCost, [kTechDataResearchTimeKey] = kMACBuildTime, [kTechDataModel] = MAC.kModelName, [kTechDataDamageType] = kMACAttackDamageType, [kTechDataInitialEnergy] = kMACInitialEnergy, [kTechDataMaxEnergy] = kMACMaxEnergy, [kTechDataMenuPriority] = 1, [kTechDataPointValue] = kMACPointValue, [kTechDataHotkey] = Move.M, [kTechDataTooltipInfo] = "MAC_TOOLTIP"},
@@ -407,7 +454,12 @@ function BuildTechData()	//OVERRIDES
 
         { [kTechDataId] = kTechId.ClusterGrenade,  [kTechDataMapName] = ClusterGrenadeThrower.kMapName,   [kTechDataDisplayName] = "CLUSTER_GRENADE", [kTechDataTooltipInfo] =  "CLUSTER_GRENADE_TOOLTIP", [kTechDataCostKey] = kClusterGrenadeCost },
         { [kTechDataId] = kTechId.GasGrenade,  [kTechDataMapName] = GasGrenadeThrower.kMapName,   [kTechDataDisplayName] = "GAS_GRENADE", [kTechDataTooltipInfo] =  "GAS_GRENADE_TOOLTIP", [kTechDataCostKey] = kGasGrenadeCost },
-        { [kTechDataId] = kTechId.PulseGrenade,  [kTechDataMapName] = PulseGrenadeThrower.kMapName,   [kTechDataDisplayName] = "PULSE_GRENADE", [kTechDataTooltipInfo] =  "PULSE_GRENADE_TOOLTIP", [kTechDataCostKey] = kPulseGrenadeCost },
+        { [kTechDataId] = kTechId.PulseGrenade,  
+			[kTechDataMapName] = PulseGrenadeThrower.kMapName,   
+			[kTechDataDisplayName] = "PULSE_GRENADE", 
+			[kTechDataTooltipInfo] =  "PULSE_GRENADE_TOOLTIP", 
+			[kTechDataCostKey] = kPulseGrenadeCost 
+		},
  
         { [kTechDataId] = kTechId.ClusterGrenadeProjectile, [kTechDataDamageType] = kClusterGrenadeDamageType,  [kTechDataMapName] = ClusterGrenade.kMapName,   [kTechDataDisplayName] = "CLUSTER_GRENADE", [kTechDataTooltipInfo] =  "CLUSTER_GRENADE_TOOLTIP", [kTechDataDamageType] = kClusterGrenadeDamageType },
         { [kTechDataId] = kTechId.GasGrenadeProjectile, [kTechDataDamageType] = kNerveGasDamageType,  [kTechDataMapName] = GasGrenade.kMapName,   [kTechDataDisplayName] = "GAS_GRENADE", [kTechDataTooltipInfo] =  "GAS_GRENADE_TOOLTIP", [kTechDataDamageType] = kGasGrenadeDamageType },
@@ -455,17 +507,42 @@ function BuildTechData()	//OVERRIDES
         { [kTechDataId] = kTechId.Armor1,                [kTechDataCostKey] = kArmor1ResearchCost,                   [kTechDataResearchTimeKey] = kArmor1ResearchTime,     [kTechDataDisplayName] = "MARINE_ARMOR1",  [kTechDataTooltipInfo] = "MARINE_ARMOR1_TOOLTIP"},
         { [kTechDataId] = kTechId.Armor2,                [kTechDataCostKey] = kArmor2ResearchCost,                   [kTechDataResearchTimeKey] = kArmor2ResearchTime,     [kTechDataDisplayName] = "MARINE_ARMOR2",  [kTechDataTooltipInfo] = "MARINE_ARMOR2_TOOLTIP"},
         { [kTechDataId] = kTechId.Armor3,                [kTechDataCostKey] = kArmor3ResearchCost,                   [kTechDataResearchTimeKey] = kArmor3ResearchTime,     [kTechDataDisplayName] = "MARINE_ARMOR3",  [kTechDataTooltipInfo] = "MARINE_ARMOR3_TOOLTIP"},
-        { [kTechDataId] = kTechId.NanoArmor,             [kTechDataCostKey] = kNanoArmorResearchCost,                [kTechDataResearchTimeKey] = kNanoArmorResearchTime,     [kTechDataDisplayName] = "NANO_ARMOR",  [kTechDataTooltipInfo] = "NANO_ARMOR_TOOLTIP"},
+        { [kTechDataId] = kTechId.NanoArmor,             
+			[kTechDataCostKey] = kNanoArmorResearchCost,                
+			[kTechDataResearchTimeKey] = kNanoArmorResearchTime,     
+			[kTechDataDisplayName] = "NANO_ARMOR",  
+			[kTechDataTooltipInfo] = "NANO_ARMOR_TOOLTIP"
+		},
 
         // Weapons research
         { [kTechDataId] = kTechId.Weapons1,              [kTechDataCostKey] = kWeapons1ResearchCost,                 [kTechDataResearchTimeKey] = kWeapons1ResearchTime,     [kTechDataDisplayName] = "MARINE_WEAPONS1", [kTechDataHotkey] = Move.Z, [kTechDataTooltipInfo] = "MARINE_WEAPONS1_TOOLTIP"},
         { [kTechDataId] = kTechId.Weapons2,              [kTechDataCostKey] = kWeapons2ResearchCost,                 [kTechDataResearchTimeKey] = kWeapons2ResearchTime,     [kTechDataDisplayName] = "MARINE_WEAPONS2", [kTechDataHotkey] = Move.Z, [kTechDataTooltipInfo] = "MARINE_WEAPONS2_TOOLTIP"},
         { [kTechDataId] = kTechId.Weapons3,              [kTechDataCostKey] = kWeapons3ResearchCost,                 [kTechDataResearchTimeKey] = kWeapons3ResearchTime,     [kTechDataDisplayName] = "MARINE_WEAPONS3", [kTechDataHotkey] = Move.Z, [kTechDataTooltipInfo] = "MARINE_WEAPONS3_TOOLTIP"},
 
-        { [kTechDataId] = kTechId.ShotgunTech,           [kTechDataCostKey] = kShotgunTechResearchCost,           [kTechDataResearchTimeKey] = kShotgunTechResearchTime, [kTechDataDisplayName] = "RESEARCH_SHOTGUNS", [kTechDataTooltipInfo] =  "SHOTGUN_TECH_TOOLTIP"},
-        { [kTechDataId] = kTechId.HeavyRifleTech,           [kTechDataCostKey] = kHeavyRifleTechResearchCost,        [kTechDataResearchTimeKey] = kHeavyRifleTechResearchTime, [kTechDataDisplayName] = "RESEARCH_HEAVY_RIFLES", [kTechDataTooltipInfo] =  "HEAVY_RIFLE_TECH_TOOLTIP"},
-        { [kTechDataId] = kTechId.GrenadeLauncherTech,   [kTechDataCostKey] = kGrenadeLauncherTechResearchCost,   [kTechDataResearchTimeKey] = kGrenadeLauncherTechResearchTime, [kTechDataDisplayName] = "RESEARCH_GRENADE_LAUNCHERS", [kTechDataTooltipInfo] = "GRENADE_LAUNCHER_TECH_TOOLTIP"},
-        { [kTechDataId] = kTechId.GrenadeTech,           [kTechDataCostKey] = kGrenadeTechResearchCost,           [kTechDataResearchTimeKey] = kGrenadeTechResearchTime, [kTechDataDisplayName] = "RESEARCH_GRENADES", [kTechDataTooltipInfo] = "GRENADES_TOOLTIP"},
+        { [kTechDataId] = kTechId.ShotgunTech,           
+			[kTechDataCostKey] = kShotgunTechResearchCost,           
+			[kTechDataResearchTimeKey] = kShotgunTechResearchTime, 
+			[kTechDataDisplayName] = "RESEARCH_SHOTGUNS", 
+			[kTechDataTooltipInfo] =  "SHOTGUN_TECH_TOOLTIP"
+		},
+        { [kTechDataId] = kTechId.HeavyRifleTech,           
+			[kTechDataCostKey] = kHeavyRifleTechResearchCost,        
+			[kTechDataResearchTimeKey] = kHeavyRifleTechResearchTime, 
+			[kTechDataDisplayName] = "RESEARCH_HEAVY_RIFLES", 
+			[kTechDataTooltipInfo] =  "HEAVY_RIFLE_TECH_TOOLTIP"
+		},
+        { [kTechDataId] = kTechId.GrenadeLauncherTech,   
+			[kTechDataCostKey] = kGrenadeLauncherTechResearchCost,   
+			[kTechDataResearchTimeKey] = kGrenadeLauncherTechResearchTime, 
+			[kTechDataDisplayName] = "RESEARCH_GRENADE_LAUNCHERS", 
+			[kTechDataTooltipInfo] = "GRENADE_LAUNCHER_TECH_TOOLTIP"
+		},
+        { [kTechDataId] = kTechId.GrenadeTech,           
+			[kTechDataCostKey] = kGrenadeTechResearchCost,           
+			[kTechDataResearchTimeKey] = kGrenadeTechResearchTime, 
+			[kTechDataDisplayName] = "RESEARCH_GRENADES", 
+			[kTechDataTooltipInfo] = "GRENADES_TOOLTIP"
+		},
         { [kTechDataId] = kTechId.AdvancedWeaponry,      [kTechDataCostKey] = kAdvancedWeaponryResearchCost,      [kTechDataResearchTimeKey] = kAdvancedWeaponryResearchTime, [kTechDataDisplayName] = "ADVANCED_WEAPONRY", [kTechDataHotkey] = Move.G, [kTechDataTooltipInfo] = "ADVANCED_WEAPONRY_TOOLTIP"},
         
         // ARC abilities

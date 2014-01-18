@@ -29,9 +29,12 @@ kTeamColors[kMinimapBlipTeam.Neutral] = Color(1, 1, 1, 1)
 kTeamColors[kMinimapBlipTeam.Alien] = Color(1, 138/255, 0, 1)
 kTeamColors[kMinimapBlipTeam.Marine] = Color(0, 216/255, 1, 1)
 
-local kPowerNodeColor = Color(1, 1, 0.7, 1)
+//local kPowerNodeColor = Color(1, 1, 0.7, 1)	Original
+local kPowerNodeColor = Color(0.2, 0.85, 0.3, 1)
+local kPowerNodeUnSocketedColor = Color(0.7, 0.75, 0.7, 1)
 local kDestroyedPowerNodeColor = Color(1, 0, 0, 1)
 
+local kNodeNeutralColor = Color(1,1,1,1)
 local kDrifterColor = Color(1, 1, 0, 1)
 local kMACColor = Color(0, 1, 0.2, 1)
 
@@ -90,12 +93,12 @@ local kLocationFontName = "fonts/AgencyFB_smaller_bordered.fnt"
 
 local kPlayerIconSize = Vector(kBlipSize, kBlipSize, 0)
 
-local kBlipColorType = enum( { 'Team', 'Infestation', 'InfestationDying', 'Waypoint', 'PowerPoint', 'DestroyedPowerPoint', 'Scan', 'Drifter', 'MAC', 'EtherealGate', 'HighlightWorld' } )
+local kBlipColorType = enum( { 'Team', 'TechPoint','ResourcePoint','Infestation', 'InfestationDying', 'Waypoint', 'PowerPoint', 'DestroyedPowerPoint', 'Scan', 'Drifter', 'MAC', 'EtherealGate', 'HighlightWorld' } )
 local kBlipSizeType = enum( { 'Normal', 'TechPoint', 'Infestation', 'Scan', 'Egg', 'Worker', 'EtherealGate', 'HighlightWorld', 'Waypoint' } )
 
 local kBlipInfo = {}
-kBlipInfo[kMinimapBlipType.TechPoint] = { kBlipColorType.Team, kBlipSizeType.TechPoint, kBackgroundBlipsLayer }
-kBlipInfo[kMinimapBlipType.ResourcePoint] = { kBlipColorType.Team, kBlipSizeType.Normal, kBackgroundBlipsLayer }
+kBlipInfo[kMinimapBlipType.TechPoint] = { kBlipColorType.TechPoint, kBlipSizeType.TechPoint, kBackgroundBlipsLayer }
+kBlipInfo[kMinimapBlipType.ResourcePoint] = { kBlipColorType.ResourcePoint, kBlipSizeType.Normal, kBackgroundBlipsLayer }
 kBlipInfo[kMinimapBlipType.Scan] = { kBlipColorType.Scan, kBlipSizeType.Scan, kBackgroundBlipsLayer }
 kBlipInfo[kMinimapBlipType.CommandStation] = { kBlipColorType.Team, kBlipSizeType.TechPoint, kStaticBlipsLayer }
 kBlipInfo[kMinimapBlipType.Hive] = { kBlipColorType.Team, kBlipSizeType.TechPoint, kStaticBlipsLayer }
@@ -153,16 +156,20 @@ function GUIMinimap:Initialize()
     // Initialize blip info lookup table
     local blipInfoTable = {}
     for blipType, _ in ipairs(kMinimapBlipType) do
+		
         local blipInfo = kBlipInfo[blipType]
         local iconCol, iconRow = GetSpriteGridByClass((blipInfo and blipInfo[4]) or EnumToString(kMinimapBlipType, blipType), kClassToGrid)
         // This looks strange, but the function returned from loadstring is faster than using unpack on a table or accessing the elements of a table manually.
-        local texCoordsFunc = loadstring(string.format("return %.f, %.f, %.f, %.f", GUIGetSprite(iconCol, iconRow, kIconWidth, kIconHeight)))
+        local texCoordsFunc = loadstring( string.format( "return %.f, %.f, %.f, %.f", GUIGetSprite(iconCol, iconRow, kIconWidth, kIconHeight) ) )
+        
         if blipInfo then
           blipInfoTable[blipType] = { texCoordsFunc, blipInfo[1], blipInfo[2], blipInfo[3] }
         else
           blipInfoTable[blipType] = { texCoordsFunc, kBlipColorType.Team, kBlipSizeType.Normal, kStaticBlipsLayer }
         end
+        
     end
+    
     self.blipInfoTable = blipInfoTable
     
     // Generate blip color lookup table
@@ -170,6 +177,8 @@ function GUIMinimap:Initialize()
     for blipTeam, _ in ipairs(kMinimapBlipTeam) do
         local colorTable = {}
         colorTable[kBlipColorType.Team] = kTeamColors[blipTeam]
+        colorTable[kBlipColorType.ResourcePoint] = kNodeNeutralColor
+        colorTable[kBlipColorType.TechPoint] = kNodeNeutralColor
         colorTable[kBlipColorType.Infestation] = kInfestationColor[blipTeam]
         colorTable[kBlipColorType.InfestationDying] = kInfestationDyingColor[blipTeam]
         colorTable[kBlipColorType.Waypoint] = kWaypointColor
@@ -178,11 +187,11 @@ function GUIMinimap:Initialize()
         colorTable[kBlipColorType.Scan] = self.scanColor
         colorTable[kBlipColorType.HighlightWorld] = self.highlightWorldColor
         colorTable[kBlipColorType.Drifter] = kDrifterColor
-        //colorTable[kBlipColorType.MAC] = kMACColor
         colorTable[kBlipColorType.MAC] = kTeamColors[blipTeam]
         colorTable[kBlipColorType.EtherealGate] = self.etherealGateColor
         blipColorTable[blipTeam] = colorTable
     end
+    
     self.blipColorTable = blipColorTable
 
     self:InitializeBackground()
@@ -192,7 +201,8 @@ function GUIMinimap:Initialize()
     self.minimap:SetPosition(Vector(0, 0, 0))
     self.minimap:SetSize(Vector(GUIMinimap.kBackgroundWidth, GUIMinimap.kBackgroundHeight, 0))
     self.minimap:SetTexture("maps/overviews/" .. Shared.GetMapName() .. ".tga")
-    self.minimap:SetColor(kOverviewColor)
+    self.minimap:SetColor( kOverviewColor )
+    //TODO Experiment with overlaying locations and applying GUI shader to colorize location
     self.background:AddChild(self.minimap)
     
     // Used for commander / spectator.
@@ -475,6 +485,20 @@ local function PulseRed()
 
 end
 
+local function PulseYellow()	//For destroyed power nodes
+	
+    local anim = ( math.cos( Shared.GetTime() * 10 ) + 1 ) * 0.5
+    local color = Color()
+    
+    color.r = anim
+    color.g = 1
+    color.b = 1
+    
+    return color
+
+end
+
+
 // Simple optimization to prevent unnecessary Vector creation inside the function.
 local blipPos = Vector(0, 0, 0)
 local blipRotation = Vector(0, 0, 0)
@@ -558,6 +582,7 @@ local function UpdateStaticBlips(self, deltaTime)
     local GUIItemSetPosition = GUIItem.SetPosition
     local GUIItemSetRotation = GUIItem.SetRotation
     local GUIItemSetColor = GUIItem.SetColor
+    
     for i = 1, numBlips do
     
         local xPos, yPos = PlotToMap(self, staticBlips[currentIndex], staticBlips[currentIndex + 1])
@@ -567,19 +592,19 @@ local function UpdateStaticBlips(self, deltaTime)
         local underAttack = staticBlips[currentIndex + 7]
         
         local blip = staticBlipItems[i]
-        local blipInfo = blipInfoTable[blipType]
+        local blipInfo = blipInfoTable[ blipType ]
         
-        local blipSize = blipSizeTable[blipInfo[3]]
+        local blipSize = blipSizeTable[ blipInfo[3] ]
         blipPos.x = xPos - blipSize.x * 0.5
         blipPos.y = yPos - blipSize.y * 0.5
         blipRotation.z = rotation
         
-        GUIItemSetLayer(blip, blipInfo[4])
-        GUIItemSetTexturePixelCoordinates(blip, blipInfo[1]())
-        GUIItemSetSize(blip, blipSize)
-        GUIItemSetPosition(blip, blipPos)
-        GUIItemSetRotation(blip, blipRotation)
-        local blipColor = blipColorTable[blipTeam][blipInfo[2]]
+        GUIItemSetLayer( blip, blipInfo[4] )
+        GUIItemSetTexturePixelCoordinates( blip, blipInfo[1]() )
+        GUIItemSetSize( blip, blipSize )
+        GUIItemSetPosition( blip, blipPos )
+        GUIItemSetRotation( blip, blipRotation )
+        local blipColor = blipColorTable[ blipTeam ][ blipInfo[2] ]	//Likely causing missing Tech/Res points from map
         
         if underAttack then
         
@@ -595,6 +620,7 @@ local function UpdateStaticBlips(self, deltaTime)
         currentIndex = currentIndex + blipItemCount
         
     end
+    
     self.inUseStaticBlipCount = numBlips
     
 end

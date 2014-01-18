@@ -40,11 +40,11 @@ local kMapBackgroundYOffset = 28
 
 local kBigSizeScale = 3
 local kZoomedBlipSizeScale = 1 // 0.8
-local kMiniBlipSizeScale = 0.65	//0.5
+local kMiniBlipSizeScale = 0.6	//0.5
 
 local kMarineZoomedIconColor = Color(191 / 255, 226 / 255, 1, 1)
 
-local kFrameTextureSize = GUIScale(Vector(473, 354, 0))
+local kFrameTextureSize = GUIScale( Vector(473, 354, 0) )
 local kMarineFrameTexture = PrecacheAsset("ui/marine_commander_textures.dds")
 local kFramePixelCoords = { 466, 250 , 466 + 473, 250 + 354 }
 
@@ -110,6 +110,7 @@ function GUIMinimapFrame:InitFrame()
     self.minimapFrame:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
     self.minimapFrame:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
     self.minimapFrame:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+    self.minimapFrame:SetFloatParameter( "teamBaseColorA", ui_baseColor.a )
     
     self.minimapFrame:SetTexturePixelCoordinates(unpack(kFramePixelCoords))
     self.minimapFrame:SetIsVisible(false)

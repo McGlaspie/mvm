@@ -1,0 +1,5 @@
+shader = "models/marine/command_station/command_station_display.surface_shader"
+emissiveMap = "models/marine/command_station/command_station_display.dds"
+welcomeEmissiveMap = "models/marine/command_station/command_station_display_welcome.dds"
+lockedEmissiveMap = "models/marine/command_station/command_station_display_locked.dds"
+normalMap = "materials/dev/dev_normal.dds"

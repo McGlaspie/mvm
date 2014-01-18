@@ -1,0 +1,10 @@
+shader = "shaders/ColoredSkins_noemissive.surface_shader"
+
+albedoMap = "models/marine/hands/hands_special.dds"
+normalMap = "models/marine/hands/hands_special_normal.dds"
+specularMap = "models/marine/hands/hands_special_spec.dds"
+
+modelColorMap = "models/marine/hands/hands_special_colormap.dds"
+
+numColumns = 1
+numRows = 2

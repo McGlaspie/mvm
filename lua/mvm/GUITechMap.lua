@@ -59,20 +59,20 @@ local kStartOffset =
 local kIconSize = GUIScale(Vector(56, 56, 0))
 local kHalfIconSize = kIconSize * 0.5
 local kBackgroundSize = Vector(15 * kIconSize.x, 15 * kIconSize.y, 0)
-local kIconTextur = "ui/buildmenu.dds"
+local kIconTexture = "ui/buildmenu.dds"
 
 local kProgressMeterSize = Vector(kIconSize.x, GUIScale(10), 0)
 
 class 'GUITechMap' (GUIScript)
 
 
-local function CreateTechIcon(self, techId, position, teamType, modFunction, text)
+local function CreateTechIcon(self, techId, position, teamNumber, modFunction, text)
 
     local icon = GetGUIManager():CreateGraphicItem()
     icon:SetSize(kIconSize)
-    icon:SetTexture(kIconTextur)    
+    icon:SetTexture(kIconTexture)    
     icon:SetPosition(Vector(position.x * kIconSize.x, position.y * kIconSize.y, 0))
-    icon:SetColor(kIconColors[teamType])
+    icon:SetColor( kIconColors[teamNumber] )
     icon:SetTexturePixelCoordinates(unpack(GetTextureCoordinatesForIcon(techId)))
     icon:SetLayer(1)
     
@@ -98,7 +98,7 @@ local function CreateTechIcon(self, techId, position, teamType, modFunction, tex
 
 end
 
-local function CreateLine(self, startPoint, endPoint, teamType)
+local function CreateLine(self, startPoint, endPoint, teamNumber)
 
     local lineStartPoint = Vector(startPoint.x * kIconSize.x, startPoint.y * kIconSize.y, 0) + kHalfIconSize
     local lineEndPoint = Vector(endPoint.x * kIconSize.x, endPoint.y * kIconSize.y, 0) + kHalfIconSize
@@ -120,7 +120,7 @@ local function CreateLine(self, startPoint, endPoint, teamType)
     line:SetPosition(lineStartPoint)
     line:SetRotationOffset(Vector(-length, 0, 0))
     line:SetRotation(rotationVec)
-    line:SetColor(kLineColors[teamType])
+    line:SetColor(kLineColors[teamNumber])
     line:SetLayer(0) 
     
     self.background:AddChild(line)
@@ -160,14 +160,14 @@ function GUITechMap:Initialize()
     self.background:SetPosition(-kBackgroundSize * 0.5)
     self.background:SetAnchor(GUIItem.Middle, GUIItem.Center)
     self.background:SetIsVisible(true)
-    self.background:SetColor(Color(0.0,0.0,0.0,0.4))
-    self.background:SetLayer(kGUILayerScoreboard)
+    self.background:SetColor( Color( 0, 0, 0, 0.5 ) )
+    self.background:SetLayer( kGUILayerScoreboard )
     
     self.teamType = PlayerUI_GetTeamType()
     self.teamNumber = PlayerUI_GetTeamNumber()
     
-    local techMap = kTechMaps[self.teamType]
-    local offset = kStartOffset[self.teamType]
+    local techMap = kTechMaps[self.teamNumber]
+    local offset = kStartOffset[self.teamNumber]
     for i = 1, #techMap do
 
         local entry = techMap[i]
@@ -224,10 +224,10 @@ end
 
 function GUITechMap:Update(deltaTime)
 
-    local teamType = PlayerUI_GetTeamType()
+    local teamNumber = PlayerUI_GetTeamNumber()
     // reload the tech map. its possible that the script is not destroyed when changing player class in some cases and would use therefor the incorrect tech map
-    if teamType ~= self.teamType then
-    
+    if teamNumber ~= self.teamNumber then
+		
         self:Uninitialize()
         self:Initialize()
         

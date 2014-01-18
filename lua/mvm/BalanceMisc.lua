@@ -32,7 +32,7 @@ kMinSupportedRTs = 0
 kRTsPerTechpoint = 3
 
 kEMPBlastEnergyDamage = 50	//??? Use as doing damage to structure?
-kElectrifiedDuration = 4	//5
+kElectrifiedDuration = 3
 kElectrifiedMovementModifier = 0.05
 
 kEnzymeAttackSpeed = 1.25
@@ -88,7 +88,8 @@ kScanRadius = 20
 // Distress Beacon (from NS1)
 kDistressBeaconRange = 16	//15
 kDistressBeaconTime = 3
-kBurningObsDistressBeaconDelay = 6
+kBurningObsDistressBeaconDelay = 5	//6
+//EMP damage should have the same delay effect?
 
 kEnergizeRange = 15
 // per stack
