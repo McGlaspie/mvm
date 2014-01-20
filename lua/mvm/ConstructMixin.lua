@@ -196,9 +196,9 @@ function ConstructMixin:Construct(elapsedTime, builder)
     end
     
     if playAV then
-
-        local builderClassName = builder and builder:GetClassName()    
-        self:TriggerEffects("construct", {classname = self:GetClassName(), doer = builderClassName, isalien = GetIsAlienUnit(self)})
+		
+        local builderClassName = builder and builder:GetClassName()
+        self:TriggerEffects("construct", {classname = self:GetClassName(), doer = builderClassName })	//, isalien = GetIsAlienUnit(self)
         
     end 
     

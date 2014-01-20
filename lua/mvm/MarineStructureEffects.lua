@@ -33,9 +33,9 @@ kMarineStructureEffects =
     {    
         marineConstructEffects =
         {
-            {cinematic = "cinematics/marine/construct_infantryportal.cinematic", classname = "InfantryPortal", isalien = false, done = true},
-            {cinematic = "cinematics/marine/construct_big.cinematic", classname = "CommandStation", isalien = false, done = true},
-            {cinematic = "cinematics/marine/construct.cinematic", isalien = false},
+            {cinematic = "cinematics/marine/construct_infantryportal.cinematic", classname = "InfantryPortal", done = true},
+            {cinematic = "cinematics/marine/construct_big.cinematic", classname = "CommandStation", done = true},
+            {cinematic = "cinematics/marine/construct.cinematic"},
         },        
     },
     

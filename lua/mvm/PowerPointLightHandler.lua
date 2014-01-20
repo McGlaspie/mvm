@@ -44,7 +44,7 @@ local kAuxPowerCycleTime = 3
 local kAuxPowerMinIntensity = 0
 local kAuxPowerMinCommanderIntensity = 2.5	//3
 
-local kForceCommanderUpdateTime = 0.125
+local kForceCommanderUpdateTime = 0.1
 
 local UnScoutedLightMode = kLightMode.NoPower
 
@@ -146,20 +146,7 @@ function PowerPointLightHandler:Run( mode, isCommander )
     if isCommander then
 		forceUpdate = ( Shared.GetTime() - Client.GetLocalPlayer():GetLoginTime() ) < 1
     end
-    /*
-    if isCommander and not self.powerPoint:IsScouted( Client.GetLocalPlayer():GetTeamNumber() ) and self.lastTimeOfChange ~= timeOfChange then
-		
-		worker = ConditionalValue(
-			self.lastWorker ~= nil,
-			self.lastWorker,
-			worker
-		)
-		
-		worker:Activate()
-		self.lastTimeOfChange = timeOfChange
-		
-    else
-	*/
+    
 	if self.lastWorker ~= worker or ( not isCommander and self.lastTimeOfChange ~= timeOfChange ) or forceUpdate then
 		
         worker:Activate()
