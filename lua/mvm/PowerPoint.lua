@@ -1,4 +1,6 @@
-
+//
+// To put it simplely...if any other mod tries to modify this class, explosions will happen.
+//
 
 Script.Load("lua/mvm/FireMixin.lua")
 
@@ -21,17 +23,17 @@ if Client then
 	// chance of a aux light flickering when powering up
 	PowerPoint.kAuxFlickerChance = 0
 	// chance of a full light flickering when powering up
-	PowerPoint.kFullFlickerChance = 0.30
+	PowerPoint.kFullFlickerChance = 0.3
 	
 	// determines if aux lights will randomly fail after they have come on for a certain amount of time
-	PowerPoint.kAuxLightsFail = true
-
+	PowerPoint.kAuxLightsFail = false
+	
 	// max varying delay to turn on full lights
-	PowerPoint.kMaxFullLightDelay = 4
+	PowerPoint.kMaxFullLightDelay = 2	//4
 	// min 2 seconds from repairing the node till the light goes on
-	PowerPoint.kMinFullLightDelay = 2
+	PowerPoint.kMinFullLightDelay = 1	//2
 	// how long time for the light to reach full power (PowerOnTime was a bit brutal and give no chance for the flicker to work)
-	PowerPoint.kFullPowerOnTime = 4
+	PowerPoint.kFullPowerOnTime = 5	//4
 
 	// max varying delay to turn on aux lights
 	PowerPoint.kMaxAuxLightDelay = 0
@@ -42,6 +44,8 @@ if Client then
 	PowerPoint.kAuxLightFailTime = 20 // short .. should be like 600 (10 minues)
 	// how long time a light takes to go from full aux power to dead (last 1/3 of that time is spent flickering)
 	PowerPoint.kAuxLightDyingTime = 20
+	
+	PowerPoint.kImpulseEffectFrequency = 25
 	
 end
 
@@ -111,19 +115,50 @@ if Client then
 				// for all of them at all times, we restrict it to powerpoints inside the updateRange. The
 				// updateRange should be long enough that players can't see the lights being updated by the
 				// powerpoint when outside this range, and short enough not to waste too much cpu.
-				local inRange = (powerPoint:GetOrigin() - playerPos):GetLengthSquared() < kDefaultUpdateRangeSq
+				//local inRange = (powerPoint:GetOrigin() - playerPos):GetLengthSquared() < kDefaultUpdateRangeSq
+				
+				local isComm = player:isa("Commander")
 				
 				// Ignore range check if the player is a commander since they are high above
 				// the lights in a lot of cases and see through ceilings and some walls.
-				if inRange or player:isa("Commander") then
-					powerPoint:UpdatePoweredLights()
-				end
+				//if inRange or isComm then
+					powerPoint:UpdatePoweredLights( isComm )
+				//end
 				
 			end
 			
 		end
 		
 	end
+	
+	
+	function PowerPoint:UpdatePoweredLights( isCommander )	//OVERRIDES
+		
+		PROFILE("PowerPoint:UpdatePoweredLights") 
+		
+		if not self.lightHandler then    
+			
+			self.lightHandler = PowerPointLightHandler():Init( self )
+	   
+		end
+		
+		local time = Shared.GetTime()
+		
+		local updateRate = ConditionalValue(
+			isCommander,
+			0.05,	//40 per second
+			0.05	//20 per second
+		)
+		
+		if self.lastUpdatedTime == nil or time - self.lastUpdatedTime > updateRate then   
+			
+			self.lastUpdatedTime = time
+			self.lightHandler:Run( self:GetLightMode(), isCommander )
+			
+		end
+
+	end
+	
 	
 end
 
@@ -216,6 +251,10 @@ end
 
 function PowerPoint:Reset()		//OVERRIDES
 
+	self.scoutedForTeam1 = false
+	self.scoutedForTeam2 = false
+	self.isStartingPoint = false
+
 	if Server then
 	
 		Print("PowerPoint:Reset()")
@@ -228,14 +267,27 @@ function PowerPoint:Reset()		//OVERRIDES
 		
 	end
 	
-	self.scoutedForTeam1 = false
-	self.scoutedForTeam2 = false
-	self.isStartingPoint = false
-	
 	if Client then
 		self.lightHandler:Run( self:GetLightMode() )
 	end
 
+end
+
+
+function PowerPoint:SetLightMode(lightMode)		//OVERRIDES
+    
+    if self:GetIsDisabled() then
+        lightMode = kLightMode.NoPower
+    end
+
+    // Don't change light mode too often or lights will change too much
+    if self.lightMode ~= lightMode or (not self.timeOfLightModeChange or (Shared.GetTime() > (self.timeOfLightModeChange + 1.0))) then
+            
+        self.lightMode = lightMode
+        self.timeOfLightModeChange = Shared.GetTime()
+        
+    end
+    
 end
 
 
@@ -363,9 +415,11 @@ if Server then
 			if not viewer:isa("ARC") and not viewer:isa("Structure") and not viewer:isa("Commander") then
 			//Only players, scans, and MACs can scout things
 				
-				if viewer:GetTeamNumber() == kTeam1Index then
+				local viewerTeam = viewer:GetTeamNumber()
+				
+				if viewerTeam == kTeam1Index then
 					self.scoutedForTeam1 = true
-				elseif viewer:GetTeamNumber() == kTeam2Index then
+				elseif viewerTeam == kTeam2Index then
 					self.scoutedForTeam2 = true
 				end
 				
@@ -689,31 +743,7 @@ end
 
 
 
-if Client then
-	
-	
-	function PowerPoint:UpdatePoweredLights()	//OVERRIDES
-		
-		PROFILE("PowerPoint:UpdatePoweredLights") 
-		
-		if not self.lightHandler then    
-			
-			self.lightHandler = PowerPointLightHandler():Init( self )
-	   
-		end
-		
-		
-		local time = Shared.GetTime()
-		// max 20 updates per second 
-		if self.lastUpdatedTime == nil or time - self.lastUpdatedTime > 0.05 then   
-			
-			self.lastUpdatedTime = time			
-			self.lightHandler:Run( self:GetLightMode() )
-			
-		end
-
-	end
-	
+if Client then	
 	
 	function PowerPoint:OnUpdateRender()	//OVERRIDES
 

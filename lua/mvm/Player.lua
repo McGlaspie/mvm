@@ -4,7 +4,8 @@ Script.Load("lua/mvm/TechData.lua")
 
 
 local newNetworkVars = {
-	previousTeamNumber	= string.format("integer (%d to %d)", kTeamInvalid, kSpectatorIndex )
+	previousTeamNumber	= string.format("integer (%d to %d)", kTeamInvalid, kSpectatorIndex ),
+	commanderLoginTime = "time"
 }
 
 
@@ -32,6 +33,10 @@ function Player:AddResources(amount)
 end
 
 
+function Player:GetLoginTime()
+	return self.commanderLoginTime
+end
+
 //Previous team member for RR skinning (on game ends)
 //????: Add game-end check also? If player explicity joins RR, then RR model should not skin
 if Server then
@@ -42,7 +47,13 @@ if Server then
 		oldPlayerCopyData( self, player )
 		
 		self.previousTeamNumber = player.previousTeamNumber
+		self.commanderLoginTime = player.commanderLoginTime
 		
+	end
+	
+	
+	function Player:OnCommanderStructureLogin( commandStructure )
+		self.commanderLoginTime = Shared.GetTime()
 	end
 	
 	/*

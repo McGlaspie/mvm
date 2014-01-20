@@ -96,9 +96,28 @@ function MvM_GetSupplyUsedByTeam( teamNumber )
 
 end
 
+if Server then
 
+	function OnCommanderLogOut(commander)	//OVERRIDES
+		
+		local client = Server.GetOwner(commander)
+		
+		if client then
+		
+			local addTime = math.max(0, 30 - GetGamerules():GetGameTimeChanged())
+			
+			client.timeUntilResourceBlock = Shared.GetTime() + addTime + kCommanderResourceBlockTime
+			client.blockPersonalResources = true
+			
+			//if client.commanderLoginTime then
+			//	client.commanderLoginTime = nil
+			//end
+			
+		end
 
+	end
 
+end
 
 //Copy of original
 local function HandleImpactDecal(position, doer, surface, target, showtracer, altMode, damage, direction, decalParams)

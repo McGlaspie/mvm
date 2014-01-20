@@ -38,7 +38,9 @@ Marine.kGroundFrictionForce = 16
 Marine.kAirStrafeWeight = 0		//May need to add back in for JP - Can stop on a dime with JP...
 
 
-local newNetworkVars = {}
+local newNetworkVars = {
+	commanderLoginTime = "time"
+}
 
 AddMixinNetworkVars(FireMixin, newNetworkVars)
 AddMixinNetworkVars(DetectableMixin, newNetworkVars)
@@ -82,6 +84,8 @@ function Marine:OnCreate()	//OVERRIDE
         self.unitStatusPercentage = 0
         self.timeLastUnitPercentageUpdate = 0
         
+        self.commanderLoginTime = 0
+        
     elseif Client then
 		
 		InitMixin(self, TeamMessageMixin, { kGUIScriptName = "mvm/Hud/Marine/GUIMarineTeamMessage" })
@@ -102,12 +106,13 @@ function Marine:OnCreate()	//OVERRIDE
 		end
         self.flashlight:SetInnerCone( math.rad(12) )
         self.flashlight:SetOuterCone( math.rad(32) )
-        self.flashlight:SetIntensity( 10 )
+        self.flashlight:SetIntensity( 12 )
         self.flashlight:SetRadius( 16 ) 	//15
         self.flashlight:SetGoboTexture("models/marine/male/flashlight.dds")
         self.flashlight:SetIsVisible(false)
-        self.flashlight:SetAtmosphericDensity( 0.015 )
-        
+        self.flashlight:SetAtmosphericDensity( 0.15 )
+        //TODO Add Flashlight lens flare attachment effect
+        // - Toggle flashlight off when sprinting?
     end
 
 end
@@ -526,5 +531,5 @@ end	//Client
 //-----------------------------------------------------------------------------
 
 
-Class_Reload("Marine", newNetworkVars)
+Class_Reload( "Marine", newNetworkVars )
 

@@ -32,17 +32,17 @@
 local kMinCommanderLightIntensityScalar = 0.2	//0.3
 
 //FIXME Below two values take too long to update light states at game start/reset
-//but the effect is good and makes more itneresting changes.
+//but the effect is good and makes more interesting changes.
 local kPowerDownTime = 0
 local kOffTime = 0
 
 local kLowPowerCycleTime = 1
-local kLowPowerMinIntensity = 0.32
+local kLowPowerMinIntensity = 0.3
 local kDamagedCycleTime = 0.8
 local kDamagedMinIntensity = 0.7
 local kAuxPowerCycleTime = 3
 local kAuxPowerMinIntensity = 0
-local kAuxPowerMinCommanderIntensity = 2.5	//3
+local kAuxPowerMinCommanderIntensity = 2.25	//3
 
 local UnScoutedLightMode = kLightMode.NoPower
 
@@ -119,17 +119,14 @@ function PowerPointLightHandler:Init(powerPoint)
 end
 
 
-function PowerPointLightHandler:GetOverrideMode( mode )
+function PowerPointLightHandler:GetOverrideMode( mode, isCommander )
 	
-	local lightMode = mode		
+	local lightMode = mode
 	local player = Client.GetLocalPlayer()
 	
-	if player:isa("Commander") then
-		
-		if not self.powerPoint:IsScouted( player:GetTeamNumber() ) then
-			lightMode = UnScoutedLightMode
-		end
-	
+	//Should also include friendlies in a location
+	if isCommander and not self.powerPoint:IsScouted( player:GetTeamNumber() ) then
+		lightMode = UnScoutedLightMode
 	end
 	
 	return lightMode
@@ -137,13 +134,18 @@ function PowerPointLightHandler:GetOverrideMode( mode )
 end
 
 
-function PowerPointLightHandler:Run( mode )
+function PowerPointLightHandler:Run( mode, isCommander )
 	
 	local timeOfChange = self.powerPoint:GetTimeOfLightModeChange()
-	local lightMode = self:GetOverrideMode( mode )
+	local lightMode = self:GetOverrideMode( mode, isCommander )
 	local worker = self.workerTable[ lightMode ]
+    local forceUpdate = false
     
-    if self.lastWorker ~= worker or self.lastTimeOfChange ~= timeOfChange then
+    if isCommander then
+		forceUpdate = ( Shared.GetTime() - Client.GetLocalPlayer():GetLoginTime() ) < 1
+    end
+    
+    if self.lastWorker ~= worker or self.lastTimeOfChange ~= timeOfChange or forceUpdate then
 		
         worker:Activate()
         self.lastWorker = worker
@@ -151,7 +153,7 @@ function PowerPointLightHandler:Run( mode )
         
     end
     
-    worker:Run()
+    worker:Run(  )
     
 end
 
@@ -256,7 +258,7 @@ function NormalLightWorker:Run()
     local timeOfChange = self.handler.powerPoint:GetTimeOfLightModeChange()
     local time = Shared.GetTime()
     local timePassed = time - timeOfChange    
-
+	
     if self.activeProbes then
     
         local startFullLightTime = PowerPoint.kMinFullLightDelay
@@ -374,7 +376,7 @@ function LowPowerLightWorker:Run()
     local time = Shared.GetTime()
     local timePassed = time - timeOfChange 
     
-    local scalar = math.cos((timePassed / (kLowPowerCycleTime / 2)) * math.pi / 2)
+    local scalar = math.cos( ( timePassed / (kLowPowerCycleTime / 2 ) ) * math.pi / 2 )
     local minIntensity = kLowPowerMinIntensity
     local halfIntensity = (1 - minIntensity) / 2
     
@@ -430,20 +432,27 @@ end
 function NoPowerLightWorker:Run()
 
     PROFILE("NoPowerLightWorker:Run")
-
-    local timeOfChange = self.handler.powerPoint:GetTimeOfLightModeChange()
-    local time = Shared.GetTime()
-    local timePassed = time - timeOfChange    
     
     local startAuxLightTime = kPowerDownTime + kOffTime
     local fullAuxLightTime = startAuxLightTime + kAuxPowerCycleTime
     local startAuxLightFailTime = fullAuxLightTime + PowerPoint.kAuxLightSafeTime
     local totalAuxLightFailTime = startAuxLightFailTime + PowerPoint.kAuxLightDyingTime
     
+    local showCommanderLight = false
+	
+	local player = Client.GetLocalPlayer()
+	if player and player:isa("Commander") then
+		showCommanderLight = true
+	end
+	
+	local time = Shared.GetTime()
+	local timeOfChange = self.handler.powerPoint:GetTimeOfLightModeChange()    
+    local timePassed = time - timeOfChange 
+    
     local probeTint
     
-    if timePassed < kPowerDownTime then
-        local intensity = math.sin(Clamp(timePassed / kPowerDownTime, 0, 1) * math.pi / 2)
+	if timePassed < kPowerDownTime then
+        local intensity = math.sin( Clamp(timePassed / kPowerDownTime, 0, 1) * math.pi / 2)
         probeTint = Color(intensity, intensity, intensity, 1)
     elseif timePassed < startAuxLightTime then
         probeTint = Color(0, 0, 0, 1)
@@ -470,8 +479,26 @@ function NoPowerLightWorker:Run()
             probe:SetTint( probeTint )
         end
     end
-
-    
+	
+    local commLoginTime = 0
+    local forceCommUpdateLimit = 0.125
+    if showCommanderLight then
+		commLoginTime = player:GetLoginTime()
+	end
+	
+	local dump = false
+	if showCommanderLight and dump then
+		Print("NoPowerLightWorker:Run()")
+		Print("\t startAuxLightTime = " ..startAuxLightTime)
+		Print("\t fullAuxLightTime = " ..fullAuxLightTime)
+		Print("\t startAuxLightFailTime = " ..startAuxLightFailTime)
+		Print("\t totalAuxLightFailTime = " ..totalAuxLightFailTime)
+		Print("\t timeOfChange = " ..timeOfChange)
+		Print("\t time = " ..time)
+		Print("\t timePassed = " ..timePassed)
+		Print("\t commLoginTime = " ..commLoginTime)
+    end
+	
     for renderLight,_ in pairs(self.activeLights) do
         
         local randomValue = renderLight.randomValue
@@ -487,22 +514,20 @@ function NoPowerLightWorker:Run()
         local intensity = nil
         local color = nil
         
-        local showCommanderLight = false
+        local forcedCommanderUpdate = ( time - commLoginTime ) <= forceCommUpdateLimit and commLoginTime ~= 0
         
-        local player = Client.GetLocalPlayer()
-        if player and player:isa("Commander") then
-            showCommanderLight = true
-        end
+        if forcedCommanderUpdate then	//Only applies to commanders
+			intensity = renderLight.originalIntensity * kMinCommanderLightIntensityScalar
+			color = PowerPoint.kDisabledCommanderColor
+        elseif timePassed < kPowerDownTime then
         
-        if timePassed < kPowerDownTime then
-        
-            local scalar = math.sin(Clamp(timePassed / kPowerDownTime, 0, 1) * math.pi / 2)
+            local scalar = math.sin( Clamp(timePassed / kPowerDownTime, 0, 1) * math.pi / 2)
             scalar = (1 - scalar)
             if showCommanderLight then
                 scalar = math.max(kMinCommanderLightIntensityScalar, scalar)
             end
             intensity = renderLight.originalIntensity * (1 - scalar)
-
+			
         elseif timePassed < startAuxLightTime then
         
             if showCommanderLight then
@@ -539,20 +564,26 @@ function NoPowerLightWorker:Run()
             // Deactivate from initial state
             self.activeLights[renderLight] = nil
             
-            // in steady state, we shift lights between a constant state and a varying state.
-            // We assign each light to one of several groups, and then randomly start/stop cycling for each group. 
-            local lightGroupIndex = math.floor(math.random() * NoPowerLightWorker.kNumGroups)
-            self.lightGroups[lightGroupIndex].lights[renderLight] = true
-
+            if showCommanderLight and ( time - commLoginTime ) <= forceCommUpdateLimit then
+				for i = 0, NoPowerLightWorker.kNumGroups, 1 do	//Run all, right now
+					self.lightGroups[i].lights[renderLight] = true
+				end
+            else
+				// in steady state, we shift lights between a constant state and a varying state.
+				// We assign each light to one of several groups, and then randomly start/stop cycling for each group. 
+				local lightGroupIndex = math.floor(math.random() * NoPowerLightWorker.kNumGroups)
+				self.lightGroups[lightGroupIndex].lights[renderLight] = true
+			end
+			
         end
         
         SetLight(renderLight, intensity, color)
         
     end
-
+	
     // handle the light-cycling groups.
     for _,lightGroup in pairs(self.lightGroups) do
-        lightGroup:Run(timePassed)
+		lightGroup:Run( timePassed, forcedCommanderUpdate )
     end
 
 end
@@ -568,12 +599,15 @@ function LightGroup:Init()
     self.cycleStartTime = 0
     self.nextThinkTime = 0
     self.stateFunction = LightGroup.RunFixed
+    self.forcedCommanderUpdate = false
     
     return self
     
 end
 
-function LightGroup:Run(time)
+function LightGroup:Run( time, forceCommUpdate )
+
+	self.forcedCommanderUpdate = forceCommUpdate
 
     if time >= self.nextThinkTime then
         self:stateFunction(time)
@@ -615,23 +649,31 @@ function LightGroup:RunCycle(time)
         end        
         
         for renderLight,_ in pairs(self.lights) do
-        
+			
             // Fade disabled color in and out to make it very clear that the power is out        
-            local scalar = math.cos((t / (kAuxPowerCycleTime / 2)) * math.pi / 2)
-            local halfAmplitude = (1 - kAuxPowerMinIntensity) / 2
+            local scalar = math.cos( ( t / (kAuxPowerCycleTime / 2 ) ) * math.pi / 2 )
+            local halfAmplitude = ( 1 - kAuxPowerMinIntensity ) / 2
             
-            local minIntensity = kAuxPowerMinIntensity
-            color = PowerPoint.kDisabledColor
+            if self.forcedCommanderUpdate and showCommanderLight then
             
-            if showCommanderLight then
+				intensity = kAuxPowerMinCommanderIntensity
+				color = PowerPoint.kDisabledCommanderColor
             
-                minIntensity = kAuxPowerMinCommanderIntensity
-                color = PowerPoint.kDisabledCommanderColor
-                
+            else
+				
+				local minIntensity = kAuxPowerMinIntensity
+				color = PowerPoint.kDisabledColor
+				
+				if showCommanderLight then
+				
+					minIntensity = kAuxPowerMinCommanderIntensity
+					color = PowerPoint.kDisabledCommanderColor
+					
+				end
+				
+				local disabledIntensity = ( kAuxPowerMinIntensity + halfAmplitude + scalar * halfAmplitude )
+				intensity = renderLight.originalIntensity * disabledIntensity
             end
-            
-            local disabledIntensity = (kAuxPowerMinIntensity + halfAmplitude + scalar * halfAmplitude)
-            intensity = renderLight.originalIntensity * disabledIntensity
             
             SetLight(renderLight, intensity, color)
             

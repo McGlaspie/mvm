@@ -8,8 +8,6 @@ Script.Load("lua/mvm/Marine.lua")
 
 function MarineTeam:OnResetComplete()
 
-	Print("MarineTeam:OnResetComplete()")
-
     //adjust first power node    
     local initialTechPoint = self:GetInitialTechPoint()
     local powerPoint = GetPowerPointForLocation( initialTechPoint:GetLocationName() )
@@ -129,7 +127,7 @@ function MarineTeam:InitTechTree()	//OVERRIDES
     
     self.techTree:AddResearchNode(kTechId.AdvancedWeaponry,      kTechId.AdvancedArmory,      kTechId.None)
     
-    self.techTree:AddResearchNode(kTechId.GrenadeLauncherTech,   kTechId.AdvancedArmory, kTechId.AdvancedWeaponry, kTechId.None )
+    self.techTree:AddResearchNode(kTechId.GrenadeLauncherTech,   kTechId.AdvancedArmory, kTechId.None )
     
     self.techTree:AddTargetedBuyNode(kTechId.GrenadeLauncher,  	 kTechId.AdvancedWeaponry, kTechId.GrenadeLauncherTech, kTechId.None)
     self.techTree:AddTargetedActivation(kTechId.DropGrenadeLauncher,  kTechId.AdvancedWeaponry, kTechId.GrenadeLauncherTech, kTechId.None)

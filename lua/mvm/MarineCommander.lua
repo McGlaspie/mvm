@@ -2,6 +2,10 @@
 
 Script.Load("lua/mvm/Commander.lua")
 
+local newNetworkVars = {}
+
+
+//-----------------------------------------------------------------------------
 
 
 if Client then
@@ -25,8 +29,7 @@ if Client then
 end
 
 
-if Client then
+//-----------------------------------------------------------------------------
 
-	Class_Reload("MarineCommander", {})
-	
-end
+
+Class_Reload( "MarineCommander", newNetworkVars )

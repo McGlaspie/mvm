@@ -124,8 +124,6 @@ kARCDamageType = kDamageType.Splash // splash damage hits friendlies (that take 
 kARCRange = 24
 kARCMinRange = 8
 
-
-
 kWeapons1DamageScalar = 1.1
 kWeapons2DamageScalar = 1.2
 kWeapons3DamageScalar = 1.3
@@ -191,7 +189,7 @@ kNanoShieldOnSpawnLength = 2
 //-----------------------------------------------------------------------------
 // BUILDING / ABILITY COSTS
 
-kCommandStationCost = 15
+kCommandStationCost = 20
 kExtractorCost = 10
 kInfantryPortalCost = 15
 kArmoryCost = 10
@@ -264,6 +262,7 @@ kDualMinigunCost = 25
 
 
 //ABILITIES ---------------------------
+
 kAmmoPackCost = 1
 kMedPackCost = 1
 kCatPackCost = 2
@@ -275,7 +274,7 @@ kNanoShieldDuration = 8
 kEMPCost = 2
 kEMPCooldown = 8
 
-kObservatoryScanCost = 3
+kObservatoryScanCost = 5
 kObservatoryDistressBeaconCost = 10
 
 

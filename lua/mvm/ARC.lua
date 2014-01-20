@@ -118,6 +118,33 @@ function ARC:OnEmpDamaged()
 end
 
 
+function ARC:OnUpdateAnimationInput(modelMixin)	//OVERRIDES
+
+    PROFILE("ARC:OnUpdateAnimationInput")
+    
+    //FIXME This does fuck all
+    if self.mode == ARC.kMode.Destroyed then
+		modelMixin:SetAnimationInput("alive", false)
+	end
+    
+    local activity = "none"
+    if self.mode == ARC.kMode.Targeting and self.deployMode == ARC.kDeployMode.Deployed then
+        activity = "primary"
+    end
+    modelMixin:SetAnimationInput("activity", activity)
+    
+    local deployed = self.deployMode == ARC.kDeployMode.Deploying or self.deployMode == ARC.kDeployMode.Deployed
+    modelMixin:SetAnimationInput("deployed", deployed)
+    
+    local move = "idle"
+    if self.mode == ARC.kMode.Moving and self.deployMode == ARC.kDeployMode.Undeployed then
+        move = "run"
+    end
+    modelMixin:SetAnimationInput("move", move)
+    
+end
+
+
 //-----------------------------------------------------------------------------
 
 
