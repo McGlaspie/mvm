@@ -42,7 +42,9 @@ local kDamagedCycleTime = 0.8
 local kDamagedMinIntensity = 0.7
 local kAuxPowerCycleTime = 3
 local kAuxPowerMinIntensity = 0
-local kAuxPowerMinCommanderIntensity = 2.25	//3
+local kAuxPowerMinCommanderIntensity = 2.5	//3
+
+local kForceCommanderUpdateTime = 0.125
 
 local UnScoutedLightMode = kLightMode.NoPower
 
@@ -144,8 +146,21 @@ function PowerPointLightHandler:Run( mode, isCommander )
     if isCommander then
 		forceUpdate = ( Shared.GetTime() - Client.GetLocalPlayer():GetLoginTime() ) < 1
     end
-    
-    if self.lastWorker ~= worker or self.lastTimeOfChange ~= timeOfChange or forceUpdate then
+    /*
+    if isCommander and not self.powerPoint:IsScouted( Client.GetLocalPlayer():GetTeamNumber() ) and self.lastTimeOfChange ~= timeOfChange then
+		
+		worker = ConditionalValue(
+			self.lastWorker ~= nil,
+			self.lastWorker,
+			worker
+		)
+		
+		worker:Activate()
+		self.lastTimeOfChange = timeOfChange
+		
+    else
+	*/
+	if self.lastWorker ~= worker or ( not isCommander and self.lastTimeOfChange ~= timeOfChange ) or forceUpdate then
 		
         worker:Activate()
         self.lastWorker = worker
@@ -481,7 +496,6 @@ function NoPowerLightWorker:Run()
     end
 	
     local commLoginTime = 0
-    local forceCommUpdateLimit = 0.125
     if showCommanderLight then
 		commLoginTime = player:GetLoginTime()
 	end
@@ -514,7 +528,7 @@ function NoPowerLightWorker:Run()
         local intensity = nil
         local color = nil
         
-        local forcedCommanderUpdate = ( time - commLoginTime ) <= forceCommUpdateLimit and commLoginTime ~= 0
+        local forcedCommanderUpdate = ( time - commLoginTime ) <= kForceCommanderUpdateTime and commLoginTime ~= 0
         
         if forcedCommanderUpdate then	//Only applies to commanders
 			intensity = renderLight.originalIntensity * kMinCommanderLightIntensityScalar
@@ -564,7 +578,7 @@ function NoPowerLightWorker:Run()
             // Deactivate from initial state
             self.activeLights[renderLight] = nil
             
-            if showCommanderLight and ( time - commLoginTime ) <= forceCommUpdateLimit then
+            if showCommanderLight and ( time - commLoginTime ) <= kForceCommanderUpdateTime then
 				for i = 0, NoPowerLightWorker.kNumGroups, 1 do	//Run all, right now
 					self.lightGroups[i].lights[renderLight] = true
 				end
