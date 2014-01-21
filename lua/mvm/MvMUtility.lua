@@ -154,7 +154,7 @@ end
 
 
 
-function HandleHitEffect(position, doer, surface, target, showtracer, altMode, damage, direction)
+function HandleHitEffect(position, doer, surface, target, showtracer, altMode, damage, direction)	//OVERRIDES
 
     local tableParams = { }
     tableParams[kEffectHostCoords] = Coords.GetTranslation(position)
@@ -164,18 +164,20 @@ function HandleHitEffect(position, doer, surface, target, showtracer, altMode, d
     tableParams[kEffectSurface] = surface
     tableParams[kEffectFilterInAltMode] = altMode
     
+	
     if target then
     
         tableParams[kEffectFilterClassName] = target:GetClassName()
         
         if target.GetTeamNumber then
-			
-            tableParams[kEffectFilterIsMarine] = true
+			//FIXME This will likely cause alien blood/hit effects
+            tableParams[kEffectFilterIsMarine] = target:GetTeamNumber() == kTeam1Index
+            tableParams[kEffectFilterIsAlien] = not tableParams[kEffectFilterIsMarine]
             //Would ne to re-enable below if Invasion mode added
             //tableParams[kEffectFilterIsAlien] = target:GetTeamNumber() == kAlienTeamType
             
         end
-        
+	
     else
 		
         tableParams[kEffectFilterIsMarine] = false

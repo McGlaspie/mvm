@@ -33,9 +33,20 @@ kMarineStructureEffects =
     {    
         marineConstructEffects =
         {
-            {cinematic = "cinematics/marine/construct_infantryportal.cinematic", classname = "InfantryPortal", done = true},
-            {cinematic = "cinematics/marine/construct_big.cinematic", classname = "CommandStation", done = true},
-            {cinematic = "cinematics/marine/construct.cinematic"},
+            {cinematic = "cinematics/marine/construct_infantryportal.cinematic", classname = "InfantryPortal", isalien = false, done = true},
+            {cinematic = "cinematics/marine/construct_big.cinematic", classname = "CommandStation", isalien = false, done = true},
+            {cinematic = "cinematics/marine/construct.cinematic", isalien = false },
+        },        
+    },
+    
+    // When players or MACs build a structure
+    construct_team2 =
+    {    
+        marineConstructEffects =
+        {
+            {cinematic = "cinematics/marine/construct_infantryportal.cinematic", classname = "InfantryPortal", isalien = true, done = true},
+            {cinematic = "cinematics/marine/construct_big.cinematic", classname = "CommandStation", isalien = true, done = true},
+            {cinematic = "cinematics/marine/construct_team2.cinematic", isalien = true },
         },        
     },
     
@@ -44,8 +55,8 @@ kMarineStructureEffects =
     {
         marineWelded =
         {
-            {cinematic = "cinematics/marine/mac/build.cinematic", isalien = false},
-            {sound = "sound/NS2.fev/marine/structures/mac/build", isalien = false, done = true},
+            {cinematic = "cinematics/marine/mac/build.cinematic"},	//, isalien = false
+            {sound = "sound/NS2.fev/marine/structures/mac/build", done = true},	//, isalien = false
         },
     },
 

@@ -1,6 +1,12 @@
-shader = "models/marine/marine.surface_shader"
+shader = "shaders/ColoredSkins.surface_shader"
+
 albedoMap = "models/marine/advanced_armory/advanced_armory.dds"
 normalMap = "models/marine/advanced_armory/advanced_armory_normal.dds"
 emissiveMap = "models/marine/advanced_armory/advanced_armory_illum.dds"
 specularMap = "models/marine/advanced_armory/advanced_armory_spec.dds"
+
+modelColorMap = "models/marine/advanced_armory/advanced_armory_colormap.dds"
+numColumns = 1
+numRows = 1
+
 surface = "metal"

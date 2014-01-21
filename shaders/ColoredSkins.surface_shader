@@ -228,6 +228,17 @@
 				//TODO Add support for Accent(G-Channel) to define coloration of emissive layer, with atlas support
 				
 				float3 emissiveTex = tex2D( emissiveMap, input.texCoord ).rgb;
+				
+				if( modelColorMapTex.g > 0 && emissiveTex.r == 0 && modelColorMapTex.a > 0 ) {
+					emissiveTex.r = modelColorMapTex.g;
+				}
+				if( modelColorMapTex.g > 0 && emissiveTex.g == 0 && modelColorMapTex.a > 0 ) {
+					emissiveTex.g = modelColorMapTex.g;
+				}
+				if( modelColorMapTex.g > 0 && emissiveTex.b == 0 && modelColorMapTex.a > 0 ) {
+					emissiveTex.b = modelColorMapTex.g;
+				}
+				
 				float3 greyEmissive = dot( emissiveTex.rgb, float3(0.299, 0.587, 0.114) ); //NTSC grey
 				//float3 tmpEmissiveModelColor = clamp( modelColorAccent.rgb / modelColorMapTex.a, 0.0, 1.0 );	//adjust per colorMap alpha
 				

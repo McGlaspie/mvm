@@ -126,7 +126,7 @@ function ConstructMixin:Construct(elapsedTime, builder)
             
             local techNode = nil
             local techTree = nil
-            //Temp hack
+            //Temp hack until PN ownership in
             if not self:isa("PowerPoint") then
 				local techTree = self:GetTeam():GetTechTree()
 				local techNode = techTree:GetTechNode(self:GetTechId())
@@ -198,7 +198,14 @@ function ConstructMixin:Construct(elapsedTime, builder)
     if playAV then
 		
         local builderClassName = builder and builder:GetClassName()
-        self:TriggerEffects("construct", {classname = self:GetClassName(), doer = builderClassName })	//, isalien = GetIsAlienUnit(self)
+        local constructEffectName = "construct"
+        
+        if builder.GetTeamNumber and builder:GetTeamNumber() == kTeam2Index then
+			constructEffectName = "construct_team2"
+		end
+		Print("constructEffectName = " .. constructEffectName)
+		
+		self:TriggerEffects( constructEffectName , {classname = self:GetClassName(), doer = builderClassName })
         
     end 
     
