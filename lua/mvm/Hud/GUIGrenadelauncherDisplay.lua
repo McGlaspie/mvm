@@ -114,9 +114,9 @@ function GUIGrenadelauncherDisplay:UpdateTeamColors()
 	self.background:SetFloatParameter( "teamBaseColorG", ui_color.g )
 	self.background:SetFloatParameter( "teamBaseColorB", ui_color.b )
 	
-	self.viewPitch:SetFloatParameter( "teamBaseColorR", kGUI_NameTagFontColors[self.teamNumber].r )
-	self.viewPitch:SetFloatParameter( "teamBaseColorG", kGUI_NameTagFontColors[self.teamNumber].g )
-	self.viewPitch:SetFloatParameter( "teamBaseColorB", kGUI_NameTagFontColors[self.teamNumber].b )
+	self.viewPitch:SetFloatParameter( "teamBaseColorR", ui_color.r )
+	self.viewPitch:SetFloatParameter( "teamBaseColorG", ui_color.g )
+	self.viewPitch:SetFloatParameter( "teamBaseColorB", ui_color.b )
 
 	for i = 1, kNumGrenades do
 		

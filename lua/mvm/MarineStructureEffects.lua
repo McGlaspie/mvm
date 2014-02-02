@@ -143,6 +143,8 @@ kMarineStructureEffects =
             {sound = "sound/NS2.fev/marine/power_node/fixed_powerup", classname = "PowerPoint", done = true},
         },
     },
+    
+    //TODO Add other PowerPoint related sounds
 
     mac_construct =
     {

@@ -41,13 +41,15 @@ GUIUnitStatus.kBlackTexture = "ui/black_dot.dds"
 local kStatusBgTexture = { 
 	[kTeam1Index] = "ui/unitstatus_marine.dds", 
 	[kTeam2Index] = "ui/unitstatus_marine.dds", 
-	[kTeamReadyRoom] = "ui/unitstatus_neutral.dds" 
+	[kTeamReadyRoom] = "ui/unitstatus_neutral.dds",
+	[kSpectatorIndex] = "ui/unitstatus_neutral.dds"
 }
 
 local kStatusFontColor = { 
 	[kTeam1Index] = Color(kMarineTeamColorFloat), 
 	[kTeam2Index] = Color(kAlienTeamColorFloat), 
-	[kTeamReadyRoom] = Color(1,1,1,1) 
+	[kTeamReadyRoom] = Color(1,1,1,1),
+	[kSpectatorIndex] = Color(1,1,1,1)
 }
 
 GUIUnitStatus.kStatusBgSize = GUIScale( Vector(168, 70, 0) )
@@ -282,7 +284,7 @@ local function CreateBlipItem(self)
     newBlip.HealthBarBg:SetTexturePixelCoordinates(unpack(GUIUnitStatus.kUnitStatusBarTexCoords))
     
     newBlip.HealthBar = GetGUIManager():CreateGraphicItem()
-    newBlip.HealthBar:SetColor(kHealthBarColors[ teamNumber ])
+    newBlip.HealthBar:SetColor( kHealthBarColors[ teamNumber ] )
     newBlip.HealthBar:SetSize(Vector(kHealthBarWidth, kHealthBarHeight, 0))
     newBlip.HealthBar:SetTexture(neutralTexture)
     newBlip.HealthBar:SetTexturePixelCoordinates(unpack(GUIUnitStatus.kUnitStatusBarTexCoords))

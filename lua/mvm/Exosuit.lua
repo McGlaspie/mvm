@@ -1,30 +1,53 @@
 
-
+Script.Load("lua/mvm/TeamMixin.lua")
+Script.Load("lua/mvm/SelectableMixin.lua")
+Script.Load("lua/mvm/LiveMixin.lua")
 Script.Load("lua/mvm/LOSMixin.lua")
-Script.Load("lua/mvm/ColoredSkinsMixin.lua")
-Script.Load("lua/PostLoadMod.lua")
+Script.Load("lua/mvm/WeldableMixin.lua")
+Script.Load("lua/mvm/PickupableMixin.lua")
+if Client then
+	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+	Script.Load("lua/mvm/CommanderGlowMixin.lua")
+end
+
+
 
 local newNetworkVars = {}
 
-//-----------------------------------------------------------------------------
 
 AddMixinNetworkVars(LOSMixin, newNetworkVars)
 
+
 //-----------------------------------------------------------------------------
 
-local oldExosuitCreate = Exosuit.OnCreate
-function Exosuit:OnCreate()
 
-	oldExosuitCreate(self)
-	
-	InitMixin(self, EntityChangeMixin)
-	InitMixin(self, LOSMixin)
-	
-	if Client then
-		InitMixin(self, ColoredSkinsMixin)
-	end
+function Exosuit:OnCreate ()
 
+    ScriptActor.OnCreate(self)
+    
+    InitMixin(self, BaseModelMixin)
+    InitMixin(self, ModelMixin)
+    InitMixin(self, TeamMixin)
+    InitMixin(self, SelectableMixin)
+    InitMixin(self, LiveMixin)
+    InitMixin(self, ParasiteMixin)
+    InitMixin(self, GameEffectsMixin)
+    InitMixin(self, CorrodeMixin)
+    InitMixin(self, EntityChangeMixin)
+    InitMixin(self, LOSMixin)
+    
+    InitMixin(self, PickupableMixin, { kRecipientType = "Marine" })
+
+    self:SetPhysicsGroup(PhysicsGroup.SmallStructuresGroup)
+    
+    if Client then
+		InitMixin(self, CommanderGlowMixin)
+        InitMixin(self, UnitStatusMixin)
+        InitMixin(self, ColoredSkinsMixin)
+    end
+    
 end
+
 
 local orgExosuitInit = Exosuit.OnInitialized
 function Exosuit:OnInitialized()

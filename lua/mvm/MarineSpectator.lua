@@ -1,8 +1,6 @@
 
 
-Script.Load("lua/PostLoadMod.lua")
 
-//-----------------------------------------------------------------------------
 
 function MarineSpectator:OnCreate()
 	

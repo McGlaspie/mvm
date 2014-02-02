@@ -48,6 +48,18 @@ function PowerConsumerMixin:OnUpdateRender()
         end
     
     end
+    
+    if HasMixin( self, "ColoredSkins" ) and not self:GetIsAlive() then
+		
+		self.skinAccentColor = unpoweredColor	//FIXME preventing dissolve from being colorized
+		
+		if HasMixin( self, "Dissolve" ) then
+			if self.dissolveStart ~= nil and self.dissolveStart <= Shared.GetTime() then
+				self.skinAcentColor = self:GetAccentSkinColor()
+			end
+		end
+		
+	end
 
 end
 

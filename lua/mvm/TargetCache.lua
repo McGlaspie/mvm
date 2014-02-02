@@ -3,7 +3,6 @@
 // lua\TargetCache.lua
 //
 //    Created by:   Mats Olsson (mats.olsson@matsotech.se)
-//	  Modified By: Brock 'McGlaspie' Gillespie
 //
 // Modifications:
 // Instead of working under the assumptiong that there will be two teams of distinct TYPES
@@ -258,26 +257,38 @@ function StaticTargetType:OnEntityAdded(entity)
     end
 end
 
-function StaticTargetType:OnEntityMoved(entity)
+function StaticTargetType:OnEntityMoved( entity )
+	
+	assert( type(self.cacheMap) == "table" )
+	
     for id,cache in pairs(self.cacheMap) do
         cache:OnEntityMoved(entity) 
     end
+    
 end
 
 function StaticTargetType:OnEntityRemoved(entity)
+	
+	assert( type(self.cacheMap) == "table" )
+	
     for id,cache in pairs(self.cacheMap) do
         cache:OnEntityRemoved(entity)
     end
+    
 end
+
+
 
 class 'StaticTargetCache'
 
 function StaticTargetCache:Init(targetType, selector)
+	
     self.targetType = targetType
     self.selector = selector
     self.targetIdToRangeMap = nil 
 
     return self
+    
 end
 
 function StaticTargetCache:Log(formatString, ...)

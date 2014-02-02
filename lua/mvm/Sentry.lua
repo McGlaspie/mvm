@@ -1,13 +1,25 @@
 
-
+Script.Load("lua/mvm/LOSMixin.lua")
+Script.Load("lua/mvm/LiveMixin.lua")
+Script.Load("lua/mvm/TeamMixin.lua")
+Script.Load("lua/mvm/DamageMixin.lua")
+Script.Load("lua/mvm/ConstructMixin.lua")
+Script.Load("lua/mvm/SelectableMixin.lua")
+Script.Load("lua/mvm/GhostStructureMixin.lua")
 Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
+Script.Load("lua/mvm/WeldableMixin.lua")
+Script.Load("lua/mvm/DissolveMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
-Script.Load("lua/mvm/ColoredSkinsMixin.lua")
-Script.Load("lua/PostLoadMod.lua")
 Script.Load("lua/mvm/SupplyUserMixin.lua")
+if Client then
+	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+	Script.Load("lua/mvm/CommanderGlowMixin.lua")
+end
+
 
 //-----------------------------------------------------------------------------
+
 
 local kSpinUpSoundName = PrecacheAsset("sound/NS2.fev/marine/structures/sentry_spin_up")
 local kSpinDownSoundName = PrecacheAsset("sound/NS2.fev/marine/structures/sentry_spin_down")
@@ -64,7 +76,7 @@ function Sentry:OnCreate()		//OVERRIDES
     InitMixin(self, SelectableMixin)
     InitMixin(self, EntityChangeMixin)
     InitMixin(self, LOSMixin)
-    //InitMixin(self, CorrodeMixin)
+    InitMixin(self, CorrodeMixin)
     InitMixin(self, ConstructMixin)
     InitMixin(self, ResearchMixin)
     InitMixin(self, RecycleMixin)
@@ -76,8 +88,8 @@ function Sentry:OnCreate()		//OVERRIDES
     InitMixin(self, OrdersMixin, { kMoveOrderCompleteDistance = kAIMoveOrderCompleteDistance })
     InitMixin(self, DissolveMixin)
     InitMixin(self, GhostStructureMixin)
-    //InitMixin(self, VortexAbleMixin)
-    //InitMixin(self, ParasiteMixin)
+    InitMixin(self, VortexAbleMixin)
+    InitMixin(self, ParasiteMixin)
 	
 	InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)

@@ -47,6 +47,7 @@ if Client then
 end
 
 
+Script.Load("lua/mvm/ResourcePoint.lua")
 Script.Load("lua/mvm/ResourceTower.lua")
 
 Script.Load("lua/mvm/Location.lua")
@@ -70,12 +71,16 @@ Script.Load("lua/mvm/Observatory.lua")
 Script.Load("lua/mvm/PhaseGate.lua")
 Script.Load("lua/mvm/RoboticsFactory.lua")
 Script.Load("lua/mvm/PrototypeLab.lua")
+Script.Load("lua/mvm/CommandStructure.lua")
 Script.Load("lua/mvm/CommandStation.lua")
 Script.Load("lua/mvm/Sentry.lua")
 Script.Load("lua/mvm/ARC.lua")
 Script.Load("lua/mvm/InfantryPortal.lua")
 Script.Load("lua/mvm/PowerPoint.lua")
 Script.Load("lua/mvm/SentryBattery.lua")
+Script.Load("lua/mvm/AmmoPack.lua")
+Script.Load("lua/mvm/MedPack.lua")
+Script.Load("lua/mvm/CatPack.lua")
 
 
 Script.Load("lua/mvm/CommAbilities/Marine/Scan.lua")

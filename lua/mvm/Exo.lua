@@ -2,8 +2,14 @@
 
 Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
-Script.Load("lua/mvm/ColoredSkinsMixin.lua")
-Script.Load("lua/PostLoadMod.lua")	//this really needed for all scripts that call override stuffs?
+Script.Load("lua/mvm/LOSMixin.lua")
+Script.Load("lua/mvm/WeldableMixin.lua")
+Script.Load("lua/mvm/SelectableMixin.lua")
+Script.Load("lua/mvm/DissolveMixin.lua")
+if Client then
+	Script.Load("lua/mvm/CommanderGlowMixin.lua")
+	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+end
 
 
 local newNetworkVars = {}
@@ -20,28 +26,74 @@ local kExoFirstPersonHitEffectName = PrecacheAsset("cinematics/marine/exo/hit_vi
 local kExoViewDamaged = PrecacheAsset("cinematics/marine/exo/hurt_view.cinematic")
 local kExoViewHeavilyDamaged = PrecacheAsset("cinematics/marine/exo/hurt_severe_view.cinematic")
 
+local kIdle2D = PrecacheAsset("sound/NS2.fev/marine/heavy/idle_2D")
 
 AddMixinNetworkVars(FireMixin, newNetworkVars)
 AddMixinNetworkVars(DetectableMixin, newNetworkVars)
 
+
 //-----------------------------------------------------------------------------
 
 
-local oldExoCreate = Exo.OnCreate
-function Exo:OnCreate()
-	
-	oldExoCreate(self)
-	
-	InitMixin(self, FireMixin)
+function Exo:OnCreate()	//OVERRIDES
+
+    Player.OnCreate(self)
+    
+    InitMixin(self, BaseMoveMixin, { kGravity = Player.kGravity })
+    InitMixin(self, GroundMoveMixin)
+    InitMixin(self, VortexAbleMixin)
+    InitMixin(self, LOSMixin)
+    InitMixin(self, CameraHolderMixin, { kFov = kExoFov })
+    InitMixin(self, ScoringMixin, { kMaxScore = kMaxScore })
+    InitMixin(self, WeldableMixin)
+    InitMixin(self, CombatMixin)
+    InitMixin(self, SelectableMixin)
+    InitMixin(self, CorrodeMixin)
+    InitMixin(self, TunnelUserMixin)
+    InitMixin(self, ParasiteMixin)
+    InitMixin(self, MarineActionFinderMixin)
+    InitMixin(self, WebableMixin)
+    InitMixin(self, MarineVariantMixin)
+    
+    InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
-	
-	if Client then
-		
-		InitMixin(self, ColoredSkinsMixin)
-		
-		if self.flashlight ~= nil then
-			Client.DestroyRenderLight(self.flashlight)
-		end
+    
+    self:SetIgnoreHealth(true)
+    
+    self.deployed = false
+    
+    self.flashlightOn = false
+    self.flashlightLastFrame = false
+    self.idleSound2DId = Entity.invalidId
+    self.timeThrustersEnded = 0
+    self.timeThrustersStarted = 0
+    self.inventoryWeight = 0
+    self.thrusterMode = kExoThrusterMode.Vertical
+    self.catpackboost = false
+    self.timeCatpackboost = 0
+    self.ejecting = false
+    
+    self.creationTime = Shared.GetTime()
+    
+    if Server then
+    
+        self.idleSound2D = Server.CreateEntity(SoundEffect.kMapName)
+        self.idleSound2D:SetAsset( kIdle2D )
+        self.idleSound2D:SetParent(self)
+        self.idleSound2D:Start()
+        
+        // Only sync 2D sound with this Exo player.
+        self.idleSound2D:SetPropagate(Entity.Propagate_Callback)
+        function self.idleSound2D.OnGetIsRelevant(_, player)
+            return player == self
+        end
+        
+        self.idleSound2DId = self.idleSound2D:GetId()
+        
+    elseif Client then
+    
+        InitMixin(self, ColoredSkinsMixin)
+        InitMixin(self, CommanderGlowMixin)
 		
 		self.flashlight = Client.CreateRenderLight()
         
@@ -53,14 +105,16 @@ function Exo:OnCreate()
 		end
         self.flashlight:SetInnerCone(math.rad(32))
         self.flashlight:SetOuterCone(math.rad(48))
-        self.flashlight:SetIntensity(10)
-        self.flashlight:SetRadius(25)
+        self.flashlight:SetIntensity(18)
+        self.flashlight:SetRadius(26)
         self.flashlight:SetGoboTexture("models/marine/male/flashlight.dds")
-        self.flashlight:SetAtmosphericDensity( 0.015 )
+        self.flashlight:SetAtmosphericDensity( 0.25 )
         
         self.flashlight:SetIsVisible(false)
-		
-	end
+        
+        self.idleSound2DId = Entity.invalidId
+
+    end
 	
 end
 

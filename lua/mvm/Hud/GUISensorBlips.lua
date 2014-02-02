@@ -18,13 +18,13 @@ GUISensorBlips.kBlipImageName = "ui/sensor.dds"
 GUISensorBlips.kFontName = "fonts/Arial_15.fnt"
 GUISensorBlips.kFontSize = GUIScale(30)
 
-GUISensorBlips.kDefaultBlipSize = 20
+GUISensorBlips.kDefaultBlipSize = 22	//20
 GUISensorBlips.kMaxBlipSize = 180
 
 GUISensorBlips.kAlphaPerSecond = 0.8
-GUISensorBlips.kImpulseIntervall = 2.5
+GUISensorBlips.kImpulseIntervall = 2	//2.5
 
-GUISensorBlips.kRotationDuration = 5
+GUISensorBlips.kRotationDuration = 3.5	//5
 
 function GUISensorBlips:Initialize()
 
@@ -66,11 +66,14 @@ function GUISensorBlips:UpdateAnimations(deltaTime)
         self.timeLastImpulse = Shared.GetTime()
     end  
 	
+	local ui_baseColor = Color( 1, 0, 0, 1 )
+	/*
 	local ui_baseColor = ConditionalValue( 
 		PlayerUI_GetTeamNumber() == kTeam1Index, 
-		kGUI_Team1_BaseColor, 
-		kGUI_Team2_BaseColor 
+		kGUI_Team1_AccentColor, 
+		kGUI_Team2_AccentColor 
 	)
+	*/
 
     local destAlpha = math.max(0, 1 - (Shared.GetTime() - self.timeLastImpulse) * GUISensorBlips.kAlphaPerSecond)  
     
@@ -100,7 +103,7 @@ function GUISensorBlips:UpdateAnimations(deltaTime)
 			destAlpha = ConditionalValue( blip.Obstructed, destAlpha * blip.Radius, currentColor.a - GUISensorBlips.kAlphaPerSecond * deltaTime)
 		end
 		
-        currentColor.a = destAlpha
+        currentColor.a = destAlpha + 0.25
         blip.GraphicsItem:SetColor(currentColor)
         blip.TextItem:SetColor(currentColor)
         

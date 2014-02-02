@@ -1,6 +1,5 @@
 
 
-Script.Load("lua/PostLoadMod.lua")
 
 
 function LayMines:GetIsValidRecipient(recipient)

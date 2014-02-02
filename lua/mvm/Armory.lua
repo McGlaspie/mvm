@@ -1,10 +1,19 @@
 
-
-Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+Script.Load("lua/mvm/LiveMixin.lua")
+Script.Load("lua/mvm/TeamMixin.lua")
+Script.Load("lua/mvm/SelectableMixin.lua")
+Script.Load("lua/mvm/LOSMixin.lua")
+Script.Load("lua/mvm/ConstructMixin.lua")
+Script.Load("lua/mvm/GhostStructureMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
+Script.Load("lua/mvm/WeldableMixin.lua")
+Script.Load("lua/mvm/DissolveMixin.lua")
 Script.Load("lua/mvm/PowerConsumerMixin.lua")
 Script.Load("lua/mvm/DetectableMixin.lua")
-Script.Load("lua/PostLoadMod.lua")
+if Client then
+	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+	Script.Load("lua/mvm/CommanderGlowMixin.lua")
+end
 Script.Load("lua/mvm/SupplyUserMixin.lua")
 
 
@@ -12,6 +21,7 @@ local newNetworkVars = {}
 
 AddMixinNetworkVars(FireMixin, newNetworkVars)
 AddMixinNetworkVars(DetectableMixin, newNetworkVars)
+AddMixinNetworkVars(DissolveMixin, newNetworkVars)
 
 
 //-----------------------------------------------------------------------------
@@ -43,6 +53,7 @@ function Armory:OnCreate()	//OVERRIDES
     InitMixin(self, CombatMixin)
     InitMixin(self, PowerConsumerMixin)
     InitMixin(self, ParasiteMixin)
+    
     InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
     
@@ -167,7 +178,7 @@ if Server then
 		end
 		
 	end
-
+	
 	
 	function Armory:OverrideRemoveSupply( team )
 

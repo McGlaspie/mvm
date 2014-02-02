@@ -3,7 +3,6 @@
 //
 //
 
-Script.Load("lua/PostLoadMod.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
 Script.Load("lua/mvm/LiveMixin.lua")
 

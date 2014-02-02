@@ -26,8 +26,15 @@ function ClipWeapon:OnCreate()
     
 end
 
+
 function ClipWeapon:SetTeamNumber( teamNumber )
 	self.teamNumber = teamNumber
+end
+
+
+// Play tracer sound/effect every %d bullets
+function ClipWeapon:GetTracerEffectFrequency()
+    return 1	//0.5
 end
 
 

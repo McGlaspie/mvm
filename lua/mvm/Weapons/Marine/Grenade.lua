@@ -1,5 +1,4 @@
 
-Script.Load("lua/PostLoadMod.lua")
 
 
 if Server then

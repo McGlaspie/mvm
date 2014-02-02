@@ -45,7 +45,7 @@ kSentriesPerBattery = 3		//MvM upgradable?
 kDefaultStructureCost = 10
 kStructureCircleRange = 4
 kInfantryPortalUpgradeCost = 10
-kInfantryPortalAttachRange = 10
+kInfantryPortalAttachRange = 12	//10
 kArmoryWeaponAttachRange = 10
 
 // Minimum distance that initial IP spawns away from team location
@@ -122,9 +122,9 @@ kLightShakeBaseSpeed = 30
 kLightShakeVariableSpeed = 30
 
 // Jetpack
-kJetpackUseFuelRate = .25
+kJetpackUseFuelRate = .3	//.25
 kJetpackUpgradeUseFuelRate = .15
-kJetpackReplenishFuelRate = .35
+kJetpackReplenishFuelRate = .3	//.35
 
 // Mines
 kNumMines = 3

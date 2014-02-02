@@ -1,9 +1,15 @@
 
-
+Script.Load("lua/mvm/LiveMixin.lua")
+Script.Load("lua/mvm/TeamMixin.lua")
+Script.Load("lua/mvm/DamageMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
-Script.Load("lua/mvm/ColoredSkinsMixin.lua")
-Script.Load("lua/PostLoadMod.lua")
+Script.Load("lua/mvm/WeldableMixin.lua")
+Script.Load("lua/mvm/ElectroMagneticMixin.lua")
 //Script.Load("lua/mvm/DetectableMixin.lua")
+if Client then
+	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+	Script.Load("lua/mvm/CommanderGlowMixin.lua")
+end
 
 
 // The amount of time until the mine is detonated once armed.
@@ -21,17 +27,41 @@ local kMineMaxShakeIntensity = 0.13
 local newNetworkVars = {}
 
 AddMixinNetworkVars(FireMixin, newNetworkVars)
+AddMixinNetworkVars(ElectroMagneticMixin, newNetworkVars)
+
 
 //-----------------------------------------------------------------------------
 
-local oldMineCreate = Mine.OnCreate
-function Mine:OnCreate()
 
-	oldMineCreate(self)
-	
-	InitMixin(self, FireMixin)
+function Mine:OnCreate()	//OVERRIDES
+
+	ScriptActor.OnCreate(self)
+    
+    InitMixin(self, BaseModelMixin)
+    InitMixin(self, ClientModelMixin)
+    InitMixin(self, LiveMixin)
+    InitMixin(self, GameEffectsMixin)
+    InitMixin(self, StunMixin)
+    InitMixin(self, TeamMixin)
+    InitMixin(self, DamageMixin)
+    InitMixin(self, VortexAbleMixin)
+    InitMixin(self, ParasiteMixin)
+    
+    InitMixin(self, FireMixin)
+    InitMixin(self, ElectroMagneticMixin)
+    
+    if Server then
+    
+        // init after OwnerMixin since 'OnEntityChange' is expected callback
+        InitMixin(self, EntityChangeMixin)
+        InitMixin(self, SleeperMixin)
+        
+        self:SetUpdates(true)
+        
+    end
 	
 	if Client then
+		InitMixin(self, CommanderGlowMixin)
 		InitMixin(self, ColoredSkinsMixin)
 	end
 
@@ -55,7 +85,6 @@ if Client then
 		self.skinBaseColor = self:GetBaseSkinColor()
 		self.skinAccentColor = self:GetAccentSkinColor()
 		self.skinTrimColor = self:GetTrimSkinColor()
-		//self.skinAtlasIndex = self:GetTeamNumber() - 1
 		self.skinAtlasIndex = 0
 	end
 
@@ -217,6 +246,7 @@ if Server then
     
         local now = Shared.GetTime()
         self.lastMineUpdateTime = self.lastMineUpdateTime or now
+        
         if now - self.lastMineUpdateTime >= 0.5 then
             MvM_CheckAllEntsInTriggerExplodeMine(self)
             self.lastMineUpdateTime = now
@@ -230,16 +260,20 @@ end	//Server
 if Client then
 
     function Mine:OnGetIsVisible(visibleTable, viewerTeamNumber)
+		
         local player = Client.GetLocalPlayer()
         
         if player and player:isa("Commander") and viewerTeamNumber == GetEnemyTeamNumber(self:GetTeamNumber()) then
             visibleTable.Visible = false
         end
+        
     end
 
 end	//Client
 
+
 //-----------------------------------------------------------------------------
+
 
 Class_Reload("Mine", newNetworkVars)
 

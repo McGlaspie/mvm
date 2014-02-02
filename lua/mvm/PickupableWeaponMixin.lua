@@ -1,5 +1,6 @@
 
 Script.Load("lua/PickupableWeaponMixin.lua")
+Script.Load("lua/mvm/EquipmentOutline.lua")
 
 
 function PickupableWeaponMixin:GetIsValidRecipient(recipient)

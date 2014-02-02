@@ -2,11 +2,11 @@
 
 local kLifeTime = 1.2
 
-local kGrenadeCameraShakeDistance = 15
+local kGrenadeCameraShakeDistance = 12	//15
 local kGrenadeMinShakeIntensity = 0.01
-local kGrenadeMaxShakeIntensity = 0.14
+local kGrenadeMaxShakeIntensity = 0.12
 
-local kGrenadeDetonationTriggerRange = 2.5
+local kGrenadeDetonationTriggerRange = 2.25
 
 
 //-----------------------------------------------------------------------------
@@ -29,11 +29,9 @@ local function EnergyDamage(hitEntities, origin, radius, damage)
             entity:SetEnergy(entity:GetEnergy() - energyToDrain)
         
         end
-		/*
-        if entity.SetElectrified then
-            entity:SetElectrified( kElectrifiedDuration )
-        end
-		*/
+		
+		//TODO Add EMP's affected?
+        
     end
 
 end
@@ -62,7 +60,7 @@ function PulseGrenade:Detonate( targetHit )	//OVERRIDES
     end
     
     RadiusDamage( hitEntities, self:GetOrigin(), kPulseGrenadeDamageRadius, kPulseGrenadeDamage, self )
-    EnergyDamage( hitEntities, self:GetOrigin(), kPulseGrenadeEnergyDamageRadius, kPulseGrenadeEnergyDamage )
+    //EnergyDamage( hitEntities, self:GetOrigin(), kPulseGrenadeEnergyDamageRadius, kPulseGrenadeEnergyDamage )
 
     local surface = GetSurfaceFromEntity(targetHit)
 

@@ -1,11 +1,21 @@
 
-
+Script.Load("lua/mvm/LOSMixin.lua")
+Script.Load("lua/mvm/LiveMixin.lua")
+Script.Load("lua/mvm/TeamMixin.lua")
+Script.Load("lua/mvm/ConstructMixin.lua")
+Script.Load("lua/mvm/SelectableMixin.lua")
+Script.Load("lua/mvm/GhostStructureMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
+Script.Load("lua/mvm/WeldableMixin.lua")
+Script.Load("lua/mvm/DissolveMixin.lua")
 Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
-Script.Load("lua/PostLoadMod.lua")
 Script.Load("lua/mvm/SupplyUserMixin.lua")
+if Client then
+	Script.Load("lua/mvm/CommanderGlowMixin.lua")
+end
+
 
 local newNetworkVars = {}
 
@@ -18,20 +28,47 @@ AddMixinNetworkVars(ElectroMagneticMixin, newNetworkVars)
 //-----------------------------------------------------------------------------
 
 
-local oldSentryBatteryCreate = SentryBattery.OnCreate
-function SentryBattery:OnCreate()
+function SentryBattery:OnCreate()	//OVERRIDES
 
-	oldSentryBatteryCreate(self)
-	
-	InitMixin(self, FireMixin)
+	ScriptActor.OnCreate(self)
+    
+    InitMixin(self, BaseModelMixin)
+    InitMixin(self, ClientModelMixin)
+    InitMixin(self, LiveMixin)
+    InitMixin(self, GameEffectsMixin)
+    InitMixin(self, FlinchMixin)
+    InitMixin(self, TeamMixin)
+    InitMixin(self, PointGiverMixin)
+    InitMixin(self, SelectableMixin)
+    InitMixin(self, EntityChangeMixin)
+    InitMixin(self, LOSMixin)
+    InitMixin(self, CorrodeMixin)
+    InitMixin(self, ConstructMixin)
+    InitMixin(self, ResearchMixin)
+    InitMixin(self, RecycleMixin)
+    InitMixin(self, CombatMixin)
+    InitMixin(self, ObstacleMixin)
+    InitMixin(self, DissolveMixin)
+    InitMixin(self, GhostStructureMixin)
+    InitMixin(self, VortexAbleMixin)
+    InitMixin(self, PowerConsumerMixin)
+    InitMixin(self, ParasiteMixin)
+    
+    InitMixin(self, FireMixin)
 	InitMixin(self, DetectableMixin)
 	InitMixin(self, ElectroMagneticMixin)
     
     if Client then
-		InitMixin(self, ColoredSkinsMixin)
+        InitMixin(self, CommanderGlowMixin)
+        InitMixin(self, ColoredSkinsMixin)
     end
+    
+    self:SetLagCompensated(false)
+    self:SetPhysicsType(PhysicsType.Kinematic)
+    self:SetPhysicsGroup(PhysicsGroup.BigStructuresGroup)
 
 end
+
 
 local orgSentryBattInit = SentryBattery.OnInitialized
 function SentryBattery:OnInitialized()

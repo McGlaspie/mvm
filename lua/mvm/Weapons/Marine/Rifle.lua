@@ -1,5 +1,4 @@
 
-Script.Load("lua/PostLoadMod.lua")
 
 Script.Load("lua/mvm/Weapons/Marine/ClipWeapon.lua")
 Script.Load("lua/mvm/PickupableWeaponMixin.lua")
@@ -11,7 +10,7 @@ local newNetworkVars = {}
 //-----------------------------------------------------------------------------
 
 function Rifle:GetSpread()
-    return ClipWeapon.kCone3Degrees
+    return ClipWeapon.kCone4Degrees	//3
 end
 
 

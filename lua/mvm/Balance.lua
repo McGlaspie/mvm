@@ -17,6 +17,13 @@ Script.Load("lua/BalanceMisc.lua")
 //-----------------------------------------------------------------------------
 // MARINE DAMAGE
 
+kNanoShieldDamageReductionDamage = 0.75	//0.5
+
+kInfestationCorrodeDamagePerSecond = 15
+
+kEmpDamageEffectsDuration = 3
+
+
 kRifleDamage = 12	//10
 kRifleDamageType = kDamageType.Normal
 kRifleClipSize = 50		//Note: changing this is can break rifle animation timing
@@ -32,20 +39,15 @@ kWelderDamagePerSecond = 45	//NS2 - 30
 kWelderDamageType = kDamageType.Structural
 kWelderFireDelay = 0.2		//.2	Does this affect repair rates?
 kWelderWeldDelay = 0.3
+kSelfWeldAmount = 5
+kPlayerArmorWeldRate = 20
 
-kAxeDamage = 35
-kAxeDamageType = kDamageType.Structural
-
-kGrenadeLauncherGrenadeDamage = 110
-kGrenadeLauncherGrenadeDamageType = kDamageType.Structural
-kGrenadeLauncherClipSize = 4
-kGrenadeLauncherGrenadeDamageRadius = 4	//6
-kGrenadeLifetime = 2	//2.5
-
+kAxeDamage = 15		//25 - orgMvM: 35 
+kAxeDamageType = kDamageType.Puncture	//Structural
 
 kPulseGrenadeDamageRadius = 6
 kPulseGrenadeEnergyDamageRadius = 10
-kPulseGrenadeDamage = 125
+kPulseGrenadeDamage = 75	//125
 kPulseGrenadeEnergyDamage = 50
 kPulseGrenadeDamageType = kDamageType.ElectroMagnetic
 
@@ -55,26 +57,34 @@ kClusterFragmentDamageRadius = 5	//6
 kClusterFragmentDamage = 25		//20
 kClusterGrenadeDamageType = kDamageType.Flame
 
-kNerveGasDamagePerSecond = 15	//50
+kNerveGasDamagePerSecond = 12	//50
 kNerveGasDamageType = kDamageType.Gas	//I.e. Lerk Spores, HP only
 
-
+kShotgunFireRate = 0.88
 kShotgunDamage = 17
 kShotgunDamageType = kDamageType.Normal
 kShotgunClipSize = 8
 kShotgunBulletsPerShot = 10
 kShotgunRange = 38	//NS2 - 30
 
-kFlamethrowerDamage = 7.5
-kFlamethrowerDamageType = kDamageType.Flame
-kFlamethrowerClipSize = 30
+kGrenadeLauncherGrenadeDamage = 110
+kGrenadeLauncherGrenadeDamageType = kDamageType.Structural
+kGrenadeLauncherClipSize = 4
+kGrenadeLauncherGrenadeDamageRadius = 4	//4.8
+kGrenadeLifetime = 2	//2.5
+kGrenadeUpgradedLifetime = 1.5
 
+kFlamethrowerDamage = 10			//15
+kFlamethrowerDamageType = kDamageType.Flame
+kFlamethrowerClipSize = 40			//50
+kFlamethrowerRange = 10				//9
+kFlamethrowerUpgradedRange = 12		//11.5
 kBurnDamagePerStackPerSecond = 3
-kFlamethrowerMaxStacks = 25	//20
-kFlamethrowerBurnDuration = 7	//6
-kFlamethrowerStackRate = 0.75	//0.4
-kFlameRadius = 1.75
-kFlameDamageStackWeight = 0.1	//0.2
+kFlamethrowerMaxStacks = 25			//20
+kFlamethrowerBurnDuration = 7		//6
+kFlamethrowerStackRate = 0.8		//0.4
+kFlameRadius = 1.75					//1.8
+kFlameDamageStackWeight = 0.1		//0.5
 
 kWhileBurningWeldEffectReduction = 0.5
 kBurnDamageMarineStructureReduction = 1	//0.15
@@ -102,8 +112,10 @@ kRailgunWeight = 0.08
 
 
 kMACAttackDamage = 5
+kMACEMPBlastDamage = 25
 kMACAttackDamageType = kDamageType.Normal	//Light?
 kMACAttackFireDelay = 0.6
+kMACEMPCooldown = kEmpDamageEffectsDuration
 
 
 kMineDamage = 150	//NS2 - 125
@@ -128,9 +140,6 @@ kWeapons1DamageScalar = 1.1
 kWeapons2DamageScalar = 1.2
 kWeapons3DamageScalar = 1.3
 
-kNanoShieldDamageReductionDamage = 0.75	//0.5
-
-kInfestationCorrodeDamagePerSecond = 15
 
 
 //-----------------------------------------------------------------------------

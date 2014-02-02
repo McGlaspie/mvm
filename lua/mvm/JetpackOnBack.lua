@@ -1,7 +1,6 @@
 
 
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
-Script.Load("lua/PostLoadMod.lua")
 
 //-----------------------------------------------------------------------------
 
@@ -26,6 +25,8 @@ function JetpackOnBack:OnCreate()
 
 end
 
+
 //-----------------------------------------------------------------------------
+
 
 Class_Reload("JetpackOnBack", {})

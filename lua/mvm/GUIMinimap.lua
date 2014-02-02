@@ -9,6 +9,8 @@
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 Script.Load("lua/GUIMinimapConnection.lua")
+Script.Load("lua/mvm/GUIColorGlobals.lua")
+
 
 class 'GUIMinimap' (GUIScript)
 
@@ -330,14 +332,23 @@ function GUIMinimap:InitializeLocationNames()
         
     end
     
+    local player = Client.GetLocalPlayer()
+    local locationFontColor = ConditionalValue( //FIXME change to table lookup
+        player:GetTeamNumber() == kTeam2Index,
+        kGUI_Team2_BaseColor,
+        kGUI_Team1_BaseColor
+    )
+    locationFontColor.a = 0.65
+    
     for i, location in ipairs(uniqueLocationsData) do
 
         local posX, posY = PlotToMap(self, location.Origin.x, location.Origin.z)
 
         // Locations only supported on the big mode.
         local locationText = GUIManager:CreateTextItem()
-        SetupLocationTextItem(locationText)
-        locationText:SetColor(Color(1.0, 1.0, 1.0, 0.65))
+        SetupLocationTextItem( locationText )
+        locationText:SetColor( Color(1.0, 1.0, 1.0, 0.65) )
+        //locationText:SetColor( locationFontColor )
         locationText:SetText(location.Name)
         locationText:SetPosition( Vector(posX, posY, 0) )
 

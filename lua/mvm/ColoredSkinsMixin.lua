@@ -27,13 +27,15 @@
 //=============================================================================
 
 if Client then
-
-	Shared.PrecacheSurfaceShader("shaders/ColoredSkins.surface_shader")
-	Shared.PrecacheSurfaceShader("shaders/ColoredSkins_noemissive.surface_shader")
-	Shared.PrecacheSurfaceShader("shaders/ColoredSkinsViewModel.surface_shader")
-	Shared.PrecacheSurfaceShader("shaders/ColoredSkinsViewModel_emissive.surface_shader")
 	
-end
+	
+Shared.PrecacheSurfaceShader("shaders/ColoredSkins.surface_shader")
+Shared.PrecacheSurfaceShader("shaders/ColoredSkins_Emissive.surface_shader")
+Shared.PrecacheSurfaceShader("shaders/ColoredSkins_noemissive.surface_shader")
+Shared.PrecacheSurfaceShader("shaders/ColoredSkins_emissive_alpha.surface_shader")
+Shared.PrecacheSurfaceShader("shaders/ColoredSkins_emissive_alpha_noColorMap.surface_shader")
+Shared.PrecacheSurfaceShader("shaders/ColoredSkinsViewModel.surface_shader")
+Shared.PrecacheSurfaceShader("shaders/ColoredSkinsViewModel_emissive.surface_shader")
 
 
 gColoredSkinsToggle = true	//global to specify if colored skins are Active
@@ -47,6 +49,7 @@ gSkinColorOverrides = {
 	["accent"] = nil,
 	["trim"] = nil
 }
+
 
 
 //-----------------------------------------------------------------------------
@@ -104,11 +107,23 @@ end
 
 
 function ColoredSkinsMixin:SetAtlasIndex( newIdx )	//Incomplete, don't use
+	
     assert(  )  //TODO Add type check/numeric
 
 	if newIdx ~= nil and newIdx >= 0 then
 		self.skinAtlasIndex = newIdx
 	end
+	
+end
+
+
+function ColoredSkinsMixin:ResetSkin()
+	self:InitializeSkin()
+	self:InstanceMaterials()
+end
+
+
+function ColoredSkinsMixin:OnKillClient()
 end
 
 
@@ -201,7 +216,7 @@ function ColoredSkinsMixin:OnUpdateRender()
 		model:SetMaterialParameter( "modelColorTrimG", trimColor.g )
 		model:SetMaterialParameter( "modelColorTrimB", trimColor.b )
 		
-		//Set enabled state
+		//Set skinning enabled state
 		model:SetMaterialParameter( "colorizeModel", enabled )
 		
 		//Set Color Map Index of atlas texture
@@ -308,148 +323,157 @@ local function ColorAsParamInt( color )
 end
 
 
-if Client then
 
-	local function OnCommandGetEntityColorInfo()
+local function OnCommandGetEntityColorInfo()
+	
+	if Shared.GetCheatsEnabled() then
 		
-		if Shared.GetCheatsEnabled() then
+		local player = Client.GetLocalPlayer()
+		if player then
 			
-			local player = Client.GetLocalPlayer()
-			if player then
-				
-				local viewCoords = player:GetViewAngles():GetCoords()	//FIXME This is not working in this context
-				
-				local trace = Shared.TraceRay(player:GetOrigin(), player:GetOrigin() + viewCoords.zAxis * 1000, CollisionRep.Damage, PhysicsMask.Bullets, EntityFilterOne(player))
-				if trace.fraction < 1 then
-					
-					if trace.entity and HasMixin(trace.entity, "ColoredSkin") then
-						
-						Print( trace.entity:GetClassName() .. " ColoredSkinsMixin Info" )
-						Print("\t ColorMap Atlas Index: " .. tostring( trace.entity.skinAtlasIndex ) )
-						Print("\t BaseColor = " .. ColorAsParam( trace.entity.skinBaseColor ) )
-						Print("\t AccentColor = " .. ColorAsParam( trace.entity.skinBaseColor ) )
-						Print("\t TrimColor = " .. ColorAsParam( trace.entity.skinBaseColor ) )
-						Print("\t SkinEnabled = " .. tostring( trace.entity.skinColoringEnabled ) )
-						
-					end
-				
-				end
-				
-			end
-		
-		end
-
-	end
-
-
-	local function OnCommandToggleColoredSkins()
-		
-		if Shared.GetCheatsEnabled() then
+			local viewCoords = player:GetViewAngles():GetCoords()	//FIXME This is not working in this context
 			
-			gColoredSkinsToggle = ConditionalValue(
-				gColoredSkinsToggle == true,
-				false,
-				true
+			local trace = Shared.TraceRay( 
+				player:GetOrigin(), 
+				player:GetOrigin() + viewCoords.zAxis * 1000, 
+				CollisionRep.Damage, 
+				PhysicsMask.Bullets, 
+				EntityFilterOne(player)
 			)
 			
-		end
-
-	end
-
-
-	local function OnCommandChangeColorMapIndex(enable)
-
-		if Shared.GetCheatsEnabled() then
-			
-			//Toggle flipping through indicies
-			if enable == "true" or enable == "1" then
-				gColorMapIndexOverrideEnabled = true
-			elseif enable == "0" or enable == "false" then
-				gColorMapIndexOverrideEnabled = false
-			end
-			
-			if gColorMapIndexOverrideEnabled then
+			if trace.fraction ~= 1 then
 				
-				if gColorMapIndexOverride + 1 > gColorMapMaxIndex then
-					gColorMapIndexOverride = 0	//Roll back to begining of atlas
-				else
-					gColorMapIndexOverride = gColorMapIndexOverride + 1
+				if trace.entity and HasMixin( trace.entity, "ColoredSkin" ) then
+					
+					Print( trace.entity:GetClassName() .. " ColoredSkinsMixin Info" )
+					Print("\t ColorMap Atlas Index: " .. tostring( trace.entity.skinAtlasIndex ) )
+					Print("\t BaseColor = " .. ColorAsParam( trace.entity.skinBaseColor ) )
+					Print("\t AccentColor = " .. ColorAsParam( trace.entity.skinBaseColor ) )
+					Print("\t TrimColor = " .. ColorAsParam( trace.entity.skinBaseColor ) )
+					Print("\t SkinEnabled = " .. tostring( trace.entity.skinColoringEnabled ) )
+					
 				end
-				
-			end
-		
-		end
-
-	end
-
-
-	local function OnCommandOverrideSkinColor(layer, color)
-		
-		if Shared.GetCheatsEnabled() then
-		
-			if not layer and not color and not team then
-			//toggle color override state
-				gColorOverridesEnabled = ConditionalValue( gColorOverridesEnabled, false, true )
+			
 			end
 			
-			if layer and color then	//Require both params
+		end
+	
+	end
+
+end
+
+
+local function OnCommandToggleColoredSkins()
+	
+	if Shared.GetCheatsEnabled() then
+		
+		gColoredSkinsToggle = ConditionalValue(
+			gColoredSkinsToggle == true,
+			false,
+			true
+		)
+		
+	end
+
+end
+
+
+local function OnCommandChangeColorMapIndex(enable)
+
+	if Shared.GetCheatsEnabled() then
+		
+		//Toggle flipping through indicies
+		if enable == "true" or enable == "1" then
+			gColorMapIndexOverrideEnabled = true
+		elseif enable == "0" or enable == "false" then
+			gColorMapIndexOverrideEnabled = false
+		end
+		
+		if gColorMapIndexOverrideEnabled then
+			
+			if gColorMapIndexOverride + 1 > gColorMapMaxIndex then
+				gColorMapIndexOverride = 0	//Roll back to begining of atlas
+			else
+				gColorMapIndexOverride = gColorMapIndexOverride + 1
+			end
+			
+		end
+	
+	end
+
+end
+
+
+local function OnCommandOverrideSkinColor(layer, color)
+	
+	if Shared.GetCheatsEnabled() then
+	
+		if not layer and not color and not team then
+		//toggle color override state
+			gColorOverridesEnabled = ConditionalValue( gColorOverridesEnabled, false, true )
+		end
+		
+		if layer and color then	//Require both params
+			
+			if layer == "base" or layer == "accent" or layer == "trim" then
 				
-				if layer == "base" or layer == "accent" or layer == "trim" then
+				//Color values override all colorized model in world for specified layer
+				local red, green, blue = 0
+				local validColor = true
+				local colorValues = StringSplit( color, ",", 3)
+				
+				for i, cval in ipairs(colorValues) do
 					
-					//Color values override all colorized model in world for specified layer
-					local red, green, blue = 0
-					local validColor = true
-					local colorValues = StringSplit( color, ",", 3)
+					local colorIntVal = tonumber( cval )
 					
-					for i, cval in ipairs(colorValues) do
-						
-						local colorIntVal = tonumber( cval )
-						
-						if colorIntVal == nil then
-							validColor = false
-							break
-						end
-						
-						if colorIntVal >= 0 and colorIntVal <= 255 then
-							
-							if i == 1 then
-								red = colorIntVal
-							elseif i == 2 then
-								green = colorIntVal
-							elseif i == 3 then
-								blue = colorIntVal
-							end
-							
-						else
-							Print("ColoredSkinsMixin: Color(" .. color .. "), a channel value is invalid. Only 0-255 allowed")
-							validColor = false
-							break
-						end
-						
+					if colorIntVal == nil then
+						validColor = false
+						break
 					end
 					
-					if validColor then
-						gSkinColorOverrides[layer] = Color( ColorValue(red), ColorValue(green), ColorValue(blue), 1 )	//alpha ignored
-						Print("ColoredSkinsMixin: Set global color override: Layer[" .. layer .. "] as " .. ColorAsParam( gSkinColorOverrides[layer] ) )
+					if colorIntVal >= 0 and colorIntVal <= 255 then
+						
+						if i == 1 then
+							red = colorIntVal
+						elseif i == 2 then
+							green = colorIntVal
+						elseif i == 3 then
+							blue = colorIntVal
+						end
+						
 					else
-						Print("ColoredSkinsMixin: Invalid color parameter supplied")
+						Print("ColoredSkinsMixin: Color(" .. color .. "), a channel value is invalid. Only 0-255 allowed")
+						validColor = false
+						break
 					end
-				
+					
 				end
 				
+				if validColor then
+					gSkinColorOverrides[layer] = Color( ColorValue(red), ColorValue(green), ColorValue(blue), 1 )	//alpha ignored
+					Print("ColoredSkinsMixin: Set global color override: Layer[" .. layer .. "] as " .. ColorAsParam( gSkinColorOverrides[layer] ) )
+				else
+					Print("ColoredSkinsMixin: Invalid color parameter supplied")
+				end
+			
 			end
 			
 		end
 		
 	end
 	
-	
-	
-	Event.Hook( "Console_skins", OnCommandToggleColoredSkins )			//Toggle
-	Event.Hook( "Console_skinsindex", OnCommandChangeColorMapIndex )	//Toggle/Cycler
-	Event.Hook( "Console_skins_colors", OnCommandOverrideSkinColor )	//Toggle and value setter
+end
 
-	Event.Hook( "Console_skins_entinfo", OnCommandGetEntityColorInfo )	//FIXME not getting player or performing trace...
-	
+
+
+Event.Hook( "Console_skins", OnCommandToggleColoredSkins )			//Toggle
+Event.Hook( "Console_skinsindex", OnCommandChangeColorMapIndex )	//Toggle/Cycler
+Event.Hook( "Console_skins_colors", OnCommandOverrideSkinColor )	//Toggle and value setter
+
+Event.Hook( "Console_skins_entinfo", OnCommandGetEntityColorInfo )	//FIXME not getting player or performing trace...
+
+
+
+
 end	//end Client
 

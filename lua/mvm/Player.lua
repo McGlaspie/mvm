@@ -1,5 +1,4 @@
 
-Script.Load("lua/PostLoadMod.lua")
 Script.Load("lua/mvm/TechData.lua")
 
 

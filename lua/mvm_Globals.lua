@@ -72,6 +72,9 @@ kMinimapBlipType = enum(
 )
 
 
+kGameEffect = CreateBitMask( {"InUmbra", "Fury", "Cloaked", "Parasite", "NearDeath", "OnFire", "OnInfestation", "Beacon", "Energize", "IsPulsed" } )
+kGameEffectMax = bit.lshift( 1, GetBitMaskNumBits(kGameEffect) )
+
 
 
 // 

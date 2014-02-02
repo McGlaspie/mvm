@@ -1,11 +1,21 @@
 
-
+Script.Load("lua/mvm/LiveMixin.lua")
+Script.Load("lua/mvm/TeamMixin.lua")
+Script.Load("lua/mvm/LOSMixin.lua")
+Script.Load("lua/mvm/ConstructMixin.lua")
+Script.Load("lua/mvm/SelectableMixin.lua")
+Script.Load("lua/mvm/GhostStructureMixin.lua")
 Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
-Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+Script.Load("lua/mvm/NanoshieldMixin.lua")
+Script.Load("lua/mvm/WeldableMixin.lua")
+Script.Load("lua/mvm/DissolveMixin.lua")
 Script.Load("lua/mvm/PowerConsumerMixin.lua")
-Script.Load("lua/PostLoadMod.lua")
 Script.Load("lua/mvm/SupplyUserMixin.lua")
+if Client then
+	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+	Script.Load("lua/mvm/CommanderGlowMixin.lua")
+end
 
 
 Observatory.kDistressBeaconTime = kDistressBeaconTime
@@ -24,22 +34,51 @@ local kObservatoryTechButtons = {
 	kTechId.Scan, kTechId.DistressBeacon, kTechId.Detector, kTechId.None,
 	kTechId.PhaseTech, kTechId.None, kTechId.None, kTechId.None 
 }
-                                   
+
+kAnimationGraph = PrecacheAsset("models/marine/observatory/observatory.animation_graph")
 
 
 //-----------------------------------------------------------------------------
 
-local oldObsCreate = Observatory.OnCreate
-function Observatory:OnCreate()
+function Observatory:OnCreate()		//OVERRIDES
 
-	oldObsCreate(self)
-	
-	InitMixin(self, FireMixin)
+	ScriptActor.OnCreate(self)
+
+    InitMixin(self, BaseModelMixin)
+    InitMixin(self, ModelMixin)
+    InitMixin(self, GameEffectsMixin)
+    InitMixin(self, LiveMixin)
+    InitMixin(self, TeamMixin)
+    InitMixin(self, FlinchMixin)
+    InitMixin(self, PointGiverMixin)
+    InitMixin(self, SelectableMixin)
+    InitMixin(self, EntityChangeMixin)
+    InitMixin(self, LOSMixin)
+    InitMixin(self, CorrodeMixin)
+    InitMixin(self, ConstructMixin)
+    InitMixin(self, ResearchMixin)
+    InitMixin(self, RecycleMixin)
+    InitMixin(self, CombatMixin)
+    InitMixin(self, RagdollMixin)
+    InitMixin(self, DetectorMixin)
+    InitMixin(self, ObstacleMixin)
+    InitMixin(self, DissolveMixin)
+    InitMixin(self, GhostStructureMixin)
+    InitMixin(self, VortexAbleMixin)
+    InitMixin(self, PowerConsumerMixin)
+    InitMixin(self, ParasiteMixin)
+    
+    InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
     
     if Client then
-		InitMixin(self, ColoredSkinsMixin)
-	end
+        InitMixin(self, CommanderGlowMixin)
+        InitMixin(self, ColoredSkinsMixin)
+    end
+    
+    self:SetLagCompensated(false)
+    self:SetPhysicsType(PhysicsType.Kinematic)
+    self:SetPhysicsGroup(PhysicsGroup.MediumStructuresGroup) 
 
 	if Server then
     
@@ -63,18 +102,38 @@ function Observatory:OnCreate()
 
 end
 
-local orgObsInit = Observatory.OnInitialized
-function Observatory:OnInitialized()
 
-	orgObsInit(self)
-	
-	if Server then
-		InitMixin(self, SupplyUserMixin)
-	end
-	
-	if Client then
-		self:InitializeSkin()
-	end
+function Observatory:OnInitialized()	//OVERRIDES
+
+	ScriptActor.OnInitialized(self)
+    
+    InitMixin(self, WeldableMixin)
+    InitMixin(self, NanoShieldMixin)
+    
+    self:SetModel(Observatory.kModelName, kAnimationGraph)
+    
+    if Server then
+    
+        // This Mixin must be inited inside this OnInitialized() function.
+        if not HasMixin(self, "MapBlip") then
+            InitMixin(self, MapBlipMixin)
+        end
+        
+        InitMixin(self, StaticTargetMixin)
+        //InitMixin(self, InfestationTrackerMixin)
+        
+        InitMixin(self, SupplyUserMixin)
+    
+    elseif Client then
+    
+        InitMixin(self, UnitStatusMixin)
+        //InitMixin(self, HiveVisionMixin)
+        
+        self:InitializeSkin()
+        
+    end
+    
+    InitMixin(self, IdleMixin)
 
 end
 
@@ -85,6 +144,7 @@ if Client then
 		self.skinBaseColor = self:GetBaseSkinColor()
 		self.skinAccentColor = self:GetAccentSkinColor()
 		self.skinTrimColor = self:GetTrimSkinColor()
+		self.skinAtlasIndex = 0
 	end
 
 	function Observatory:GetBaseSkinColor()
@@ -101,6 +161,10 @@ if Client then
 
 	function Observatory:GetTrimSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
+	end
+	
+	function Observatory:GetAtlasIndex()
+		return 0
 	end
 
 end
@@ -221,5 +285,6 @@ end
 
 //-----------------------------------------------------------------------------
 
-Class_Reload("Observatory", newNetworkVars)
+
+Class_Reload( "Observatory", newNetworkVars )
 

@@ -1,7 +1,5 @@
 
 
-Script.Load("lua/PostLoadMod.lua")
-
 Script.Load("lua/mvm/Weapons/Marine/ClipWeapon.lua")
 Script.Load("lua/mvm/PickupableWeaponMixin.lua")
 Script.Load("lua/mvm/LiveMixin.lua")

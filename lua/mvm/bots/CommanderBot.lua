@@ -24,7 +24,7 @@ local kCommander2BrainClass =
 local kTeam2StationClassName =
 {
     "CommandStation",
-    "CommandStation"
+    "CommandStation"	//Need two? Reverse usage...
 }
 
 class 'CommanderBot' (PlayerBot)

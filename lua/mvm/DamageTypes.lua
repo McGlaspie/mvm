@@ -56,7 +56,7 @@ kCorrodeDamageExoArmorScalar = 0.3
 
 
 // deal only 33% of damage to friendlies
-kFriendlyFireScalar = 0.33
+kFriendlyFireScalar = 1	//0.33
 
 
 
@@ -276,6 +276,21 @@ local function MultiplyElectroMagnetic( target, attacker, doer, damage, armorFra
 
 end
 
+local function IgnoreHealthForPlayersUnlessExo(target, attacker, doer, damage, armorFractionUsed, healthPerArmor, damageType, hitPoint)
+        
+    if target:isa("Player") and not target:isa("Exo") then
+		local maxDamagePossible = healthPerArmor * target.armor
+		damage = math.min(damage, maxDamagePossible)
+		return damage, 1, healthPerArmor
+    else
+		return damage, armorFractionUsed, healthPerArmor
+    end
+    
+end
+
+
+//-----------------------------------------------------------------------------
+
 
 kDamageTypeGlobalRules = nil
 kDamageTypeRules = nil
@@ -349,6 +364,8 @@ local function BuildDamageTypeRules()
      // Splash rules
     kDamageTypeRules[kDamageType.Splash] = {}
     table.insert(kDamageTypeRules[kDamageType.Splash], DamageStructuresOnly)
+    table.insert(kDamageTypeRules[kDamageType.Splash], DoubleHealthPerArmor)	//ehh...
+    table.insert(kDamageTypeRules[kDamageType.Splash], MultiplyForStructures)	//As upgrade for ARC? plasma ARC?
     // ------------------------------
  
     // fall damage rules
@@ -399,9 +416,10 @@ local function BuildDamageTypeRules()
 
 	
 	// ElectroMagnetic Damage Rules
-	kDamageTypeRules[kDamageType.ElectroMagnetic] = {}
-    table.insert(kDamageTypeRules[kDamageType.ElectroMagnetic], IgnoreHealthForPlayersUnlessExo)
-    table.insert(kDamageTypeRules[kDamageType.ElectroMagnetic], MultiplyElectroMagnetic)
+	kDamageTypeRules[kDamageType.ElectroMagnetic] = {}	//FIXME Should damage armor
+    table.insert( kDamageTypeRules[kDamageType.ElectroMagnetic], MultiplyElectroMagnetic )
+	table.insert( kDamageTypeRules[kDamageType.ElectroMagnetic], IgnoreHealthForPlayersUnlessExo )
+    
     // ------------------------------
     
 

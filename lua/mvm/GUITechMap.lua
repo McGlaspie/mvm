@@ -9,9 +9,9 @@
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 Script.Load("lua/GUIScript.lua")
-Script.Load("lua/MarineTechMap.lua")
-Script.Load("lua/AlienTechMap.lua")
-Script.Load("lua/mvm/GuIColorGlobals.lua")
+Script.Load("lua/mvm/MarineTechMap.lua")
+//Script.Load("lua/AlienTechMap.lua")
+Script.Load("lua/mvm/GUIColorGlobals.lua")
 
 local kTechStatus = enum({'Available', 'Allowed', 'NotAvailable'})
 
@@ -56,9 +56,9 @@ local kStartOffset =
     [kTeam2Index] = kMarineTechMapYStart
 }
 
-local kIconSize = GUIScale(Vector(56, 56, 0))
+local kIconSize = GUIScale(Vector(64, 64, 0))
 local kHalfIconSize = kIconSize * 0.5
-local kBackgroundSize = Vector(15 * kIconSize.x, 15 * kIconSize.y, 0)
+local kBackgroundSize = Vector(16 * kIconSize.x, 16 * kIconSize.y, 0)
 local kIconTexture = "ui/buildmenu.dds"
 
 local kProgressMeterSize = Vector(kIconSize.x, GUIScale(10), 0)

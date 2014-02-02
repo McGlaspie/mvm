@@ -2,7 +2,7 @@
 
 
 Script.Load("lua/TeamInfo.lua")
-Script.Load("lua/PostLoadMod.lua")
+
 
 local newNetworkVars = {
 	supplyUsed = "integer (0 to " .. kMaxSupply .. ")"		//OVERRIDES

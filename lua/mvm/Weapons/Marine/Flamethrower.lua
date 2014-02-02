@@ -1,7 +1,5 @@
 
 
-Script.Load("lua/PostLoadMod.lua")
-
 
 local newNetworkVars = {}
 

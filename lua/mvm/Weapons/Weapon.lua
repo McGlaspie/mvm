@@ -1,12 +1,9 @@
 
 
-Script.Load("lua/PostLoadMod.lua")
-
 
 //-----------------------------------------------------------------------------
 
 
-//local orgWeaponRender = Weapon.OnUpdateRender
 function Weapon:OnUpdateRender()	//Overrides
 	
     local parent = self:GetParent()

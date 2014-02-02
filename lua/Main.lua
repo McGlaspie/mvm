@@ -16,7 +16,7 @@ Script.Load("lua/MainMenu.lua")
 local renderCamera = nil
 
 //MenuManager.SetMenuCinematic("cinematics/main_menu.cinematic")
-MenuManager.SetMenuCinematic("cinematics/preview_mockup.cinematic")
+MenuManager.SetMenuCinematic("cinematics/preview_mockup.cinematic")	//No precache? Works? Helps?
 
 
 local function OnUpdateRender()
@@ -48,6 +48,11 @@ local function OnLoadComplete(message)
     OptionsDialogUI_SyncSoundVolumes()
     
     MenuMenu_PlayMusic("sound/NS2.fev/Main Menu")
+    /*
+    MenuMenu_PlayMusic("sound/mvm.fev/MvM_Menu")    //FUUUUCCKK! "Couldn't open" is a fucking USELESS error message...
+                                                    //give us an error code, the fucking stack...SOMETHING...jesus...
+                                                    //UWE, you guys are BAD at error trapping...just bad.
+    */
     MainMenu_Open()
     
     if message then

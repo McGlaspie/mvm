@@ -1,10 +1,16 @@
 
-
+Script.Load("lua/mvm/SelectableMixin.lua")
+Script.Load("lua/mvm/LOSMixin.lua")
 Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
-Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+Script.Load("lua/mvm/WeldableMixin.lua")
+Script.Load("lua/mvm/DissolveMixin.lua")
+if Client then
+	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+	Script.Load("lua/mvm/CommanderGlowMixin.lua")
+end
 //Script.Load("lua/mvm/SprintMixin.lua")	Future use
-Script.Load("lua/PostLoadMod.lua")
+
 
 
 if Client then
@@ -38,12 +44,14 @@ Marine.kGroundFrictionForce = 16
 Marine.kAirStrafeWeight = 0		//May need to add back in for JP - Can stop on a dime with JP...
 
 
+
 local newNetworkVars = {
 	commanderLoginTime = "time"
 }
 
 AddMixinNetworkVars(FireMixin, newNetworkVars)
 AddMixinNetworkVars(DetectableMixin, newNetworkVars)
+AddMixinNetworkVars(DissolveMixin, newNetworkVars)
 
 //-----------------------------------------------------------------------------
 
@@ -75,6 +83,9 @@ function Marine:OnCreate()	//OVERRIDE
     InitMixin(self, PredictedProjectileShooterMixin)
     InitMixin(self, MarineVariantMixin)
     
+    InitMixin(self, FireMixin)
+    InitMixin(self, DetectableMixin)
+    
     if Server then
     
         self.timePoisoned = 0
@@ -89,7 +100,10 @@ function Marine:OnCreate()	//OVERRIDE
     elseif Client then
 		
 		InitMixin(self, TeamMessageMixin, { kGUIScriptName = "mvm/Hud/Marine/GUIMarineTeamMessage" })
+		
         InitMixin(self, DisorientableMixin)
+        InitMixin(self, CommanderGlowMixin)	//Isn't here in NS2...hmmm
+        
 		InitMixin(self, ColoredSkinsMixin)
 		
 		if self.flashlight ~= nil then
@@ -100,9 +114,9 @@ function Marine:OnCreate()	//OVERRIDE
         
         self.flashlight:SetType( RenderLight.Type_Spot )
         if self:GetTeamNumber() == kTeam2Index then
-			self.flashlight:SetColor( Color(1, 0.5, 0.5) )
+			self.flashlight:SetColor( Color(1, 0.5, 0.5, 1) )
 		else
-			self.flashlight:SetColor( Color(0.5, 0.5, 1) )
+			self.flashlight:SetColor( Color(0.5, 0.5, 1, 1) )
 		end
         self.flashlight:SetInnerCone( math.rad(12) )
         self.flashlight:SetOuterCone( math.rad(32) )
@@ -110,7 +124,7 @@ function Marine:OnCreate()	//OVERRIDE
         self.flashlight:SetRadius( 16 ) 	//15
         self.flashlight:SetGoboTexture("models/marine/male/flashlight.dds")
         self.flashlight:SetIsVisible(false)
-        self.flashlight:SetAtmosphericDensity( 0.15 )
+        self.flashlight:SetAtmosphericDensity( 0.05 )
         //TODO Add Flashlight lens flare attachment effect
         // - Toggle flashlight off when sprinting?
     end

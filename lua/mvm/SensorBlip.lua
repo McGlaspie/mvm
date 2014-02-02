@@ -4,8 +4,6 @@
 //
 
 
-Script.Load("lua/PostLoadMod.lua")
-
 local newNetworkVars = {
 	teamNumber	= string.format("integer (-1 to %d)", kSpectatorIndex)
 }
@@ -54,9 +52,9 @@ end
 function SensorBlip:Update(entity)
 
     if entity.GetEngagementPoint then
-        self:SetOrigin(entity:GetEngagementPoint())
+        self:SetOrigin( entity:GetEngagementPoint() )
     else
-        self:SetOrigin(entity:GetModelOrigin())
+        self:SetOrigin( entity:GetModelOrigin() )
     end
     
     self.teamNumber = entity:GetTeamNumber()

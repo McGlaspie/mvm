@@ -1,6 +1,5 @@
 
 Script.Load("lua/ScriptActor.lua")
-Script.Load("lua/PostLoadMod.lua")
 
 //Must override utility functions in order for supply to be calculated correctly
 //across the board. Otherwise, supply is tracked correctly, but doesn't restrict

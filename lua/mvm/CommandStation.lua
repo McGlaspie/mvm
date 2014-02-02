@@ -1,9 +1,13 @@
 
+Script.Load("lua/mvm/CommandStructure.lua")
 
-Script.Load("lua/DetectableMixin.lua")
+Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
-Script.Load("lua/mvm/ColoredSkinsMixin.lua")
-Script.Load("lua/PostLoadMod.lua")
+Script.Load("lua/mvm/WeldableMixin.lua")
+Script.Load("lua/mvm/GhostStructureMixin.lua")
+if Client then
+	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+end
 
 //-----------------------------------------------------------------------------
 
@@ -14,12 +18,17 @@ AddMixinNetworkVars(DetectableMixin, newNetworkVars)
 
 local kCommandStationState = enum( { "Normal", "Locked", "Welcome" } )
 
+
 //-----------------------------------------------------------------------------
 
-local orgCommandStationCreate = CommandStation.OnCreate
-function CommandStation:OnCreate()
+
+function CommandStation:OnCreate()	//OVERRIDES
 	
-	orgCommandStationCreate(self)
+	CommandStructure.OnCreate(self)
+    
+    InitMixin(self, CorrodeMixin)
+    InitMixin(self, GhostStructureMixin)
+    InitMixin(self, ParasiteMixin)
 
 	InitMixin(self, FireMixin)
 	InitMixin(self, DetectableMixin)

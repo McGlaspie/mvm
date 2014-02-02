@@ -3,7 +3,7 @@
 Script.Load("lua/mvm/LOSMixin.lua")
 Script.Load("lua/EntityChangeMixin.lua")
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
-Script.Load("lua/PostLoadMod.lua")
+
 
 local newNetworkVars = {}
 
@@ -42,9 +42,10 @@ end
 if Client then
 
 	function Jetpack:InitializeSkin()
-		self._activeBaseColor = self:GetBaseSkinColor()
-		self._activeAccentColor = self:GetAccentSkinColor()
-		self._activeTrimColor = self:GetTrimSkinColor()
+		self.skinBaseColor = self:GetBaseSkinColor()
+		self.skinAccentColor = self:GetAccentSkinColor()
+		self.skinTrimColor = self:GetTrimSkinColor()
+		self.skinAtlasIndex = 0
 	end
 
 	function Jetpack:GetBaseSkinColor()
@@ -63,6 +64,7 @@ end
 
 
 function Jetpack:GetIsValidRecipient(recipient)
+	
 	if HasMixin(recipient, "Team") then
 		return 
 			not recipient:isa("JetpackMarine") 
@@ -71,6 +73,7 @@ function Jetpack:GetIsValidRecipient(recipient)
 	end
 	
 	return false
+	
 end
 
 
@@ -83,3 +86,4 @@ end
 
 
 Class_Reload("Jetpack", newNetworkVars)
+

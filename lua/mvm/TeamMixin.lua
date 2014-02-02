@@ -3,8 +3,7 @@
 Script.Load("lua/TeamMixin.lua")
 
 
-//Just incase local {} isn't overridden
-function TeamMixin:GetTeamType()
+function TeamMixin:GetTeamType()	//OVERRIDES
 	
 	if self.teamNumber == kTeam1Index or self.teamNumber == kTeam2Index then
 		return kMarineTeamType
@@ -13,3 +12,17 @@ function TeamMixin:GetTeamType()
 	return kNeutralTeamType
 	
 end
+
+
+function TeamMixin:GetEffectParams( tableParams )		//OVERRIDES
+	
+    if not tableParams[kEffectFilterIsMarine] then
+        tableParams[kEffectFilterIsMarine] = (self:GetTeamNumber() == kTeam1Index)
+    end
+    
+    if not tableParams[kEffectFilterIsAlien] then
+        tableParams[kEffectFilterIsAlien] = (self:GetTeamNumber() == kTeam2Index)
+    end
+    
+end
+

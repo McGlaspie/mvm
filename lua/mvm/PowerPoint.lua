@@ -2,7 +2,19 @@
 // To put it simplely...if any other mod tries to modify this class, explosions will happen.
 //
 
+Script.Load("lua/mvm/LOSMixin.lua")
+Script.Load("lua/mvm/LiveMixin.lua")
+Script.Load("lua/mvm/TeamMixin.lua")
+Script.Load("lua/mvm/WeldableMixin.lua")
+Script.Load("lua/mvm/ConstructMixin.lua")
+Script.Load("lua/mvm/SelectableMixin.lua")
+Script.Load("lua/mvm/GhostStructureMixin.lua")
+
 Script.Load("lua/mvm/FireMixin.lua")
+Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+if Client then
+	Script.Load("lua/mvm/CommanderGlowMixin.lua")
+end
 
 
 local newNetworkVars = {
@@ -13,6 +25,7 @@ local newNetworkVars = {
 
 
 AddMixinNetworkVars(FireMixin, newNetworkVars)
+AddMixinNetworkVars( ElectroMagneticMixin, newNetworkVars )
 
 
 if Client then
@@ -146,7 +159,7 @@ if Client then
 		
 		local updateRate = ConditionalValue(
 			isCommander,
-			0.05,	//40 per second
+			0.05,	//40 per second, too much?
 			0.05	//20 per second
 		)
 		
@@ -163,15 +176,49 @@ if Client then
 end
 
 
+//-----------------------------------------------------------------------------
 
-local orgPowerPointCreate = PowerPoint.OnCreate
-function PowerPoint:OnCreate()
+
+function PowerPoint:OnCreate()	//OVERRIDES
 	
-	orgPowerPointCreate(self)
+	ScriptActor.OnCreate(self)
+    
+    InitMixin(self, BaseModelMixin)
+    InitMixin(self, ClientModelMixin)
+    InitMixin(self, LiveMixin)
+    InitMixin(self, GameEffectsMixin)
+    InitMixin(self, FlinchMixin)
+    InitMixin(self, TeamMixin)
+    InitMixin(self, PointGiverMixin)
+    InitMixin(self, SelectableMixin)
+    InitMixin(self, EntityChangeMixin)
+    InitMixin(self, LOSMixin)
+    InitMixin(self, CorrodeMixin)
+    InitMixin(self, ConstructMixin)
+    InitMixin(self, CombatMixin)
+    InitMixin(self, PowerSourceMixin)
+    InitMixin(self, NanoShieldMixin)
+    InitMixin(self, WeldableMixin)
+    InitMixin(self, ParasiteMixin)
+    
+    InitMixin(self, FireMixin)
+    InitMixin(self, ElectroMagneticMixin)
+    
+    if Client then
+        InitMixin(self, CommanderGlowMixin)
+    end
+    
+    self:SetLagCompensated(false)
+    self:SetPhysicsType(PhysicsType.Kinematic)
+    self:SetPhysicsGroup(PhysicsGroup.BigStructuresGroup)
+    
+    self.lightMode = kLightMode.Normal
+    self.powerState = PowerPoint.kPowerState.unsocketed
 	
 	self.scoutedForTeam1 = false
 	self.scoutedForTeam2 = false
 	self.isStartingPoint = false
+	
 	
 	if Server then
 		
@@ -295,6 +342,11 @@ function PowerPoint:GetIsFlameAble()
 	return false
 end
 
+function PowerPoint:GetIsVulnerableToEMP()
+	return true
+end
+
+
 function PowerPoint:GetCanBeNanoShieldedOverride(resultTable)
 	
     resultTable.shieldedAllowed = (
@@ -376,19 +428,7 @@ function PowerPoint:UpdateRelevancy()
 	
 	local mask = 0
 	mask = bit.bor( mask, kRelevantToTeam1, kRelevantToTeam2 )
-	/*
-	if self.scoutedForTeam1 then
-		mask = bit.bor( mask, kRelevantToTeam1Unit, kRelevantToTeam1Commander )
-	else
-		mask = bit.bor( mask, kRelevantToTeam1Unit )
-	end
-	
-	if self.scoutedForTeam2 then
-		mask = bit.bor( mask, kRelevantToTeam2Unit, kRelevantToTeam2Commander )
-	else
-		mask = bit.bor( mask, kRelevantToTeam2Unit )
-	end
-	*/
+	//Must make relevant to both teams to propogate lighting info to commanders
 	self:SetExcludeRelevancyMask( mask )
 
 end
@@ -442,11 +482,11 @@ if Server then
         self:SetInternalPowerState( PowerPoint.kPowerState.socketed )
         self:SetLightMode( kLightMode.Normal )
         self:StopSound( kAuxPowerBackupSound )
-        self:TriggerEffects("fixed_power_up")
-        self:SetPoweringState(true)
+		self:TriggerEffects( "fixed_power_up", { ismarine = self.scoutedFormTeam1, isalien = self.scoutedForTeam2 } )
+        self:SetPoweringState( true )
         
     end
-
+	
 
 	// Repaired by marine with welder or MAC 
     function PowerPoint:OnWeldOverride(entity, elapsedTime)
@@ -578,16 +618,16 @@ if Server then
     end
     
     
-    function PowerPoint:OnKill(attacker, doer, point, direction)	//OVERRIDES
+    function PowerPoint:OnKill( attacker, doer, point, direction )	//OVERRIDES
     
-        ScriptActor.OnKill(self, attacker, doer, point, direction)
+        ScriptActor.OnKill( self, attacker, doer, point, direction )
         
         self:StopDamagedSound()
         
         self:MarkBlipDirty()
         
-        self:PlaySound(kDestroyedSound)
-        self:PlaySound(kDestroyedPowerDownSound)
+        self:PlaySound( kDestroyedSound )
+        self:PlaySound( kDestroyedPowerDownSound )
         
         self:SetInternalPowerState(PowerPoint.kPowerState.destroyed)
         //self.constructionComplete = false

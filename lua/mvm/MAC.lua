@@ -1,15 +1,23 @@
 
-
+Script.Load("lua/mvm/LiveMixin.lua")
+Script.Load("lua/mvm/TeamMixin.lua")
+Script.Load("lua/mvm/SelectableMixin.lua")
+Script.Load("lua/mvm/LOSMixin.lua")
+Script.Load("lua/mvm/DamageMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
+Script.Load("lua/mvm/WeldableMixin.lua")
+Script.Load("lua/mvm/DissolveMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
 Script.Load("lua/mvm/DetectableMixin.lua")
-//Script.Load("lua/mvm/RagdollMixin.lua")
-Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+if Client then
+	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+	Script.Load("lua/mvm/CommanderGlowMixin.lua")
+end
 Script.Load("lua/mvm/SupplyUserMixin.lua")
-Script.Load("lua/PostLoadMod.lua")
-Script.Load("lua/MAC.lua")
-Script.Load("lua/ResearchMixin.lua")
+Script.Load("lua/ResearchMixin.lua")	//To allow recycle
 Script.Load("lua/RecycleMixin.lua")
+
+Script.Load("lua/mvm/CommAbilities/Marine/EMPBlast.lua")
 
 
 local kJetsCinematic = PrecacheAsset("cinematics/marine/mac/jet.cinematic")
@@ -55,7 +63,7 @@ local newNetworkVars = {
 
 AddMixinNetworkVars(ResearchMixin, newNetworkVars)
 AddMixinNetworkVars(RecycleMixin, newNetworkVars)
-
+AddMixinNetworkVars(DissolveMixin, newNetworkVars)
 AddMixinNetworkVars(FireMixin, newNetworkVars)
 AddMixinNetworkVars(DetectableMixin, newNetworkVars)
 AddMixinNetworkVars(ElectroMagneticMixin, newNetworkVars)
@@ -255,6 +263,7 @@ function MAC:OnCreate()		//OVERRIDES
     InitMixin(self, ResearchMixin)
     InitMixin(self, RecycleMixin)
     
+    InitMixin(self, DissolveMixin)
     InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
     InitMixin(self, ElectroMagneticMixin)
@@ -368,6 +377,34 @@ function MAC:OnDestroy()
 
 end
 
+
+function MAC:GetTechButtons(techId)	//OVERRIDES
+
+    return { kTechId.Move, kTechId.Stop, kTechId.Welding, kTechId.None,
+             kTechId.None, kTechId.None, kTechId.None, kTechId.None }	//MACEMP
+    
+end
+
+
+//function MAC:GetDamageType()
+//	return kDamageType.ElectroMagnetic
+//end
+/*
+function MAC:PerformActivation(techId, position, normal, commander)	//OVERRIDES
+
+    if techId == kTechId.MACEMP then
+		
+        local empBlast = CreateEntity( EMPBlast.kMapName, self:GetOrigin(), self:GetTeamNumber() )
+        self:DoDamage( kMACEMPBlastDamage * 2.5, self, self:GetOrigin(), GetNormalizedVector(self:GetOrigin()), "none")
+        
+        return empBlast ~= nil, false
+		
+    end
+    
+    return ScriptActor.PerformActivation(self, techId, position, normal, commander)
+    
+end
+*/
 
 local function MvM_MAC_GetOrderTargetIsConstructTarget(order, doerTeamNumber)
 
@@ -793,9 +830,11 @@ end	//End Server
 
 //-----------------------------------------------------------------------------
 
+
 //TODO Verify these actually work...
 ReplaceLocals( MAC.OnUpdate, { FindSomethingToDo = MvM_FindSomethingToDo } )
 ReplaceLocals( MAC.ProcessConstruct, { GetCanConstructTarget = MvM_GetCanConstructTarget } )
 
-Class_Reload("MAC", newNetworkVars)
+
+Class_Reload( "MAC", newNetworkVars )
 

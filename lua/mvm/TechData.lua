@@ -362,7 +362,12 @@ function BuildTechData()	//OVERRIDES
 
         { [kTechDataId] = kTechId.Recycle, [kTechDataDisplayName] = "RECYCLE", [kTechDataCostKey] = 0,    [kTechIDShowEnables] = false,       [kTechDataResearchTimeKey] = kRecycleTime, [kTechDataHotkey] = Move.R, [kTechDataTooltipInfo] =  "RECYCLE_TOOLTIP"},
         { [kTechDataId] = kTechId.MAC,    [kTechDataSupply] = kMACSupply,    [kTechDataHint] = "MAC_HINT",           [kTechDataMapName] = MAC.kMapName,                      [kTechDataDisplayName] = "MAC",  [kTechDataMaxHealth] = MAC.kHealth, [kTechDataMaxArmor] = MAC.kArmor, [kTechDataCostKey] = kMACCost, [kTechDataResearchTimeKey] = kMACBuildTime, [kTechDataModel] = MAC.kModelName, [kTechDataDamageType] = kMACAttackDamageType, [kTechDataInitialEnergy] = kMACInitialEnergy, [kTechDataMaxEnergy] = kMACMaxEnergy, [kTechDataMenuPriority] = 1, [kTechDataPointValue] = kMACPointValue, [kTechDataHotkey] = Move.M, [kTechDataTooltipInfo] = "MAC_TOOLTIP"},
-        { [kTechDataId] = kTechId.CatPackTech, [kTechDataCostKey] = kCatPackTechResearchCost,          [kTechDataResearchTimeKey] = kCatPackTechResearchTime, [kTechDataDisplayName] = "CAT_PACKS", [kTechDataTooltipInfo] = "CAT_PACK_TECH_TOOLTIP"},
+        { [kTechDataId] = kTechId.CatPackTech, 
+			[kTechDataCostKey] = kCatPackTechResearchCost,          
+			[kTechDataResearchTimeKey] = kCatPackTechResearchTime, 
+			[kTechDataDisplayName] = "CAT_PACKS", 
+			[kTechDataTooltipInfo] = "CAT_PACK_TECH_TOOLTIP"
+		},
 
         // Marine base structures
         { [kTechDataId] = kTechId.Extractor, [kTechDataIgnorePathingMesh] = true, [kTechDataSpawnBlock] = true, [kTechDataHint] = "EXTRACTOR_HINT", [kTechDataCollideWithWorldOnly] = true, [kTechDataAllowStacking] = true,    [kTechDataGhostModelClass] = "MarineGhostModel", [kTechDataRequiresPower] = true,       [kTechDataMapName] = Extractor.kMapName,                [kTechDataDisplayName] = "EXTRACTOR",           [kTechDataCostKey] = kExtractorCost,       [kTechDataBuildTime] = kExtractorBuildTime, [kTechDataEngagementDistance] = kExtractorEngagementDistance, [kTechDataModel] = Extractor.kModelName,            [kTechDataMaxHealth] = kExtractorHealth, [kTechDataMaxArmor] = kExtractorArmor, [kStructureAttachClass] = "ResourcePoint", [kTechDataPointValue] = kExtractorPointValue, [kTechDataHotkey] = Move.E, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataTooltipInfo] =  "EXTRACTOR_TOOLTIP"},
@@ -393,9 +398,25 @@ function BuildTechData()	//OVERRIDES
         { [kTechDataId] = kTechId.SentryBattery, [kTechDataSupply] = kSentryBatterySupply, [kTechDataBuildRequiresMethod] = GetRoomHasNoSentryBattery, [kTechDataBuildMethodFailedMessage] = "COMMANDERERROR_ONLY_ONE_BATTERY_PER_ROOM",  [kTechDataHint] = "SENTRY_BATTERY_HINT", [kTechDataGhostModelClass] = "MarineGhostModel", [kTechDataMapName] = SentryBattery.kMapName,                [kTechDataDisplayName] = "SENTRY_BATTERY",          [kTechDataCostKey] = kSentryBatteryCost,      [kTechDataPointValue] = kSentryBatteryPointValue, [kTechDataModel] = SentryBattery.kModelName,  [kTechDataEngagementDistance] = 2,   [kTechDataBuildTime] = kSentryBatteryBuildTime, [kTechDataMaxHealth] = kSentryBatteryHealth,  [kTechDataMaxArmor] = kSentryBatteryArmor, [kTechDataTooltipInfo] = "SENTRY_BATTERY_TOOLTIP", [kTechDataHotkey] = Move.S, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kVisualRange] = SentryBattery.kRange, [kTechDataObstacleRadius] = 0.25},
 
         // MACs 
-        { [kTechDataId] = kTechId.MACEMP,   [kTechDataDisplayName] = "MAC_EMP", [kTechDataTooltipInfo] = "MAC_EMP_TOOLTIP", [kTechDataCostKey] = kEMPCost },        
-        { [kTechDataId] = kTechId.MACEMPTech,       [kTechDataDisplayName] = "MAC_EMP_RESEARCH", [kTechDataTooltipInfo] = "MAC_EMP_RESEARCH_TOOLTIP", [kTechDataCostKey] = kTechEMPResearchCost,             [kTechDataResearchTimeKey] = kTechEMPResearchTime, },
-        { [kTechDataId] = kTechId.MACSpeedTech,     [kTechDataDisplayName] = "MAC_SPEED",  [kTechDataCostKey] = kTechMACSpeedResearchCost,  [kTechDataResearchTimeKey] = kTechMACSpeedResearchTime, [kTechDataHotkey] = Move.S, [kTechDataTooltipInfo] = "MAC_SPEED_TOOLTIP"},
+        { [kTechDataId] = kTechId.MACEMP,   
+			[kTechDataDisplayName] = "MAC_EMP", 
+			[kTechDataTooltipInfo] = "MAC_EMP_TOOLTIP", 
+			[kTechDataCostKey] = kEMPCost,
+			[kTechDataCooldown] = kMACEMPCooldown
+		},        
+        { [kTechDataId] = kTechId.MACEMPTech,       
+			[kTechDataDisplayName] = "MAC_EMP_RESEARCH", 
+			[kTechDataTooltipInfo] = "MAC_EMP_RESEARCH_TOOLTIP", 
+			[kTechDataCostKey] = kTechEMPResearchCost,             
+			[kTechDataResearchTimeKey] = kTechEMPResearchTime, 
+		},
+        { [kTechDataId] = kTechId.MACSpeedTech,     
+			[kTechDataDisplayName] = "MAC_SPEED",  
+			[kTechDataCostKey] = kTechMACSpeedResearchCost,  
+			[kTechDataResearchTimeKey] = kTechMACSpeedResearchTime, 
+			[kTechDataHotkey] = Move.S, 
+			[kTechDataTooltipInfo] = "MAC_SPEED_TOOLTIP"
+		},
 		
         // Marine advanced structures
         { 
@@ -423,13 +444,55 @@ function BuildTechData()	//OVERRIDES
         { [kTechDataId] = kTechId.UpgradeRoboticsFactory, [kTechDataDisplayName] = "UPGRADE_ROBOTICS_FACTORY", [kTechIDShowEnables] = false, [kTechDataCostKey] = kUpgradeRoboticsFactoryCost,   [kTechDataResearchTimeKey] = kUpgradeRoboticsFactoryTime, [kTechDataTooltipInfo] = "UPGRADE_ROBOTICS_FACTORY_TOOLTIP"},        
         { [kTechDataId] = kTechId.ARCRoboticsFactory, [kTechDataCostKey] = kRoboticsFactoryCost + kUpgradeRoboticsFactoryCost, [kTechDataHint] = "ARC_ROBOTICS_FACTORY_HINT", [kTechDataRequiresPower] = true,  [kTechIDShowEnables] = false,  [kTechDataDisplayName] = "ARC_ROBOTICS_FACTORY",  [kTechDataMapName] = ARCRoboticsFactory.kMapName, [kTechDataModel] = RoboticsFactory.kModelName,   [kTechDataEngagementDistance] = kRoboticsFactorEngagementDistance,        [kTechDataSpecifyOrientation] = true, [kTechDataBuildTime] = kRoboticsFactoryBuildTime, [kTechDataMaxHealth] = kARCRoboticsFactoryHealth,    [kTechDataMaxArmor] = kARCRoboticsFactoryArmor, [kTechDataPointValue] = kARCRoboticsFactoryPointValue, [kTechDataHotkey] = Move.R, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataTooltipInfo] = "ARC_ROBOTICS_FACTORY_TOOLTIP"},        
 
-        { [kTechDataId] = kTechId.ARC,   [kTechDataSupply] = kARCSupply,   [kTechDataHint] = "ARC_HINT",             [kTechDataDisplayName] = "ARC",               [kTechDataTooltipInfo] = "ARC_TOOLTIP", [kTechDataMapName] = ARC.kMapName,   [kTechDataCostKey] = kARCCost,       [kTechDataDamageType] = kARCDamageType,  [kTechDataResearchTimeKey] = kARCBuildTime, [kTechDataMaxHealth] = kARCHealth, [kTechDataEngagementDistance] = kARCEngagementDistance, [kVisualRange] = ARC.kFireRange, [kTechDataMaxArmor] = kARCArmor, [kTechDataModel] = ARC.kModelName, [kTechDataMaxHealth] = kARCHealth, [kTechDataPointValue] = kARCPointValue, [kTechDataHotkey] = Move.T},
+        { [kTechDataId] = kTechId.ARC,   
+			[kTechDataSupply] = kARCSupply,   
+			[kTechDataHint] = "ARC_HINT",             
+			[kTechDataDisplayName] = "ARC",               
+			[kTechDataTooltipInfo] = "ARC_TOOLTIP", 
+			[kTechDataMapName] = ARC.kMapName,   
+			[kTechDataCostKey] = kARCCost,       
+			[kTechDataDamageType] = kARCDamageType,  
+			[kTechDataResearchTimeKey] = kARCBuildTime, 
+			[kTechDataMaxHealth] = kARCHealth, 
+			[kTechDataEngagementDistance] = kARCEngagementDistance, 
+			[kVisualRange] = ARC.kFireRange, 
+			[kTechDataMaxArmor] = kARCArmor, 
+			[kTechDataModel] = ARC.kModelName, 
+			[kTechDataMaxHealth] = kARCHealth, 
+			[kTechDataPointValue] = kARCPointValue, 
+			[kTechDataHotkey] = Move.T
+		},
         { [kTechDataId] = kTechId.ARCSplashTech,        [kTechDataCostKey] = kARCSplashTechResearchCost,             [kTechDataResearchTimeKey] = kARCSplashTechResearchTime, [kTechDataDisplayName] = "ARC_SPLASH", [kTechDataImplemented] = false },
         { [kTechDataId] = kTechId.ARCArmorTech,         [kTechDataCostKey] = kARCArmorTechResearchCost,             [kTechDataResearchTimeKey] = kARCArmorTechResearchTime, [kTechDataDisplayName] = "ARC_ARMOR", [kTechDataImplemented] = false },
         
         // Upgrades
-        { [kTechDataId] = kTechId.PhaseTech, [kTechDataCostKey] = kPhaseTechResearchCost, [kTechDataDisplayName] = "PHASE_TECH", [kTechDataResearchTimeKey] = kPhaseTechResearchTime, [kTechDataTooltipInfo] = "PHASE_TECH_TOOLTIP" },
-        { [kTechDataId] = kTechId.PhaseGate, [kTechDataHint] = "PHASE_GATE_HINT", [kTechDataGhostModelClass] = "MarineGhostModel",   [kTechDataSupply] = kPhaseGateSupply, [kTechDataRequiresPower] = true,    [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation,    [kTechDataMapName] = PhaseGate.kMapName,                    [kTechDataDisplayName] = "PHASE_GATE",  [kTechDataCostKey] = kPhaseGateCost,       [kTechDataModel] = PhaseGate.kModelName, [kTechDataBuildTime] = kPhaseGateBuildTime, [kTechDataMaxHealth] = kPhaseGateHealth,   [kTechDataEngagementDistance] = kPhaseGateEngagementDistance, [kTechDataMaxArmor] = kPhaseGateArmor,   [kTechDataPointValue] = kPhaseGatePointValue, [kTechDataHotkey] = Move.P, [kTechDataSpecifyOrientation] = true, [kTechDataBuildRequiresMethod] = CheckSpaceForPhaseGate, [kTechDataTooltipInfo] = "PHASE_GATE_TOOLTIP", [kTechDataObstacleRadius] = 0.5},
+        { [kTechDataId] = kTechId.PhaseTech, 
+			[kTechDataCostKey] = kPhaseTechResearchCost, 
+			[kTechDataDisplayName] = "PHASE_TECH", 
+			[kTechDataResearchTimeKey] = kPhaseTechResearchTime, 
+			[kTechDataTooltipInfo] = "PHASE_TECH_TOOLTIP" 
+		},
+        { [kTechDataId] = kTechId.PhaseGate, 
+			[kTechDataHint] = "PHASE_GATE_HINT", 
+			[kTechDataGhostModelClass] = "MarineGhostModel",   
+			[kTechDataSupply] = kPhaseGateSupply, 
+			[kTechDataRequiresPower] = true,    
+			[kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation,    
+			[kTechDataMapName] = PhaseGate.kMapName,
+			[kTechDataDisplayName] = "PHASE_GATE",  
+			[kTechDataCostKey] = kPhaseGateCost,       
+			[kTechDataModel] = PhaseGate.kModelName, 
+			[kTechDataBuildTime] = kPhaseGateBuildTime, 
+			[kTechDataMaxHealth] = kPhaseGateHealth,   
+			[kTechDataEngagementDistance] = kPhaseGateEngagementDistance, 
+			[kTechDataMaxArmor] = kPhaseGateArmor,   
+			[kTechDataPointValue] = kPhaseGatePointValue, 
+			[kTechDataHotkey] = Move.P, 
+			[kTechDataSpecifyOrientation] = true, 
+			[kTechDataBuildRequiresMethod] = CheckSpaceForPhaseGate, 
+			[kTechDataTooltipInfo] = "PHASE_GATE_TOOLTIP", 
+			[kTechDataObstacleRadius] = 0.5
+		},
         { [kTechDataId] = kTechId.AdvancedArmoryUpgrade, [kTechDataCostKey] = kAdvancedArmoryUpgradeCost,  [kTechIDShowEnables] = false,          [kTechDataResearchTimeKey] = kAdvancedArmoryResearchTime,  [kTechDataHotkey] = Move.U, [kTechDataDisplayName] = "ADVANCED_ARMORY_UPGRADE", [kTechDataTooltipInfo] =  "ADVANCED_ARMORY_TOOLTIP"},
         { [kTechDataId] = kTechId.PrototypeLab, [kTechDataSupply] = kPrototypeLabSupply, [kTechDataHint] = "PROTOTYPE_LAB_HINT", [kTechDataGhostModelClass] = "MarineGhostModel",  [kTechDataRequiresPower] = true,  [kTechDataMapName] = PrototypeLab.kMapName,  [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation,   [kTechDataCostKey] = kPrototypeLabCost,                     [kTechDataResearchTimeKey] = kPrototypeLabBuildTime,       [kTechDataDisplayName] = "PROTOTYPE_LAB", [kTechDataModel] = PrototypeLab.kModelName, [kTechDataMaxHealth] = kPrototypeLabHealth, [kTechDataPointValue] = kPrototypeLabPointValue, [kTechDataTooltipInfo] = "PROTOTYPE_LAB_TOOLTIP", [kTechDataObstacleRadius] = 0.5},
        

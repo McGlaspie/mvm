@@ -22,13 +22,15 @@ function RagdollMixin:OnTakeDamage(damage, attacker, doer, point)
 		local damageImpulse = MvM_GetDamageImpulse(doer, point)
 		
 		if damageImpulse and doer and doer:GetDamageType() == kDamageType.Splash then
-			damageImpulse = damageImpluse * 20
+			damageImpulse = damageImpluse * 200
         end
         
         if damageImpulse then
-            self:GetPhysicsModel():AddImpulse(point, damageImpulse)
+            self:GetPhysicsModel():AddImpulse( point, damageImpulse )
         end
         
     end
     
 end
+
+

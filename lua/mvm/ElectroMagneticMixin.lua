@@ -3,6 +3,7 @@
 // Electro-Magnetic Damage Mixin
 // Author: Brock 'McGlaspie' Gillespie - mcglaspie@gmail.com
 //
+//	FIXME This should handled via GameEffects for Server
 //
 //-----------------------------------------------------------------------------
 
@@ -10,11 +11,13 @@
 ElectroMagneticMixin = CreateMixin( ElectroMagneticMixin )
 ElectroMagneticMixin.type = "EMP"
 
-ElectroMagneticMixin.networkVars =
-{
-    isEmpAffected = "boolean"
-}
+ElectroMagneticMixin.networkVars = {}
 
+/*
+ElectroMagneticMixin.expectedMixins = {
+	GameEffectsMixin = ""
+}
+*/
 ElectroMagneticMixin.expectedCallbacks = {
 	GetIsVulnerableToEMP = "Boolean. Unit receives extra damage if true and ElectroMagnetic damage type dealt"
 }
@@ -23,8 +26,6 @@ ElectroMagneticMixin.optionalCallbacks = {
 	OnEmpDamaged = "Event trigger for entity to handle when it is hit by EMP damage"
 }
 
-
-local kEmpEffectsDuration = 2	//static? Move to Balance or DamageType?
 
 local kEmpEffectSmall = PrecacheAsset("cinematics/marine/electrified_sml.cinematic")
 
@@ -37,6 +38,7 @@ kEmpEffectCinematicTable["SentryBattery"] = kEmpEffectSmall
 
 local function GetElectrifiedCinematic(ent, firstPerson)
 	
+	//Should be able to re-work parasite effect for this
     //if firstPerson then	//TODO Add this
     //    return kEmp1PCinematic
     //end
@@ -51,7 +53,6 @@ end
 
 function ElectroMagneticMixin:__initmixin()
 	
-	self.isEmpAffected = false
 	self.timeEmpStarted = 0
 	self.timeOfLastEmpEffect = 0
 
@@ -67,8 +68,10 @@ function ElectroMagneticMixin:OnTakeDamage(damage, attacker, doer, point, direct
     
 	if doer and doer.GetDamageType and doer:GetDamageType() == kDamageType.ElectroMagnetic then
 		
-		self.isEmpAffected = true
+		self:SetGameEffectMask( kGameEffect.IsPulsed, true )
 		self.timeEmpStarted = Shared.GetTime()
+		
+		self:TriggerEffects("emp_blasted")	//TODO Update and change acordingly to size, class, and team
 		
 		if self.OnEmpDamaged then
 			self:OnEmpDamaged()
@@ -80,7 +83,7 @@ end
 
 
 function ElectroMagneticMixin:GetIsUnderEmpEffect()
-	return self.isEmpAffected	
+	return self:GetGameEffectMask( kGameEffect.IsPulsed )
 end
 
 //TODO Add same effect (except more pronounced) Onos Stun from stomp
@@ -89,13 +92,15 @@ end
 
 function ElectroMagneticMixin:OnUpdate( deltaTime )
 	
-	if Shared.GetTime() > self.timeEmpStarted + kEmpEffectsDuration and self.isEmpAffected then
+	local isPulsed = self:GetGameEffectMask( kGameEffect.IsPulsed )
+	
+	if Shared.GetTime() > self.timeEmpStarted + kEmpDamageEffectsDuration and isPulsed then
 		
-		self.isEmpAffected = false
 		self.timeEmpStarted = 0
 		self.timeOfLastEmpEffect = 0
+		self:SetGameEffectMask( kGameEffect.IsPulsed, false )
 		
-	elseif self.isEmpAffected then
+	elseif isPulsed then
 		
 		if Client and self:GetIsVisible() then
 			//self:_UpdateElectrifiedEffects()	//insufficient atm

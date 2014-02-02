@@ -1,9 +1,14 @@
 
-
+Script.Load("lua/mvm/GhostStructureMixin.lua")
 Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
+Script.Load("lua/mvm/DissolveMixin.lua")
 Script.Load("lua/mvm/PowerConsumerMixin.lua")
-Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+if Client then
+	Script.Load("lua/mvm/CommanderGlowMixin.lua")
+	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+end
+
 
 local newNetworkVars = {}
 
@@ -14,15 +19,26 @@ AddMixinNetworkVars(FireMixin, newNetworkVars)
 
 //-----------------------------------------------------------------------------
 
-local oldExtractorCreate = Extractor.OnCreate
-function Extractor:OnCreate()
 
-	oldExtractorCreate(self)
+function Extractor:OnCreate()	//OVERRIDES
+
+	ResourceTower.OnCreate(self)
+    
+    InitMixin(self, CorrodeMixin)
+    InitMixin(self, RecycleMixin)
+    InitMixin(self, DissolveMixin)
+    InitMixin(self, GhostStructureMixin)
+    InitMixin(self, VortexAbleMixin)
+    InitMixin(self, PowerConsumerMixin)
+    InitMixin(self, ParasiteMixin)
+    InitMixin(self, HiveVisionMixin)
+    InitMixin(self, UpgradableMixin)
 	
 	InitMixin(self, FireMixin)
 	InitMixin(self, DetectableMixin)
 	
 	if Client then
+		InitMixin(self, CommanderGlowMixin)
 		InitMixin(self, ColoredSkinsMixin)
 	end
 	
