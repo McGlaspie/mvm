@@ -1,5 +1,8 @@
 
 
+Script.Load("lua/mvm/Weapons/Marine/GrenadeThrower.lua")
+
+
 local newNetworkVars = {
 	grenadesLeft = "integer (0 to 1)",
 }

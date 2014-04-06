@@ -11,13 +11,16 @@
 ElectroMagneticMixin = CreateMixin( ElectroMagneticMixin )
 ElectroMagneticMixin.type = "EMP"
 
-ElectroMagneticMixin.networkVars = {}
+ElectroMagneticMixin.networkVars = {
+    isPulsed = "boolean"
+}
 
 /*
 ElectroMagneticMixin.expectedMixins = {
 	GameEffectsMixin = ""
 }
 */
+
 ElectroMagneticMixin.expectedCallbacks = {
 	GetIsVulnerableToEMP = "Boolean. Unit receives extra damage if true and ElectroMagnetic damage type dealt"
 }
@@ -27,25 +30,9 @@ ElectroMagneticMixin.optionalCallbacks = {
 }
 
 
-local kEmpEffectSmall = PrecacheAsset("cinematics/marine/electrified_sml.cinematic")
+Shared.PrecacheSurfaceShader("cinematics/vfx_materials/pulse_gre_elec.surface_shader")
 
-local kEmpEffectCinematicTable = {}
-kEmpEffectCinematicTable["MAC"] = kEmpEffectSmall
-kEmpEffectCinematicTable["ARC"] = kEmpEffectSmall
-kEmpEffectCinematicTable["Sentry"] = kEmpEffectSmall
-kEmpEffectCinematicTable["SentryBattery"] = kEmpEffectSmall
-
-
-local function GetElectrifiedCinematic(ent, firstPerson)
-	
-	//Should be able to re-work parasite effect for this
-    //if firstPerson then	//TODO Add this
-    //    return kEmp1PCinematic
-    //end
-    
-    return kEmpEffectCinematicTable[ent:GetClassName()] or kEmpEffectSmall
-    
-end
+local k1P_EMDamamgeEffect = PrecacheAsset("cinematics/marine/1P_em_damagedstatic.cinematic")
 
 
 //-------------------------------------
@@ -53,91 +40,182 @@ end
 
 function ElectroMagneticMixin:__initmixin()
 	
-	self.timeEmpStarted = 0
-	self.timeOfLastEmpEffect = 0
+	self.isPulsed = false
+	
+	if Client then
+		
+		self.electrifiedMaterial = nil
+		self.timeOfLastEmpEffect = 0
+		
+	elseif Server then
+	
+		self.timeEmpStarted = 0
+	
+	end
+
+end
+
+
+function ElectroMagneticMixin:OnTakeDamage( damage, attacker, doer, point, direction )
+    
+	if doer and doer.GetDamageType and doer:GetDamageType() == kDamageType.ElectroMagnetic then
+		self:SetPulsed( attacker, doer )
+	end
+    
+end
+
+
+function ElectroMagneticMixin:SetPulsed( attacker, doer )
+	
+	if Server and not self:GetIsDestroyed() then
+		
+		self.timeEmpStarted = Shared.GetTime()
+		
+		self:TriggerEffects("emp_blasted")
+		
+		if self.OnEmpDamaged then
+			self:OnEmpDamaged()
+		end
+	
+		self.isPulsed = true
+	
+	end
+
+end
+
+
+function ElectroMagneticMixin:GetIsUnderEmpEffect()
+	return self.isPulsed
+end
+
+
+
+
+local function CreateElectrifiedMaterial( self )
+
+	if self.electrifiedMaterial == nil then
+		self.electrifiedMaterial = Client.CreateRenderMaterial()
+		self.electrifiedMaterial:SetMaterial( "cinematics/vfx_materials/pulse_gre_elec.material" )
+	end
+
+end
+
+
+local function CreateElectrifiedEffect( self )
+
+	local model = self:GetRenderModel()
+	
+	if model then
+		
+		CreateElectrifiedMaterial( self )
+		model:AddMaterial( self.electrifiedMaterial )
+		
+	end
+	
+	if self == Client.GetLocalPlayer() then
+		
+		local viewEnt = self:GetViewModelEntity()
+		
+		if viewEnt then
+			
+			local viewModel = viewEnt:GetRenderModel()
+			
+			if viewModel then
+				CreateElectrifiedMaterial( self )
+				viewModel:AddMaterial(  self.electrifiedMaterial  )
+			end
+			
+			//Add 1p cinematic fuzzy screen, garbled UI, etc
+		
+		end
+	
+	end
+
+end
+
+
+local function RemoveElectrifiedEffect( self )
+
+	if self.electrifiedMaterial ~= nil then
+		
+		local model = self:GetRenderModel()
+		if model then
+			model:RemoveMaterial( self.electrifiedMaterial )
+		end
+		
+		if self == Client.GetLocalPlayer() then
+		
+			local viewEnt = self:GetViewModelEntity()
+			if viewEnt then
+				local viewModel = viewEnt:GetRenderModel()
+				if viewModel then
+					viewModel:RemoveMaterial( self.electrifiedMaterial )
+				end
+			end
+		
+		end
+		
+	end
+
+end
+
+
+local function DestroyElectrifiedMaterial( self )
+	
+	if self.electrifiedMaterial then	//check, because in some cases material never created
+		Client.DestroyRenderMaterial( self.electrifiedMaterial )
+		self.electrifiedMaterial = nil
+	end
 
 end
 
 
 function ElectroMagneticMixin:OnDestroy()
-	//TODO stop effects
-end
-
-
-function ElectroMagneticMixin:OnTakeDamage(damage, attacker, doer, point, direction)
-    
-	if doer and doer.GetDamageType and doer:GetDamageType() == kDamageType.ElectroMagnetic then
-		
-		self:SetGameEffectMask( kGameEffect.IsPulsed, true )
-		self.timeEmpStarted = Shared.GetTime()
-		
-		self:TriggerEffects("emp_blasted")	//TODO Update and change acordingly to size, class, and team
-		
-		if self.OnEmpDamaged then
-			self:OnEmpDamaged()
-		end
-		
+	if Client then
+		DestroyElectrifiedMaterial( self )
 	end
-    
 end
 
 
-function ElectroMagneticMixin:GetIsUnderEmpEffect()
-	return self:GetGameEffectMask( kGameEffect.IsPulsed )
-end
-
-//TODO Add same effect (except more pronounced) Onos Stun from stomp
 
 
+local function SharedUpdate( self )
 
-function ElectroMagneticMixin:OnUpdate( deltaTime )
+	local time = Shared.GetTime()
 	
-	local isPulsed = self:GetGameEffectMask( kGameEffect.IsPulsed )
-	
-	if Shared.GetTime() > self.timeEmpStarted + kEmpDamageEffectsDuration and isPulsed then
+	if Client then
 		
-		self.timeEmpStarted = 0
-		self.timeOfLastEmpEffect = 0
-		self:SetGameEffectMask( kGameEffect.IsPulsed, false )
-		
-	elseif isPulsed then
-		
-		if Client and self:GetIsVisible() then
-			//self:_UpdateElectrifiedEffects()	//insufficient atm
-		end
-		
-	end
-
-end
-
-
-if Client then
-    
-    function ElectroMagneticMixin:_UpdateElectrifiedEffects()
-    
-		local time = Shared.GetTime()
-		
-		if not self.timeOfLastEmpEffect or (time > (self.timeOfLastEmpEffect + .25)) then
-            
-			//local firstPerson = (Client.GetLocalPlayer() == self)
-			local cinematicName = GetElectrifiedCinematic(self, false)
-			
-			/*
-			if firstPerson then
-				local viewModel = self:GetViewModelEntity()
-				if viewModel then
-					Shared.CreateAttachedEffect(self, cinematicName, viewModel, Coords.GetTranslation(Vector(0, 0, 0)), "", true, false)
-				end
-			else
-				Shared.CreateEffect(self, cinematicName, self, self:GetAngles():GetCoords())
-			end
-			*/
-			Shared.CreateEffect(self, cinematicName, self, self:GetAngles():GetCoords() )	//does this return a ref?
+		if self.isPulsed and self.timeOfLastEmpEffect == 0 then
 			
 			self.timeOfLastEmpEffect = time
+			CreateElectrifiedEffect( self )
+			
+		elseif not self.isPulsed and self.timeOfLastEmpEffect ~= 0 then
+			
+			RemoveElectrifiedEffect( self )
+			self.timeOfLastEmpEffect = 0
 			
 		end
-    
-    end
-    
+		
+	end
+	
+	if Server then
+	    
+	    if time > self.timeEmpStarted + kEmpDamageEffectsDuration then
+            self.timeEmpStarted = 0
+            self.isPulsed = false
+		end
+		
+	end
+
 end
+
+function ElectroMagneticMixin:OnUpdate()
+	SharedUpdate( self )
+end
+
+function ElectroMagneticMixin:OnProcessMove()
+	SharedUpdate( self )
+end
+
+

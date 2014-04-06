@@ -18,11 +18,11 @@ local kNanoDamageSound = PrecacheAsset("sound/NS2.fev/marine/commander/nano_dama
 
 function NanoShieldMixin:__initmixin()
 
-    //if Server then
+    if Server then
         self.timeNanoShieldInit = 0		//Used for IP shields
-        self.tempShieldLifeTime = 0
+        self.tempShieldLifetime = 0
         self.nanoShielded = false
-    //end
+    end
     
 end
 
@@ -30,7 +30,7 @@ local function ClearNanoShield(self, destroySound)
 
     self.nanoShielded = false
     self.timeNanoShieldInit = 0
-    self.tempShieldLifeTime = 0
+    self.tempShieldLifetime = 0
     
     if Client then
         self:_RemoveEffect()
@@ -53,16 +53,16 @@ function NanoShieldMixin:OnDestroy()
 end
 
 function NanoShieldMixin:ActivateNanoShield( shieldLifetime )
-
+	
     if self:GetCanBeNanoShielded() then
 		
         self.timeNanoShieldInit = Shared.GetTime()
         self.nanoShielded = true
         
-        if shieldLifeTime ~= nil and shieldLifeTime > 0 then
-			self.tempShieldLifeTime = shieldLifeTime
+        if shieldLifetime ~= nil and shieldLifetime > 0 then
+			self.tempShieldLifetime = shieldLifetime
 		else
-			self.tempShieldLifeTime = 0
+			self.tempShieldLifetime = 0
 		end
         
         if Server then
@@ -86,6 +86,7 @@ function NanoShieldMixin:GetIsNanoShielded()
     return self.nanoShielded
 end
 
+
 function NanoShieldMixin:GetCanBeNanoShielded()
 
     local resultTable = { shieldedAllowed = not self.nanoShielded }
@@ -97,6 +98,19 @@ function NanoShieldMixin:GetCanBeNanoShielded()
     return resultTable.shieldedAllowed
     
 end
+
+
+//Override - neede to use MvM balance data
+function NanoShieldMixin:ComputeDamageOverrideMixin(attacker, damage, damageType, time)
+
+    if self.nanoShielded == true then
+        return damage * kNanoShieldDamageReductionDamage, damageType
+    end
+    
+    return damage
+    
+end
+
 
 local function UpdateClientNanoShieldEffects(self)
 
@@ -119,16 +133,29 @@ local function SharedUpdate(self)
             return
         end
         
+        if self:GetGameEffectMask( kGameEffect.OnFire ) then
+			self:SetGameEffectMask( kGameEffect.OnFire, false )	//smother fires
+        end
+        
+        local time = Shared.GetTime()
+        
         // See if nano shield time is over
-        if self.tempShieldLifeTime > 0 and ( self.tempShieldLifeTime + self.timeNanoShieldInit < Shared.GetTime() ) then
-			ClearNanoShield(self, true)
-			self.tempShieldLifeTime = 0
-        elseif self.timeNanoShieldInit + kNanoShieldDuration < Shared.GetTime() then
+        if self.tempShieldLifetime ~= 0 then
+			
+			if time > self.timeNanoShieldInit + self.tempShieldLifetime then	//Temp lifetime values always supercede default duration
+				ClearNanoShield(self, true)
+			end
+			
+        elseif time > self.timeNanoShieldInit + kNanoShieldDuration then
+			
             ClearNanoShield(self, true)
+            
         end
        
     elseif Client and not Shared.GetIsRunningPrediction() then
+		
         UpdateClientNanoShieldEffects(self)
+        
     end
     
 end

@@ -1,8 +1,11 @@
 
-
+Script.Load("lua/mvm/ScriptActor.lua")
+Script.Load("lua/mvm/TeamMixin.lua")
 Script.Load("lua/mvm/LOSMixin.lua")
+Script.Load("lua/mvm/PickupableMixin.lua")
 Script.Load("lua/EntityChangeMixin.lua")
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+
 
 
 local newNetworkVars = {}
@@ -12,13 +15,17 @@ AddMixinNetworkVars(LOSMixin, newNetworkVars)
 //-----------------------------------------------------------------------------
 
 
-local oldJetpackCreate = Jetpack.OnCreate
-function Jetpack:OnCreate()
+function Jetpack:OnCreate()		//OVERRIDES
 	
-	oldJetpackCreate(self)
-	
+	ScriptActor.OnCreate(self)
+    
+    InitMixin(self, BaseModelMixin)
+    InitMixin(self, ModelMixin)
+    InitMixin(self, TeamMixin)
+    InitMixin(self, SelectableMixin)
+    
+    InitMixin(self, PickupableMixin, { kRecipientType = "Marine" })
 	InitMixin(self, EntityChangeMixin)
-	
 	InitMixin(self, LOSMixin)
 	
 	if Client then

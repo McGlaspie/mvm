@@ -11,11 +11,15 @@ Script.Load("lua/mvm/DissolveMixin.lua")
 Script.Load("lua/mvm/PowerConsumerMixin.lua")
 Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/SupplyUserMixin.lua")
+Script.Load("lua/mvm/NanoshieldMixin.lua")
+Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 	Script.Load("lua/mvm/CommanderGlowMixin.lua")
 end
 
+local kAnimationGraph = PrecacheAsset("models/marine/arms_lab/arms_lab.animation_graph")
 
 local kHaloCinematicTeam2 = PrecacheAsset("cinematics/marine/arms_lab/arms_lab_holo_team2.cinematic")
 local kHaloCinematic = PrecacheAsset("cinematics/marine/arms_lab/arms_lab_holo.cinematic")
@@ -27,14 +31,15 @@ local kHaloAttachPoint = "ArmsLab_hologram"
 
 local newNetworkVars = {}
 
-AddMixinNetworkVars(FireMixin, newNetworkVars)
-AddMixinNetworkVars(DetectableMixin, newNetworkVars)
+AddMixinNetworkVars( FireMixin, newNetworkVars )
+AddMixinNetworkVars( DetectableMixin, newNetworkVars )
+AddMixinNetworkVars( ElectroMagneticMixin, newNetworkVars )
 
 
 //-----------------------------------------------------------------------------
 
 
-function ArmsLab:OnCreate()	//OVERRIDES
+function ArmsLab:OnCreate()		//OVERRIDES
 	
 	ScriptActor.OnCreate(self)
     
@@ -63,6 +68,7 @@ function ArmsLab:OnCreate()	//OVERRIDES
     
     InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
+    InitMixin(self, ElectroMagneticMixin)
     
     if Client then
     
@@ -80,19 +86,46 @@ function ArmsLab:OnCreate()	//OVERRIDES
 end
 
 
-local orgArmsLabInit = ArmsLab.OnInitialized
-function ArmsLab:OnInitialized()
+function ArmsLab:OnInitialized()	//OVERRIDES
 	
-	orgArmsLabInit(self)
+	ScriptActor.OnInitialized(self)
+    
+    InitMixin(self, WeldableMixin)
+    InitMixin(self, NanoShieldMixin)
+    
+    if Server then
+    
+        // This Mixin must be inited inside this OnInitialized() function.
+        if not HasMixin(self, "MapBlip") then
+            InitMixin(self, MapBlipMixin)
+        end
+        
+        InitMixin(self, StaticTargetMixin)
+        //InitMixin(self, InfestationTrackerMixin)
+        
+        InitMixin(self, SupplyUserMixin)
+        
+    elseif Client then
+		
+        InitMixin(self, UnitStatusMixin)
+        InitMixin(self, HiveVisionMixin)
+        
+        self:InitializeSkin()
+        
+    end
+    
+    self:SetModel(ArmsLab.kModelName, kAnimationGraph)
 	
-	if Server then
-		InitMixin(self, SupplyUserMixin)
-	end
-	
-	if Client then
-		self:InitializeSkin()
-	end
-	
+end
+
+
+function ArmsLab:OverrideVisionRadius()
+	return 2
+end
+
+
+function ArmsLab:GetIsVulnerableToEMP()
+	return false
 end
 
 

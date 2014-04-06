@@ -1,0 +1,10 @@
+shader = "shaders/ColoredSkins.surface_shader"
+
+albedoMap = "models/marine/mine/mine_view.dds"
+normalMap = "models/marine/mine/mine_view_normal.dds"
+emissiveMap = "models/marine/mine/mine_view_illum.dds"
+specularMap = "models/marine/mine/mine_view_spec.dds"
+
+modelColorMap = "models/marine/mine/mine_view_colorMap.dds"
+numColumns = 1
+numRows = 1

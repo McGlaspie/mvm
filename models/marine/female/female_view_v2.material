@@ -6,4 +6,6 @@ specularMap = "models/marine/female/female_view_v2_spec.dds"
 
 modelColorMap = "models/marine/female/female_view_v2_colorMap.dds"
 numColumns = 1
-numRows = 2
+numRows = 1
+
+surface = "organic"

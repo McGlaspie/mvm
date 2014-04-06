@@ -146,4 +146,4 @@ ReplaceLocals( Commander.OnInitLocalClient, {
 	SetupHud = MvM_SetupHud
 })
 
-Class_Reload( "Commander", {})
+Class_Reload( "Commander", {} )

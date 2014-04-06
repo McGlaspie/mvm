@@ -3,7 +3,8 @@
 	<inputs>
 		<input name="scanMap" type="texture" address="wrap" srgb="true"/>
 		<input name="timeDetected" type="float">1.0</input>
-
+		<input name="teamNumber" type="float">0.0</input>
+		<input name="reduceFx" type="float">0.0</input>
 	</inputs>	
 
 	<params>
@@ -19,16 +20,34 @@
 	<![CDATA[
 		void MaterialShader(in Material_Input input, inout Material material)
 		{
-		
-			const float3 tint = float3(2, 5, 5);
+			
+			const float3 teamOneTint = float3(2, 3, 7);
+			const float3 teamTwoTint = float3(7, 3, 0.15);
+			
+			const float reduceFxAlpha = 0.5;
+			
+			float3 tint;
 			const float animationDuration = 2;
+			
+			if( teamNumber == 1 ) {
+				tint = teamTwoTint;
+			} else if( teamNumber == 2 ) {
+				tint = teamOneTint;
+			} else {
+				tint = float3(1,1,1);
+			}
 			
 			float animationTime = time - timeDetected;
 			float alpha = 1 - clamp( (animationTime) / animationDuration, 0, 1);
-		
+			
 			float3 scan = tex2D( scanMap, input.wsPosition.y * float2(8, 8) + float2(animationTime * 1, animationTime * -1) ).rgb;
-
-			material.emissive = scan * alpha * 2;
+			scan = dot( scan.rgb, float3(0.299, 0.587, 0.114) );	//grey-scale
+			
+			if( reduceFx == 1 ) {
+				alpha = clamp( alpha - reduceFxAlpha, 0, 1);
+			} 
+				
+			material.emissive = scan * tint * alpha;
 			
 		}
 	]]>

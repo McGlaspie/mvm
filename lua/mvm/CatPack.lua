@@ -17,3 +17,6 @@ function CatPack:OnInitialized()
 
 end
 
+
+Class_Reload( "CatPack", {} )
+

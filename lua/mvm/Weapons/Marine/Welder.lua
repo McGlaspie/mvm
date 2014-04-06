@@ -3,9 +3,15 @@
 Script.Load("lua/mvm/Weapons/Weapon.lua")
 Script.Load("lua/mvm/PickupableWeaponMixin.lua")
 Script.Load("lua/mvm/LiveMixin.lua")
+Script.Load("lua/mvm/TeamMixin.lua")
+Script.Load("lua/EntityChangeMixin.lua")
+Script.Load("lua/mvm/LOSMixin.lua")
 
 
 local newNetworkVars = {}
+
+AddMixinNetworkVars(TeamMixin, newNetworkVars )
+AddMixinNetworkVars(LOSMixin, newNetworkVars )
 
 
 local kWelderEffectRate = 0.45
@@ -19,20 +25,81 @@ local kHealScoreAdded = 2
 // kHealScoreAdded points to their score.
 local kAmountHealedForPoints = 600
 
+
 //-----------------------------------------------------------------------------
 
 
-function Welder:GetIsValidRecipient(recipient)
+function Welder:OnCreate()
+
+    Weapon.OnCreate(self)
+    
+    self.welding = false
+    self.deployed = false
+    
+    InitMixin(self, PickupableWeaponMixin)
+    InitMixin(self, LiveMixin)
+    InitMixin(self, EntityChangeMixin)
+    InitMixin(self, LOSMixin)
+    
+    self.loopingSoundEntId = Entity.invalidId
+    
+    if Server then
+    
+        self.loopingFireSound = Server.CreateEntity(SoundEffect.kMapName)
+        self.loopingFireSound:SetAsset(kFireLoopingSound)
+        // SoundEffect will automatically be destroyed when the parent is destroyed (the Welder).
+        self.loopingFireSound:SetParent(self)
+        self.loopingSoundEntId = self.loopingFireSound:GetId()
+        
+    end
+    
+end
+
+
+function Welder:OverrideCheckVision()
+	return false
+end
+
+
+function Welder:GetIsValidRecipient(recipient)	//OVERRIDES
 
 	if self:GetParent() == nil and recipient and recipient:isa("Marine") then	//and not GetIsVortexed(recipient) 
-    
-        local welder = recipient:GetWeapon(Welder.kMapName)
-        return welder == nil
+		
+		if HasMixin( recipient, "Team") and recipient:GetTeamNumber() == self:GetTeamNumber() then
+			local welder = recipient:GetWeapon(Welder.kMapName)
+			return welder == nil
+		end
         
     end
     
     return false
     
+end
+
+
+local kNormalRelevancy = bit.bor( kRelevantToTeam1Unit, kRelevantToTeam2Unit )
+
+local function UpdateSoundRelevancy( self, player )
+	
+	local playerTeamRelev = ConditionalValue(
+		player:GetTeamNumber() == kTeam1Index,
+		kRelevantToTeam1Commander,
+		kRelevantToTeam2Commander
+	)
+	local enemyCommRelv = ConditionalValue(
+		playerTeamRelev == kRelevantToTeam1Commander,
+		kRelevantToTeam2Commander,
+		kRelevantToTeam1Commander
+	)
+	
+	local mask = bit.bor( kNormalRelevancy, playerTeamRelev )
+	
+	if player:GetIsSighted() then
+		mask = bit.bor( mask, enemyCommRelv )
+	end
+	
+	self.loopingFireSound:SetExcludeRelevancyMask( mask )
+	
 end
 
 
@@ -47,7 +114,10 @@ function Welder:OnPrimaryAttack(player)
         self.timeWeldStarted = Shared.GetTime()
         
         if Server then
+			
+			UpdateSoundRelevancy( self, player )
             self.loopingFireSound:Start()
+            
         end
         
     end

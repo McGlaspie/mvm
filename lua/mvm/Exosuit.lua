@@ -5,6 +5,10 @@ Script.Load("lua/mvm/LiveMixin.lua")
 Script.Load("lua/mvm/LOSMixin.lua")
 Script.Load("lua/mvm/WeldableMixin.lua")
 Script.Load("lua/mvm/PickupableMixin.lua")
+Script.Load("lua/mvm/DetectableMixin.lua")
+Script.Load("lua/mvm/FireMixin.lua")
+Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 	Script.Load("lua/mvm/CommanderGlowMixin.lua")
@@ -14,8 +18,10 @@ end
 
 local newNetworkVars = {}
 
-
-AddMixinNetworkVars(LOSMixin, newNetworkVars)
+AddMixinNetworkVars( LOSMixin, newNetworkVars )
+AddMixinNetworkVars( FireMixin, newNetworkVars )
+AddMixinNetworkVars( DetectableMixin, newNetworkVars )
+AddMixinNetworkVars( ElectroMagneticMixin, newNetworkVars )
 
 
 //-----------------------------------------------------------------------------
@@ -37,6 +43,10 @@ function Exosuit:OnCreate ()
     InitMixin(self, LOSMixin)
     
     InitMixin(self, PickupableMixin, { kRecipientType = "Marine" })
+    
+    InitMixin(self, FireMixin)
+    InitMixin(self, DetectableMixin)
+    InitMixin(self, ElectroMagneticMixin)
 
     self:SetPhysicsGroup(PhysicsGroup.SmallStructuresGroup)
     
@@ -59,6 +69,19 @@ function Exosuit:OnInitialized()
 	end
 
 end
+
+
+function Exosuit:OverrideVisionRadius()
+	return 0
+end
+
+function Exosuit:GetIsVulnerableToEMP()
+	return true
+end
+
+//function Exosuit:GetIsFlameAble()
+//	return false
+//end
 
 
 if Client then
@@ -87,7 +110,7 @@ end
 
 function Exosuit:GetIsValidRecipient(recipient)
 	
-	if HasMixin(recipient, "Team") then
+	if HasMixin(recipient, "Team") then	//prevent JP?
 		return not recipient:isa("Exo") and self:GetTeamNumber() == recipient:GetTeamNumber()
 	end
 	
@@ -96,12 +119,13 @@ function Exosuit:GetIsValidRecipient(recipient)
 end
 
 
-function Exosuit:OnEntityChange( oldId, newId )
+//function Exosuit:OnEntityChange( oldId, newId )
 	//ScriptActor.OnEntityChange( oldId, newId )
-end
+//end
+
 
 //-----------------------------------------------------------------------------
 
 
-Class_Reload("Exosuit", newNetworkVars)
+Class_Reload( "Exosuit", newNetworkVars )
 

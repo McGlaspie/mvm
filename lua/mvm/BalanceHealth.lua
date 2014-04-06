@@ -14,12 +14,12 @@
 // HEALTH AND ARMOR		
 kMarineHealth = 100	kMarineArmor = 30	kMarinePointValue = 5
 kJetpackHealth = 100	kJetpackArmor = 30	kJetpackPointValue = 10
-kExosuitHealth = 100	kExosuitArmor = 350	kExosuitPointValue = 25
+kExosuitHealth = 100	kExosuitArmor = 300	kExosuitPointValue = 25
 
 kMarineWeaponHealth = 400
 
 kArmorPerUpgradeLevel = 20
-kExosuitArmorPerUpgradeLevel = 150
+kExosuitArmorPerUpgradeLevel = 125
 kArmorHealScalar = 1
 
 kBuildPointValue = 5
@@ -33,8 +33,8 @@ kBalanceInfestationHurtPercentPerSecond = 2
 kStartHealthScalar = 0.3
 
 kArmoryHealth = 1400	kArmoryArmor = 250	kArmoryPointValue = 10	//1800, 300
-kAdvancedArmoryHealth = 1900	kAdvancedArmoryArmor = 350	kAdvancedArmoryPointValue = 25	//3000, 500
-kCommandStationHealth = 2700	kCommandStationArmor = 1250	kCommandStationPointValue = 40	//3000, 1500
+kAdvancedArmoryHealth = 2000	kAdvancedArmoryArmor = 350	kAdvancedArmoryPointValue = 25	//3000, 500
+kCommandStationHealth = 2800	kCommandStationArmor = 1300	kCommandStationPointValue = 40	//3000, 1500
 kObservatoryHealth = 1400	kObservatoryArmor = 150	kObservatoryPointValue = 15	//1700, 0
 kPhaseGateHealth = 2000	kPhaseGateArmor = 400	kPhaseGatePointValue = 20	//2700, 450
 kRoboticsFactoryHealth = 2200	kRoboticsFactoryArmor = 700	kRoboticsFactoryPointValue = 20	//2800, 1000
@@ -49,11 +49,11 @@ kMACHealth = 300	kMACArmor = 150	kMACPointValue = 5
 
 kMineHealth = 50	kMineArmor = 10	kMinePointValue = 2		//80, 10, 2
 
-kExtractorHealth = 2000	kExtractorArmor = 300	kExtractorPointValue = 15	//3500, 500
+kExtractorHealth = 2000	kExtractorArmor = 350	kExtractorPointValue = 15	//3500, 500
 
 kSentryHealth = 550	kSentryArmor = 80	kSentryPointValue = 10		//500, 100, 10
-kARCHealth = 1200	kARCArmor = 250	kARCPointValue = 20		//2000, 500, 20
-kARCDeployedHealth = 1200	kARCDeployedArmor = 0	kARCPointValue = 20		//2000, 0, 20
+kARCHealth = 1250	kARCArmor = 300	kARCPointValue = 20		//2000, 500, 20
+kARCDeployedHealth = 1250	kARCDeployedArmor = 0	kARCPointValue = 20		//2000, 0, 20
 
 kPowerPointHealth = 1400	kPowerPointArmor = 650	kPowerPointPointValue = 0	//2000, 1000, 15
 kDoorHealth = 1200	kDoorArmor = 500	kDoorPointValue = 0	//2000, 1000, 15

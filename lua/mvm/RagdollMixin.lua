@@ -9,6 +9,7 @@ local function MvM_GetDamageImpulse(doer, point)
     if doer and point then
         return GetNormalizedVector(doer:GetOrigin() - point) * 1.5 * 0.01
     end
+    
     return nil
     
 end

@@ -65,7 +65,7 @@ function GUIWelderDisplay:Initialize()
     healthCircleSettings.InheritParentAlpha = true
     self.circle = GUIDial()
     self.circle:Initialize(healthCircleSettings)
-    self.circle.dialBackground:SetShader("shaders/GUI_TeamThemed.surface_shader")
+    self.circle.dialBackground:SetShader("shaders/GUI_TeamThemed.surface_shader")   //FIXME Dial not affected
     
     // Slightly larger copy of the text for a glow effect
     self.percentageText = GUIManager:CreateTextItem()
@@ -76,7 +76,7 @@ function GUIWelderDisplay:Initialize()
     self.percentageText:SetTextAlignmentY(GUIItem.Align_Center)
     self.percentageText:SetPosition(Vector(256, 256, 0))
     self.percentageText:SetIsVisible(false)
-    self.percentageText:SetColor(Color(1, 1, 1, 1))
+    self.percentageText:SetColor( Color(1, 1, 1, 1) )
     
     // Force an update so our initial state is correct.
     self:Update(0)
@@ -112,11 +112,12 @@ function GUIWelderDisplay:UpdateTeamColors()
 	self.squares:SetFloatParameter( "teamBaseColorG", ui_color.g )
 	self.squares:SetFloatParameter( "teamBaseColorB", ui_color.b )
 	
+	//FIXME Below is not effecting Dial
 	self.circle.dialBackground:SetFloatParameter( "teamBaseColorR", kGUI_HealthBarColors[self.teamNumber].r )
 	self.circle.dialBackground:SetFloatParameter( "teamBaseColorG", kGUI_HealthBarColors[self.teamNumber].g )
 	self.circle.dialBackground:SetFloatParameter( "teamBaseColorB", kGUI_HealthBarColors[self.teamNumber].b )
 	
-	self.percentageText:SetColor( kGUI_NameTagFontColors[ self.teamNumber ] )
+	//self.percentageText:SetColor( kGUI_NameTagFontColors[ self.teamNumber ] )
 
 end
 

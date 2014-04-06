@@ -29,7 +29,7 @@ function DamageMixin:DoDamage(damage, target, point, direction, surface, altMode
     local parentVortexed = false
     
     if target and target:isa("Ragdoll") then
-        return true	//experimental - check damageType, if explodsive, continue...
+        return true	//experimental - check damageType, if explosive, continue...
     end
     
     if self:isa("Player") then

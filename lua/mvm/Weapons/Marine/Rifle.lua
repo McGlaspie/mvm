@@ -6,11 +6,32 @@ Script.Load("lua/mvm/LiveMixin.lua")
 
 local newNetworkVars = {}
 
+local kNumberOfVariants = 3
+
 
 //-----------------------------------------------------------------------------
 
+
+function Rifle:OnCreate()	//OVERRIDES
+
+    ClipWeapon.OnCreate(self)
+    
+    InitMixin(self, PickupableWeaponMixin)
+    //InitMixin(self, EntityChangeMixin)
+    InitMixin(self, LiveMixin)
+    
+    if Client then
+        InitMixin(self, ClientWeaponEffectsMixin)
+    elseif Server then
+        self.soundVariant = Shared.GetRandomInt(1, kNumberOfVariants)
+        self.soundType = self.soundVariant
+    end
+    
+end
+
+
 function Rifle:GetSpread()
-    return ClipWeapon.kCone4Degrees	//3
+    return ClipWeapon.kCone4Degrees	//3		//Move to Balance
 end
 
 
@@ -22,6 +43,8 @@ if Client then
     
 end
 
+
 //-----------------------------------------------------------------------------
+
 
 Class_Reload("Rifle", newNetworkVars)

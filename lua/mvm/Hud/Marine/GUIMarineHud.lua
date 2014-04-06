@@ -275,7 +275,7 @@ function GUIMarineHUD:Initialize()
     self.locationText:SetLayer(kGUILayerPlayerHUDForeground2)
 	self.locationText:SetColor(
 		ConditionalValue(
-			PlayerUI_GetTeamNumber() == kTeam1Index,
+			playerTeam == kTeam1Index,
 			kBrightColorTeam1,
 			kBrightColorTeam2
 		)
@@ -300,7 +300,7 @@ function GUIMarineHUD:Initialize()
     
     local style = { }
     style.textColor = ConditionalValue(
-		PlayerUI_GetTeamNumber() == kTeam1Index,
+		playerTeam == kTeam1Index,
 		kBrightColorTeam1,
 		kBrightColorTeam2
 	)
@@ -624,7 +624,7 @@ end
 
 //FIXME This is SO fucking ugly it's not even remotely close to funny...
 function GUIMarineHUD:UpdateHudColors()
-
+	
 	local playerTeam = PlayerUI_GetTeamNumber()
 	local ui_baseColor = ConditionalValue(
 		playerTeam == kTeam1Index,
@@ -632,22 +632,26 @@ function GUIMarineHUD:UpdateHudColors()
 		kGUI_Team2_BaseColor
 	)
 	
-	self.minimapFrame:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
-    self.minimapFrame:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
-    self.minimapFrame:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
-    
-    self.minimapScanLines:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
-    self.minimapScanLines:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
-    self.minimapScanLines:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
-    
-    self.minimapStencil:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
-    self.minimapStencil:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
-    self.minimapStencil:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
-    
-    self.minimapBackground:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
-    self.minimapBackground:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
-    self.minimapBackground:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
-    
+	if self.minimapEnabled then
+		
+		self.minimapFrame:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+		self.minimapFrame:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+		self.minimapFrame:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+		
+		self.minimapScanLines:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+		self.minimapScanLines:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+		self.minimapScanLines:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+		
+		self.minimapStencil:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+		self.minimapStencil:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+		self.minimapStencil:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+		
+		self.minimapBackground:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+		self.minimapBackground:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+		self.minimapBackground:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+		
+	end
+	
     self.bottomRightFrame:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
     self.bottomRightFrame:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
     self.bottomRightFrame:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
@@ -690,19 +694,14 @@ end
 
 
 
+
 function GUIMarineHUD:Update(deltaTime)
 
     PROFILE("GUIMarineHUD:Update")
     
-    /*
-    if PlayerUI_GetHasNewOrder() then
-        self.minimapScript:SetDesiredZoom(0.3)
-    else
-        self.minimapScript:SetDesiredZoom(1)
-    end
-    */
+    local fullMode = Client.GetOptionInteger("hudmode", kHUDMode.Full) == kHUDMode.Full
     
-    self:UpdateHudColors()
+    self:SetHUDMapEnabled(fullMode)
     
     // Update health / armor bar
     self.statusDisplay:Update(deltaTime, { PlayerUI_GetPlayerHealth(), PlayerUI_GetPlayerMaxHealth(), PlayerUI_GetPlayerArmor(), PlayerUI_GetPlayerMaxArmor(), PlayerUI_GetPlayerParasiteState() } )
@@ -721,65 +720,68 @@ function GUIMarineHUD:Update(deltaTime)
     // Update notifications and events
     if self.lastNotificationUpdate + GUIMarineHUD.kNotificationUpdateIntervall < Client.GetTime() then
     
-        self.eventDisplay:Update(Client.GetTime() - self.lastNotificationUpdate, { PlayerUI_GetRecentNotification(), PlayerUI_GetRecentPurchaseable() } )
+        local notification = PlayerUI_GetRecentNotification()
+        
+        if Client.GetOptionInteger("hudmode", kHUDMode.Full) == kHUDMode.Minimal then
+            notification = nil
+        end
+    
+        self.eventDisplay:Update(Client.GetTime() - self.lastNotificationUpdate, { notification, PlayerUI_GetRecentPurchaseable() } )
         self.lastNotificationUpdate = Client.GetTime()
         
     end
     
     // Update inventory
     self.inventoryDisplay:Update(deltaTime, { PlayerUI_GetActiveWeaponTechId(), PlayerUI_GetInventoryTechIds() })
+
+    if Client.GetOptionInteger("hudmode", kHUDMode.Full) == kHUDMode.Full then
     
-    // Update commander name
-    local commanderName = PlayerUI_GetCommanderName()
+        // Update commander name
+        local commanderName = PlayerUI_GetCommanderName()
     
-    if commanderName == nil then
+        self.commanderName:SetIsVisible(true)
     
-        commanderName = Locale.ResolveString("NO_COMMANDER")
+        if commanderName == nil then
         
-        if not self.commanderNameIsAnimating then
+            commanderName = Locale.ResolveString("NO_COMMANDER")
+            
+            if not self.commanderNameIsAnimating then
+            
+                self.commanderNameIsAnimating = true
+                self.commanderName:SetColor(Color(1, 0, 0, 1))
+                self.commanderName:FadeOut(1, nil, AnimateLinear, AnimFadeIn)
+                
+            end
+            
+        else
         
-            self.commanderNameIsAnimating = true
-            self.commanderName:SetColor(Color(1, 0, 0, 1))
-            self.commanderName:FadeOut(1, nil, AnimateLinear, AnimFadeIn)
+            commanderName = Locale.ResolveString("COMMANDER") .. commanderName
+        
+            if self.commanderNameIsAnimating then
+            
+                self.commanderNameIsAnimating = false
+                self.commanderName:DestroyAnimations()
+                self.commanderName:SetColor(GUIMarineHUD.kActiveCommanderColor)
+                
+            end
             
         end
         
+        commanderName = string.upper(commanderName)
+        if self.lastCommanderName ~= commanderName then
+        
+            self.commanderName:DestroyAnimation("COMM_TEXT_WRITE")
+            self.commanderName:SetText("")
+            self.commanderName:SetText(commanderName, 0.5, "COMM_TEXT_WRITE")
+            self.lastCommanderName = commanderName
+            
+    end
+    
     else
-    
-        commanderName = Locale.ResolveString("COMMANDER") .. commanderName
-    
-        if self.commanderNameIsAnimating then
         
-            self.commanderNameIsAnimating = false
-            self.commanderName:DestroyAnimations()
-            self.commanderName:SetColor(GUIMarineHUD.kActiveCommanderColor)
-            
-        end
+        self.commanderName:SetIsVisible(false)
         
     end
-    
-    commanderName = string.upper(commanderName)
-    if self.lastCommanderName ~= commanderName then
-    
-        self.commanderName:DestroyAnimation("COMM_TEXT_WRITE")
-        self.commanderName:SetText("")
-        self.commanderName:SetText(commanderName, 0.5, "COMM_TEXT_WRITE")
-        self.lastCommanderName = commanderName
-        
-    end
-    
-    // Update game time
-    local gameTime = PlayerUI_GetGameStartTime()
-    
-    if gameTime ~= 0 then
-        gameTime = math.floor(Shared.GetTime()) - PlayerUI_GetGameStartTime()
-    end
-    
-    //local minutes = math.floor(gameTime/60)
-    //local seconds = gameTime - minutes*60
-    //local gameTimeText = string.format("game time: %d:%02d", minutes, seconds)
-    
-    //self.gameTimeText:SetText(gameTimeText)
     
     // Update minimap
     local locationName = PlayerUI_GetLocationName()
@@ -790,11 +792,11 @@ function GUIMarineHUD:Update(deltaTime)
     end
     
     if self.lastLocationText ~= locationName then
-		
+    
         // Delete current string and start write animation
         self.locationText:DestroyAnimations()
         self.locationText:SetText("")
-        self.locationText:SetText( string.format( Locale.ResolveString("IN_LOCATION"), locationName ), 0.8 )
+        self.locationText:SetText(string.format(Locale.ResolveString("IN_LOCATION"), locationName), 0.8)
         
         self.lastLocationText = locationName
         
@@ -835,36 +837,42 @@ function GUIMarineHUD:Update(deltaTime)
     GUIAnimatedScript.Update(self, deltaTime)
     
     // Update power indicator
-    if not self.lastPowerCheck then
-        self.lastPowerCheck = Client.GetTime()
-    end
+    if self.minimapScript then
     
-    if self.lastPowerCheck + 0.3 < Client.GetTime() then
-    
-        local currentPowerState = POWER_OFF
-        local isPowered, powerSource = unpack(PlayerUI_GetLocationPower())
+        if not self.lastPowerCheck then
+            self.lastPowerCheck = Client.GetTime()
+        end
         
-        if powerSource and powerSource:GetIsSocketed() then
-        
-            if isPowered then
-                currentPowerState = ConditionalValue(powerSource:GetHealth() < powerSource:GetMaxHealth(), POWER_DAMAGED, POWER_ON)
+        if self.lastPowerCheck + 0.3 < Client.GetTime() then
+			
+			//TODO Add scouted flag check
+			
+            local currentPowerState = POWER_OFF
+            local isPowered, powerSource = unpack(PlayerUI_GetLocationPower())
+            
+            if powerSource and powerSource:GetIsSocketed() then
+            
+                if isPowered then
+                    currentPowerState = ConditionalValue(powerSource:GetHealth() < powerSource:GetMaxHealth(), POWER_DAMAGED, POWER_ON)
+                else
+                    currentPowerState = ConditionalValue(powerSource:GetIsDisabled(), POWER_DESTROYED, POWER_DAMAGED)  
+                end
+                
             else
-                currentPowerState = ConditionalValue(powerSource:GetIsDisabled(), POWER_DESTROYED, POWER_DAMAGED)  
+                currentPowerState = POWER_OFF
             end
             
-        else
-            currentPowerState = POWER_OFF
-        end
-        
-        if currentPowerState ~= self.lastPowerState then
-        
-            self:UpdatePowerIcon(currentPowerState)
-            self.lastPowerState = currentPowerState
+            if currentPowerState ~= self.lastPowerState then
+            
+                self:UpdatePowerIcon(currentPowerState)
+                self.lastPowerState = currentPowerState
+                
+            end
+            
+            self.lastPowerCheck = Client.GetTime()
             
         end
-        
-        self.lastPowerCheck = Client.GetTime()
-        
+    
     end
 
     // Update nanoshield
@@ -885,7 +893,11 @@ function GUIMarineHUD:Update(deltaTime)
             
         end
         
-    end   
+    end
+    
+    
+    self:UpdateHudColors()
+    
     
 end
 
@@ -1027,9 +1039,13 @@ local kDefaultZoom = 0.75
 // The Client options is the master copy, so modify that, and call this when it changes
 function GUIMarineHUD:RefreshMinimapZoom()
 
-    local normRoot = Clamp( Client.GetOptionFloat("minimap-zoom", kDefaultZoom), 0, 1 )
-    local root = (1-normRoot)*kMinUserZoomRoot + normRoot*kMaxUserZoomRoot
-    self.minimapScript:SetDesiredZoom( root*root )
+    if self.minimapScript then
+
+        local normRoot = Clamp( Client.GetOptionFloat("minimap-zoom", kDefaultZoom), 0, 1 )
+        local root = (1-normRoot)*kMinUserZoomRoot + normRoot*kMaxUserZoomRoot
+        self.minimapScript:SetDesiredZoom( root*root )
+
+    end
 
 end
 

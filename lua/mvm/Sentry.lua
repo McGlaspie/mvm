@@ -12,6 +12,8 @@ Script.Load("lua/mvm/WeldableMixin.lua")
 Script.Load("lua/mvm/DissolveMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
 Script.Load("lua/mvm/SupplyUserMixin.lua")
+Script.Load("lua/mvm/NanoshieldMixin.lua")
+
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 	Script.Load("lua/mvm/CommanderGlowMixin.lua")
@@ -39,7 +41,7 @@ Sentry.kMaxYaw = Sentry.kFov / 2
 
 Sentry.kBaseROF = kSentryAttackBaseROF
 Sentry.kRandROF = kSentryAttackRandROF
-Sentry.kSpread = Math.Radians(5)	//6
+Sentry.kSpread = Math.Radians(6)
 Sentry.kBulletsPerSalvo = kSentryAttackBulletsPerSalvo
 Sentry.kBarrelScanRate = 90      		// Degrees per second to scan back and forth with no target
 Sentry.kBarrelMoveRate = 180			//150    // Degrees per second to move sentry orientation towards target or back to flat when targeted
@@ -59,6 +61,46 @@ AddMixinNetworkVars(ElectroMagneticMixin, newNetworkVars)
 
 
 //-----------------------------------------------------------------------------
+
+//FIXME extending the SentryBattery attach range screws with this function
+function GetCheckSentryLimit( techId, origin, normal, commander )		//OVERRIDES & Global
+
+    -- Prevent the case where a Sentry in one room is being placed next to a
+    -- SentryBattery in another room.
+    local battery = GetSentryBatteryInRoom( origin, commander:GetTeamNumber() )
+    if battery and battery:GetTeamNumber() == commander:GetTeamNumber() then
+    
+        if ( battery:GetOrigin() - origin):GetLength() > SentryBattery.kRange then
+            return false
+        end
+        
+    else
+        return false
+    end
+    
+    local location = GetLocationForPoint(origin)
+    local locationName = location and location:GetName() or nil
+    local numInRoom = 0
+    local validRoom = false
+    
+    if locationName then
+    
+        validRoom = true
+        
+        for index, sentry in ientitylist(Shared.GetEntitiesWithClassname("Sentry")) do
+			
+            if sentry:GetLocationName() == locationName and sentry:GetTeamNumber() == commander:GetTeamNumber() then
+                numInRoom = numInRoom + 1
+            end
+            
+        end
+        
+    end
+    
+    return validRoom and numInRoom < kSentriesPerBattery
+    
+end
+
 
 
 //local oldSentryCreate = Sentry.OnCreate
@@ -121,7 +163,7 @@ function Sentry:OnCreate()		//OVERRIDES
         // Play a "ping" sound effect every Sentry.kPingInterval while scanning.
         local function PlayScanPing(sentry)
         
-            if GetIsUnitActive(self) and not self.attacking and self.attachedToBattery then
+            if MvM_GetIsUnitActive(self) and not self.attacking and self.attachedToBattery then
                 local player = Client.GetLocalPlayer()
                 Shared.PlayPrivateSound(player, kSentryScanSoundName, nil, 1, sentry:GetModelOrigin())
             end
@@ -270,7 +312,7 @@ function Sentry:OnUpdate(time)
 			self.skinAccentColor = ConditionalValue(
 				self.attachedToBattery,
 				self:GetAccentSkinColor(),
-				Color( 0, 0, 0, 1 )
+				Color( 0, 0, 0 )
 			)
 		
 		end
@@ -290,15 +332,25 @@ function Sentry:GetIsVulnerableToEMP()
 end
 
 
+function Sentry:OverrideVisionRadius()
+	return 2
+end
+
+
 if Server then
 	
 	function Sentry:OnEmpDamaged()
 		self:Confuse( Sentry.kConfuseDuration )
 	end
 	
+	function Sentry:OnOverrideCanSetFire()
+		self:Confuse( Sentry.kConfuseDuration )	//hax, bleh
+		return true
+	end
+	
 	
 	//FIXME Crouching marine seems to destroy accuracy
-	//TODO Add weapon damage upgrades
+	//TODO Add weapon damage upgrades?
 	function Sentry:FireBullets()	//OVERRIDES (Removed Umbra check)
 
         local fireCoords = Coords.GetLookIn(Vector(0,0,0), self.targetDirection)     
@@ -331,29 +383,7 @@ if Server then
     end
     
     
-    local function UpdateConfusedState(self, target)
-		
-        if not self.confused then	//and target 
-			
-            if self:GetIsOnFire() then
-				self:Confuse( Sentry.kConfuseDuration )
-			else
-				self.confused = false
-			end
-			
-            
-        elseif self.confused then
-			
-            if self.timeConfused < Shared.GetTime() then
-                self.confused = false
-            end
-            
-        end
-
-    end
-    
-    
-    local function UpdateBatteryState(self)
+    local function MvM_SentryUpdateBatteryState(self)
 		
         local time = Shared.GetTime()
         
@@ -364,7 +394,7 @@ if Server then
             local ents = GetEntitiesForTeamWithinRange("SentryBattery", self:GetTeamNumber(), self:GetOrigin(), SentryBattery.kRange)
             for index, ent in ipairs(ents) do
             
-                if GetIsUnitActive(ent) then
+                if MvM_GetIsUnitActive(ent) then
                     self.attachedToBattery = true
                     break
                 end
@@ -377,6 +407,8 @@ if Server then
         
     end    
     
+	
+	ReplaceLocals( Sentry.OnUpdate, { UpdateBatteryState = MvM_SentryUpdateBatteryState } )
 
 end	//Server
 
@@ -384,4 +416,4 @@ end	//Server
 //-----------------------------------------------------------------------------
 
 
-Class_Reload("Sentry", newNetworkVars)
+Class_Reload( "Sentry", newNetworkVars )

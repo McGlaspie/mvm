@@ -1,4 +1,45 @@
 
+Script.Load("lua/mvm/TeamMixin.lua")
+Script.Load("lua/mvm/LOSMixin.lua")
+Script.Load("lua/EntityChangeMixin.lua")
+Script.Load("lua/mvm/PickupableWeaponMixin.lua")
+Script.Load("lua/mvm/DamageMixin.lua")
+
+
+local newNetworkVars = {}
+
+AddMixinNetworkVars(LOSMixin, newNetworkVars )
+
+
+//-----------------------------------------------------------------------------
+
+
+function Grenade:OnCreate()		//OVERRIDES
+
+    PredictedProjectile.OnCreate(self)
+    
+    InitMixin(self, BaseModelMixin)	//ClientModel?
+    InitMixin(self, ModelMixin)
+    InitMixin(self, TeamMixin)
+    InitMixin(self, DamageMixin)
+    InitMixin(self, VortexAbleMixin)
+    InitMixin(self, EntityChangeMixin)
+    InitMixin(self, LOSMixin)
+
+    if Server then    
+        self:AddTimedCallback( Grenade.Detonate, kGrenadeLifetime )        
+    end
+    
+end
+
+
+//function Grenade:OverrideCheckVision()
+//	return false
+//end
+
+function Grenade:OverrideVisionRadius()
+	return 0
+end
 
 
 if Server then
@@ -12,15 +53,22 @@ if Server then
 			"Live", self:GetOrigin(), kGrenadeLauncherGrenadeDamageRadius, 
 			function(entity)
 				return 
-					( HasMixin(entity, "Team") 
-					and entity:GetTeamNumber() ~= self:GetTeamNumber()
-					and entity ~= self:GetOwner() )
+					( 
+						HasMixin(entity, "Team") 
+						and entity:GetTeamNumber() ~= self:GetTeamNumber()
+						and entity ~= self:GetOwner() 
+					)
 					or ( entity:isa("PowerPoint") and entity:GetIsBuilt() )		//FIXME Check is failing
 			end
 		)
         
         // Remove grenade and add firing player.
         table.removevalue(hitEntities, self)
+        
+        if hitEntities and #hitEntities > 0 then
+			self:SetIsSighted(true)
+			self:SetExcludeRelevancyMask( bit.bor( kRelevantToTeam1, kRelevantToTeam2 ) )
+        end
         
         // full damage on direct impact
         if targetHit then
@@ -54,7 +102,9 @@ if Server then
 
 end	//Server
 
+
 //-----------------------------------------------------------------------------
 
-Class_Reload("Grenade", {})
+
+Class_Reload( "Grenade", newNetworkVars )
 

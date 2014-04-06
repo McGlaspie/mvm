@@ -393,9 +393,76 @@ function BuildTechData()	//OVERRIDES
 				[kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation,
 				[kTechDataTooltipInfo] = "ARMORY_TOOLTIP"
 		},
-        { [kTechDataId] = kTechId.ArmsLab, [kTechDataSupply] = kArmsLabSupply, [kTechDataHint] = "ARMSLAB_HINT", [kTechDataGhostModelClass] = "MarineGhostModel", [kTechDataRequiresPower] = true,       [kTechDataMapName] = ArmsLab.kMapName,                  [kTechDataDisplayName] = "ARMS_LAB",            [kTechDataCostKey] = kArmsLabCost,              [kTechDataBuildTime] = kArmsLabBuildTime, [kTechDataMaxHealth] = kArmsLabHealth, [kTechDataMaxArmor] = kArmsLabArmor, [kTechDataEngagementDistance] = kArmsLabEngagementDistance, [kTechDataModel] = ArmsLab.kModelName, [kTechDataPointValue] = kArmsLabPointValue, [kTechDataHotkey] = Move.A, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataTooltipInfo] = "ARMS_LAB_TOOLTIP", [kTechDataObstacleRadius] = 0.25},
-        { [kTechDataId] = kTechId.Sentry,  [kTechDataSupply] = kSentrySupply, [kTechDataBuildMethodFailedMessage] = "COMMANDERERROR_TOO_MANY_SENTRIES",      [kTechDataHint] = "SENTRY_HINT", [kTechDataGhostModelClass] = "MarineGhostModel", [kTechDataMapName] = Sentry.kMapName,                   [kTechDataDisplayName] = "SENTRY_TURRET",       [kTechDataCostKey] = kSentryCost,         [kTechDataPointValue] = kSentryPointValue, [kTechDataModel] = Sentry.kModelName,            [kTechDataBuildTime] = kSentryBuildTime, [kTechDataMaxHealth] = kSentryHealth,  [kTechDataMaxArmor] = kSentryArmor, [kTechDataDamageType] = kSentryAttackDamageType, [kTechDataSpecifyOrientation] = true, [kTechDataHotkey] = Move.S, [kTechDataInitialEnergy] = kSentryInitialEnergy,      [kTechDataMaxEnergy] = kSentryMaxEnergy, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataEngagementDistance] = kSentryEngagementDistance, [kTechDataTooltipInfo] = "SENTRY_TOOLTIP", [kStructureBuildNearClass] = "SentryBattery", [kStructureAttachRange] = SentryBattery.kRange, [kTechDataBuildRequiresMethod] = GetCheckSentryLimit, [kTechDataGhostGuidesMethod] = GetBatteryInRange, [kTechDataObstacleRadius] = 0.25 },
-        { [kTechDataId] = kTechId.SentryBattery, [kTechDataSupply] = kSentryBatterySupply, [kTechDataBuildRequiresMethod] = GetRoomHasNoSentryBattery, [kTechDataBuildMethodFailedMessage] = "COMMANDERERROR_ONLY_ONE_BATTERY_PER_ROOM",  [kTechDataHint] = "SENTRY_BATTERY_HINT", [kTechDataGhostModelClass] = "MarineGhostModel", [kTechDataMapName] = SentryBattery.kMapName,                [kTechDataDisplayName] = "SENTRY_BATTERY",          [kTechDataCostKey] = kSentryBatteryCost,      [kTechDataPointValue] = kSentryBatteryPointValue, [kTechDataModel] = SentryBattery.kModelName,  [kTechDataEngagementDistance] = 2,   [kTechDataBuildTime] = kSentryBatteryBuildTime, [kTechDataMaxHealth] = kSentryBatteryHealth,  [kTechDataMaxArmor] = kSentryBatteryArmor, [kTechDataTooltipInfo] = "SENTRY_BATTERY_TOOLTIP", [kTechDataHotkey] = Move.S, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kVisualRange] = SentryBattery.kRange, [kTechDataObstacleRadius] = 0.25},
+        { 
+            [kTechDataId] = kTechId.ArmsLab, 
+                [kTechDataSupply] = kArmsLabSupply, 
+                [kTechDataHint] = "ARMSLAB_HINT", 
+                [kTechDataGhostModelClass] = "MarineGhostModel", 
+                [kTechDataRequiresPower] = true,       
+                [kTechDataMapName] = ArmsLab.kMapName,                  
+                [kTechDataDisplayName] = "ARMS_LAB",            
+                [kTechDataCostKey] = kArmsLabCost,              
+                [kTechDataBuildTime] = kArmsLabBuildTime, 
+                [kTechDataMaxHealth] = kArmsLabHealth, 
+                [kTechDataMaxArmor] = kArmsLabArmor, 
+                [kTechDataEngagementDistance] = kArmsLabEngagementDistance, 
+                [kTechDataModel] = ArmsLab.kModelName, 
+                [kTechDataPointValue] = kArmsLabPointValue, 
+                [kTechDataHotkey] = Move.A, 
+                [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, 
+                [kTechDataTooltipInfo] = "ARMS_LAB_TOOLTIP", 
+                [kTechDataObstacleRadius] = 0.25
+        },
+        { 
+			[kTechDataId] = kTechId.Sentry,  
+				[kTechDataSupply] = kSentrySupply, 
+				[kTechDataBuildMethodFailedMessage] = "COMMANDERERROR_TOO_MANY_SENTRIES",      
+				[kTechDataHint] = "SENTRY_HINT", 
+				[kTechDataGhostModelClass] = "MarineGhostModel", 	
+				[kTechDataMapName] = Sentry.kMapName,                   
+				[kTechDataDisplayName] = "SENTRY_TURRET",       
+				[kTechDataCostKey] = kSentryCost,         
+				[kTechDataPointValue] = kSentryPointValue, 
+				[kTechDataModel] = Sentry.kModelName,            
+				[kTechDataBuildTime] = kSentryBuildTime, 
+				[kTechDataMaxHealth] = kSentryHealth,  
+				[kTechDataMaxArmor] = kSentryArmor, 
+				[kTechDataDamageType] = kSentryAttackDamageType, 
+				[kTechDataSpecifyOrientation] = true, 
+				[kTechDataHotkey] = Move.S, 
+				[kTechDataInitialEnergy] = kSentryInitialEnergy,      
+				[kTechDataMaxEnergy] = kSentryMaxEnergy, 
+				[kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, 
+				[kTechDataEngagementDistance] = kSentryEngagementDistance, 
+				[kTechDataTooltipInfo] = "SENTRY_TOOLTIP", 
+				[kStructureBuildNearClass] = "SentryBattery", 
+				[kStructureAttachRange] = SentryBattery.kRange, 
+				[kTechDataBuildRequiresMethod] = GetCheckSentryLimit, 
+				[kTechDataGhostGuidesMethod] = GetBatteryInRange, 
+				[kTechDataObstacleRadius] = 0.25 
+		},
+        { 
+			[kTechDataId] = kTechId.SentryBattery, 
+			[kTechDataSupply] = kSentryBatterySupply, 
+			[kTechDataBuildRequiresMethod] = GetRoomHasNoSentryBattery, 
+			[kTechDataBuildMethodFailedMessage] = "COMMANDERERROR_ONLY_ONE_BATTERY_PER_ROOM",  
+			[kTechDataHint] = "SENTRY_BATTERY_HINT", 
+			[kTechDataGhostModelClass] = "MarineGhostModel", 
+			[kTechDataMapName] = SentryBattery.kMapName,                
+			[kTechDataDisplayName] = "SENTRY_BATTERY",          
+			[kTechDataCostKey] = kSentryBatteryCost,      
+			[kTechDataPointValue] = kSentryBatteryPointValue, 
+			[kTechDataModel] = SentryBattery.kModelName,  
+			[kTechDataEngagementDistance] = 2,   
+			[kTechDataBuildTime] = kSentryBatteryBuildTime, 
+			[kTechDataMaxHealth] = kSentryBatteryHealth,  
+			[kTechDataMaxArmor] = kSentryBatteryArmor, 
+			[kTechDataTooltipInfo] = "SENTRY_BATTERY_TOOLTIP", 
+			[kTechDataHotkey] = Move.S, 
+			[kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, 
+			[kVisualRange] = SentryBattery.kRange, 
+			[kTechDataObstacleRadius] = 0.25
+		},
 
         // MACs 
         { [kTechDataId] = kTechId.MACEMP,   
@@ -437,6 +504,16 @@ function BuildTechData()	//OVERRIDES
 				[kTechDataUpgradeTech] = kTechId.Armory,
 				[kTechDataPointValue] = kAdvancedArmoryPointValue
 		},
+		{ 
+            [kTechDataId] = kTechId.AdvancedArmoryUpgrade, 
+                [kTechDataSupply] = kAdvancedArmorySupply,
+                [kTechDataCostKey] = kAdvancedArmoryUpgradeCost,  
+                [kTechIDShowEnables] = false,          
+                [kTechDataResearchTimeKey] = kAdvancedArmoryResearchTime,  
+                [kTechDataHotkey] = Move.U, 
+                [kTechDataDisplayName] = "ADVANCED_ARMORY_UPGRADE", 
+                [kTechDataTooltipInfo] =  "ADVANCED_ARMORY_TOOLTIP"
+        },
         { [kTechDataId] = kTechId.Observatory, [kTechDataSupply] = kObservatorySupply, [kTechDataHint] = "OBSERVATORY_HINT", [kTechDataGhostModelClass] = "MarineGhostModel",  [kTechDataRequiresPower] = true,        [kTechDataMapName] = Observatory.kMapName,    [kTechDataDisplayName] = "OBSERVATORY",  [kVisualRange] = Observatory.kDetectionRange, [kTechDataCostKey] = kObservatoryCost,       [kTechDataModel] = Observatory.kModelName,            [kTechDataBuildTime] = kObservatoryBuildTime, [kTechDataMaxHealth] = kObservatoryHealth,   [kTechDataEngagementDistance] = kObservatoryEngagementDistance, [kTechDataMaxArmor] = kObservatoryArmor,   [kTechDataInitialEnergy] = kObservatoryInitialEnergy,      [kTechDataMaxEnergy] = kObservatoryMaxEnergy, [kTechDataPointValue] = kObservatoryPointValue, [kTechDataHotkey] = Move.O, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataTooltipInfo] = "OBSERVATORY_TOOLTIP", [kTechDataObstacleRadius] = 0.25},
         { [kTechDataId] = kTechId.DistressBeacon,    [kTechDataBuildTime] = 0.1,    [kTechDataDisplayName] = "DISTRESS_BEACON",   [kTechDataHotkey] = Move.B, [kTechDataCostKey] = kObservatoryDistressBeaconCost, [kTechDataTooltipInfo] =  "DISTRESS_BEACON_TOOLTIP"},
 
@@ -493,8 +570,24 @@ function BuildTechData()	//OVERRIDES
 			[kTechDataTooltipInfo] = "PHASE_GATE_TOOLTIP", 
 			[kTechDataObstacleRadius] = 0.5
 		},
-        { [kTechDataId] = kTechId.AdvancedArmoryUpgrade, [kTechDataCostKey] = kAdvancedArmoryUpgradeCost,  [kTechIDShowEnables] = false,          [kTechDataResearchTimeKey] = kAdvancedArmoryResearchTime,  [kTechDataHotkey] = Move.U, [kTechDataDisplayName] = "ADVANCED_ARMORY_UPGRADE", [kTechDataTooltipInfo] =  "ADVANCED_ARMORY_TOOLTIP"},
-        { [kTechDataId] = kTechId.PrototypeLab, [kTechDataSupply] = kPrototypeLabSupply, [kTechDataHint] = "PROTOTYPE_LAB_HINT", [kTechDataGhostModelClass] = "MarineGhostModel",  [kTechDataRequiresPower] = true,  [kTechDataMapName] = PrototypeLab.kMapName,  [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation,   [kTechDataCostKey] = kPrototypeLabCost,                     [kTechDataResearchTimeKey] = kPrototypeLabBuildTime,       [kTechDataDisplayName] = "PROTOTYPE_LAB", [kTechDataModel] = PrototypeLab.kModelName, [kTechDataMaxHealth] = kPrototypeLabHealth, [kTechDataPointValue] = kPrototypeLabPointValue, [kTechDataTooltipInfo] = "PROTOTYPE_LAB_TOOLTIP", [kTechDataObstacleRadius] = 0.5},
+        
+        { 
+			[kTechDataId] = kTechId.PrototypeLab, 
+			[kTechDataSupply] = kPrototypeLabSupply, 
+			[kTechDataHint] = "PROTOTYPE_LAB_HINT", 
+			[kTechDataGhostModelClass] = "MarineGhostModel",  
+			[kTechDataRequiresPower] = true,  
+			[kTechDataMapName] = PrototypeLab.kMapName,  
+			[kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation,   
+			[kTechDataCostKey] = kPrototypeLabCost,                     
+			[kTechDataResearchTimeKey] = kPrototypeLabBuildTime,       
+			[kTechDataDisplayName] = "PROTOTYPE_LAB", 
+			[kTechDataModel] = PrototypeLab.kModelName, 
+			[kTechDataMaxHealth] = kPrototypeLabHealth, 
+			[kTechDataPointValue] = kPrototypeLabPointValue, 
+			[kTechDataTooltipInfo] = "PROTOTYPE_LAB_TOOLTIP", 
+			[kTechDataObstacleRadius] = 0.5
+		},
        
         // Weapons
         
@@ -515,29 +608,97 @@ function BuildTechData()	//OVERRIDES
 
         // hand grenades
 
-        { [kTechDataId] = kTechId.ClusterGrenade,  [kTechDataMapName] = ClusterGrenadeThrower.kMapName,   [kTechDataDisplayName] = "CLUSTER_GRENADE", [kTechDataTooltipInfo] =  "CLUSTER_GRENADE_TOOLTIP", [kTechDataCostKey] = kClusterGrenadeCost },
-        { [kTechDataId] = kTechId.GasGrenade,  [kTechDataMapName] = GasGrenadeThrower.kMapName,   [kTechDataDisplayName] = "GAS_GRENADE", [kTechDataTooltipInfo] =  "GAS_GRENADE_TOOLTIP", [kTechDataCostKey] = kGasGrenadeCost },
-        { [kTechDataId] = kTechId.PulseGrenade,  
+        { 
+			[kTechDataId] = kTechId.ClusterGrenade,  
+			[kTechDataMapName] = ClusterGrenadeThrower.kMapName,   
+			[kTechDataDisplayName] = "CLUSTER_GRENADE", 
+			[kTechDataTooltipInfo] =  "CLUSTER_GRENADE_TOOLTIP", 
+			[kTechDataCostKey] = kClusterGrenadeCost 
+		},
+        { 
+			[kTechDataId] = kTechId.GasGrenade,  
+			[kTechDataMapName] = GasGrenadeThrower.kMapName,   
+			[kTechDataDisplayName] = "GAS_GRENADE", 
+			[kTechDataTooltipInfo] =  "GAS_GRENADE_TOOLTIP", 
+			[kTechDataCostKey] = kGasGrenadeCost 
+		},
+        { 
+			[kTechDataId] = kTechId.PulseGrenade,  
 			[kTechDataMapName] = PulseGrenadeThrower.kMapName,   
 			[kTechDataDisplayName] = "PULSE_GRENADE", 
 			[kTechDataTooltipInfo] =  "PULSE_GRENADE_TOOLTIP", 
 			[kTechDataCostKey] = kPulseGrenadeCost 
 		},
- 
-        { [kTechDataId] = kTechId.ClusterGrenadeProjectile, [kTechDataDamageType] = kClusterGrenadeDamageType,  [kTechDataMapName] = ClusterGrenade.kMapName,   [kTechDataDisplayName] = "CLUSTER_GRENADE", [kTechDataTooltipInfo] =  "CLUSTER_GRENADE_TOOLTIP", [kTechDataDamageType] = kClusterGrenadeDamageType },
-        { [kTechDataId] = kTechId.GasGrenadeProjectile, [kTechDataDamageType] = kNerveGasDamageType,  [kTechDataMapName] = GasGrenade.kMapName,   [kTechDataDisplayName] = "GAS_GRENADE", [kTechDataTooltipInfo] =  "GAS_GRENADE_TOOLTIP", [kTechDataDamageType] = kGasGrenadeDamageType },
-        { [kTechDataId] = kTechId.PulseGrenadeProjectile,  [kTechDataDamageType] = kPulseGrenadeDamageType, [kTechDataMapName] = PulseGrenade.kMapName,   [kTechDataDisplayName] = "PULSE_GRENADE", [kTechDataTooltipInfo] =  "PULSE_GRENADE_TOOLTIP", [kTechDataDamageType] = kPulseGrenadeDamageType },
-
+		
+        { 
+			[kTechDataId] = kTechId.ClusterGrenadeProjectile, 
+			[kTechDataDamageType] = kClusterGrenadeDamageType,  
+			[kTechDataMapName] = ClusterGrenade.kMapName,   
+			[kTechDataDisplayName] = "CLUSTER_GRENADE", 
+			[kTechDataTooltipInfo] =  "CLUSTER_GRENADE_TOOLTIP", 
+		},
+        { 
+			[kTechDataId] = kTechId.GasGrenadeProjectile, 
+			[kTechDataDamageType] = kNerveGasDamageType,  
+			[kTechDataMapName] = GasGrenade.kMapName,   
+			[kTechDataDisplayName] = "GAS_GRENADE", 
+			[kTechDataTooltipInfo] =  "GAS_GRENADE_TOOLTIP", 
+		},
+        { 
+			[kTechDataId] = kTechId.PulseGrenadeProjectile,  
+			[kTechDataDamageType] = kPulseGrenadeDamageType, 
+			[kTechDataMapName] = PulseGrenade.kMapName,   
+			[kTechDataDisplayName] = "PULSE_GRENADE", 
+			[kTechDataTooltipInfo] =  "PULSE_GRENADE_TOOLTIP", 
+		},
+		/*
+		{ 
+			[kTechDataId] = kTechId.NerveGasCloud,  
+			[kTechDataDamageType] = kNerveGasDamageType, 
+			[kTechDataMapName] = NerveGasCloud.kMapName,   
+			[kTechDataDisplayName] = "NERVE_GAS",
+		},
+		*/
  
         // dropped by commander:
         
         { [kTechDataId] = kTechId.FlamethrowerTech,      [kTechDataCostKey] = kFlamethrowerTechResearchCost,     [kTechDataResearchTimeKey] = kFlamethrowerTechResearchTime, [kTechDataDisplayName] = "RESEARCH_FLAMETHROWERS", [kTechDataTooltipInfo] =  "FLAMETHROWER_TECH_TOOLTIP"},
         { [kTechDataId] = kTechId.FlamethrowerRangeTech,      [kTechDataCostKey] = kFlamethrowerRangeTechResearchCost,     [kTechDataResearchTimeKey] = kFlamethrowerRangeTechResearchTime, [kTechDataDisplayName] = "FLAMETHROWER_RANGE", [kTechDataTooltipInfo] =  "FLAMETHROWER_RANGE_TOOLTIP"},
         { [kTechDataId] = kTechId.Flamethrower,     [kTechDataMaxHealth] = kMarineWeaponHealth, [kTechDataPointValue] = kFlamethrowerPointValue,  [kTechDataMapName] = Flamethrower.kMapName,             [kTechDataDisplayName] = "FLAMETHROWER", [kTechDataTooltipInfo] = "FLAMETHROWER_TOOLTIP", [kTechDataModel] = Flamethrower.kModelName,  [kTechDataDamageType] = kFlamethrowerDamageType, [kTechDataCostKey] = kFlamethrowerCost, [kStructureAttachId] = kTechId.Armory, [kStructureAttachRange] = kArmoryWeaponAttachRange, [kStructureAttachRequiresPower] = true},
-        { [kTechDataId] = kTechId.DualMinigunTech,   [kTechDataCostKey] = kDualMinigunTechResearchCost,      [kTechDataResearchTimeKey] = kDualRailgunTechResearchTime, [kTechDataDisplayName] = "RESEARCH_DUAL_MINIGUNS", [kTechDataHotkey] = Move.D, [kTechDataTooltipInfo] = "DUAL_MINIGUN_TECH_TOOLTIP"},
-        { [kTechDataId] = kTechId.ClawRailgunTech,   [kTechIDShowEnables] = false,    [kTechDataCostKey] = kClawRailgunTechResearchCost,      [kTechDataResearchTimeKey] = kClawMinigunTechResearchTime, [kTechDataDisplayName] = "RESEARCH_CLAW_RAILGUN", [kTechDataHotkey] = Move.D, [kTechDataTooltipInfo] = "CLAW_RAILGUN_TECH_TOOLTIP"},
-        { [kTechDataId] = kTechId.DualRailgunTech,   [kTechIDShowEnables] = false,   [kTechDataCostKey] = kDualRailgunTechResearchCost,      [kTechDataResearchTimeKey] = kDualMinigunTechResearchTime, [kTechDataDisplayName] = "RESEARCH_DUAL_RAILGUNS", [kTechDataHotkey] = Move.D, [kTechDataTooltipInfo] = "DUAL_RAILGUN_TECH_TOOLTIP"},
-        { [kTechDataId] = kTechId.Minigun,        [kTechDataPointValue] = kMinigunPointValue,       [kTechDataMapName] = Minigun.kMapName,                  [kTechDataDisplayName] = "MINIGUN", [kTechDataDamageType] = kMinigunDamageType, [kTechDataDisplayName] = "MINIGUN_CLAW_TOOLTIP", [kTechDataModel] = Minigun.kModelName},
+        { 
+			[kTechDataId] = kTechId.DualMinigunTech,   
+			[kTechDataCostKey] = kDualMinigunTechResearchCost,      
+			[kTechDataResearchTimeKey] = kDualRailgunTechResearchTime, 
+			[kTechDataDisplayName] = "RESEARCH_DUAL_MINIGUNS", 
+			[kTechDataHotkey] = Move.D, 
+			[kTechDataTooltipInfo] = "DUAL_MINIGUN_TECH_TOOLTIP"
+		},
+        { 
+			[kTechDataId] = kTechId.ClawRailgunTech,   
+			[kTechIDShowEnables] = false,    
+			[kTechDataCostKey] = kClawRailgunTechResearchCost,      
+			[kTechDataResearchTimeKey] = kClawMinigunTechResearchTime, 
+			[kTechDataDisplayName] = "RESEARCH_CLAW_RAILGUN", 
+			[kTechDataHotkey] = Move.D, 
+			[kTechDataTooltipInfo] = "CLAW_RAILGUN_TECH_TOOLTIP"
+		},
+        { 
+			[kTechDataId] = kTechId.DualRailgunTech,   
+			[kTechIDShowEnables] = false,   
+			[kTechDataCostKey] = kDualRailgunTechResearchCost,      
+			[kTechDataResearchTimeKey] = kDualMinigunTechResearchTime, 
+			[kTechDataDisplayName] = "RESEARCH_DUAL_RAILGUNS", 
+			[kTechDataHotkey] = Move.D, 
+			[kTechDataTooltipInfo] = "DUAL_RAILGUN_TECH_TOOLTIP"},
+        { 
+			[kTechDataId] = kTechId.Minigun,        
+			[kTechDataPointValue] = kMinigunPointValue,       
+			[kTechDataMapName] = Minigun.kMapName,                  
+			[kTechDataDisplayName] = "MINIGUN", 
+			[kTechDataDamageType] = kMinigunDamageType, 
+			[kTechDataDisplayName] = "MINIGUN_CLAW_TOOLTIP", 
+			[kTechDataModel] = Minigun.kModelName
+		},
         { [kTechDataId] = kTechId.Railgun,        [kTechDataPointValue] = kRailgunPointValue,       [kTechDataMapName] = Railgun.kMapName,                  [kTechDataDisplayName] = "RAILGUN", [kTechDataDamageType] = kRailgunDamageType, [kTechDataDisplayName] = "RAILGUN_CLAW_TOOLTIP", [kTechDataModel] = Railgun.kModelName},
         { [kTechDataId] = kTechId.GrenadeLauncher,    [kTechDataMaxHealth] = kMarineWeaponHealth,  [kTechDataPointValue] = kGrenadeLauncherPointValue, [kTechDataMapName] = GrenadeLauncher.kMapName,          [kTechDataDisplayName] = "GRENADE_LAUNCHER",  [kTechDataTooltipInfo] = "GRENADE_LAUNCHER_TOOLTIP",   [kTechDataModel] = GrenadeLauncher.kModelName,   [kTechDataDamageType] = kRifleDamageType,    [kTechDataCostKey] = kGrenadeLauncherCost, [kStructureAttachId] = kTechId.Armory, [kStructureAttachRange] = kArmoryWeaponAttachRange, [kStructureAttachRequiresPower] = true},
 

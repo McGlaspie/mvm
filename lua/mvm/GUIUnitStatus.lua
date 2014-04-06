@@ -127,6 +127,17 @@ local function GetColorForUnitState(unitStatus)
 
 end
 
+local function DestroyActiveBlips(self)
+
+    for _, blip in ipairs(self.activeBlipList) do
+        GUI.DestroyItem(blip.statusBg)
+        blip.GraphicsItem:Destroy()
+    end
+
+    self.activeBlipList = { }
+    
+end
+
 function GUIUnitStatus:Initialize()
 
     GUIAnimatedScript.Initialize(self)
@@ -134,6 +145,7 @@ function GUIUnitStatus:Initialize()
     self.activeBlipList = { }
     
     self.useMarineStyle = false
+    self.fullHUD = Client.GetOptionInteger("hudmode", kHUDMode.Full) == kHUDMode.Full
     
 end
 
@@ -141,12 +153,7 @@ function GUIUnitStatus:Uninitialize()
 
     GUIAnimatedScript.Uninitialize(self)
     
-    for _, blip in ipairs(self.activeBlipList) do
-        GUI.DestroyItem(blip.statusBg)
-        blip.GraphicsItem:Destroy()
-    end
-
-    self.activeBlipList = { }
+    DestroyActiveBlips(self)
     
 end
 
@@ -190,20 +197,17 @@ local function CreateBlipItem(self)
     local teamNumber = PlayerUI_GetTeamNumber()
     
     //TODO Wrap below in utility function(s)
-    local _uiBaseColor = Color(0.5, 0.5, 0.5, 1)
-    local _uiAccentColor = Color(0.5, 0.5, 0.5, 1)
+    local ui_BaseColor = Color(0.5, 0.5, 0.5, 1)
     
     if teamNumber == kTeam2Index then
-		_uiBaseColor = kTeam2_BaseColor
-		_uiAccentColor = kTeam2_AccentColor
+		ui_BaseColor = kTeam2_BaseColor
     elseif teamNumber == kTeam1Index then
-		_uiBaseColor = kTeam1_BaseColor
-		_uiAccentColor = kTeam1_AccentColor
+		ui_BaseColor = kTeam1_BaseColor
     end
     
     local texture = kStatusBgTexture[ teamNumber ]
     local fontColor = kStatusFontColor[ teamNumber ]
-
+	
     newBlip.GraphicsItem = self:CreateAnimatedGraphicItem()
     newBlip.GraphicsItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     if self.useMarineStyle then
@@ -215,28 +219,22 @@ local function CreateBlipItem(self)
     newBlip.GraphicsItem:SetTexture(texture)
     newBlip.GraphicsItem:SetLayer(kGUILayerPlayerNameTags)
     newBlip.GraphicsItem:SetShader("shaders/GUI_TeamThemed.surface_shader")
-    newBlip.GraphicsItem:SetFloatParameter( "teamBaseColorR", _uiBaseColor.r )
-    newBlip.GraphicsItem:SetFloatParameter( "teamBaseColorG", _uiBaseColor.g )
-    newBlip.GraphicsItem:SetFloatParameter( "teamBaseColorB", _uiBaseColor.b )
-    newBlip.GraphicsItem:SetFloatParameter( "teamAccentColorR", _uiAccentColor.r )
-    newBlip.GraphicsItem:SetFloatParameter( "teamAccentColorG", _uiAccentColor.g )
-    newBlip.GraphicsItem:SetFloatParameter( "teamAccentColorB", _uiAccentColor.b )
+    newBlip.GraphicsItem:SetFloatParameter( "teamBaseColorR", ui_BaseColor.r )
+    newBlip.GraphicsItem:SetFloatParameter( "teamBaseColorG", ui_BaseColor.g )
+    newBlip.GraphicsItem:SetFloatParameter( "teamBaseColorB", ui_BaseColor.b )
     
     newBlip.OverLayGraphic = self:CreateAnimatedGraphicItem()
     newBlip.OverLayGraphic:SetAnchor(GUIItem.Left, GUIItem.Top)
     newBlip.OverLayGraphic:SetBlendTechnique(GUIItem.Add)
     newBlip.OverLayGraphic:SetSize(GUIUnitStatus.kUnitStatusSize)
     newBlip.OverLayGraphic:SetIsScaling(false)
-    newBlip.OverLayGraphic:SetColor(Color(1,1,1,1))
+    newBlip.OverLayGraphic:SetColor(Color(1,1,1,0.4))
     newBlip.OverLayGraphic:SetTexture(texture)
     newBlip.OverLayGraphic:SetLayer(kGUILayerPlayerNameTags)
     newBlip.OverLayGraphic:SetShader("shaders/GUI_TeamThemed.surface_shader")
-    newBlip.OverLayGraphic:SetFloatParameter( "teamBaseColorR", _uiBaseColor.r )
-    newBlip.OverLayGraphic:SetFloatParameter( "teamBaseColorG", _uiBaseColor.g )
-    newBlip.OverLayGraphic:SetFloatParameter( "teamBaseColorB", _uiBaseColor.b )
-    newBlip.OverLayGraphic:SetFloatParameter( "teamAccentColorR", _uiAccentColor.r )
-    newBlip.OverLayGraphic:SetFloatParameter( "teamAccentColorG", _uiAccentColor.g )
-    newBlip.OverLayGraphic:SetFloatParameter( "teamAccentColorB", _uiAccentColor.b )
+    newBlip.OverLayGraphic:SetFloatParameter( "teamBaseColorR", ui_BaseColor.r )
+    newBlip.OverLayGraphic:SetFloatParameter( "teamBaseColorG", ui_BaseColor.g )
+    newBlip.OverLayGraphic:SetFloatParameter( "teamBaseColorB", ui_BaseColor.b )
 
     newBlip.ProgressingIcon = GetGUIManager():CreateGraphicItem()
     newBlip.ProgressingIcon:SetTexture(texture)
@@ -247,12 +245,9 @@ local function CreateBlipItem(self)
     newBlip.ProgressingIcon:SetPosition(-GUIUnitStatus.kProgressingIconSize/2 + GUIUnitStatus.kProgressingIconOffset )
     newBlip.ProgressingIcon:SetIsVisible(false)
     newBlip.ProgressingIcon:SetShader("shaders/GUI_TeamThemed.surface_shader")
-    newBlip.ProgressingIcon:SetFloatParameter( "teamBaseColorR", _uiBaseColor.r )
-    newBlip.ProgressingIcon:SetFloatParameter( "teamBaseColorG", _uiBaseColor.g )
-    newBlip.ProgressingIcon:SetFloatParameter( "teamBaseColorB", _uiBaseColor.b )
-    newBlip.ProgressingIcon:SetFloatParameter( "teamAccentColorR", _uiAccentColor.r )
-    newBlip.ProgressingIcon:SetFloatParameter( "teamAccentColorG", _uiAccentColor.g )
-    newBlip.ProgressingIcon:SetFloatParameter( "teamAccentColorB", _uiAccentColor.b )
+    newBlip.ProgressingIcon:SetFloatParameter( "teamBaseColorR", ui_BaseColor.r )
+    newBlip.ProgressingIcon:SetFloatParameter( "teamBaseColorG", ui_BaseColor.g )
+    newBlip.ProgressingIcon:SetFloatParameter( "teamBaseColorB", ui_BaseColor.b )
     
     newBlip.ProgressBackground = GetGUIManager():CreateGraphicItem()
     newBlip.ProgressBackground:SetTexture(GUIUnitStatus.kBlackTexture)
@@ -334,22 +329,26 @@ local function CreateBlipItem(self)
     newBlip.HintText:SetScale(GUIUnitStatus.kFontScaleSmall)
     newBlip.HintText:SetPosition(GUIScale(Vector(0, 28, 0)))
     
-    newBlip.Border = GUIManager:CreateGraphicItem()
-    newBlip.Border:SetAnchor(GUIItem.Left, GUIItem.Top)
-    newBlip.Border:SetSize(GUIUnitStatus.kStatusBgSize)
-    newBlip.Border:SetTexture(neutralTexture)
-    newBlip.Border:SetTexturePixelCoordinates(unpack(kBorderCoords))
-    newBlip.Border:SetIsStencil(true)
+    if self.fullHUD then
     
-    newBlip.BorderMask = GUIManager:CreateGraphicItem()
-    newBlip.BorderMask:SetTexture(neutralTexture)
-    newBlip.BorderMask:SetAnchor(GUIItem.Middle, GUIItem.Center)
-    newBlip.BorderMask:SetBlendTechnique(GUIItem.Add)
-    newBlip.BorderMask:SetTexturePixelCoordinates(unpack(kBorderMaskPixelCoords))
-    newBlip.BorderMask:SetSize(Vector(kBorderMaskCircleRadius * 2, kBorderMaskCircleRadius * 2, 0))
-    newBlip.BorderMask:SetPosition(Vector(-kBorderMaskCircleRadius, -kBorderMaskCircleRadius, 0))
-    newBlip.BorderMask:SetStencilFunc(GUIItem.NotEqual)
-    newBlip.Border:AddChild(newBlip.BorderMask)
+        newBlip.Border = GUIManager:CreateGraphicItem()
+        newBlip.Border:SetAnchor(GUIItem.Left, GUIItem.Top)
+        newBlip.Border:SetSize(GUIUnitStatus.kStatusBgSize)
+        newBlip.Border:SetTexture(neutralTexture)
+        newBlip.Border:SetTexturePixelCoordinates(unpack(kBorderCoords))
+        newBlip.Border:SetIsStencil(true)
+        
+        newBlip.BorderMask = GUIManager:CreateGraphicItem()
+        newBlip.BorderMask:SetTexture(neutralTexture)
+        newBlip.BorderMask:SetAnchor(GUIItem.Middle, GUIItem.Center)
+        newBlip.BorderMask:SetBlendTechnique(GUIItem.Add)
+        newBlip.BorderMask:SetTexturePixelCoordinates(unpack(kBorderMaskPixelCoords))
+        newBlip.BorderMask:SetSize(Vector(kBorderMaskCircleRadius * 2, kBorderMaskCircleRadius * 2, 0))
+        newBlip.BorderMask:SetPosition(Vector(-kBorderMaskCircleRadius, -kBorderMaskCircleRadius, 0))
+        newBlip.BorderMask:SetStencilFunc(GUIItem.NotEqual)
+        newBlip.Border:AddChild(newBlip.BorderMask)
+    
+    end
     
     // Create badge icon items
     newBlip.Badges = {}
@@ -367,13 +366,15 @@ local function CreateBlipItem(self)
 
     end
     
-    //newBlip.statusBg:AddChild(newBlip.smokeyBackground)
     newBlip.statusBg:AddChild(newBlip.HealthBarBg)
     newBlip.statusBg:AddChild(newBlip.ArmorBarBg)
     newBlip.statusBg:AddChild(newBlip.NameText)
     newBlip.statusBg:AddChild(newBlip.HintText)
     
-    newBlip.statusBg:AddChild(newBlip.Border)
+    if self.fullHUD then
+        newBlip.statusBg:AddChild(newBlip.Border)
+    end
+    
     newBlip.statusBg:SetColor(Color(0,0,0,0))
     
     newBlip.GraphicsItem:AddChild(newBlip.ProgressingIcon)
@@ -395,6 +396,30 @@ local function AddWelderIcon(blipItem)
     blipItem.welderIcon:SetAnchor(GUIItem.Right, GUIItem.Center)
 	
     blipItem.statusBg:AddChild(blipItem.welderIcon)
+
+end
+
+function AddAbilityBar(blipItem)
+
+    blipItem.AbilityBarBg = GetGUIManager():CreateGraphicItem()
+    blipItem.AbilityBarBg:SetAnchor(GUIItem.Middle, GUIItem.Bottom)
+    blipItem.AbilityBarBg:SetSize(Vector(kArmorBarWidth, kArmorBarHeight * 2, 0))
+    blipItem.AbilityBarBg:SetPosition(Vector(-kArmorBarWidth / 2, -kArmorBarHeight * 2, 0))
+    blipItem.AbilityBarBg:SetTexture("ui/unitstatus_neutral.dds")
+    blipItem.AbilityBarBg:SetColor(Color(0,0,0,0))
+    blipItem.AbilityBarBg:SetInheritsParentAlpha(true)
+    blipItem.AbilityBarBg:SetTexturePixelCoordinates(unpack(GUIUnitStatus.kUnitStatusBarTexCoords))
+    
+    blipItem.AbilityBar = GUIManager:CreateGraphicItem()
+    blipItem.AbilityBar:SetColor(Color(0.65, 0.65, 0.65, 1))
+    blipItem.AbilityBar:SetSize(Vector(kArmorBarWidth, kArmorBarHeight *2, 0))
+    blipItem.AbilityBar:SetTexture("ui/unitstatus_neutral.dds")
+    blipItem.AbilityBar:SetTexturePixelCoordinates(unpack(GUIUnitStatus.kUnitStatusBarTexCoords))
+    blipItem.AbilityBar:SetBlendTechnique(GUIItem.Add)
+    blipItem.AbilityBar:SetInheritsParentAlpha(true)
+    blipItem.AbilityBarBg:AddChild(blipItem.AbilityBar)
+
+    blipItem.statusBg:AddChild(blipItem.AbilityBarBg)
 
 end
 
@@ -427,25 +452,26 @@ local function UpdateUnitStatusList(self, activeBlips, deltaTime)
     
     // Update current blip state.
     local currentIndex = 1
+	local playerTeamType = PlayerUI_GetTeamType()
+	local playerTeamNumber = PlayerUI_GetTeamNumber()
+	
     for i = 1, #self.activeBlipList do
     
         local blipData = activeBlips[i]
         local updateBlip = self.activeBlipList[i]
         
-        local playerTeamType = PlayerUI_GetTeamType()
-        local playerTeamNumber = PlayerUI_GetTeamNumber()
         local teamType = blipData.TeamType
         local teamNumber = blipData.TeamNumber
         local isEnemy = false
         
-        if playerTeamType ~= kNeutralTeamType then
-        
-            isEnemy = (playerTeamNumber ~= blipData.TeamNumber) and (teamType ~= kNeutralTeamType)
+        if playerTeamType ~= kNeutralTeamType and teamType ~= kNeutralTeamType then
+			
+            isEnemy = GetEnemyTeamNumber( playerTeamNumber ) == blipData.TeamNumber
             teamType = playerTeamType
             
         end
         
-        //Prevent some environmental ents (Res/Tech nodes) from cause script errors
+        //Prevent environmental ents (Res/Tech nodes) from causing script errors
         if teamNumber == kTeamInvalid or teamNumber == nil then
 			teamNumber = kTeamReadyRoom
         end
@@ -456,7 +482,13 @@ local function UpdateUnitStatusList(self, activeBlips, deltaTime)
         
         updateBlip.OverLayGraphic:SetTexturePixelCoordinates(GetUnitStatusTextureCoordinates(blipData.Status))
         
-        updateBlip.statusBg:SetTexture( kStatusBgTexture[teamNumber] )
+        local statusTexture = kStatusBgTexture[teamNumber]
+        
+        if not self.fullHUD then
+            statusTexture = kTransparentTexture
+        end
+        
+        updateBlip.statusBg:SetTexture( statusTexture )
         updateBlip.statusBg:SetPosition(blipData.HealthBarPosition - GUIUnitStatus.kStatusBgSize * .5 )
 		
         if blipData.HealthFraction == 0 or PlayerUI_IsACommander() then
@@ -498,16 +530,25 @@ local function UpdateUnitStatusList(self, activeBlips, deltaTime)
         // use the entities team color here, so you can make a difference between enemy or friend
         updateBlip.statusBg:SetColor(Color(1,1,1,alpha))
         updateBlip.NameText:SetText( blipData.Name )
-        updateBlip.ActionText:SetText(blipData.Action)
+        updateBlip.NameText:SetIsVisible( self.fullHUD or blipData.IsPlayer )
+        updateBlip.ActionText:SetText( blipData.Action )
         
         local hintVisible = showHints and blipData.Hint ~= nil and string.len(blipData.Hint) > 0
         
         if hintVisible then
             updateBlip.statusBg:SetSize(GUIUnitStatus.kStatusBgSize)
-            updateBlip.Border:SetSize(GUIUnitStatus.kStatusBgSize)
+            
+            if updateBlip.Border then            
+                updateBlip.Border:SetSize(GUIUnitStatus.kStatusBgSize)
+            end
+            
         else    
             updateBlip.statusBg:SetSize(GUIUnitStatus.kStatusBgNoHintSize)
-            updateBlip.Border:SetSize(GUIUnitStatus.kStatusBgNoHintSize)
+            
+            if updateBlip.Border then            
+                updateBlip.Border:SetSize(GUIUnitStatus.kStatusBgNoHintSize)
+            end
+            
         end    
         
         // Only show hint text with hints enabled
@@ -519,6 +560,8 @@ local function UpdateUnitStatusList(self, activeBlips, deltaTime)
         
         if isEnemy then
             textColor = GUIUnitStatus.kEnemyColor
+        elseif blipData.IsSteamFriend then
+            textColor = Color(kSteamFriendColor)
         end
         
         if not blipData.ForceName then
@@ -537,9 +580,12 @@ local function UpdateUnitStatusList(self, activeBlips, deltaTime)
         updateBlip.ArmorBar:SetTexturePixelCoordinates(GetPixelCoordsForFraction(blipData.ArmorFraction)) 
         
         updateBlip.ProgressingIcon:SetRotation(Vector(0, 0, -2 * math.pi * baseResearchRot))
-        updateBlip.BorderMask:SetRotation(Vector(0, 0, -2 * math.pi * baseResearchRot))
-        updateBlip.BorderMask:SetIsVisible(teamType == kMarineTeamType and blipData.IsCrossHairTarget)
-        //updateBlip.smokeyBackground:SetIsVisible(teamType == kAlienTeamType and blipData.HealthFraction ~= 0)
+        
+        if updateBlip.BorderMask then
+			updateBlip.BorderMask:SetRotation(Vector(0, 0, -2 * math.pi * baseResearchRot))
+			updateBlip.BorderMask:SetIsVisible(teamType == kMarineTeamType and blipData.IsCrossHairTarget)
+		end
+        
 		
         assert( #updateBlip.Badges >= #blipData.BadgeTextures )
         for i = 1, #updateBlip.Badges do
@@ -568,16 +614,48 @@ local function UpdateUnitStatusList(self, activeBlips, deltaTime)
             updateBlip.welderIcon = nil
             
         end
-         
+		
+		
+        if blipData.AbilityFraction > 0 and not updateBlip.AbilityBarBg then
+        
+            AddAbilityBar(updateBlip)
+        
+        elseif blipData.AbilityFraction == 0 and updateBlip.AbilityBarBg then
+            
+            GUI.DestroyItem(updateBlip.AbilityBarBg)
+            updateBlip.AbilityBarBg = nil
+            updateBlip.AbilityBar = nil
+            
+        end
+        
+        if updateBlip.AbilityBarBg then
+
+            local bgColor = Color(0,0,0,alpha)
+            updateBlip.AbilityBarBg:SetColor(bgColor)
+            
+            updateBlip.AbilityBar:SetSize(Vector(kArmorBarWidth * blipData.AbilityFraction, kArmorBarHeight * 2, 0))
+            updateBlip.AbilityBar:SetTexturePixelCoordinates(GetPixelCoordsForFraction(blipData.AbilityFraction)) 
+                
+        end
+		
     end
 
 end
+
 
 function GUIUnitStatus:Update(deltaTime)
 
     PROFILE("GUIUnitStatus:Update")
     
     GUIAnimatedScript.Update(self, deltaTime)
+    
+    local fullHUD = Client.GetOptionInteger("hudmode", kHUDMode.Full) == kHUDMode.Full
+    if self.fullHUD ~= fullHUD then
+        
+        self.fullHUD = fullHUD
+        DestroyActiveBlips(self)
+        
+    end
     
     UpdateUnitStatusList(self, PlayerUI_GetUnitStatusInfo(), deltaTime)
     

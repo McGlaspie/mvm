@@ -46,9 +46,9 @@
             float f = 1 - dissolveAmount;
 
 
-	float blendcir3 = tex2D(exoMap, input.texCoord * float2(1, 1)).rgb;
-	float blendcir = tex2D(blendMap, input.texCoord * float2(8, 8)+ float2(time * .1, time * .25)).rgb;
-	float blendcir2 = tex2D(blendMap, input.texCoord * float2(0.05, 4) + float2(time * -.1, time * .15)).rgb;
+			float blendcir3 = tex2D(exoMap, input.texCoord * float2(1, 1)).rgb;
+			float blendcir = tex2D(blendMap, input.texCoord * float2(8, 8)+ float2(time * .1, time * .25)).rgb;
+			float blendcir2 = tex2D(blendMap, input.texCoord * float2(0.05, 4) + float2(time * -.1, time * .15)).rgb;
             float param =  blendcir3 + (blendcir*blendcir2)+ 0.1;
 			float textureSpeed = 2;
 			float destroySpeed = 1;
@@ -75,20 +75,18 @@
 			material.emissive   = emissive + (light * albedo + specular) * closeFraction;
 			
             // Blending
-            if (blend + f > 1)
-            {
-            
-            }
-            else
-            {
+            if (blend + f > 1) {
+				
+            } else {
                 material.emissive += 3 * ((1 - (blend + f)) * tex2D(scanlinesMap, input.texCoord * float2(1, 70)+ float2(0, time * -.75)).rgb * float3(2.2, 4.2, 6) );
             }
             
             // Opacity
             material.opacity = opacity + f - 0.5;
+			
             if (material.opacity < 0.5)
             {
-                material.opacity = 0.2;
+                material.opacity = 0.1;	//0.2
                 material.albedo.rgb = 0;
 				float4 scanlines = tex2D(scanlinesMap, input.osPosition.xy * 50 + float2(time * .02, time * - .25));
 				material.emissive = scanlines.rgb * scanlines.a * 0.1;

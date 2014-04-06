@@ -26,14 +26,18 @@ kShowOnTeam["all"] = {
 	GUIDeathScreen = true,
 	GUITipVideo = false, 
 	GUIVoteMenu = true, 
-	GUIStartVoteMenu = true
+	GUIStartVoteMenu = true,
+	GUIGatherOverlay = true //does gather even work for mods?
 }
 
 
 kShowOnTeam[kTeamReadyRoom] = { GUIReadyRoomOrders = true } // , GUIPlayerRanking = true }
 kShowOnTeam[kTeam1Index] = { }
 kShowOnTeam[kTeam2Index] = { }
-kShowOnTeam[kSpectatorIndex] = { GUIGameEnd = true, GUISpectator = true }
+kShowOnTeam[kSpectatorIndex] = { 
+	["mvm/GUIGameEnd"] = true, 
+	GUISpectator = true 
+}
 
 local kBothAlienAndMarine = { 
 	GUICrosshair = true, 
@@ -60,7 +64,7 @@ local kShowAsClass = { }
 kShowAsClass["Marine"] = { 
 	["mvm/Hud/Marine/GUIMarineHUD"] = true, 
 	GUIPoisonedFeedback = false, 
-	GUIPickups = true,
+	["mvm/Hud/GUIPickups"] = true,
 	["mvm/Hud/GUISensorBlips"] = true, 
 	["mvm/Hud/GUIObjectiveDisplay"] = true, 
 	["mvm/Hud/GUIProgressBar"] = true, 
@@ -85,7 +89,7 @@ kShowAsClass["Exo"] = {
 kShowAsClass["MarineSpectator"] = { GUIRequestMenu = true }
 
 kShowAsClass["Commander"] = { 
-	GUICommanderOrders = true 
+	["mvm/GUICommanderOrders"] = true 
 }
 kShowAsClass["MarineCommander"] = { 
 	GUICommanderTutorial = true, 
@@ -318,3 +322,39 @@ local function PrintUIScripts()
     
 end
 Event.Hook("Console_print_client_ui", PrintUIScripts)
+
+function PreLoadGUIScripts()
+
+    for team, uiScripts in pairs(kShowOnTeam) do
+    
+        for name, enabled in pairs(uiScripts) do
+            
+            if enabled then
+                Script.Load("lua/" .. name .. ".lua")
+            end
+            
+        end 
+
+    end   
+
+    for name, enabled in pairs(kBothAlienAndMarine) do
+        
+        if enabled then
+            Script.Load("lua/" .. name .. ".lua")
+        end
+        
+    end
+    
+    for class, uiScripts in pairs(kShowAsClass) do
+
+        for name, enabled in pairs(uiScripts) do
+            
+            if enabled then
+                Script.Load("lua/" .. name .. ".lua")
+            end
+            
+        end
+    
+    end
+
+end

@@ -20,8 +20,10 @@ local networkVars =
     m_angles = "interpolated angles (by 10 [0], by 0.1 [3], by 10 [0])",
     mapBlipType = "enum kMinimapBlipType",
     mapBlipTeam = "integer (" .. ToString(kTeamInvalid) .. " to " .. ToString(kSpectatorIndex) .. ")",
+    isInCombat = "boolean",
     ownerEntityId = "entityid",
-    isInCombat = "boolean"
+    isHallucination = "boolean",
+    active = "boolean"
 }
 
 
@@ -52,7 +54,7 @@ function MapBlip:UpdateRelevancy()
     
     local mask = 0
     
-    if self.mapBlipType == kMinimapBlipType.PowerPoint then
+    if self.mapBlipType == kMinimapBlipType.PowerPoint or self.mapBlipType == kMinimapBlipType.DestroyedPowerPoint then
 	//Special case for PowerNodes, only propigate if scouted
 	
 		local powerNode = Shared.GetEntity( self.ownerEntityId )
@@ -75,7 +77,7 @@ function MapBlip:UpdateRelevancy()
 		if self.mapBlipTeam == kTeam1Index or self.mapBlipTeam == kTeamInvalid or self:GetIsSighted() then
 			mask = bit.bor( mask, kRelevantToTeam1 )
 		end
-	
+		
 		if self.mapBlipTeam == kTeam2Index or self.mapBlipTeam == kTeamInvalid or self:GetIsSighted() then
 			mask = bit.bor( mask, kRelevantToTeam2 )
 		end
@@ -118,6 +120,9 @@ function MapBlip:GetRotation()
     return self:GetAngles().yaw
 end
 
+function MapBlip:GetIsActive()
+    return self.active
+end
 
 function MapBlip:GetIsSighted()
 
@@ -146,12 +151,10 @@ end
 function MapBlip:Update()
 
     PROFILE("MapBlip:Update")
-	
-	local owner = Shared.GetEntity( self.ownerEntityId ) 
-	
-    if self.ownerEntityId and owner then
-		
-        //local owner = Shared.GetEntity(self.ownerEntityId)
+
+    if self.ownerEntityId and Shared.GetEntity(self.ownerEntityId) then
+    
+        local owner = Shared.GetEntity(self.ownerEntityId)
         
         local fowardNormal = owner:GetCoords().zAxis
         local yaw = math.atan2(fowardNormal.x, fowardNormal.z)
@@ -168,9 +171,11 @@ function MapBlip:Update()
         if origin then
         
             // always use zero y-origin (for now, if you want to use it for long-range hivesight, add it back
-            self:SetOrigin(Vector(origin.x, 0, origin.z))
+            self:SetOrigin(Vector(origin.x, 0, origin.z))      
             
-            //local owner = Shared.GetEntity(self.ownerEntityId)
+            //self:UpdateRelevancy()
+            
+            local owner = Shared.GetEntity(self.ownerEntityId)
             
             if HasMixin(owner, "MapBlip") then
             
@@ -181,6 +186,14 @@ function MapBlip:Update()
                 self.isInCombat = isInCombat    
                 
             end 
+            
+            if owner:isa("Player") then
+                self.clientIndex = owner:GetClientIndex()
+            end 
+			
+            self.isHallucination = owner.isHallucination == true or owner:isa("Hallucination")
+            
+            self.active = MvM_GetIsUnitActive(owner)
 
         end
         
@@ -206,6 +219,16 @@ function MapBlip:GetIsValid()
     
 end
 
-
 Shared.LinkClassToMap("MapBlip", MapBlip.kMapName, networkVars)
 
+
+class 'PlayerMapBlip' (MapBlip)
+
+PlayerMapBlip.kMapName = "PlayerMapBlip"
+
+local networkVars =
+{
+    clientIndex = "integer (-1 to 4000)",
+}
+
+Shared.LinkClassToMap("PlayerMapBlip", PlayerMapBlip.kMapName, networkVars)

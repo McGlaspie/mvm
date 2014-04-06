@@ -88,6 +88,9 @@ function GUIExoHUD:Initialize()
     rightInfoBar:SetLayer(kGUILayerPlayerHUDForeground1)
     self.background:AddChild(rightInfoBar)
     
+    self.leftInfoBar = leftInfoBar
+    self.rightInfoBar = rightInfoBar
+    
     self.innerRing = GUIManager:CreateGraphicItem()
     self.innerRing:SetTexture(kSheet1)
     self.innerRing:SetColor( ui_baseColor )
@@ -266,28 +269,42 @@ end
 
 local kAnimDuration = 1
 
+
 function GUIExoHUD:Update(deltaTime)
 
     PROFILE("GUIExoHUD:Update")
+
+    local fullMode = Client.GetOptionInteger("hudmode", kHUDMode.Full) == kHUDMode.Full
+
+    if fullMode then
     
-    self.ringRotation = self.ringRotation or 0
-    self.lastPlayerYaw = self.lastPlayerYaw or PlayerUI_GetYaw()
+        self.ringRotation = self.ringRotation or 0
+        self.lastPlayerYaw = self.lastPlayerYaw or PlayerUI_GetYaw()
+
+        local currentYaw = PlayerUI_GetYaw()
+        self.ringRotation = self.ringRotation + (GetAnglesDifference(self.lastPlayerYaw, currentYaw) * 0.25)
+        self.lastPlayerYaw = currentYaw
+        
+        self.innerRing:SetRotation(Vector(0, 0, -self.ringRotation))
+        self.outerRing:SetRotation(Vector(0, 0, self.ringRotation))
+
+    end
     
-    local currentYaw = PlayerUI_GetYaw()
-    self.ringRotation = self.ringRotation + (GetAnglesDifference(self.lastPlayerYaw, currentYaw) * 0.25)
-    self.lastPlayerYaw = currentYaw
-    
-    self.innerRing:SetRotation(Vector(0, 0, -self.ringRotation))
-    self.outerRing:SetRotation(Vector(0, 0, self.ringRotation))
+    self.innerRing:SetIsVisible(fullMode)
+    self.outerRing:SetIsVisible(fullMode)
+    self.leftInfoBar:SetIsVisible(fullMode)
+    self.rightInfoBar:SetIsVisible(fullMode)
     
     local timeLastDamage = PlayerUI_GetTimeDamageTaken()
     local animFraction = Clamp( (Shared.GetTime() - timeLastDamage) / kAnimDuration, 0, 1)
     
     local color = Color(1, animFraction, animFraction, 1)
-	
+   
     self.staticRing:SetColor(color)    
     self.innerRing:SetColor(color)
     self.outerRing:SetColor(color)
+    
+    self.staticRing:SetIsVisible(fullMode)
     
     UpdateTargets(self)
     

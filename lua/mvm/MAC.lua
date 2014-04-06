@@ -9,11 +9,16 @@ Script.Load("lua/mvm/WeldableMixin.lua")
 Script.Load("lua/mvm/DissolveMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
 Script.Load("lua/mvm/DetectableMixin.lua")
+Script.Load("lua/mvm/NanoshieldMixin.lua")
+Script.Load("lua/mvm/SupplyUserMixin.lua")
+
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 	Script.Load("lua/mvm/CommanderGlowMixin.lua")
+	//TODO Add IFFMixin
 end
-Script.Load("lua/mvm/SupplyUserMixin.lua")
+
+
 Script.Load("lua/ResearchMixin.lua")	//To allow recycle
 Script.Load("lua/RecycleMixin.lua")
 
@@ -34,14 +39,16 @@ local kConstructRate = 0.4
 local kWeldRate = 0.5
 local kOrderScanRadius = 10
 
+local kEmpChatterSoundDelay = 0.75
+
 MAC.kRepairHealthPerSecond = 50
 MAC.kHealth = kMACHealth
 MAC.kArmor = kMACArmor
-MAC.kMoveSpeed = 4.5
+MAC.kMoveSpeed = 6
 MAC.kHoverHeight = .5
 MAC.kStartDistance = 3
-MAC.kWeldDistance = 2
-MAC.kBuildDistance = 2     // Distance at which bot can start building a structure. 
+MAC.kWeldDistance = 2.25
+MAC.kBuildDistance = 2.25     // Distance at which bot can start building a structure. 
 MAC.kSpeedUpgradePercent = ( 1 + kMACSpeedAmount )
 
 MAC.kCapsuleHeight = .2
@@ -156,7 +163,7 @@ local function MvM_GetAutomaticOrder(self)
                 
             end
             
-            
+            /*
             if not target then
 			//Auto-Build Powernodes for a given location (not just nearby the MAC)
 				local locationName = GetLocationForPoint( self:GetOrigin() ):GetName()
@@ -179,7 +186,7 @@ local function MvM_GetAutomaticOrder(self)
 				end
 				
 			end
-			
+			*/
             
             //FIXME Below will not repair power nodes. This might be a good thing, would prevent accidental repairs
             //when enemy structures still in a room. Pehapes add a weighted repair command? I.e. only repair when 
@@ -335,7 +342,7 @@ function MAC:OnInitialized()	//OVERRIDES
             self.jetsCinematics[index]:SetAttachPoint(self:GetAttachPointIndex(attachPoint))
             self.jetsCinematics[index]:SetIsActive(false)
         end
-        
+        //Colorize above?
         
         self.headlightCinematic = nil
         self.headlightCinematic = Client.CreateCinematic(RenderScene.Zone_Default)
@@ -532,6 +539,60 @@ end
 
 
 
+function MAC:ProcessConstruct(deltaTime, orderTarget, orderLocation)	//OVERRIDES
+
+    local time = Shared.GetTime()
+    
+    local toTarget = (orderLocation - self:GetOrigin())
+    local distToTarget = toTarget:GetLengthXZ()
+    local orderStatus = kOrderStatus.InProgress
+    local canConstructTarget = MvM_GetCanConstructTarget(self, orderTarget)   
+    
+    if self.timeOfLastConstruct == 0 or (time > (self.timeOfLastConstruct + kConstructRate)) then
+
+        if canConstructTarget then
+        
+            local engagementDist = GetEngagementDistance(orderTarget:GetId()) 
+            if distToTarget < engagementDist then
+        
+                if orderTarget:GetIsBuilt() then   
+                    orderStatus = kOrderStatus.Completed
+                else
+            
+                    // Otherwise, add build time to structure
+                    if not self:GetIsVortexed() and not GetIsVortexed(orderTarget) then
+                        orderTarget:Construct(kConstructRate * kMACConstructEfficacy, self)
+                        self.timeOfLastConstruct = time
+                    end
+                
+                end
+                
+            else
+				
+                local hoverAdjustedLocation = GetHoverAt(self, orderLocation)
+                local doneMoving = self:MoveToTarget( PhysicsMask.AIMovement, hoverAdjustedLocation, self:GetMoveSpeed(), deltaTime )
+                self.moving = not doneMoving
+
+            end    
+        
+        
+        else
+            orderStatus = kOrderStatus.Cancelled
+        end
+
+        
+    end
+    
+    // Continuously turn towards the target. But don't mess with path finding movement if it was done.
+    if not self.moving and toTarget then
+        self:SmoothTurn(deltaTime, GetNormalizedVector(toTarget), 0)
+    end
+    
+    return orderStatus
+    
+end
+
+
 /*
 function MAC:ProcessWeldOrder(deltaTime, orderTarget, orderLocation, autoWeld)	//OVERRIDES
 
@@ -725,16 +786,49 @@ local function SetOrderFromPrevious(self, order, clearExisting, insertFirst, giv
 end
 
 
-local kEmpChatterSoundDelay = 0.75
+local function UpdateOrders(self, deltaTime)
 
-local orgMACupdate = MAC.OnUpdate
-function MAC:OnUpdate(deltaTime)
+    local currentOrder = self:GetCurrentOrder()
+    
+    if currentOrder ~= nil then
+    
+        local orderStatus = kOrderStatus.None        
+        local orderTarget = Shared.GetEntity( currentOrder:GetParam() )
+        local orderLocation = currentOrder:GetLocation()
+    
+        if currentOrder:GetType() == kTechId.FollowAndWeld then
+            orderStatus = self:ProcessFollowAndWeldOrder(deltaTime, orderTarget, orderLocation)    
+        elseif currentOrder:GetType() == kTechId.Move then
+        
+            orderStatus = self:ProcessMove(deltaTime, orderTarget, orderLocation)
+            self:UpdateGreetings()
+
+        elseif currentOrder:GetType() == kTechId.Weld or currentOrder:GetType() == kTechId.AutoWeld then
+            orderStatus = self:ProcessWeldOrder(deltaTime, orderTarget, orderLocation, currentOrder:GetType() == kTechId.AutoWeld)
+        elseif currentOrder:GetType() == kTechId.Build or currentOrder:GetType() == kTechId.Construct then
+            orderStatus = self:ProcessConstruct(deltaTime, orderTarget, orderLocation)
+        end
+        
+        if orderStatus == kOrderStatus.Cancelled then
+            self:ClearCurrentOrder()
+        elseif orderStatus == kOrderStatus.Completed then
+            self:CompletedCurrentOrder()
+        end
+        
+    end
+    
+end
+
+
+function MAC:OnUpdate( deltaTime )	//OVERRIDES
 	
 	if self:GetIsUnderEmpEffect() and self:GetIsAlive() then
 		
-		if Shared.GetTime() > self.timeEmpStarted + kEmpChatterSoundDelay and not self.playedEmpEffectedSound then
-			self:PlaySound( kMAC_ChatterSoundAsset )
-			self.playedEmpEffectedSound = true
+		if Client then
+			if Shared.GetTime() > self.timeOfLastEmpEffect + kEmpChatterSoundDelay and not self.playedEmpEffectedSound then
+				self:PlaySound( kMAC_ChatterSoundAsset )
+				self.playedEmpEffectedSound = true
+			end
 		end
 		
 		if Server then
@@ -774,23 +868,125 @@ function MAC:OnUpdate(deltaTime)
 	end
 	
 	//FIXME This is NOT toggling MAC light per location powered status
+	// - This is due to MACs not impacting Location triggers (Physics/Collision issue(s))
 	if Server then
-		
+		/*
 		local location = GetLocationForPoint( self:GetOrigin() )
-		local locationPower = GetPowerPointForLocation( location:GetName() )
-		if locationPower and locationPower:isa("PowerPoint") then
-			self.headlightActive = locationPower:GetIsDisabled() or not locationPower:GetIsBuilt()
-		else
-			self.headlightActive = false
-		end
 		
+		if location and location:isa("Location") then
+			
+			local locationPower = GetPowerPointForLocation( location:GetName() )
+			if locationPower and locationPower:isa("PowerPoint") then
+				self.headlightActive = locationPower:GetIsDisabled()
+			else
+				self.headlightActive = false
+			end
+			
+		end
+		*/
 	end
 	
 	if Client and self.headlightCinematic then
 		self.headlightCinematic:SetIsActive( self.headlightActive )
 	end
 	
-	orgMACupdate(self, deltaTime)
+	
+//Original OnUpdate -----------------------------
+    if Server and self:GetIsAlive() then
+
+        // assume we're not moving initially
+        self.moving = false
+    
+        if not self:GetHasOrder() then
+            MvM_FindSomethingToDo(self)
+        else
+            UpdateOrders(self, deltaTime)
+        end
+        
+        self.constructing = Shared.GetTime() - self.timeOfLastConstruct < 0.5
+        self.welding = Shared.GetTime() - self.timeOfLastWeld < 0.5
+
+        if self.moving and not self.jetsSound:GetIsPlaying() then
+            self.jetsSound:Start()
+        elseif not self.moving and self.jetsSound:GetIsPlaying() then
+            self.jetsSound:Stop()
+        end
+        
+    // client side build / weld effects
+    elseif Client and self:GetIsAlive() then
+		
+        if self.constructing then
+        
+            if not self.timeLastConstructEffect or self.timeLastConstructEffect + kConstructRate < Shared.GetTime()  then
+				
+				local currentOrder = self:GetCurrentOrder()
+				local orderTarget = nil
+				if currentOrder then
+					orderTarget = Shared.GetEntity( currentOrder:GetParam() )
+				end
+				
+				if orderTarget and orderTarget:isa("PowerPoint") then
+					self:TriggerEffects( "mac_construct", {
+						ismarine = ( orderTarget.scoutedForTeam1 ~= false ), isalien = ( orderTarget.scoutedForTeam2 ~= false )
+					})
+				else
+					self:TriggerEffects( "mac_construct", {
+						ismarine = ( self:GetTeamNumber() == kTeam1Index ), isalien = ( self:GetTeamNumber() == kTeam2Index )
+					})
+				end
+				
+				self.timeLastConstructEffect = Shared.GetTime()
+                
+            end
+            
+        end
+        
+        if self.welding then
+        
+            if not self.timeLastWeldEffect or self.timeLastWeldEffect + kWeldRate < Shared.GetTime()  then
+				
+				local currentOrder = self:GetCurrentOrder()
+				local orderTarget = nil
+				if currentOrder then
+					orderTarget = Shared.GetEntity( currentOrder:GetParam() )
+				end
+				
+				if orderTarget and orderTarget:isa("PowerPoint") then
+					self:TriggerEffects( "mac_weld", {
+						ismarine = ( orderTarget.scoutedForTeam1 ~= false ), isalien = ( orderTarget.scoutedForTeam2 ~= false )
+					})
+				else
+					self:TriggerEffects( "mac_weld", {
+						ismarine = ( self:GetTeamNumber() == kTeam1Index ), isalien = ( self:GetTeamNumber() == kTeam2Index )
+					})
+				end
+				
+                self.timeLastWeldEffect = Shared.GetTime()
+                
+            end
+            
+        end
+        
+        if self:GetHasOrder() ~= self.clientHasOrder then
+        
+            self.clientHasOrder = self:GetHasOrder()
+            
+            if self.clientHasOrder then
+                self:TriggerEffects("mac_set_order")
+            end
+            
+        end
+
+        if self.jetsCinematics then
+
+            for id,cinematic in ipairs(self.jetsCinematics) do
+                self.jetsCinematics[id]:SetIsActive(self.moving and self:GetIsVisible())
+            end
+
+        end
+
+    end
+	
 
 end
 
@@ -805,6 +1001,10 @@ if Server then
 	// Required by ControllerMixin.
 	function MAC:GetMovePhysicsMask()
 		return PhysicsMask.Movement
+	end
+	
+	function MAC:GetControllerPhysicsGroup()
+		return PhysicsGroup.WhipGroup	//???
 	end
 	
 	
@@ -829,11 +1029,6 @@ end	//End Server
 
 
 //-----------------------------------------------------------------------------
-
-
-//TODO Verify these actually work...
-ReplaceLocals( MAC.OnUpdate, { FindSomethingToDo = MvM_FindSomethingToDo } )
-ReplaceLocals( MAC.ProcessConstruct, { GetCanConstructTarget = MvM_GetCanConstructTarget } )
 
 
 Class_Reload( "MAC", newNetworkVars )

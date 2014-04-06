@@ -8,19 +8,13 @@
 
 kMarineWeaponEffects =
 {
+
     power_surge = 
     {
         powerSurgeEffects = 
         {
-            {cinematic = "cinematics/marine/power_surge.cinematic"},
-        }
-    },
-    
-    power_surge_team2 = 
-    {
-        powerSurgeEffects = 
-        {
-            {cinematic = "cinematics/marine/power_surge_team2.cinematic"},
+            {cinematic = "cinematics/marine/power_surge.cinematic", ismarine = true, isalien = false },
+            {cinematic = "cinematics/marine/power_surge_team2.cinematic", ismarine = false, isalien = true },
         }
     },
 
@@ -336,8 +330,13 @@ kMarineWeaponEffects =
     {
         mineSpawn =
         {
-            {sound = "sound/NS2.fev/marine/common/mine_drop"},
-            {sound = "sound/NS2.fev/marine/common/mine_warmup"},
+            //FIXME Cases like this don't care about LOS...
+            {sound = "sound/NS2.fev/marine/common/mine_drop", ismarine = true, isalien = false },
+            {sound = "sound/NS2.fev/marine/common/mine_warmup", ismarine = true, isalien = false },
+            
+            {sound = "sound/NS2.fev/marine/common/mine_drop", ismarine = false, isalien = true },
+            {sound = "sound/NS2.fev/marine/common/mine_warmup", ismarine = false, isalien = true },
+            
         },
     },
     

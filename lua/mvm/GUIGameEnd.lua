@@ -124,7 +124,8 @@ function GUIGameEnd:SetGameEnded(playerWon, playerIsMarine)
     
 end
 
-local function OnGameEnd(message)
+
+local function MvMOnGameEnd( message )
 	
     local localPlayer = Client.GetLocalPlayer()
     
@@ -134,13 +135,13 @@ local function OnGameEnd(message)
         
             -- Spectators always want the 'Win' screen to appear
             -- Using the win variable to specify which team won instead
-            ClientUI.GetScript("mvm/GUIGameEnd"):SetGameEnded(true, message.win)
+            ClientUI.GetScript("mvm/GUIGameEnd"):SetGameEnded( true, message.win )
             Client.PlayMusic("sound/NS2.fev/victory")
             
         else
 			
             ClientUI.GetScript("mvm/GUIGameEnd"):SetGameEnded( message.win, localPlayer:GetTeamNumber() == kTeam1Index )
-            Client.PlayMusic("sound/NS2.fev/" .. (message.win and "victory" or "loss"))
+            Client.PlayMusic("sound/NS2.fev/" .. ( message.win and "victory" or "loss") )
             
         end
         
@@ -150,4 +151,7 @@ local function OnGameEnd(message)
     Shared.ConsoleCommand("p_endlog")
     
 end
-Client.HookNetworkMessage("GameEnd", OnGameEnd)
+
+
+Client.HookNetworkMessage( "GameEnd", MvMOnGameEnd )
+

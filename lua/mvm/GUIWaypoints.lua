@@ -10,11 +10,11 @@
 
 Script.Load("lua/Marine_Order.lua")
 Script.Load("lua/GUIAnimatedScript.lua")
-Script.Load("lua/mvm/GuIColorGlobals.lua")
+Script.Load("lua/mvm/GUIColorGlobals.lua")
 
 class 'GUIWaypoints' (GUIAnimatedScript)
 
-local kMarineTextureName = PrecacheAsset("ui/marine_order.dds")
+local kMarineTextureName = PrecacheAsset("ui/marine_order.dds")		//FIXME Colorize
 
 local kOrderbackground = PrecacheAsset("ui/order_background.dds")
 local kIconTexture = "ui/buildmenu.dds"
@@ -504,13 +504,28 @@ local function AnimateFinalWaypoint(self)
     local finalWaypointData = PlayerUI_GetFinalWaypointInScreenspace()
     local showWayPoint = not PlayerUI_GetIsConstructing() and not PlayerUI_GetIsRepairing()
     
+    local fullHUD = Client.GetOptionInteger("hudmode", kHUDMode.Full) == kHUDMode.Full
+    
     self.animatedCircle:SetIsVisible(showWayPoint)
     self.finalWaypoint:SetIsVisible(showWayPoint)
     
     if finalWaypointData then
+		
+		local useTexture
     
-        self.finalDistanceText:SetIsVisible(true)
-        self.finalNameText:SetIsVisible(true)
+        if not fullHUD then
+            useTexture = kTransparentTexture    
+        else
+			useTexture = kMarineTextureName
+        end
+		
+		if self.usedTexture ~= useTexture then
+            self.finalWaypoint:SetTexture(useTexture)
+            self.usedTexture = useTexture
+        end
+        
+        self.finalDistanceText:SetIsVisible(fullHUD)
+        self.finalNameText:SetIsVisible(fullHUD)
         
         local x = finalWaypointData.x
         local y = finalWaypointData.y

@@ -8,5 +8,6 @@ specularMap = "models/marine/mine/mine_spec.dds"
 modelColorMap = "models/marine/mine/mine_colorMap.dds"
 numColumns = 1
 numRows = 1
+colorMapIndex = 0
 
 surface = "thin_metal"

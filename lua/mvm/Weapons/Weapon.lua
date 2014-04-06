@@ -1,5 +1,8 @@
 
 
+Script.Load("lua/mvm/PickupableWeaponMixin.lua")
+Script.Load("lua/mvm/LiveMixin.lua")
+
 
 //-----------------------------------------------------------------------------
 
@@ -39,4 +42,4 @@ end
 //-----------------------------------------------------------------------------
 
 
-Class_Reload("Weapon", {})
+Class_Reload( "Weapon", {} )

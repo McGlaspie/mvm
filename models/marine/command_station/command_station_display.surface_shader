@@ -6,12 +6,16 @@
 		<input name="welcomeEmissiveMap" type="texture" address="wrap" srgb="true"/>
 		<input name="lockedEmissiveMap" type="texture" address="wrap" srgb="true"/>
 		
+		<input name="colorMap" type="texture" address="wrap" srgb="true"/>
+		
 		<input name="hiddenAmount" type="float">0.0</input>
 		
 		<input name="timeStateChanged" type="float">0.0</input>
 		<input name="state" type="float">1.0</input>
 		
-		
+		<input name="displayColorAccentR" type="float">0</input>
+		<input name="displayColorAccentG" type="float">0</input>
+		<input name="displayColorAccentB" type="float">0</input>
 		
 	</inputs>
 	
@@ -19,7 +23,31 @@
 	<![CDATA[
 	
 		
-		
+		float3 BlendColorOverlay( float3 texColor, float3 blendColor ) 
+		//Spcefic to handling emissive colorization in similar to Photoshop's Overlay layer blend-mode
+		{
+			float3 resultColor;
+			
+			if (texColor.r > 0.5) {
+				resultColor.r = 1 - (1 - 2 * (texColor.r - 0.5)) * (1 - blendColor.r);
+			} else {
+				resultColor.r = (2 * texColor.r) * blendColor.r;
+			}
+
+			if (texColor.g > 0.5) {
+				resultColor.g = 1 - (1 - 2 * (texColor.g - 0.5)) * (1 - blendColor.g);
+			} else {
+				resultColor.g = (2 * texColor.g) * blendColor.g;
+			}
+			
+			if (texColor.b > 0.5) {
+				resultColor.b = 1 - (1 - 2 * (texColor.b - 0.5)) * (1 - blendColor.b);
+			} else {
+				resultColor.b = (2 * texColor.b) * blendColor.b;
+			}
+			
+			return resultColor;
+		}
 	
 	
 		void MaterialShader(in Material_Input input, inout Material material)
@@ -31,16 +59,27 @@
 			const float welcome  = 3;
 		
 			float4 tex;
-		
+			
+			float3 modelColorAccent = float3( displayColorAccentR, displayColorAccentG, displayColorAccentB );
+			float4 modelColorMapTex = tex2D( colorMap, input.texCoord ).rgba;
+			
 			if (state == normal) {
-				tex = tex2D(emissiveMap, input.texCoord);
+				tex = tex2D( emissiveMap, input.texCoord );
 			} else if (state == locked) {
-				tex = tex2D(lockedEmissiveMap, input.texCoord);
+				tex = tex2D( lockedEmissiveMap, input.texCoord );
 			} else if (state == welcome) {
-				tex = tex2D(welcomeEmissiveMap, input.texCoord);
+				tex = tex2D( welcomeEmissiveMap, input.texCoord );
+			}
+			
+			float3 greyEmissive = dot( tex.rgb, float3(0.299, 0.587, 0.114) ); //NTSC grey
+			
+			if( modelColorMapTex.a > 0.0 ) {
+				material.emissive = BlendColorOverlay( greyEmissive.rgb, modelColorAccent.rgb ) * input.color.rgb * 10; //blend color into emissive grey;
+			} else {
+				material.emissive = tex;
 			}
 		
-			material.emissive = tex.rgb * input.color.rgb * ( f + 1 + cos(time * 4) );
+			//material.emissive = tex.rgb * input.color.rgb * ( f + 1 + cos(time * 4) );
 			material.opacity  = tex.a * input.color.a;
 		}
 	]]>

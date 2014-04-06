@@ -258,7 +258,6 @@ if Server then
             
                 if entity:isa("Player") then
 					
-					//Print("\t entity.previousTeamNumber = " .. tostring(entity.previousTeamNumber) )
 					entity:SetUpdates(true)
 					
                     if team:AddPlayer(entity) then
@@ -267,9 +266,6 @@ if Server then
                         entity.sendTechTreeBase = true           
                         
                     end
-                   
-                    // Send scoreboard changes to everyone    
-                    entity:SetScoreboardChanged(true)
                 
                 end
                 
@@ -385,7 +381,7 @@ if Server then
             
             if success then
             
-                self.sponitor:OnJoinTeam(newPlayer, team)
+                //self.sponitor:OnJoinTeam(newPlayer, team)
                 
                 if oldPlayerWasSpectating then
                     newPlayerClient:SetSpectatingPlayer(nil)
@@ -451,7 +447,7 @@ if Server then
             // at the start of the next game, including the NS2Gamerules. This is how a map transition would have to work anyway.
             // Do not destroy any entity that has a parent. The entity will be destroyed when the parent is destroyed or
             // when the owner manually destroyes the entity.
-            local shieldTypes = { "GameInfo", "MapBlip", "NS2Gamerules" }
+            local shieldTypes = { "GameInfo", "MapBlip", "NS2Gamerules", "PlayerInfoEntity" }
             local allowDestruction = true
             for i = 1, #shieldTypes do
                 allowDestruction = allowDestruction and not entity:isa(shieldTypes[i])
@@ -628,8 +624,6 @@ if Server then
                 self.team2:Update(timePassed)
                 self.spectatorTeam:Update(timePassed)
                 
-                // Send scores every so often
-                self:UpdateScores()
                 self:UpdatePings()
                 self:UpdateHealth()
                 self:UpdateTechPoints()
@@ -639,8 +633,9 @@ if Server then
                 KillEnemiesNearCommandStructureInPreGame(self, timePassed)
                 
             end
-
+			
             //self.sponitor:Update(timePassed)
+            self.gameInfo:SetIsGatherReady(Server.GetIsGatherReady())
             
         end
         
@@ -841,6 +836,8 @@ if Server then
     // Function for allowing teams to hear each other's voice chat
     function NS2Gamerules:GetCanPlayerHearPlayer(listenerPlayer, speakerPlayer)
 //MvM: Stub for future use
+//Once Game-Mode voting added, allow All-Talk during voting period?
+		
         local canHear = false
         
         // Check if the listerner has the speaker muted.

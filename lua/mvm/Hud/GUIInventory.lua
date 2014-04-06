@@ -8,6 +8,8 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
+Script.Load("lua/mvm/GUIColorGlobals.lua")
+
 class 'GUIInventory'
 
 local kFontName = "fonts/AgencyFB_small.fnt"
@@ -36,16 +38,27 @@ local function CreateInventoryItem(self, index, alienStyle)
 
     local item = self.script:CreateAnimatedGraphicItem()
     
+    local ui_baseColor = ConditionalValue(
+		PlayerUI_GetTeamNumber() == kTeam1Index,
+		kTeam1_BaseColor,
+		kTeam2_BaseColor
+	)
+    
     item:SetSize(GUIInventory.kItemSize)
     item:SetTexture( kInventoryIconsTexture )
     item:SetShader("shaders/GUI_TeamThemed.surface_shader")
+    item:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
+    item:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
+    item:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
+    
     item:AddAsChildTo(self.background)
     
     local key, keyText = GUICreateButtonIcon("Weapon1", alienStyle)
     key:SetAnchor(GUIItem.Middle, GUIItem.Bottom)
     key:SetInheritsParentAlpha(true)
     keyText:SetInheritsParentAlpha(true)
-    keyText:SetFontName(kFontName)
+    keyText:SetFontName( kFontName )
+    //keyText:SetColor( kGUI_NameTagFontColors[ playerTeam ] )
     
     local keySize = key:GetSize()    
     key:SetPosition(Vector(keySize.x * -.5, 8, 0))
@@ -71,20 +84,10 @@ local function LocalAdjustSlot(self, index, hudSlot, techId, isActive, resetAnim
         inventoryItem.Graphic:Pause(2, "ANIM_INVENTORY_ITEM_PAUSE", AnimateLinear, function(script, item) item:FadeOut(0.5, "ANIM_INVENTORY_ITEM") end )
     end
     
-    local ui_baseColor = ConditionalValue(
-		PlayerUI_GetTeamNumber() == kTeam1Index,
-		kTeam1_BaseColor,
-		kTeam2_BaseColor
-	)
-    
     inventoryItem.KeyText:SetText(BindingsUI_GetInputValue("Weapon" .. hudSlot))
     inventoryItem.Graphic:SetUniformScale(self.scale)
     inventoryItem.Graphic:SetTexturePixelCoordinates(GetTexCoordsForTechId(techId))
     inventoryItem.Graphic:SetPosition(Vector( (GUIInventory.kItemPadding + GUIInventory.kItemSize.x) * (index-1) , 0, 0) )
-    
-    inventoryItem.Graphic:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
-    inventoryItem.Graphic:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
-    inventoryItem.Graphic:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
     
     if resetAnimations then
         inventoryItem.Graphic:Pause(2, "ANIM_INVENTORY_ITEM_PAUSE", AnimateLinear, function(script, item) item:FadeOut(0.5, "ANIM_INVENTORY_ITEM") end )    
@@ -135,37 +138,44 @@ function GUIInventory:Update(deltaTime, parameters)
 
     PROFILE("GUIInventory:Update")
     
-    local activeWeaponTechId, inventoryTechIds = unpack(parameters)
+    local fullMode = Client.GetOptionInteger("hudmode", kHUDMode.Full) == kHUDMode.Full
+    self.background:SetIsVisible(fullMode)
     
-    if #self.inventoryIcons > #inventoryTechIds then
-    
-        self.inventoryIcons[#self.inventoryIcons].Graphic:Destroy()
-        table.remove(self.inventoryIcons, #self.inventoryIcons)
+    if fullMode then
         
-    end
-    
-    local resetAnimations = false
-    if activeWeaponTechId ~= self.lastActiveWeaponTechId and gTechIdPosition and gTechIdPosition[activeWeaponTechId] then
+        local activeWeaponTechId, inventoryTechIds = unpack(parameters)
+        
+        if #self.inventoryIcons > #inventoryTechIds then
+        
+            self.inventoryIcons[#self.inventoryIcons].Graphic:Destroy()
+            table.remove(self.inventoryIcons, #self.inventoryIcons)
+            
+        end
+        
+        local resetAnimations = false
+        if activeWeaponTechId ~= self.lastActiveWeaponTechId and gTechIdPosition and gTechIdPosition[activeWeaponTechId] then
 
-        self.lastActiveWeaponTechId = activeWeaponTechId
-        resetAnimations = true
+            self.lastActiveWeaponTechId = activeWeaponTechId
+            resetAnimations = true
+            
+        end
         
-    end
+        if self.forceAnimationReset then
+            resetAnimations = true
+        end
+        
+        local numItems = #inventoryTechIds
+        self.background:SetPosition(Vector(
+            self.scale * -0.5 * (numItems*GUIInventory.kItemSize.x + (numItems-1)*GUIInventory.kItemPadding),
+            GUIInventory.kBackgroundYOffset,
+            0))
+        
+        local alienStyle = PlayerUI_GetTeamType() == kAlienTeamType
+        
+        for index, inventoryItem in ipairs(inventoryTechIds) do
+            LocalAdjustSlot(self, index, inventoryItem.HUDSlot, inventoryItem.TechId, inventoryItem.TechId == activeWeaponTechId, resetAnimations, alienStyle)
+        end
     
-    if self.forceAnimationReset then
-        resetAnimations = true
-    end
-    
-    local numItems = #inventoryTechIds
-    self.background:SetPosition(Vector(
-        self.scale * -0.5 * (numItems*GUIInventory.kItemSize.x + (numItems-1)*GUIInventory.kItemPadding),
-        GUIInventory.kBackgroundYOffset,
-        0))
-    
-    local alienStyle = PlayerUI_GetTeamType() == kAlienTeamType
-    
-    for index, inventoryItem in ipairs(inventoryTechIds) do
-        LocalAdjustSlot(self, index, inventoryItem.HUDSlot, inventoryItem.TechId, inventoryItem.TechId == activeWeaponTechId, resetAnimations, alienStyle)
     end
     
 end

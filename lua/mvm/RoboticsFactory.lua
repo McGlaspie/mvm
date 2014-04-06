@@ -11,6 +11,9 @@ Script.Load("lua/mvm/WeldableMixin.lua")
 Script.Load("lua/mvm/DissolveMixin.lua")
 Script.Load("lua/mvm/PowerConsumerMixin.lua")
 Script.Load("lua/mvm/SupplyUserMixin.lua")
+Script.Load("lua/mvm/NanoshieldMixin.lua")
+Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 	Script.Load("lua/mvm/CommanderGlowMixin.lua")
@@ -22,9 +25,7 @@ local newNetworkVars = {}
 
 AddMixinNetworkVars(FireMixin, newNetworkVars)
 AddMixinNetworkVars(DetectableMixin, newNetworkVars)
-
-local kOpenSound = PrecacheAsset("sound/NS2.fev/marine/structures/roboticsfactory_open")
-local kCloseSound = PrecacheAsset("sound/NS2.fev/marine/structures/roboticsfactory_close")
+AddMixinNetworkVars( ElectroMagneticMixin, newNetworkVars)
 
 
 //-----------------------------------------------------------------------------
@@ -60,6 +61,7 @@ function RoboticsFactory:OnCreate()	//OVERRIDES
     
     InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
+    InitMixin(self, ElectroMagneticMixin)
     
     if Client then
         InitMixin(self, CommanderGlowMixin)
@@ -75,15 +77,47 @@ function RoboticsFactory:OnCreate()	//OVERRIDES
 end
 
 
-local orgRoboFactInit = RoboticsFactory.OnInitialized
-function RoboticsFactory:OnInitialized()
+function RoboticsFactory:OnInitialized()	//OVERRIDES
 
-	orgRoboFactInit(self)
-	
-	if Client then
+	ScriptActor.OnInitialized(self)
+    
+    InitMixin(self, WeldableMixin)
+    InitMixin(self, NanoShieldMixin)
+    
+    self:SetModel(RoboticsFactory.kModelName, RoboticsFactory.kAnimationGraph)
+    
+    self:SetPhysicsType(PhysicsType.Kinematic)
+    
+    self.researchId = Entity.invalidId
+    
+    if Server then
+    
+        // This Mixin must be inited inside this OnInitialized() function.
+        if not HasMixin(self, "MapBlip") then
+            InitMixin(self, MapBlipMixin)
+        end
+        
+        InitMixin(self, StaticTargetMixin)
+        InitMixin(self, HiveVisionMixin)
+        //InitMixin(self, InfestationTrackerMixin)
+        InitMixin(self, SupplyUserMixin)
+    
+    elseif Client then
+    
+        InitMixin(self, UnitStatusMixin)
 		self:InitializeSkin()
-	end
+		
+    end
 
+end
+
+
+function RoboticsFactory:OverrideVisionRadius()
+	return 2
+end
+
+function RoboticsFactory:GetIsVulnerableToEMP()
+	return false
 end
 
 
@@ -95,7 +129,7 @@ function RoboticsFactory:OnTag(tagName)
 		
 		if self.researchId == kTechId.MAC or self.researchId == kTechId.ARC then
 		
-			//ensure supply is removed before entity is spawned due to create delay
+			//ensure supply is removed before entity is spawned due to entity create delay
 			local team = self:GetTeam()
 			if team then
 				team:RemoveSupplyUsed(  LookupTechData( self.researchId, kTechDataSupply, 0) )
@@ -113,10 +147,12 @@ function RoboticsFactory:OnTag(tagName)
         
     end
     
+    local selfTeam = self:GetTeamNumber()
+    
     if tagName == "open_start" then
-        StartSoundEffectAtOrigin( kOpenSound, self:GetOrigin() )
+        self:TriggerEffects( "robofact_open", { ismarine = ( selfTeam == kTeam1Index ), isalien = ( selfTeam == kTeam2Index ) } )
     elseif tagName == "close_start" then
-        StartSoundEffectAtOrigin( kCloseSound, self:GetOrigin() )
+        self:TriggerEffects( "robofact_close", { ismarine = ( selfTeam == kTeam1Index ), isalien = ( selfTeam == kTeam2Index ) } )
     end
     
 end

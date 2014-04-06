@@ -1,5 +1,52 @@
 
 Script.Load("lua/ScriptActor.lua")
+Script.Load("lua/mvm/EffectsMixin.lua")
+
+
+// Called right after an entity is created on the client or server. This happens through Server.CreateEntity, 
+// or when a server-created object is propagated to client. 
+function ScriptActor:OnCreate()     //OVERRIDES - Required to use MvM EffectsMixin
+
+    Entity.OnCreate(self)
+    
+    // This field is not synchronized over the network.
+    self.creationTime = Shared.GetTime()
+    
+    InitMixin(self, EffectsMixin)
+    InitMixin(self, TechMixin)
+    
+    self.attachedId = Entity.invalidId
+    
+    self.locationId = 0
+    
+    self.pathingFlags = 0
+    
+    if Server then
+    
+        self.locationEntId = Entity.invalidId
+        
+        InitMixin(self, InvalidOriginMixin)
+        InitMixin(self, RelevancyMixin)
+        
+        // Ownership only exists on the Server.
+        InitMixin(self, OwnerMixin)
+        
+        self.selectedCount = 0
+        self.hotgroupedCount = 0
+        
+    end
+    
+    InitMixin(self, ExtentsMixin)
+    InitMixin(self, TargetMixin)
+    InitMixin(self, UsableMixin)
+    
+    self:SetUpdates(true)
+    self:SetPropagate(Entity.Propagate_Mask)
+    self:SetRelevancyDistance(kMaxRelevancyDistance)
+    
+end
+
+
 
 //Must override utility functions in order for supply to be calculated correctly
 //across the board. Otherwise, supply is tracked correctly, but doesn't restrict
@@ -15,8 +62,8 @@ function ScriptActor:GetTechAllowed( techId, techNode, player )
         allowed = false
         canAfford = false
         
-    elseif requiredSupply > 0 and MvM_GetSupplyUsedByTeam(self:GetTeamNumber()) + requiredSupply > MvM_GetMaxSupplyForTeam(self:GetTeamNumber()) then
-    
+    elseif requiredSupply > 0 and MvM_GetSupplyUsedByTeam(self:GetTeamNumber()) + requiredSupply > MvM_GetMaxSupplyForTeam( self:GetTeamNumber() ) then
+    //???? Why does this not catch armory upgrade?
         allowed = false
         canAfford = false
         
@@ -31,7 +78,7 @@ function ScriptActor:GetTechAllowed( techId, techNode, player )
         canAfford = true
         
     elseif techNode:GetIsUpgrade() then
-    
+        
         canAfford = techNode:GetCost() <= player:GetTeamResources()
         allowed = HasMixin(self, "Research") and not self:GetIsResearching() and allowed
         
@@ -81,14 +128,8 @@ function ScriptActor:GetTechAllowed( techId, techNode, player )
 end
 
 
-Class_Reload("ScriptActor", {})
+//-----------------------------------------------------------------------------
 
-/*
-ReplaceLocals( 	//Doesn't seem to fix anything...
-	ScriptActor.GetTechAllowed, 
-	{
-		GetMaxSupplyForTeam = MvM_GetMaxSupplyForTeam,
-		GetSupplyUsedByTeam = MvM_GetSupplyUsedByTeam
-	}
-)
-*/
+
+Class_Reload( "ScriptActor", {} )
+

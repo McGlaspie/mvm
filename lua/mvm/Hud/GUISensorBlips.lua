@@ -9,7 +9,7 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
-Script.Load("lua/mvm/GuIColorGlobals.lua")
+Script.Load("lua/mvm/GUIColorGlobals.lua")
 
 class 'GUISensorBlips' (GUIScript)
 
@@ -46,13 +46,13 @@ function GUISensorBlips:Update(deltaTime)
 
     PROFILE("GUISensorBlips:Update")
 
-    self:UpdateBlipList(PlayerUI_GetSensorBlipInfo())
+    self:UpdateBlipList( PlayerUI_GetSensorBlipInfo() )
     
-    self:UpdateAnimations(deltaTime)
+    self:UpdateAnimations( deltaTime )
     
 end
 
-function GUISensorBlips:UpdateAnimations(deltaTime)
+function GUISensorBlips:UpdateAnimations( deltaTime )
 
     PROFILE("GUISensorBlips:UpdateAnimations")
     
@@ -66,14 +66,14 @@ function GUISensorBlips:UpdateAnimations(deltaTime)
         self.timeLastImpulse = Shared.GetTime()
     end  
 	
-	local ui_baseColor = Color( 1, 0, 0, 1 )
-	/*
+	//local ui_baseColor = Color( 1, 0, 0, 1 )
+	//*
 	local ui_baseColor = ConditionalValue( 
 		PlayerUI_GetTeamNumber() == kTeam1Index, 
 		kGUI_Team1_AccentColor, 
 		kGUI_Team2_AccentColor 
 	)
-	*/
+	//*/
 
     local destAlpha = math.max(0, 1 - (Shared.GetTime() - self.timeLastImpulse) * GUISensorBlips.kAlphaPerSecond)  
     
@@ -95,7 +95,7 @@ function GUISensorBlips:UpdateAnimations(deltaTime)
         // Draw blips as barely visible when in view, to communicate their purpose. Animate color towards final value.
         local currentColor = blip.GraphicsItem:GetColor()
         
-        //TODO Below will need to updated once cloaking re-added
+        //TODO Below will need to updated once cloaking added
         local player = Client.GetLocalPlayer()
         if not player:isa("Commander") then
 			destAlpha = ConditionalValue( blip.Obstructed, destAlpha * blip.Radius, 0)
@@ -103,7 +103,8 @@ function GUISensorBlips:UpdateAnimations(deltaTime)
 			destAlpha = ConditionalValue( blip.Obstructed, destAlpha * blip.Radius, currentColor.a - GUISensorBlips.kAlphaPerSecond * deltaTime)
 		end
 		
-        currentColor.a = destAlpha + 0.25
+        currentColor.a = destAlpha + 0.5
+        
         blip.GraphicsItem:SetColor(currentColor)
         blip.TextItem:SetColor(currentColor)
         

@@ -12,6 +12,8 @@ Script.Load("lua/mvm/WeldableMixin.lua")
 Script.Load("lua/mvm/DissolveMixin.lua")
 Script.Load("lua/mvm/PowerConsumerMixin.lua")
 Script.Load("lua/mvm/SupplyUserMixin.lua")
+Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 	Script.Load("lua/mvm/CommanderGlowMixin.lua")
@@ -21,14 +23,18 @@ end
 Observatory.kDistressBeaconTime = kDistressBeaconTime
 Observatory.kDistressBeaconRange = kDistressBeaconRange
 Observatory.kDetectionRange = 22 // From NS1
+//TODO Experiment with increasing range to 30-40 or so and making
+//Obs more expensive (res & supply). Use this and create "sensor nets"
+
 
 local newNetworkVars = {}
 
 AddMixinNetworkVars(FireMixin, newNetworkVars)
 AddMixinNetworkVars(DetectableMixin, newNetworkVars)
+AddMixinNetworkVars(ElectroMagneticMixin, newNetworkVars)
 
 local kDistressBeaconSoundMarine = PrecacheAsset("sound/NS2.fev/marine/common/distress_beacon_marine")
-local kDistressBeaconSoundAlien = PrecacheAsset("sound/NS2.fev/marine/common/distress_beacon_alien")
+//local kDistressBeaconSoundAlien = PrecacheAsset("sound/NS2.fev/marine/common/distress_beacon_alien")
 
 local kObservatoryTechButtons = { 
 	kTechId.Scan, kTechId.DistressBeacon, kTechId.Detector, kTechId.None,
@@ -70,6 +76,7 @@ function Observatory:OnCreate()		//OVERRIDES
     
     InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
+    InitMixin(self, ElectroMagneticMixin)
     
     if Client then
         InitMixin(self, CommanderGlowMixin)
@@ -80,6 +87,7 @@ function Observatory:OnCreate()		//OVERRIDES
     self:SetPhysicsType(PhysicsType.Kinematic)
     self:SetPhysicsGroup(PhysicsGroup.MediumStructuresGroup) 
 
+	/*
 	if Server then
     
         self.distressBeaconSoundMarine = Server.CreateEntity(SoundEffect.kMapName)
@@ -97,6 +105,17 @@ function Observatory:OnCreate()		//OVERRIDES
 			self.distressBeaconSoundMarine:SetExcludeRelevancyMask(kRelevantToTeam1)
 			self.distressBeaconSoundAlien:SetExcludeRelevancyMask(kRelevantToTeam2)
 		end
+        
+    end
+    */
+    
+    if Server then
+    
+        self.distressBeaconSound = Server.CreateEntity(SoundEffect.kMapName)
+        self.distressBeaconSound:SetAsset(kDistressBeaconSoundMarine)
+        self.distressBeaconSound:SetRelevancyDistance(Math.infinity)
+        
+        //self:AddTimedCallback(Observatory.RevealCysts, 0.4)
         
     end
 
@@ -135,6 +154,15 @@ function Observatory:OnInitialized()	//OVERRIDES
     
     InitMixin(self, IdleMixin)
 
+end
+
+
+function Observatory:OverrideVisionRadius()
+	return 4
+end
+
+function Observatory:GetIsVulnerableToEMP()
+	return false
 end
 
 
@@ -237,33 +265,112 @@ local function RespawnPlayer(self, player, distressOrigin)
 end
 
 
+function Observatory:PerformActivation(techId, position, normal, commander)	//OVERRIDES
 
-function Observatory:TriggerDistressBeacon()
+    local success = false
+    
+    if MvM_GetIsUnitActive(self) then
+    
+        if techId == kTechId.DistressBeacon then
+            return self:TriggerDistressBeacon()
+        end
+        
+    end
+    
+    return ScriptActor.PerformActivation(self, techId, position, normal, commander)
+    
+end
+
+
+function Observatory:PerformDistressBeacon()	//OVERRIDES
+
+    self.distressBeaconSound:Stop()
+    
+    local anyPlayerWasBeaconed = false
+    local successfullPositions = {}
+    local successfullExoPositions = {}
+    local failedPlayers = {}
+    
+    local distressOrigin = self:GetDistressOrigin()
+    if distressOrigin then
+    
+        for index, player in ipairs(GetPlayersToBeacon(self, distressOrigin)) do
+        
+            local success, respawnPoint = RespawnPlayer(self, player, distressOrigin)
+            if success then
+            
+                anyPlayerWasBeaconed = true
+                if player:isa("Exo") then
+                    table.insert(successfullExoPositions, respawnPoint)
+                end
+                    
+                table.insert(successfullPositions, respawnPoint)
+                
+            else
+                table.insert(failedPlayers, player)
+            end
+            
+        end
+        
+        // Also respawn players that are spawning in at infantry portals near command station (use a little extra range to account for vertical difference)
+        for index, ip in ipairs(GetEntitiesForTeamWithinRange("InfantryPortal", self:GetTeamNumber(), distressOrigin, kInfantryPortalAttachRange + 1)) do
+        
+            ip:FinishSpawn()
+            local spawnPoint = ip:GetAttachPointOrigin("spawn_point")
+            table.insert(successfullPositions, spawnPoint)
+            
+        end
+        
+    end
+    
+    local usePositionIndex = 1
+    local numPosition = #successfullPositions
+
+    for i = 1, #failedPlayers do
+    
+        local player = failedPlayers[i]  
+    
+        if player:isa("Exo") then        
+            player:SetOrigin(successfullExoPositions[math.random(1, #successfullExoPositions)])        
+        else
+              
+            player:SetOrigin(successfullPositions[usePositionIndex])
+            if player.TriggerBeaconEffects then
+                player:TriggerBeaconEffects()
+            end
+            
+            usePositionIndex = Math.Wrap(usePositionIndex + 1, 1, numPosition)
+            
+        end    
+    
+    end
+
+    if anyPlayerWasBeaconed then
+        self:TriggerEffects("distress_beacon_complete")
+    end
+    
+end
+
+
+function Observatory:TriggerDistressBeacon()	//OVERRIDES
 
     local success = false
     
     if not self:GetIsBeaconing() then
 
-        self.distressBeaconSoundMarine:Start()
-        self.distressBeaconSoundAlien:Start()
-        
+        self.distressBeaconSound:Start()
+
         local origin = self:GetDistressOrigin()
         
         if origin then
         
-            self.distressBeaconSoundMarine:SetOrigin(origin)
-            self.distressBeaconSoundAlien:SetOrigin(origin)
-            
+            self.distressBeaconSound:SetOrigin(origin)
+
             // Beam all faraway players back in a few seconds!
             self.distressBeaconTime = Shared.GetTime() + Observatory.kDistressBeaconTime
             
-			if HasMixin(self, "Fire") and self:GetIsOnFire() then
-				self.distressBeaconTime = self.distressBeaconTime + kBurningObsDistressBeaconDelay
-			end
-			
-
-			if Server then
-				
+            if Server then
+            
                 TriggerMarineBeaconEffects(self)
                 
                 local location = GetLocationForPoint(self:GetDistressOrigin())
@@ -282,6 +389,8 @@ function Observatory:TriggerDistressBeacon()
     return success, not success
     
 end
+
+
 
 //-----------------------------------------------------------------------------
 

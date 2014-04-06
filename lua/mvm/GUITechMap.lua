@@ -225,7 +225,8 @@ end
 function GUITechMap:Update(deltaTime)
 
     local teamNumber = PlayerUI_GetTeamNumber()
-    // reload the tech map. its possible that the script is not destroyed when changing player class in some cases and would use therefor the incorrect tech map
+    // reload the tech map. its possible that the script is not destroyed when changing 
+	//player class in some cases and would use therefor the incorrect tech map
     if teamNumber ~= self.teamNumber then
 		
         self:Uninitialize()
@@ -243,7 +244,7 @@ function GUITechMap:Update(deltaTime)
     
     if player:isa("Commander") and not self.registered then
         
-        local script = GetGUIManager():GetGUIScriptSingle("GUICommanderTooltip")
+        local script = GetGUIManager():GetGUIScriptSingle("mvm/GUICommanderTooltip")
         if script then
             script:Register(self)
             self.registered = true

@@ -1,27 +1,78 @@
 
 
-function GetEntitiesForTeamByLocation( location, teamNumber )
+function GetEntitiesByLocation( location, entityType )
+
+	assert( location:isa("Location") )
+	
+	if location and entityType then
+		
+		local locationEnts = location:GetEntitiesInTrigger()
+		local foundEntities = {}
+		
+		for _, entity in ipairs( locationEnts ) do
+			
+			if entityType ~= nil then
+				if entity:isa( entityType ) then
+					table.insert( foundEntities, entity )
+				end
+			else
+				table.insert( foundEntities, entity )
+			end
+			
+		end
+		
+		return foundEntities
+	
+	end
+	
+	return nil
+
+end
+
+
+function GetEntitiesForTeamByLocation( location, teamNumber, entityType )
 
 	assert( location:isa("Location") )
 	
 	if location and teamNumber then
 		
 		local locationEnts = location:GetEntitiesInTrigger()
-		local entities = {}
+		local foundEntities = {}
 		
-		for _, entity in ipairs(locationEnts) do
+		for _, entity in ipairs( locationEnts ) do
 			
 			if HasMixin(entity, "Team") and entity:GetTeamNumber() == teamNumber then
-				table.insert(entities, entity)
+				
+				if entityType ~= nil then
+					if entity:isa( entityType ) then
+						table.insert( foundEntities, entity )
+					end
+				else
+					table.insert( foundEntities, entity )
+				end
+				
 			end
 			
 		end
 		
-		return entities
+		return foundEntities
 	
 	end
 	
 	return {}
+
+end
+
+
+function DestroyEntitiesWithinRangeByTeam( className, origin, range, teamNumber, filterFunc )
+
+    for index, entity in ipairs( GetEntitiesWithinRange(className, origin, range) ) do
+        if not filterFunc or not filterFunc(entity) then
+			if HasMixin( entity, "Team" ) and entity:GetTeamNumber() == teamNumber then
+				DestroyEntity( entity )
+			end
+        end
+    end
 
 end
 
@@ -96,6 +147,7 @@ function MvM_GetSupplyUsedByTeam( teamNumber )
 
 end
 
+
 if Server then
 
 	function OnCommanderLogOut(commander)	//OVERRIDES
@@ -109,15 +161,52 @@ if Server then
 			client.timeUntilResourceBlock = Shared.GetTime() + addTime + kCommanderResourceBlockTime
 			client.blockPersonalResources = true
 			
-			//if client.commanderLoginTime then
-			//	client.commanderLoginTime = nil
-			//end
-			
 		end
 
 	end
 
 end
+
+
+local kExplosionDirections =
+{
+    Vector(0, 1, 0),
+    Vector(0, -1, 0),
+    Vector(1, 0, 0),
+    Vector(-1, 0, 0),
+    Vector(1, 0, 0),
+    Vector(0, 0, 1),
+    Vector(0, 0, -1),
+}
+
+//FIXME Prevent drawing of decals (visible) when no LOS, but still Create them...mmm, fun...
+function CreateExplosionDecals( triggeringEntity, effectName )	//OVERRIDES
+
+    effectName = effectName or "explosion_decal"
+
+    local startPoint = triggeringEntity:GetOrigin() + Vector(0, 0.2, 0)
+    for i = 1, #kExplosionDirections do
+    
+        local direction = kExplosionDirections[i]
+        local trace = Shared.TraceRay(startPoint, startPoint + direction * 2, CollisionRep.Damage, PhysicsMask.Bullets, EntityFilterAll())
+
+        if trace.fraction ~= 1 then
+        
+            local coords = Coords.GetTranslation(trace.endPoint)
+            coords.yAxis = trace.normal
+            coords.zAxis = trace.normal:GetPerpendicular()
+            coords.xAxis = coords.zAxis:CrossProduct(coords.yAxis)
+			
+            triggeringEntity:TriggerEffects( effectName, {
+				effecthostcoords = coords
+			})
+        
+        end
+    
+    end
+
+end
+
 
 //Copy of original
 local function HandleImpactDecal(position, doer, surface, target, showtracer, altMode, damage, direction, decalParams)
@@ -371,3 +460,25 @@ function CanEntityDoDamageTo(attacker, target, cheats, devMode, friendlyFire, da
     
 end
 
+
+
+function MvM_GetIsUnitActive( unit, debug )		//OVERRIDES
+
+    local powered = not HasMixin(unit, "PowerConsumer") or not unit:GetRequiresPower() or unit:GetIsPowered()
+    local alive = not HasMixin(unit, "Live") or unit:GetIsAlive()
+    local isBuilt = not HasMixin(unit, "Construct") or unit:GetIsBuilt()
+    local isRecycled = HasMixin(unit, "Recycle") and (unit:GetIsRecycled() or unit:GetIsRecycling())
+    
+    if debug then
+        Print("------------ GetIsUnitActive(%s) -----------------", ToString(unit))
+        Print("powered: %s", ToString(powered))
+        Print("alive: %s", ToString(alive))
+        Print("isBuilt: %s", ToString(isBuilt))
+        Print("isRecycled: %s", ToString(isRecycled))
+        Print("-----------------------------")
+    end
+    
+    //not GetIsVortexed(unit) and 
+    return powered and alive and isBuilt and not isRecycled	//??? Add IsShocked?
+    
+end

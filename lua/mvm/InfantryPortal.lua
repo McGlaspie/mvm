@@ -12,6 +12,9 @@ Script.Load("lua/mvm/DissolveMixin.lua")
 Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/PowerConsumerMixin.lua")
 Script.Load("lua/mvm/SupplyUserMixin.lua")
+Script.Load("lua/mvm/NanoshieldMixin.lua")
+Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 	Script.Load("lua/mvm/CommanderGlowMixin.lua")
@@ -25,11 +28,21 @@ local kSpinEffectTeam2 = PrecacheAsset("cinematics/marine/infantryportal/spin_te
 local kAnimationGraph = PrecacheAsset("models/marine/infantry_portal/infantry_portal.animation_graph")
 local kHoloMarineModel = PrecacheAsset("models/marine/male/male_spawn.model")
 
-local kHoloMarineMaterialname = "cinematics/vfx_materials/marine_ip_spawn.material"
+local kHoloMarineMaterialname = "cinematics/vfx_materials/marine_ip_spawn_mvm.material"
 
-AddMixinNetworkVars(FireMixin, newNetworkVars)
-AddMixinNetworkVars(DetectableMixin, newNetworkVars)
-AddMixinNetworkVars(DissolveMixin, newNetworkVars)
+if Client then
+    Shared.PrecacheSurfaceShader("cinematics/vfx_materials/marine_ip_spawn_mvm.surface_shader")	//FIXME this needs some work, ugly atm
+end
+
+AddMixinNetworkVars( FireMixin, newNetworkVars )
+AddMixinNetworkVars( DetectableMixin, newNetworkVars )
+AddMixinNetworkVars( DissolveMixin, newNetworkVars )
+AddMixinNetworkVars( ElectroMagneticMixin, newNetworkVars )
+
+
+local kUpdateRate = 0.25
+local kPushRange = 3
+local kPushImpulseStrength = 40
 
 
 //-----------------------------------------------------------------------------
@@ -77,7 +90,12 @@ local function MvMCreateSpinEffect(self)
     local spawnProgress = Clamp((Shared.GetTime() - self.timeSpinStarted) / kMarineRespawnTime, 0, 1)
     
     self.fakeMarineModel:SetIsVisible(true)
-    self.fakeMarineMaterial:SetParameter("spawnProgress", spawnProgress+0.2)    // Add a little so it always fills up
+    self.fakeMarineMaterial:SetParameter("spawnProgress", spawnProgress + 0.2)    // Add a little so it always fills up
+    
+    local teamAccentColor = self:GetAccentSkinColor()
+    self.fakeMarineMaterial:SetParameter("teamAccentR", teamAccentColor.r )
+    self.fakeMarineMaterial:SetParameter("teamAccentG", teamAccentColor.g )
+	self.fakeMarineMaterial:SetParameter("teamAccentB", teamAccentColor.b )
 
 end
 
@@ -140,6 +158,8 @@ function InfantryPortal:OnCreate()
     
     InitMixin(self, FireMixin)
 	InitMixin(self, DetectableMixin)
+	InitMixin(self, ElectroMagneticMixin)
+	
 	
     if Client then
         InitMixin(self, CommanderGlowMixin)
@@ -159,13 +179,53 @@ function InfantryPortal:OnCreate()
 end
 
 
+local function PushPlayers(self)
+
+    for _, player in ipairs(GetEntitiesWithinRange("Player", self:GetOrigin(), 0.5)) do
+
+        if player:GetIsAlive() and HasMixin(player, "Controller") then
+
+            player:DisableGroundMove(0.1)
+            player:SetVelocity(Vector(GetSign(math.random() - 0.5) * 2, 3, GetSign(math.random() - 0.5) * 2))
+
+        end
+        
+    end
+
+end
+
+
 local function InfantryPortalUpdate(self)
 
     self:FillQueueIfFree()
     
-    if GetIsUnitActive(self) then
+    if MvM_GetIsUnitActive(self) then
+        
+        local remainingSpawnTime = self:GetSpawnTime()
+        if self.queuedPlayerId ~= Entity.invalidId then
+        
+            local queuedPlayer = Shared.GetEntity(self.queuedPlayerId)
+            if queuedPlayer then
+            
+                remainingSpawnTime = math.max(0, self.queuedPlayerStartTime + self:GetSpawnTime() - Shared.GetTime())
+            
+                if remainingSpawnTime < 0.3 and self.timeLastPush + 0.5 < Shared.GetTime() then
+                
+                    //PushPlayers(self)
+                    self.timeLastPush = Shared.GetTime()
+                    
+                end
+                
+            else
+            
+                self.queuedPlayerId = nil
+                self.queuedPlayerStartTime = nil
+                
+            end
+
+        end
     
-        if self:SpawnTimeElapsed() then
+        if remainingSpawnTime == 0 then
             self:FinishSpawn()
         end
         
@@ -181,18 +241,50 @@ local function InfantryPortalUpdate(self)
 end
 
 
-local orgInfantryPortalInit = InfantryPortal.OnInitialized
-function InfantryPortal:OnInitialized()
 
-	orgInfantryPortalInit(self)
-	
-	if Client then
-		self:InitializeSkin()
-	end
+function InfantryPortal:OnInitialized()		//OVERRIDES
 
+    ScriptActor.OnInitialized(self)
+    
+    InitMixin(self, WeldableMixin)
+    InitMixin(self, NanoShieldMixin)
+    
+    self:SetModel(InfantryPortal.kModelName, kAnimationGraph)
+    
+    if Server then
+		
+        self:AddTimedCallback( InfantryPortalUpdate, kUpdateRate )
+        
+        // This Mixin must be inited inside this OnInitialized() function.
+        if not HasMixin(self, "MapBlip") then
+            InitMixin(self, MapBlipMixin)
+        end
+        
+        InitMixin(self, StaticTargetMixin)
+        //InitMixin(self, InfestationTrackerMixin)
+        InitMixin(self, SupplyUserMixin)
+        
+    elseif Client then
+		
+        InitMixin(self, UnitStatusMixin)
+        InitMixin(self, HiveVisionMixin)
+        
+        self:InitializeSkin()
+        
+    end
+    
+    InitMixin(self, IdleMixin)
+    
 end
 
 
+function InfantryPortal:OverrideVisionRadius()
+	return 3
+end
+
+function InfantryPortal:GetIsVulnerableToEMP()
+	return false
+end
 
 
 // Spawn player on top of IP. Returns true if it was able to, false if way was blocked.
@@ -271,7 +363,7 @@ if Client then
             self.preventSpinDuration = math.max(0, self.preventSpinDuration - deltaTime)         
         end
 
-        local shouldSpin = GetIsUnitActive(self) and self.queuedPlayerId ~= Entity.invalidId and (self.preventSpinDuration == nil or self.preventSpinDuration == 0)
+        local shouldSpin = MvM_GetIsUnitActive(self) and self.queuedPlayerId ~= Entity.invalidId and (self.preventSpinDuration == nil or self.preventSpinDuration == 0)
         
         if shouldSpin then
             MvMCreateSpinEffect(self)

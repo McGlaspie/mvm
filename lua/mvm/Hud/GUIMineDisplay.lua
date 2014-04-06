@@ -28,25 +28,26 @@ function GUIMineDisplay:Initialize()
     self.background = GUIManager:CreateGraphicItem()
     self.background:SetSize( Vector(256, 512, 0) )
     self.background:SetPosition( Vector(0, 0, 0))    
-    self.background:SetColor(kBackgroundColor)
+    self.background:SetColor( kGUI_NameTagFontColors[teamNumber] )
     self.background:SetIsVisible(true)
     
     // Slightly larger copy of the text for a glow effect
     self.ammoTextBg = GUIManager:CreateTextItem()
     self.ammoTextBg:SetFontName("fonts/MicrogrammaDMedExt_large.fnt")
-    self.ammoTextBg:SetScale(Vector(1.5, 1.5, 1.5))
+    self.ammoTextBg:SetScale(Vector( 1.8, 2.25, 1.8))
     self.ammoTextBg:SetTextAlignmentX(GUIItem.Align_Center)
     self.ammoTextBg:SetTextAlignmentY(GUIItem.Align_Center)
     self.ammoTextBg:SetAnchor(GUIItem.Middle, GUIItem.Center)
-    self.ammoTextBg:SetColor(Color(1, 1, 1, 0.25))
+    self.ammoTextBg:SetColor(  kGUI_Grey  )
     
     // Text displaying the amount of ammo in the clip
     self.ammoText = GUIManager:CreateTextItem()
     self.ammoText:SetFontName("fonts/MicrogrammaDMedExt_large.fnt")
-    self.ammoText:SetScale(Vector(1.5, 1.5, 1.5))
+    self.ammoText:SetScale(Vector(1.75, 2.2, 1.75))
     self.ammoText:SetTextAlignmentX(GUIItem.Align_Center)
     self.ammoText:SetTextAlignmentY(GUIItem.Align_Center)
     self.ammoText:SetAnchor(GUIItem.Middle, GUIItem.Center)
+    self.ammoText:SetColor( kGUI_HealthBarColors[teamNumber] )
     
     self.flashInOverlay = GUIManager:CreateGraphicItem()
     self.flashInOverlay:SetSize(Vector(256, 512, 0))
@@ -68,14 +69,9 @@ end
 
 
 function GUIMineDisplay:UpdateTeamColors()
-
-	local bgColor = kGUI_Team1_BaseColor
 	
-	if self.teamNumber == 2 then
-		bgColor = kGUI_Team2_BaseColor
-	end
-	
-	self.background:SetColor( bgColor )
+	self.background:SetColor( kGUI_TeamThemes_BaseColor[self.teamNumber] )
+	//self.ammoText:SetColor( kGUI_HealthBarColors[self.teamNumber] )
 
 end
 

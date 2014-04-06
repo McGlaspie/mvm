@@ -5,7 +5,22 @@ Script.Load("lua/mvm/LiveMixin.lua")
 Script.Load("lua/mvm/Weapons/Marine/ClipWeapon.lua")
 Script.Load("lua/mvm/PickupableWeaponMixin.lua")
 
+
+
 //-----------------------------------------------------------------------------
+
+
+function Shotgun:OnCreate()
+
+    ClipWeapon.OnCreate(self)
+    
+    InitMixin(self, PickupableWeaponMixin)
+    InitMixin(self, LiveMixin)
+    InitMixin(self, PointGiverMixin)
+    
+    self.emptyPoseParam = 0
+
+end
 
 
 function Shotgun:GetRange()

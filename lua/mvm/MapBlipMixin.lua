@@ -25,6 +25,11 @@ MapBlipMixin.expectedCallbacks =
     SetCoords = "Sets both both location and angles"
 }
 
+MapBlipMixin.optionalCallbacks =
+{
+    GetDestroyMapBlipOnKill = "Return true to destroy map blip when units is killed."
+}
+
 // What entities have become dirty.
 // Flushed in the UpdateServer hook by MapBlipMixin.OnUpdateServer
 local mapBlipMixinDirtyTable = { }
@@ -53,7 +58,9 @@ end
 
 local function CreateMapBlip(self, blipType, blipTeam, isInCombat)
 
-    local mapBlip = Server.CreateEntity(MapBlip.kMapName)
+    local mapName = self:isa("Player") and PlayerMapBlip.kMapName or MapBlip.kMapName
+
+    local mapBlip = Server.CreateEntity(mapName)
     // This may fail if there are too many entities.
     if mapBlip then
     
@@ -103,6 +110,18 @@ function MapBlipMixin:MarkBlipDirty()
     mapBlipMixinDirtyTable[self:GetId()] = true
 end
 
+function MapBlipMixin:OnConstructionComplete()
+    mapBlipMixinDirtyTable[self:GetId()] = true
+end
+
+function MapBlipMixin:OnPowerOn()
+    mapBlipMixinDirtyTable[self:GetId()] = true
+end
+
+function MapBlipMixin:OnPowerOff()
+    mapBlipMixinDirtyTable[self:GetId()] = true
+end
+
 function MapBlipMixin:OnSighted(sighted)
 
     // because sighted is always set during each LOS calc, we need to keep track of
@@ -118,8 +137,7 @@ function MapBlipMixin:GetMapBlipInfo()
 
     local success = false
     local blipType = kMinimapBlipType.Undefined
-    //local blipTeam = -1
-    local blipTeam = -1 //kTeamReadyRoom
+    local blipTeam = kTeamInvalid
     local isAttacked = false
     
     if HasMixin(self, "Combat") then
@@ -135,7 +153,35 @@ function MapBlipMixin:GetMapBlipInfo()
         blipType = kMinimapBlipType.TechPoint
     // Don't display PowerPoints unless they are in an unpowered state.
     elseif self:isa("PowerPoint") then
-        blipType = ConditionalValue( self:GetIsDisabled(), kMinimapBlipType.DestroyedPowerPoint, kMinimapBlipType.PowerPoint )
+    
+        blipType = ConditionalValue( self:GetIsDisabled(), kMinimapBlipType.DestroyedPowerPoint, kMinimapBlipType.PowerPoint)
+        blipTeam = self:GetTeamNumber()
+        
+    elseif self:isa("Cyst") then
+    
+        blipType = kMinimapBlipType.Infestation
+        
+        if not self:GetIsConnected() then
+            blipType = kMinimapBlipType.InfestationDying
+        end
+        
+        blipTeam = self:GetTeamNumber()
+        isAttacked = false
+        
+    elseif self:isa("Hallucination") then
+
+        local hallucinatedTechId = self:GetAssignedTechId()
+ 
+        if hallucinatedTechId == kTechId.Drifter then
+            blipType = kMinimapBlipType.Drifter
+        elseif hallucinatedTechId == kTechId.Hive then
+            blipType = kMinimapBlipType.Hive
+        elseif hallucinatedTechId == kTechId.Harvester then
+            blipType = kMinimapBlipType.Harvester
+        end   
+
+        blipTeam = self:GetTeamNumber()
+        
     // Everything else that is supported by kMinimapBlipType.
     elseif self:GetIsVisible() then
 		
@@ -167,13 +213,11 @@ function MapBlipMixin:DestroyBlip()
     
 end
 
-
 function MapBlipMixin:OnKill()
-	
-	//PowerNodes are never "killed", accomodate for such
-	if not self:isa("PowerPoint") then
-		self:DestroyBlip()
-	end
+
+    if not self.GetDestroyMapBlipOnKill or self:GetDestroyMapBlipOnKill() then
+        self:DestroyBlip()
+    end
     
 end
 

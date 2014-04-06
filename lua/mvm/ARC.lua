@@ -9,11 +9,16 @@ Script.Load("lua/mvm/WeldableMixin.lua")
 Script.Load("lua/mvm/DissolveMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
 Script.Load("lua/mvm/DetectableMixin.lua")
+Script.Load("lua/mvm/SupplyUserMixin.lua")
+Script.Load("lua/mvm/NanoshieldMixin.lua")
+
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 	Script.Load("lua/mvm/CommanderGlowMixin.lua")
+	//TODO Add IFFMixin
 end
-Script.Load("lua/mvm/SupplyUserMixin.lua")
+
+
 
 
 //-----------------------------------------------------------------------------
@@ -25,6 +30,7 @@ AddMixinNetworkVars( FireMixin, newNetworkVars )
 AddMixinNetworkVars( DetectableMixin, newNetworkVars )
 AddMixinNetworkVars( ElectroMagneticMixin, newNetworkVars )
 AddMixinNetworkVars( DissolveMixin, newNetworkVars )
+
 
 // Balance
 ARC.kHealth                 = kARCHealth
@@ -46,15 +52,17 @@ ARC.kCapsuleRadius = .5
 
 if Server then
 	
+	local kMoveParam = "move_speed"
 	local kMuzzleNode = "fxnode_arcmuzzle"
-
+	
 end
+
 
 //-----------------------------------------------------------------------------
 
 
 
-function ARC:OnCreate()
+function ARC:OnCreate()		//OVERRIDES
 
     ScriptActor.OnCreate(self)
     
@@ -106,15 +114,29 @@ function ARC:OnCreate()
     
 end
 
-
-local orgArcInit = ARC.OnInitialized
-function ARC:OnInitialized()
+/*
+function ARC:OnInitialized()	//OVERRIDES
 	
-	orgArcInit(self)
-	
-	if Server then
-		
-	    self.targetSelector = nil
+    ScriptActor.OnInitialized(self)
+    
+    InitMixin(self, WeldableMixin)
+    InitMixin(self, NanoShieldMixin)
+    
+    self:SetModel(ARC.kModelName, kAnimationGraph)
+    
+    if Server then
+    
+        local angles = self:GetAngles()
+        self.desiredPitch = angles.pitch
+        self.desiredRoll = angles.roll
+    
+        InitMixin(self, MobileTargetMixin)
+        InitMixin(self, SupplyUserMixin)
+        
+        // TargetSelectors require the TargetCacheMixin for cleanup.
+        InitMixin(self, TargetCacheMixin)
+        
+        self.targetSelector = nil
 	    
 		self.targetSelector = TargetSelector():Init(	//OVERRIDES?
 			self,
@@ -131,11 +153,73 @@ function ARC:OnInitialized()
 			}
 			//TODO Auto-Prioritization of targets
 		)
+
+        
+        self:SetPhysicsType(PhysicsType.Kinematic)
+        
+        // Cannons start out mobile
+        self:SetMode(ARC.kMode.Stationary)
+        
+        self.undeployedArmor = kARCArmor
+        self.deployedArmor = kARCDeployedArmor
+        
+        // This Mixin must be inited inside this OnInitialized() function.
+        if not HasMixin(self, "MapBlip") then
+            InitMixin(self, MapBlipMixin)
+        end
+    
+        self.desiredForwardTrackPitchDegrees = 0
+        
+        //InitMixin(self, InfestationTrackerMixin)
+        
+        InitMixin(self, ControllerMixin)
+        self:CreateController(PhysicsGroup.WhipGroup)
+    
+    elseif Client then
+    
+        self.lastModeClient = self.mode
+        
+        InitMixin(self, UnitStatusMixin)
+        InitMixin(self, HiveVisionMixin)
+        
+        self:InitializeSkin()
+    
+    end
+    
+    self:SetUpdates(true)
+    
+    InitMixin(self, IdleMixin)
+
+end
+*/
+
+local orgArcInit = ARC.OnInitialized
+function ARC:OnInitialized()
+
+	orgArcInit( self )
 		
-		
+	if Server then
+	
+		self.targetSelector = nil
+			
+		self.targetSelector = TargetSelector():Init(	//OVERRIDES?
+			self,
+			ARC.kFireRange,
+			false, 
+			ConditionalValue(
+				self:GetTeamNumber() == kTeam1Index,
+				{ kMarineTeam2StaticTargets },
+				{ kMarineTeam1StaticTargets }
+			),
+			{ 
+				self.FilterTarget(self), CloakTargetFilter()
+				//PitchTargetFilter(self,  -Sentry.kMaxPitch, Sentry.kMaxPitch)	- Will be needed when direct fire mode added
+			}
+			//TODO Auto-Prioritization of targets
+		)
+	
 		InitMixin(self, ControllerMixin)
         self:CreateController(PhysicsGroup.WhipGroup)
-		
 	end
 	
 	if Client then
@@ -154,7 +238,11 @@ if Server then
 		
 		self:SetMode( ARC.kMode.Moving )  
 		
-		local moveSpeed = ( self:GetGameEffectMask( kGameEffect.IsPulsed ) ) and ARC.kCombatMoveSpeed or ARC.kMoveSpeed
+		local moveSpeed = ConditionalValue(
+			self:GetIsUnderEmpEffect() or self:GetIsOnFire(),
+			ARC.kCombatMoveSpeed,
+			ARC.kMoveSpeed
+		)
 		
 		local maxSpeedTable = { maxSpeed = moveSpeed }
 		self:ModifyMaxSpeed( maxSpeedTable )
@@ -163,10 +251,10 @@ if Server then
 		
 		self:AdjustPitchAndRoll()
 		
-		if self:IsTargetReached(currentOrder:GetLocation(), kAIMoveOrderCompleteDistance) then
-		
+		if self:IsTargetReached( currentOrder:GetLocation(), kAIMoveOrderCompleteDistance ) then
+		    
 			self:CompletedCurrentOrder()
-			self:SetPoseParam(kMoveParam, 0)
+			self:SetPoseParam( "move_speed" , 0)
 			
 			// If no more orders, we're done
 			if self:GetCurrentOrder() == nil then
@@ -213,41 +301,10 @@ end
 
 function ARC:OnEmpDamaged()
 	
-	if Client then
-		self:_UpdateElectrifiedEffects()
-	end
-	
 	if Server then
 		self:TriggerEffects("arc_stop_charge")
 	end
 
-end
-
-
-function ARC:OnUpdateAnimationInput(modelMixin)	//OVERRIDES
-
-    PROFILE("ARC:OnUpdateAnimationInput")
-    
-    //FIXME This does fuck all
-    if self.mode == ARC.kMode.Destroyed then
-		modelMixin:SetAnimationInput("alive", false)
-	end
-    
-    local activity = "none"
-    if self.mode == ARC.kMode.Targeting and self.deployMode == ARC.kDeployMode.Deployed then
-        activity = "primary"
-    end
-    modelMixin:SetAnimationInput("activity", activity)
-    
-    local deployed = self.deployMode == ARC.kDeployMode.Deploying or self.deployMode == ARC.kDeployMode.Deployed
-    modelMixin:SetAnimationInput("deployed", deployed)
-    
-    local move = "idle"
-    if self.mode == ARC.kMode.Moving and self.deployMode == ARC.kDeployMode.Undeployed then
-        move = "run"
-    end
-    modelMixin:SetAnimationInput("move", move)
-    
 end
 
 
@@ -265,6 +322,10 @@ if Server then
 	// Required by ControllerMixin.
 	function ARC:GetMovePhysicsMask()
 		return PhysicsMask.Movement
+	end
+	
+	function ARC:GetControllerPhysicsGroup()
+		return PhysicsGroup.WhipGroup	//???
 	end
 	
 	

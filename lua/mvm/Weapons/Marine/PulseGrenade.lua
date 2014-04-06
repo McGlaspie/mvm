@@ -1,4 +1,10 @@
 
+Script.Load("lua/mvm/TeamMixin.lua")
+Script.Load("lua/mvm/LOSMixin.lua")
+Script.Load("lua/EntityChangeMixin.lua")
+Script.Load("lua/mvm/PickupableWeaponMixin.lua")
+Script.Load("lua/mvm/DamageMixin.lua")
+
 
 local kLifeTime = 1.2
 
@@ -9,11 +15,48 @@ local kGrenadeMaxShakeIntensity = 0.12
 local kGrenadeDetonationTriggerRange = 2.25
 
 
+local newNetworkVars = {}
+
+AddMixinNetworkVars(LOSMixin, newNetworkVars )
+
+
 //-----------------------------------------------------------------------------
 
 
+function PulseGrenade:OnCreate()	//OVERRIDES
+
+    PredictedProjectile.OnCreate(self)
+    
+    InitMixin(self, BaseModelMixin)
+    InitMixin(self, ModelMixin)
+    InitMixin(self, TeamMixin)
+    InitMixin(self, DamageMixin)
+    InitMixin(self, EntityChangeMixin)
+    InitMixin(self, LOSMixin)
+    
+    if Server then
+    
+        self:AddTimedCallback(PulseGrenade.Detonate, kLifeTime)
+        
+    end
+    
+end
+
+
+//function PulseGrenade:OverrideCheckVision()
+//	return false
+//end
+
+function PulseGrenade:OverrideVisionRadius()
+	return 0
+end
+
 function PulseGrenade:GetDamageType()
 	return kPulseGrenadeDamageType
+end
+
+function PulseGrenade:GetDeathIconIndex()
+	return kDeathMessageIcon.PulseGrenade
 end
 
 
@@ -47,7 +90,12 @@ function PulseGrenade:Detonate( targetHit )	//OVERRIDES
 	)
 	
     table.removevalue(hitEntities, self)
-
+	
+	if hitEntities and #hitEntities > 0 then
+		self:SetIsSighted(true)
+		self:SetExcludeRelevancyMask( bit.bor( kRelevantToTeam1, kRelevantToTeam2 ) )
+	end
+	
     if targetHit then
 		
         table.removevalue(hitEntities, targetHit)
@@ -102,4 +150,5 @@ end
 
 //-----------------------------------------------------------------------------
 
-Class_Reload("PulseGrenade", {})
+
+Class_Reload( "PulseGrenade", newNetworkVars )

@@ -11,7 +11,6 @@
 Script.Load("lua/GUIMinimapConnection.lua")
 Script.Load("lua/mvm/GUIColorGlobals.lua")
 
-
 class 'GUIMinimap' (GUIScript)
 
 GUIMinimap.kBackgroundWidth = GUIScale(300)
@@ -23,6 +22,8 @@ local kWaypointColor = Color(1, 1, 1, 1)
 local kEtherealGateColor = Color(0.8, 0.6, 1, 1)
 local kOverviewColor = Color(1, 1, 1, 0.85)
 
+local kHallucinationColor = Color(0.8, 0.6, 1, 1)
+
 // colors are defined in the dds
 local kTeamColors = { }
 kTeamColors[kMinimapBlipTeam.Friendly] = Color(1, 1, 1, 1)
@@ -30,13 +31,18 @@ kTeamColors[kMinimapBlipTeam.Enemy] = Color(1, 0, 0, 1)
 kTeamColors[kMinimapBlipTeam.Neutral] = Color(1, 1, 1, 1)
 kTeamColors[kMinimapBlipTeam.Alien] = Color(1, 138/255, 0, 1)
 kTeamColors[kMinimapBlipTeam.Marine] = Color(0, 216/255, 1, 1)
+// steam friend colors
+kTeamColors[kMinimapBlipTeam.FriendAlien] = Color(1, 189/255, 111/255, 1)
+kTeamColors[kMinimapBlipTeam.FriendMarine] = Color(164/255, 241/255, 1, 1)
 
-//local kPowerNodeColor = Color(1, 1, 0.7, 1)	Original
-local kPowerNodeColor = Color(0.2, 0.85, 0.3, 1)
-local kPowerNodeUnSocketedColor = Color(0.7, 0.75, 0.7, 1)
-local kDestroyedPowerNodeColor = Color(1, 0, 0, 1)
+kTeamColors[kMinimapBlipTeam.InactiveAlien] = Color(85/255, 46/255, 0, 1, 1)
+kTeamColors[kMinimapBlipTeam.InactiveMarine] = Color(0, 72/255, 85/255, 1)
 
 local kNodeNeutralColor = Color(1,1,1,1)
+
+local kPowerNodeColor = Color(0 , 1, 1, 1)
+local kDestroyedPowerNodeColor = Color(1, 0.3, 0.3, 1)
+
 local kDrifterColor = Color(1, 1, 0, 1)
 local kMACColor = Color(0, 1, 0.2, 1)
 
@@ -51,6 +57,8 @@ kInfestationColor[kMinimapBlipTeam.Enemy] = Color(1, 0.67, 0.06, .25)
 kInfestationColor[kMinimapBlipTeam.Neutral] = Color(0.2, 0.7, 0.2, .25)
 kInfestationColor[kMinimapBlipTeam.Alien] = Color(0.2, 0.7, 0.2, .25)
 kInfestationColor[kMinimapBlipTeam.Marine] = Color(0.2, 0.7, 0.2, .25)
+kInfestationColor[kMinimapBlipTeam.InactiveAlien] = Color(0.2 /3, 0.7/3, 0.2/3, .25)
+kInfestationColor[kMinimapBlipTeam.InactiveMarine] = Color(0.2/3, 0.7/3, 0.2/3, .25)
 
 local kInfestationDyingColor = { }
 kInfestationDyingColor[kMinimapBlipTeam.Friendly] = Color(1, 0.2, 0, .25)
@@ -58,6 +66,8 @@ kInfestationDyingColor[kMinimapBlipTeam.Enemy] = Color(1, 0.2, 0, .25)
 kInfestationDyingColor[kMinimapBlipTeam.Neutral] =Color(1, 0.2, 0, .25)
 kInfestationDyingColor[kMinimapBlipTeam.Alien] = Color(1, 0.2, 0, .25)
 kInfestationDyingColor[kMinimapBlipTeam.Marine] = Color(1, 0.2, 0, .25)
+kInfestationDyingColor[kMinimapBlipTeam.InactiveAlien] = Color(1/3, 0.2/3, 0, .25)
+kInfestationDyingColor[kMinimapBlipTeam.InactiveMarine] = Color(1/3, 0.2/3, 0, .25)
 
 local kShrinkingArrowInitSize = Vector(kBlipSize * 10, kBlipSize * 10, 0)
 
@@ -95,8 +105,18 @@ local kLocationFontName = "fonts/AgencyFB_smaller_bordered.fnt"
 
 local kPlayerIconSize = Vector(kBlipSize, kBlipSize, 0)
 
-local kBlipColorType = enum( { 'Team', 'TechPoint','ResourcePoint','Infestation', 'InfestationDying', 'Waypoint', 'PowerPoint', 'DestroyedPowerPoint', 'Scan', 'Drifter', 'MAC', 'EtherealGate', 'HighlightWorld' } )
-local kBlipSizeType = enum( { 'Normal', 'TechPoint', 'Infestation', 'Scan', 'Egg', 'Worker', 'EtherealGate', 'HighlightWorld', 'Waypoint' } )
+local kBlipColorType = enum({
+	'Team', 'Infestation', 'InfestationDying', 
+	'TechPoint', 'ResourcePoint', 
+	'Waypoint', 'PowerPoint', 'DestroyedPowerPoint', 
+	'Scan', 'Drifter', 'MAC', 'EtherealGate', 'HighlightWorld' 
+})
+local kBlipSizeType = enum({
+	'Normal', 'TechPoint', 
+	'Infestation', 'Scan', 'Egg', 'Worker', 
+	'EtherealGate', 'HighlightWorld', 'Waypoint' 
+})
+
 
 local kBlipInfo = {}
 kBlipInfo[kMinimapBlipType.TechPoint] = { kBlipColorType.TechPoint, kBlipSizeType.TechPoint, kBackgroundBlipsLayer }
@@ -116,6 +136,7 @@ kBlipInfo[kMinimapBlipType.Drifter] = { kBlipColorType.Drifter, kBlipSizeType.Wo
 kBlipInfo[kMinimapBlipType.MAC] = { kBlipColorType.MAC, kBlipSizeType.Worker, kStaticBlipsLayer }
 kBlipInfo[kMinimapBlipType.EtherealGate] = { kBlipColorType.EtherealGate, kBlipSizeType.EtherealGate, kBackgroundBlipsLayer }
 kBlipInfo[kMinimapBlipType.HighlightWorld] = { kBlipColorType.HighlightWorld, kBlipSizeType.HighlightWorld, kBackgroundBlipsLayer }
+
 
 local kClassToGrid = BuildClassToGrid()
 
@@ -165,9 +186,9 @@ function GUIMinimap:Initialize()
         local texCoordsFunc = loadstring( string.format( "return %.f, %.f, %.f, %.f", GUIGetSprite(iconCol, iconRow, kIconWidth, kIconHeight) ) )
         
         if blipInfo then
-          blipInfoTable[blipType] = { texCoordsFunc, blipInfo[1], blipInfo[2], blipInfo[3] }
+			blipInfoTable[blipType] = { texCoordsFunc, blipInfo[1], blipInfo[2], blipInfo[3] }
         else
-          blipInfoTable[blipType] = { texCoordsFunc, kBlipColorType.Team, kBlipSizeType.Normal, kStaticBlipsLayer }
+			blipInfoTable[blipType] = { texCoordsFunc, kBlipColorType.Team, kBlipSizeType.Normal, kStaticBlipsLayer }
         end
         
     end
@@ -179,14 +200,14 @@ function GUIMinimap:Initialize()
     for blipTeam, _ in ipairs(kMinimapBlipTeam) do
         local colorTable = {}
         colorTable[kBlipColorType.Team] = kTeamColors[blipTeam]
-        colorTable[kBlipColorType.ResourcePoint] = kNodeNeutralColor
         colorTable[kBlipColorType.TechPoint] = kNodeNeutralColor
+        colorTable[kBlipColorType.ResourcePoint] = kNodeNeutralColor
         colorTable[kBlipColorType.Infestation] = kInfestationColor[blipTeam]
         colorTable[kBlipColorType.InfestationDying] = kInfestationDyingColor[blipTeam]
         colorTable[kBlipColorType.Waypoint] = kWaypointColor
         colorTable[kBlipColorType.PowerPoint] = kPowerNodeColor
         colorTable[kBlipColorType.DestroyedPowerPoint] = kDestroyedPowerNodeColor
-        colorTable[kBlipColorType.Scan] = self.scanColor
+        colorTable[kBlipColorType.Scan] = self.scanColor	//FIXME Move to .Team
         colorTable[kBlipColorType.HighlightWorld] = self.highlightWorldColor
         colorTable[kBlipColorType.Drifter] = kDrifterColor
         colorTable[kBlipColorType.MAC] = kTeamColors[blipTeam]
@@ -501,9 +522,9 @@ local function PulseYellow()	//For destroyed power nodes
     local anim = ( math.cos( Shared.GetTime() * 10 ) + 1 ) * 0.5
     local color = Color()
     
-    color.r = anim
-    color.g = 1
-    color.b = 1
+    color.r = 0
+    color.g = anim
+    color.b = anim
     
     return color
 
@@ -518,7 +539,7 @@ local function UpdateStaticBlips(self, deltaTime)
     PROFILE("GUIMinimap:UpdateStaticBlips")
     
     local staticBlips = PlayerUI_GetStaticMapBlips()
-    local blipItemCount = 8
+    local blipItemCount = 10
     local numBlips = table.count(staticBlips) / blipItemCount
     
     local staticBlipItems = self.staticBlips
@@ -578,9 +599,9 @@ local function UpdateStaticBlips(self, deltaTime)
     local spectating = Client.GetLocalPlayer():GetTeamNumber() == kSpectatorIndex
     local playerTeam = Client.GetLocalPlayer():GetTeamNumber()
     
-    if playerTeam == kMarineTeamType then
+    if playerTeam == kTeam1Index then
         playerTeam = kMinimapBlipTeam.Marine
-    elseif playerTeam == kAlienTeamType then
+    elseif playerTeam == kTeam2Index then
         playerTeam = kMinimapBlipTeam.Alien
     end
     
@@ -601,6 +622,8 @@ local function UpdateStaticBlips(self, deltaTime)
         local blipType = staticBlips[currentIndex + 5]
         local blipTeam = staticBlips[currentIndex + 6]
         local underAttack = staticBlips[currentIndex + 7]
+        local isSteamFriend = staticBlips[currentIndex + 8]
+        local isHallucination = staticBlips[currentIndex + 9]
         
         local blip = staticBlipItems[i]
         local blipInfo = blipInfoTable[ blipType ]
@@ -610,17 +633,18 @@ local function UpdateStaticBlips(self, deltaTime)
         blipPos.y = yPos - blipSize.y * 0.5
         blipRotation.z = rotation
         
-        GUIItemSetLayer( blip, blipInfo[4] )
-        GUIItemSetTexturePixelCoordinates( blip, blipInfo[1]() )
-        GUIItemSetSize( blip, blipSize )
-        GUIItemSetPosition( blip, blipPos )
-        GUIItemSetRotation( blip, blipRotation )
-        local blipColor = blipColorTable[ blipTeam ][ blipInfo[2] ]	//Likely causing missing Tech/Res points from map
+        GUIItemSetLayer(blip, blipInfo[4])
+        GUIItemSetTexturePixelCoordinates(blip, blipInfo[1]())
+        GUIItemSetSize(blip, blipSize)
+        GUIItemSetPosition(blip, blipPos)
+        GUIItemSetRotation(blip, blipRotation)
+        local blipColor = blipColorTable[blipTeam][blipInfo[2]]
         
-        if underAttack then
+        if blipTeam == playerTeam or spectating then
         
-            // Copy color, dont modify constant.
-            if spectating or blipTeam == playerTeam then
+            if isHallucination then
+                blipColor = kHallucinationColor
+            elseif underAttack then
                 blipColor = PulseRed()
             end
             

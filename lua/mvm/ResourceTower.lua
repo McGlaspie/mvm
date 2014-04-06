@@ -56,7 +56,11 @@ if Server then
 			
 		end
 		
-		self:TriggerEffects("extractor_collect")
+		if self:isa("Harvester") then
+			self:TriggerEffects("harvester_collect")
+		else
+			self:TriggerEffects("extractor_collect")
+		end
 		
 		local attached = self:GetAttached()
 		

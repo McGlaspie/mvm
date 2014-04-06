@@ -11,7 +11,7 @@
 Script.Load("lua/mvm/GUIColorGlobals.lua")
 
 Script.Load("lua/GUIBorderBackground.lua")
-Script.Load("lua/GUICommanderTooltip.lua")
+Script.Load("lua/mvm/Hud/GUICommanderTooltip.lua")
 Script.Load("lua/GUIDial.lua")
 
 

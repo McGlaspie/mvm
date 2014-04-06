@@ -3,6 +3,9 @@ Script.Load("lua/mvm/DropPack.lua")
 Script.Load("lua/mvm/PickupableMixin.lua")
 
 
+local kPickupDelay = 0.53
+
+
 function MedPack:OnInitialized()
 
     DropPack.OnInitialized(self)

@@ -7,7 +7,10 @@ modelColorMap = "models/marine/female/female_assault_visor_colorMap.dds"
 
 numColumns = 1
 numRows = 1
+colorMapIndex = 0
 
-modelColorAccentR = 0.756
-modelColorAccentG = 0.982
-modelColorAccentB = 1
+modelColorAccentR = 1
+modelColorAccentG = 0
+modelColorAccentB = 0
+
+surface = "organic"

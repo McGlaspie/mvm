@@ -5,11 +5,15 @@ Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
 Script.Load("lua/mvm/WeldableMixin.lua")
 Script.Load("lua/mvm/DissolveMixin.lua")
+Script.Load("lua/mvm/NanoshieldMixin.lua")
+Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 	Script.Load("lua/mvm/CommanderGlowMixin.lua")
+	//TODO Add IFFMixin
 end
-//Script.Load("lua/mvm/SprintMixin.lua")	Future use
+//Script.Load("lua/mvm/SprintMixin.lua")	//Future use
 
 
 
@@ -49,9 +53,10 @@ local newNetworkVars = {
 	commanderLoginTime = "time"
 }
 
-AddMixinNetworkVars(FireMixin, newNetworkVars)
-AddMixinNetworkVars(DetectableMixin, newNetworkVars)
-AddMixinNetworkVars(DissolveMixin, newNetworkVars)
+AddMixinNetworkVars( FireMixin, newNetworkVars )
+AddMixinNetworkVars( DetectableMixin, newNetworkVars )
+AddMixinNetworkVars( DissolveMixin, newNetworkVars )
+AddMixinNetworkVars( ElectroMagneticMixin, newNetworkVars )
 
 //-----------------------------------------------------------------------------
 
@@ -85,6 +90,8 @@ function Marine:OnCreate()	//OVERRIDE
     
     InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
+    InitMixin(self, ElectroMagneticMixin)
+	
     
     if Server then
     
@@ -102,7 +109,7 @@ function Marine:OnCreate()	//OVERRIDE
 		InitMixin(self, TeamMessageMixin, { kGUIScriptName = "mvm/Hud/Marine/GUIMarineTeamMessage" })
 		
         InitMixin(self, DisorientableMixin)
-        InitMixin(self, CommanderGlowMixin)	//Isn't here in NS2...hmmm
+        InitMixin(self, CommanderGlowMixin)
         
 		InitMixin(self, ColoredSkinsMixin)
 		
@@ -242,7 +249,27 @@ end
 
 
 function Marine:GetSlowOnLand()
-    return false	--REMOVED
+    return true
+end
+
+
+function Marine:GetIsVulnerableToEMP()
+    return false
+end
+
+
+function Marine:SetFlashlightOn(state)
+    
+    self.flashlightOn = state
+    /*
+    if Client then
+        self.skinAccentColor = ConditionalValue(
+            state ~= true,
+            Color( 0, 0, 0, 0 ),
+            self:GetAccentSkinColor()
+        )
+    end
+    */
 end
 
 
@@ -267,8 +294,8 @@ function Marine:OnWeldOverride(doer, elapsedTime)
     
 end
 
-//OVERRIDES
-function Marine:OnProcessMove(input)
+
+function Marine:OnProcessMove( input )		//OVERRIDES
 
     if self.catpackboost then
         self.catpackboost = Shared.GetTime() - self.timeCatpackboost < kCatPackDuration
@@ -320,7 +347,7 @@ function Marine:OnProcessMove(input)
         
     end
     
-    Player.OnProcessMove(self, input)
+    Player.OnProcessMove( self, input )
     
 end
 
@@ -339,11 +366,11 @@ if Server then
 			
 			if doer:isa("Railgun") then
 			
-				Print("\t Marine:OnKill() - Trigger railgun_death effect")
+				//Print("\t Marine:OnKill() - Trigger railgun_death effect")
 				GetEffectManager():TriggerEffects(
 					"railgun_death", 
 					{ 
-						effecthostcoords = Coords.GetTranslation( self:GetOrigin()) 
+						effecthostcoords = Coords.GetTranslation( self:GetOrigin() ) 
 					} 
 				)
 				
@@ -364,14 +391,29 @@ if Client then
 	
 	
 	function Marine:OnCountDown()
+	
 		Player.OnCountDown(self)
-		ClientUI.GetScript("mvm/GUIMarineHUD"):SetIsVisible(false)	
+		
+		local script = ClientUI.GetScript("mvm/Hud/Marine/GUIMarineHUD")
+		if script then
+		
+			script:SetIsVisible(true)
+			script:TriggerInitAnimations()
+			
+		end
+		
 	end
 
 	function Marine:OnCountDownEnd()
+		
 		Player.OnCountDownEnd(self)
-		ClientUI.GetScript("mvm/GUIMarineHUD"):SetIsVisible(true)
-		ClientUI.GetScript("mvm/GUIMarineHUD"):TriggerInitAnimations()
+		
+		local script = ClientUI.GetScript("mvm/Hud/Marine/GUIMarineHUD")
+		if script then
+			script:SetIsVisible(true)
+			script:TriggerInitAnimations()
+		end
+		
 	end
 	
 	
@@ -380,11 +422,12 @@ if Client then
 		Player.UpdateClientEffects(self, deltaTime, isLocal)
 		
 		if isLocal then
+			
 			Client.SetMouseSensitivityScalar(ConditionalValue(self:GetIsStunned(), 0, 1))
 			
 			self:UpdateGhostModel()
 			
-			local marineHUD = ClientUI.GetScript("mvm/GUIMarineHUD")
+			local marineHUD = ClientUI.GetScript("mvm/Hud/Marine/GUIMarineHUD")
 			if marineHUD then
 				marineHUD:SetIsVisible(self:GetIsAlive())
 			end

@@ -29,7 +29,7 @@
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 
-local kMinCommanderLightIntensityScalar = 0.15	//0.3
+local kMinCommanderLightIntensityScalar = 0.125	//0.3
 
 //FIXME Below two values take too long to update light states at game start/reset
 //but the effect is good and makes more interesting changes.
@@ -44,7 +44,7 @@ local kAuxPowerCycleTime = 3
 local kAuxPowerMinIntensity = 0
 local kAuxPowerMinCommanderIntensity = 2.25	//3
 
-local kForceCommanderUpdateTime = 0.125
+local kForceCommanderUpdateTime = 0.2	//.215
 
 local UnScoutedLightMode = kLightMode.NoPower
 
@@ -121,6 +121,37 @@ function PowerPointLightHandler:Init(powerPoint)
 end
 
 
+function PowerPointLightHandler:Reset()
+
+    self.lightTable = { }
+    self.probeTable = { }
+    
+    // all lights for this powerPoint, and filter away those that
+    // shouldn't be affected by the power changes
+    for _, light in ipairs(GetLightsForLocation(self.powerPoint:GetLocationName())) do
+    
+        if not light.ignorePowergrid then
+            self.lightTable[light] = true
+        end
+        
+    end
+    
+    for _, probe in ipairs(GetReflectionProbesForLocation(self.powerPoint:GetLocationName())) do
+        self.probeTable[probe] = true
+    end
+    
+    self.workerTable = {
+        [kLightMode.Normal] = NormalLightWorker():Init(self, "normal"),
+        [kLightMode.NoPower] = NoPowerLightWorker():Init(self, "nopower"),
+        [kLightMode.LowPower] = LowPowerLightWorker():Init(self, "lowpower"),
+        [kLightMode.Damaged] = DamagedLightWorker():Init(self, "damaged"),
+    }
+    
+    self:Run( self.lastMode, Client.GetLocalPlayer():GetIsCommander() )
+
+end
+
+
 function PowerPointLightHandler:GetOverrideMode( mode, isCommander )
 	
 	local lightMode = mode
@@ -130,6 +161,8 @@ function PowerPointLightHandler:GetOverrideMode( mode, isCommander )
 	if isCommander and not self.powerPoint:IsScouted( player:GetTeamNumber() ) then
 		lightMode = UnScoutedLightMode
 	end
+	
+	self.lastMode = lightMode
 	
 	return lightMode
 
@@ -647,10 +680,10 @@ function LightGroup:RunCycle(time)
         local player = Client.GetLocalPlayer()
         if player and player:isa("Commander") then
             showCommanderLight = true
-        end        
+        end
         
         for renderLight,_ in pairs(self.lights) do
-			
+        
             // Fade disabled color in and out to make it very clear that the power is out        
             local scalar = math.cos( ( t / (kAuxPowerCycleTime / 2 ) ) * math.pi / 2 )
             local halfAmplitude = ( 1 - kAuxPowerMinIntensity ) / 2

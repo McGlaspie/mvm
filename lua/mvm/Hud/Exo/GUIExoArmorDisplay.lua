@@ -37,8 +37,8 @@ function Update(dt)
     background:SetColor(
 		ConditionalValue(
 			teamNumber == kGUI_Team1Index,
-			kGUI_Team1_BaseColor,
-			kGUI_Team2_BaseColor
+			Color( kGUI_Team1_BaseColor.r, kGUI_Team1_BaseColor.g, kGUI_Team1_BaseColor.b, 1 ),
+			Color( kGUI_Team2_BaseColor.r, kGUI_Team2_BaseColor.g, kGUI_Team2_BaseColor.b, 1 )
 		)
     )
     
@@ -56,8 +56,8 @@ function Initialize()
     background:SetColor(
 		ConditionalValue(
 			teamNumber == kGUI_Team1Index,
-			kGUI_Team1_BaseColor,
-			kGUI_Team2_BaseColor
+			Color( kGUI_Team1_BaseColor.r, kGUI_Team1_BaseColor.g, kGUI_Team1_BaseColor.b, 1 ),
+			Color( kGUI_Team2_BaseColor.r, kGUI_Team2_BaseColor.g, kGUI_Team2_BaseColor.b, 1 )
 		)
     )
     background:SetBlendTechnique(GUIItem.Add)

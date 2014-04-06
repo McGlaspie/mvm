@@ -1,0 +1,111 @@
+﻿<shader>
+	
+	<inputs>
+		<input name="albedoMap" type="texture" address="wrap" />
+		<input name="normalMap" type="texture" address="wrap" />
+		<input name="specularMap" type="texture" address="wrap" />
+	//	<input name="emissiveMap" type="texture" address="wrap" srgb="true"/>
+		<input name="scanMap" type="texture" address="wrap">cinematics/vfx_materials/vfx_gradient_05.dds</input>
+		<input name="scanMap2" type="texture" address="wrap">cinematics/vfx_materials/vfx_gradient_06.dds</input>
+		<input name="maskMap" type="texture" address="wrap">cinematics/vfx_materials/vfx_gradient_02.dds</input>
+		<input name="maskMap2" type="texture" address="wrap">cinematics/vfx_materials/vfx_gradient_03.dds</input>
+		<input name="maskMap3" type="texture" address="wrap">cinematics/vfx_materials/vfx_gradient_04.dds</input>
+		<input name="overlayMap" type="texture" address="wrap">materials/effects/mesh_effects/nanoshield_circuit.dds</input>
+		<input name="spawnProgress" type="float" />
+		
+		<input name="teamAccentR" type="float">0.0</input>
+		<input name="teamAccentG" type="float">0.0</input>
+		<input name="teamAccentB" type="float">0.0</input>
+		
+	</inputs>
+	
+	<params>
+		<param name="osPosition">true</param>
+		<param name="alphaTest">true</param>
+		<param name="twoSided">true</param>
+	</params>
+	
+	<code>
+	<![CDATA[
+		
+		float paramQuick(float x, float p) {
+			return pow(x,p);
+		}
+		
+		float paramSlow(float x, float p) {
+			return 1 - abs(pow(abs(x - 1),p));
+		}
+		
+		float3 DecodeNormal(const float4 texNormal)
+		{
+			float4 n = texNormal * 2 - 1;
+			return n.xyz;
+		}
+		
+		
+		float3 BlendColorOverlay( float3 texColor, float3 blendColor ) 
+		//Spcefic to handling emissive colorization in similar to Photoshop's Overlay layer blend-mode
+		{
+			float3 resultColor;
+			
+			if (texColor.r > 0.5) {
+				resultColor.r = 1 - (1 - 2 * (texColor.r - 0.5)) * (1 - blendColor.r);
+			} else {
+				resultColor.r = (2 * texColor.r) * blendColor.r;
+			}
+
+			if (texColor.g > 0.5) {
+				resultColor.g = 1 - (1 - 2 * (texColor.g - 0.5)) * (1 - blendColor.g);
+			} else {
+				resultColor.g = (2 * texColor.g) * blendColor.g;
+			}
+			
+			if (texColor.b > 0.5) {
+				resultColor.b = 1 - (1 - 2 * (texColor.b - 0.5)) * (1 - blendColor.b);
+			} else {
+				resultColor.b = (2 * texColor.b) * blendColor.b;
+			}
+			
+			return resultColor;
+		}
+		
+		
+		void MaterialShader(in Material_Input input, inout Material material)
+		{
+
+			float ProgressVar = - spawnProgress * .23 ;
+			
+			float3 teamSpawnColor = float3( teamAccentR, teamAccentG, teamAccentB );
+			
+
+			float3 mask = tex2D( maskMap, input.osPosition.y * float2(1 , .5)).rgb;
+			float3 animMask = tex2D( maskMap2, input.osPosition.y * float2(1 , .005) +  float2(0, ProgressVar - 0.02 )).rgb;
+			float3 circuitMask = tex2D( maskMap3, input.osPosition.y * float2(1 , .005) +  float2(0, ProgressVar )).rgb;
+			float3 scan = tex2D( scanMap, input.osPosition.y * float2(1 , .125) +  float2(0, ProgressVar )).rgb ;	
+			float3 circuitScan = tex2D( scanMap2, input.osPosition.y * float2(1 , .04) +  float2(0, ProgressVar )).rgb ;		
+			
+			float3 animCircuit = tex2D( overlayMap, input.texCoord * float2(10 , 10) +  float2(time * -0.15, time * -0.15)).rgb;
+			float3 animCircuit2 = tex2D( overlayMap, input.texCoord * float2(8 , 5) ).rgb;
+
+			float4 specularGloss = tex2D(specularMap, input.texCoord);
+			material.tsNormal 	= DecodeNormal( tex2D(normalMap, input.texCoord) );	
+			material.specular	= specularGloss.rgb;
+			material.gloss		= specularGloss.a;
+			
+			material.albedo    = tex2D(albedoMap, input.texCoord).rgb;				
+			
+			float3 resultantEmissive = scan * 100 * ((animCircuit * animCircuit2 )  * circuitMask) + (circuitScan * animCircuit * animCircuit2 ) ;
+			float3 greyEmissive = dot( resultantEmissive.rgb, float3(0.299, 0.587, 0.114) ); //NTSC grey
+			
+			material.emissive = BlendColorOverlay( greyEmissive, teamSpawnColor );
+			
+			// Opacity
+			material.opacity = mask * 5 * animMask ;
+
+		
+			
+		}
+	]]>
+	</code>
+
+</shader>

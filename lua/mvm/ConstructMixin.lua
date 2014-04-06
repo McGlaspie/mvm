@@ -11,7 +11,9 @@ end
 local kBuildEffectsInterval = 1
 local kDrifterBuildRate = 1
 
+
 //-----------------------------------------------------------------------------
+
 
 //FIXME Ideally, this should be based on params, not hard coded in shader(s)
 local function CreateBuildEffect_MvM(self)
@@ -198,14 +200,24 @@ function ConstructMixin:Construct(elapsedTime, builder)
     if playAV then
 		
         local builderClassName = builder and builder:GetClassName()
-        local constructEffectName = "construct"
-        
-        if builder.GetTeamNumber and builder:GetTeamNumber() == kTeam2Index then
-			constructEffectName = "construct_team2"
-		end
-		Print("constructEffectName = " .. constructEffectName)
 		
-		self:TriggerEffects( constructEffectName , {classname = self:GetClassName(), doer = builderClassName })
+		if self:isa("PowerPoint") then  //TEMP - Until PP ownership added (aka PowerGrids)
+		    //FIXME Rework logic here, shouldn't call TriggerEffects when can't be seen at all
+		    self:TriggerEffects( "construct" , {
+                classname = self:GetClassName(), doer = builderClassName,
+                ismarine = ( self:GetTeamNumber() == kTeam1Index and self.scoutedForTeam1 ~= false ),
+                isalien = ( self:GetTeamNumber() == kTeam2Index and self.scoutedForTeam2 ~= false  )
+           })
+		
+        else
+           
+           self:TriggerEffects( "construct" , {
+                classname = self:GetClassName(), doer = builderClassName,
+                ismarine = ( self:GetTeamNumber() == kTeam1Index ),
+                isalien = ( self:GetTeamNumber() == kTeam2Index )
+           }) 
+            
+		end
         
     end 
     

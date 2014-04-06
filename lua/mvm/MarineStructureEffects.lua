@@ -27,27 +27,21 @@ kMarineStructureEffects =
         }
     
     },
-
+    
     // When players or MACs build a structure
     construct =
     {    
         marineConstructEffects =
         {
-            {cinematic = "cinematics/marine/construct_infantryportal.cinematic", classname = "InfantryPortal", isalien = false, done = true},
-            {cinematic = "cinematics/marine/construct_big.cinematic", classname = "CommandStation", isalien = false, done = true},
-            {cinematic = "cinematics/marine/construct.cinematic", isalien = false },
-        },        
-    },
-    
-    // When players or MACs build a structure
-    construct_team2 =
-    {    
-        marineConstructEffects =
-        {
-            {cinematic = "cinematics/marine/construct_infantryportal.cinematic", classname = "InfantryPortal", isalien = true, done = true},
-            {cinematic = "cinematics/marine/construct_big.cinematic", classname = "CommandStation", isalien = true, done = true},
-            {cinematic = "cinematics/marine/construct_team2.cinematic", isalien = true },
-        },        
+            {cinematic = "cinematics/marine/construct_infantryportal.cinematic", classname = "InfantryPortal", ismarine = true, isalien = false, done = true},
+            {cinematic = "cinematics/marine/construct_big.cinematic", classname = "CommandStation", ismarine = true, isalien = false, done = true},
+            {cinematic = "cinematics/marine/construct.cinematic", ismarine = true, isalien = false }, //done?
+            
+            {cinematic = "cinematics/marine/construct_infantryportal_team2.cinematic", classname = "InfantryPortal", ismarine = false, isalien = true, done = true},
+            {cinematic = "cinematics/marine/construct_big_team2.cinematic", classname = "CommandStation", ismarine = false, isalien = true, done = true},
+            {cinematic = "cinematics/marine/construct_team2.cinematic", ismarine = false, isalien = true }, //done?
+            
+        },
     },
     
     // Play when marine welds another marine's armor
@@ -135,23 +129,21 @@ kMarineStructureEffects =
             {sound = "sound/NS2.fev/marine/structures/power_up"},
         },
     },
+	
     
-    fixed_power_up =
-    {
-        fixedPowerUpEffects =
-        {
-            {sound = "sound/NS2.fev/marine/power_node/fixed_powerup", classname = "PowerPoint", done = true},
+    powernode_auxbackup = {
+        auxkBackupEffects = {
+            { cinematic = "cinematics/common/powerpoint_offline.cinematic", done = true },
         },
     },
     
-    //TODO Add other PowerPoint related sounds
-
+    
     mac_construct =
     {
         macConstructEffects =
         {
-            {sound = "sound/NS2.fev/marine/structures/mac/weld"},
-            {parented_cinematic = "cinematics/marine/mac/build.cinematic", attach_point = "fxnode_welder"},
+            { sound = "sound/NS2.fev/marine/structures/mac/weld" },
+			{ parented_cinematic = "cinematics/marine/mac/build.cinematic", attach_point = "fxnode_welder" },
         },
     },
     
@@ -162,7 +154,7 @@ kMarineStructureEffects =
         macWeldEffects =
         {
             {animation = "construct_weld", blend_time = .2},
-            {sound = "sound/NS2.fev/marine/structures/mac/weld"},
+            {sound = "sound/NS2.fev/marine/structures/mac/weld" },
             {parented_cinematic = "cinematics/marine/mac/weld.cinematic", attach_point = "fxnode_welder"},
         },
     },
@@ -310,7 +302,8 @@ kMarineStructureEffects =
         armoryHealth =
         {
             {sound = "sound/NS2.fev/marine/common/health"},
-            {cinematic = "cinematics/marine/spawn_item.cinematic"},
+            {cinematic = "cinematics/marine/spawn_item.cinematic", ismarine = true, isalien = false},
+            {cinematic = "cinematics/marine/spawn_item_team2.cinematic", ismarine = false, isalien = true},
         },
     },
 
@@ -319,7 +312,8 @@ kMarineStructureEffects =
         armoryAmmo =
         {
             {sound = "sound/NS2.fev/marine/common/pickup_ammo"},
-            {cinematic = "cinematics/marine/spawn_item.cinematic"},
+            {cinematic = "cinematics/marine/spawn_item.cinematic", ismarine = true, isalien = false},
+            {cinematic = "cinematics/marine/spawn_item_team2.cinematic", ismarine = false, isalien = true},
         },
     },
     
@@ -510,6 +504,25 @@ kMarineStructureEffects =
         {
             {parented_cinematic = "cinematics/marine/sentry/fire.cinematic", attach_point = "fxnode_sentrymuzzle"},
         }    
+    },
+    
+    
+    robofact_open = {
+        
+        factoryOpenEffects = {
+            { sound = "sound/NS2.fev/marine/structures/roboticsfactory_open", ismarine = true, isalien = false },
+            { sound = "sound/NS2.fev/marine/structures/roboticsfactory_open", ismarine = false, isalien = true }
+        },
+        
+    },
+    
+    robofact_close = {
+    
+        factoryCloseEffects = {
+            { sound = "sound/NS2.fev/marine/structures/roboticsfactory_close", ismarine = true, isalien = false },        
+            { sound = "sound/NS2.fev/marine/structures/roboticsfactory_close", ismarine = false, isalien = true },
+        },
+    
     },
     
 }

@@ -104,7 +104,7 @@ function GUIMinimapFrame:InitFrame()
     self.minimapFrame:SetAnchor(GUIItem.Left, GUIItem.Bottom)
     self.minimapFrame:SetSize(kFrameTextureSize)
     self.minimapFrame:SetPosition(Vector(-kMapBackgroundXOffset, -kFrameTextureSize.y + kMapBackgroundYOffset, 0))
-    self.minimapFrame:SetTexture(kMarineFrameTexture)
+    self.minimapFrame:SetTexture( kMarineFrameTexture )
     
     self.minimapFrame:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.minimapFrame:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
@@ -180,7 +180,7 @@ function GUIMinimapFrame:Update(deltaTime)
         
     end
 
-
+	
 	local ui_baseColor = ConditionalValue(
 		PlayerUI_GetTeamNumber() == kTeam1Index,
 		kGUI_Team1_BaseColor,

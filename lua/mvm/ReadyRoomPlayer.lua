@@ -16,10 +16,9 @@ function ReadyRoomPlayer:OnCreate()	//OVERRIDES
     InitMixin(self, LadderMoveMixin)
     InitMixin(self, CameraHolderMixin, { kFov = kDefaultFov })
     InitMixin(self, ScoringMixin, { kMaxScore = kMaxScore })
+    InitMixin(self, MarineVariantMixin )
     
     Player.OnCreate(self)
-    
-    InitMixin(self, MarineVariantMixin )
     
     if Client then
 		InitMixin(self, ColoredSkinsMixin)
@@ -40,35 +39,18 @@ function ReadyRoomPlayer:OnInitialized()	//OVERRIDES
     
 end
 
-/*
-function ReadyRoomPlayer:OnUpdateRender()
-	Print("ReadyRoomPlayer:OnUpdateRender()")
-end
-*/
-
-function ReadyRoomPlayer:OnUpdatePlayer(deltaTime)
-	
-	if Client then
-		//self:InitializeSkin()
-    end
-
-	Player.OnUpdatePlayer( self, deltaTime )
-
-end
 
 if Client then
 	
 	
 	function ReadyRoomPlayer:InitializeSkin()
 		
-		//Print("ReadyRoomPlayer:InitializeSkin() - self.previousTeamNumber =" .. self.previousTeamNumber )
-		
 		self.skinBaseColor = self:GetBaseSkinColor()
 		self.skinAccentColor = self:GetAccentSkinColor()
 		self.skinTrimColor = self:GetTrimSkinColor()
 		self.skinAtlasIndex = self:GetSkinAtlasIndex()
 		
-		self.skinColoringEnabled = false
+		self.skinColoringEnabled = ( self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index )
 		
 	end
 	
@@ -77,9 +59,9 @@ if Client then
 		
 		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
 			return self.previousTeamNumber - 1
-		else
-			return 0
 		end
+		
+		return 0
 		
 	end
 	
@@ -127,6 +109,7 @@ if Client then
 		return kNeutral_TrimColor
 		
 	end
+	
 
 end	//End Client
 
@@ -134,5 +117,6 @@ end	//End Client
 
 //-----------------------------------------------------------------------------
 
-Class_Reload("ReadyRoomPlayer", {})
+
+Class_Reload( "ReadyRoomPlayer", {} )
 

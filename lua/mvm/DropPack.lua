@@ -1,13 +1,39 @@
 
+Script.Load("lua/mvm/ScriptActor.lua")
+Script.Load("lua/mvm/TeamMixin.lua")
+Script.Load("lua/EntityChangeMixin.lua")
+Script.Load("lua/mvm/LOSMixin.lua")
 
-//TODO Add equipment outline
+
+//-----------------------------------------------------------------------------
+
+
+function DropPack:OnCreate()	//OVERRIDES
+
+    ScriptActor.OnCreate(self)
+    
+    InitMixin(self, BaseModelMixin)
+    InitMixin(self, ClientModelMixin)
+    InitMixin(self, TeamMixin)
+    InitMixin(self, EntityChangeMixin)
+    InitMixin(self, LOSMixin)	//bleh...has to be heavy on resources/cycles
+    
+end
+
+
+function DropPack:OverrideCheckVision()
+	return false
+end
+
+function DropPack:OverrideVisionRadius()
+	return 0
+end
 
 
 if Server then
-
 	
 	
-    function DropPack:OnUpdate(deltaTime)
+    function DropPack:OnUpdate(deltaTime)	//OVERRIDES
     
         PROFILE("DropPack:OnUpdate")
     

@@ -1,0 +1,18 @@
+shader = "shaders/ColoredSkins_Emissive.surface_shader"
+
+emissiveMap = "models/misc/sentry_arc/sentry_line.dds"
+modelColorMap = "models/misc/sentry_arc/sentry_line.dds"
+
+
+numColumns = 1
+numRows = 1
+colorMapIndex = 0
+
+
+modelColorAccentR = 0.901
+modelColorAccentG = 0.623
+modelColorAccentB = 0.215
+
+modelColorTrimR = 0.18
+modelColorTrimG = 0.15
+modelColorTrimB = 0.095

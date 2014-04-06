@@ -17,7 +17,7 @@ Script.Load("lua/BalanceMisc.lua")
 //-----------------------------------------------------------------------------
 // MARINE DAMAGE
 
-kNanoShieldDamageReductionDamage = 0.75	//0.5
+kNanoShieldDamageReductionDamage = 0.7	//0.75	ns2-0.68
 
 kInfestationCorrodeDamagePerSecond = 15
 
@@ -42,20 +42,22 @@ kWelderWeldDelay = 0.3
 kSelfWeldAmount = 5
 kPlayerArmorWeldRate = 20
 
-kAxeDamage = 15		//25 - orgMvM: 35 
+kAxeDamage = 25		//25 - orgMvM: 35 
 kAxeDamageType = kDamageType.Puncture	//Structural
+
+kHandGrenadeWeight = 0.05	//0.1
 
 kPulseGrenadeDamageRadius = 6
 kPulseGrenadeEnergyDamageRadius = 10
-kPulseGrenadeDamage = 75	//125
+kPulseGrenadeDamage = 80	//125
 kPulseGrenadeEnergyDamage = 50
 kPulseGrenadeDamageType = kDamageType.ElectroMagnetic
 
 kClusterGrenadeDamageRadius = 10
-kClusterGrenadeDamage = 75		//55
+kClusterGrenadeDamage = 65		//55
 kClusterFragmentDamageRadius = 5	//6
 kClusterFragmentDamage = 25		//20
-kClusterGrenadeDamageType = kDamageType.Flame
+kClusterGrenadeDamageType = kDamageType.Flame	//Structural?
 
 kNerveGasDamagePerSecond = 12	//50
 kNerveGasDamageType = kDamageType.Gas	//I.e. Lerk Spores, HP only
@@ -64,8 +66,8 @@ kShotgunFireRate = 0.88
 kShotgunDamage = 17
 kShotgunDamageType = kDamageType.Normal
 kShotgunClipSize = 8
-kShotgunBulletsPerShot = 10
-kShotgunRange = 38	//NS2 - 30
+kShotgunBulletsPerShot = 11	//ns2-10
+kShotgunRange = 40	//NS2 - 30
 
 kGrenadeLauncherGrenadeDamage = 110
 kGrenadeLauncherGrenadeDamageType = kDamageType.Structural
@@ -74,17 +76,17 @@ kGrenadeLauncherGrenadeDamageRadius = 4	//4.8
 kGrenadeLifetime = 2	//2.5
 kGrenadeUpgradedLifetime = 1.5
 
-kFlamethrowerDamage = 10			//15
+kFlamethrowerDamage = 16
 kFlamethrowerDamageType = kDamageType.Flame
 kFlamethrowerClipSize = 40			//50
 kFlamethrowerRange = 10				//9
 kFlamethrowerUpgradedRange = 12		//11.5
-kBurnDamagePerStackPerSecond = 3
-kFlamethrowerMaxStacks = 25			//20
-kFlamethrowerBurnDuration = 7		//6
-kFlamethrowerStackRate = 0.8		//0.4
+kBurnDamagePerStackPerSecond = 5	//3
+kFlamethrowerMaxStacks = 30			//20
+kFlamethrowerBurnDuration = 6
+kFlamethrowerStackRate = 0.75		//0.4
 kFlameRadius = 1.75					//1.8
-kFlameDamageStackWeight = 0.1		//0.5
+kFlameDamageStackWeight = 0.01		//0.5
 
 kWhileBurningWeldEffectReduction = 0.5
 kBurnDamageMarineStructureReduction = 1	//0.15
@@ -95,19 +97,20 @@ kBurnDamageExoReduction = 0.1	//.05
 kExoDualMinigunModifier = 1
 kExoDualRailgunModifier = 1
 
-kMinigunDamage = 25
+kMinigunDamage = 18		//25
 kMinigunDamageType = kDamageType.Heavy
-kMinigunClipSize = 225	//250
-kMinigunWeight = 0.15
+kMinigunClipSize = 175	//bv3-225   ns2-250		//unused..apparently...
+kMinigunWeight = 0.11
+//TODO Move heatUpRate setting to here, ref global as local in Minigun class
 
-kClawDamage = 60
+kClawDamage = 50		//60
 kClawDamageType = kDamageType.Structural
-kClawWeight = 0.05
+kClawWeight = 0.05	//0.01
 
 kRailgunDamage = 30
-kRailgunChargeDamage = 130
+kRailgunChargeDamage = 120		//ns2-130
 kRailgunDamageType = kDamageType.Structural
-kRailgunWeight = 0.08
+kRailgunWeight = 0.11	//.08
 
 
 
@@ -119,8 +122,8 @@ kMACEMPCooldown = kEmpDamageEffectsDuration
 
 
 kMineDamage = 150	//NS2 - 125
-kMineDamageType = kDamageType.Light
-
+kMineDamageType = kDamageType.Light	//structural?
+kLayMineWeight = 0.1	//0.19
 
 kSentryDamage = 7.75	//NS2 - 5
 kSentryAttackDamageType = kDamageType.Normal
@@ -131,7 +134,7 @@ kConfusedSentryBaseROF = 2.5
 kElectrifiedSentryBaseROF = 2.5
 
 
-kARCDamage = 450
+kARCDamage = 450	//450
 kARCDamageType = kDamageType.Splash // splash damage hits friendlies (that take structural dmg) as well
 kARCRange = 24
 kARCMinRange = 8
@@ -153,8 +156,7 @@ kMaxPersonalResources = 100
 
 kResourceTowerResourceInterval = 7	//NS2 - 6
 kTeamResourcePerTick = 1
-
-kPlayerResPerInterval = 0.25	//0.125
+kPlayerResPerInterval = 0.1
 
 kCommanderResourceBlockTime = 60
 
@@ -174,7 +176,7 @@ kSupplyPerResourceNode = 10
 
 
 kMACSupply = 5
-kArmorySupply = 10
+kArmorySupply = 15
 kAdvancedArmorySupply = 5
 kARCSupply = 20
 kSentrySupply = 5
@@ -226,48 +228,35 @@ kShotgunCost = 20
 kFlamethrowerCost = 20
 kGrenadeLauncherCost = 25
 
-
 kJetpackCost = 15
 
-kExosuitCost = 40
+
+kExosuitCost = 50
 kExosuitDropCost = 50
-
-kClawRailgunExosuitCost = 40
 kDualExosuitCost = 60
+kClawRailgunExosuitCost = 40
 kDualRailgunExosuitCost = 60
-
-kUpgradeToDualMinigunCost = 25
-kUpgradeToDualRailgunCost = 20
-
-kDualMinigunTechResearchCost = 30
-kClawRailgunTechResearchCost = 30
-kDualRailgunTechResearchCost = 30
 
 kClawRailgunExosuitCost = 50
 kDualExosuitCost = 75
 kDualRailgunExosuitCost = 75
 
-
-kExosuitTechResearchCost = 20
-kExosuitLockdownTechResearchCost = 20
-
-kExosuitCost = 40
-kExosuitDropCost = 50
-kClawRailgunExosuitCost = 40
-kDualExosuitCost = 60
-kDualRailgunExosuitCost = 60
-
 kUpgradeToDualMinigunCost = 20
-kUpgradeToDualRailgunCost = 20
-
-kDualMinigunTechResearchCost = 30
-kClawRailgunTechResearchCost = 30
-kDualRailgunTechResearchCost = 30
+kUpgradeToDualRailgunCost = 25
 
 
 kMinigunCost = 30
 kRailgunCost = 30
 kDualMinigunCost = 25
+
+
+kGrenadeLauncherDropCost = 25
+kFlamethrowerDropCost = 20
+kShotgunDropCost = 20
+kDropMineCost = 15
+kWelderDropCost = 5
+kJetpackDropCost = 15
+kExosuitDropCost = 50
 
 
 //ABILITIES ---------------------------
@@ -303,14 +292,14 @@ kSentryBuildTime = 4			//NS2 - 3
 kSentryBatteryBuildTime = 5
 
 kWeaponsModuleAddonTime = 40
-kPrototypeLabBuildTime = 30		//NS2 - 20
-kArmsLabBuildTime = 20			//NS2 - 17
+kPrototypeLabBuildTime = 35		//NS2 - 20
+kArmsLabBuildTime = 25			//NS2 - 17
 
-kMACBuildTime = 5
-kExtractorBuildTime = 16		//NS2 - 12
+kMACBuildTime = 4
+kExtractorBuildTime = 15		//NS2 - 12
 
 kRoboticsFactoryBuildTime = 15	//NS2 - 13
-kARCBuildTime = 16				//NS2 - 10
+kARCBuildTime = 15				//NS2 - 10
 
 kObservatoryBuildTime = 14		//NS2 - 15
 kPhaseGateBuildTime = 12
@@ -355,6 +344,7 @@ kDualRailgunTechResearchCost = 30
 kWeapons1ResearchCost = 15
 kWeapons2ResearchCost = 25
 kWeapons3ResearchCost = 35
+
 kArmor1ResearchCost = 15
 kArmor2ResearchCost = 25
 kArmor3ResearchCost = 35
@@ -380,7 +370,7 @@ kUpgradeRoboticsFactoryTime = 40
 kARCSplashTechResearchTime = 30
 kARCArmorTechResearchTime = 30
 
-kJetpackTechResearchTime = 90
+kJetpackTechResearchTime = 80
 kJetpackFuelTechResearchTime = 60
 kJetpackArmorTechResearchTime = 60
 
@@ -393,7 +383,7 @@ kFlamethrowerAltTechResearchTime = 60
 
 kCatPackTechResearchTime = 15
 
-kPhaseTechResearchTime = 60					//NS2 - 45
+kPhaseTechResearchTime = 45
 
 kWeapons1ResearchTime = 80
 kWeapons2ResearchTime = 100

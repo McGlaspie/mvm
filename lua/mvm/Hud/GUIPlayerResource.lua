@@ -290,6 +290,7 @@ function GUIPlayerResource:UpdateTeamColors()
 end
 
 
+
 function GUIPlayerResource:Update(deltaTime, parameters)
 
     PROFILE("GUIPlayerResource:Update")
@@ -317,7 +318,10 @@ function GUIPlayerResource:Update(deltaTime, parameters)
     
     self.personalText:SetText(ToString(math.floor(pRes * 10) / 10))
     self.teamText:SetText(string.format(Locale.ResolveString("TEAM_RES"), math.floor(tRes)))
+    self.teamText:SetIsVisible( Client.GetOptionInteger("hudmode", kHUDMode.Full) == kHUDMode.Full )
+    
     self.teamSupplyText:SetText( tSupply )
+    self.teamSupplyText:SetIsVisible( Client.GetOptionInteger("hudmode", kHUDMode.Full) == kHUDMode.Full )
     
     if pRes > self.lastPersonalResources then
 
@@ -345,7 +349,7 @@ function GUIPlayerResource:Update(deltaTime, parameters)
         self.personalIcon:SetSize(GUIPlayerResource.kPersonalResourceIconSize, GUIPlayerResource.kPulseTime,  nil, AnimateQuadratic)
         
     end
-	
+
     if not resGainAllowed then
     
         local timeNoRes = PlayerUI_GetNoResourceGainTimer()
@@ -360,6 +364,7 @@ function GUIPlayerResource:Update(deltaTime, parameters)
     end
 
 end
+
 
 function GUIPlayerResource:OnAnimationCompleted(animatedItem, animationName, itemHandle)
 

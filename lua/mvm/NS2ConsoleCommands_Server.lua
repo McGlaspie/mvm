@@ -106,5 +106,25 @@ local function MvM_OnCommandSpawn(client, itemName, teamnum, marineVariant, useL
 end
 
 
+local function OnCommandShockAll(client)
 
-Event.Hook("Console_spawnd", MvM_OnCommandSpawn)
+    if Shared.GetCheatsEnabled() then
+    
+        local player = client:GetControllingPlayer()
+        
+        if player then
+            
+            for _, shockable in ipairs( GetEntitiesWithMixin("EMP") ) do                
+                shockable:SetPulsed( player, player )            
+            end
+    
+        end
+        
+    end  
+
+end
+
+
+
+Event.Hook( "Console_spawnd", MvM_OnCommandSpawn )
+Event.Hook( "Console_shockall", OnCommandShockAll )

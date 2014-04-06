@@ -12,6 +12,9 @@ Script.Load("lua/mvm/DissolveMixin.lua")
 Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 Script.Load("lua/mvm/PowerConsumerMixin.lua")
 Script.Load("lua/mvm/SupplyUserMixin.lua")
+Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+Script.Load("lua/mvm/NanoshieldMixin.lua")
+
 if Client then
 	Script.Load("lua/mvm/CommanderGlowMixin.lua")
 end
@@ -21,7 +24,17 @@ local newNetworkVars = {}
 
 AddMixinNetworkVars(FireMixin, newNetworkVars)
 AddMixinNetworkVars(DetectableMixin, newNetworkVars)
+AddMixinNetworkVars(ElectroMagneticMixin, newNetworkVars)
 
+
+local kAnimationGraph = PrecacheAsset("models/marine/phase_gate/phase_gate.animation_graph")
+
+local kUpdateInterval = 0.1
+// Can only teleport a player every so often
+local kDepartureRate = 0.2
+
+local kPushRange = 3
+local kPushImpulseStrength = 40
 
 //-----------------------------------------------------------------------------
 
@@ -55,6 +68,7 @@ function PhaseGate:OnCreate()	//OVERRIDES
     
     InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
+    InitMixin(self, ElectroMagneticMixin)
     
     if Client then
         InitMixin(self, CommanderGlowMixin)
@@ -73,15 +87,50 @@ function PhaseGate:OnCreate()	//OVERRIDES
 
 end
 
-local orgPhaseGateInit = PhaseGate.OnInitialized
-function PhaseGate:OnInitialized()
 
-	orgPhaseGateInit(self)
-	
-	if Client then
-		self:InitializeSkin()
-	end
+function PhaseGate:OnInitialized()		//OVERRIDES
 
+	ScriptActor.OnInitialized(self)
+    
+    InitMixin(self, WeldableMixin)
+    InitMixin(self, NanoShieldMixin)
+    
+    self:SetModel(PhaseGate.kModelName, kAnimationGraph)
+    
+    if Server then
+    
+        self:AddTimedCallback(PhaseGate.Update, kUpdateInterval)
+        self.timeOfLastPhase = nil
+        // This Mixin must be inited inside this OnInitialized() function.
+        if not HasMixin(self, "MapBlip") then
+            InitMixin(self, MapBlipMixin)
+        end
+        
+        InitMixin(self, StaticTargetMixin)
+        //InitMixin(self, InfestationTrackerMixin)
+        InitMixin(self, MinimapConnectionMixin)
+        InitMixin(self, SupplyUserMixin)
+    
+    elseif Client then
+    
+        InitMixin(self, UnitStatusMixin)
+        InitMixin(self, HiveVisionMixin)
+        
+        self:InitializeSkin()
+        
+    end
+    
+    InitMixin(self, IdleMixin)
+
+end
+
+
+function PhaseGate:GetIsVulnerableToEMP()
+	return false
+end
+
+function PhaseGate:OverrideVisionRadius()
+	return 3
 end
 
 

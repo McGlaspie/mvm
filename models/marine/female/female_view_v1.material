@@ -8,3 +8,4 @@ modelColorMap = "models/marine/female/female_view_v1_colorMap.dds"
 numRows = 2
 numColumns = 1
 
+surface = "organic"

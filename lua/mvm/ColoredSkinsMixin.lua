@@ -24,6 +24,8 @@
 // TODO Explain usage of atlas textures
 // http://en.wikipedia.org/wiki/Texture_atlas
 //
+// FIXME This and its associated shaders are NOT compatible with OpenGL renderer
+//
 //=============================================================================
 
 if Client then
@@ -131,7 +133,6 @@ function ColoredSkinsMixin:OnUpdateRender()
 	
 	PROFILE("ColoredSkinsMixin:OnUpdateRender()")
 	
-	local model = self:GetRenderModel()
 	local enabled = ConditionalValue( gColoredSkinsToggle and self.skinColoringEnabled, 1, 0 )
 	
 	local baseColor = self.skinBaseColor
@@ -159,6 +160,9 @@ function ColoredSkinsMixin:OnUpdateRender()
 		gColorMapIndexOverride,
 		self.skinAtlasIndex
 	)
+	
+	
+	local model = self:GetRenderModel()		//self._renderModel instead?
 	
 	if model then
 		
@@ -227,8 +231,9 @@ function ColoredSkinsMixin:OnUpdateRender()
 	
 //Handle "Special" cases from here on -------------------------------------
 	
-	//TODO Devise cleaner more segregated way to handle below
-	// - Should be dependent upon the implementing class to handle
+	//TODO Devise cleaner more segregated way to below equipment handling.
+	// - Should be a child-model check for self "self:GetHasChildren()", etc.
+	// - Should be dependent upon the implementing class to handle via expectedCallbacks
 	
 	//Attachment based equipment
 	if self.GetHasEquipment and self:GetHasEquipment() then
@@ -269,7 +274,7 @@ function ColoredSkinsMixin:OnUpdateRender()
 	end
 	
 	
-	if ( self:isa("Marine") or self:isa("Exo") ) and self == Client.GetLocalPlayer() then	//Don't run on World objects
+	if self:isa("Player") and self:GetIsLocalPlayer() then	//Don't run on World objects
 	
 		local viewEnt = self:GetViewModelEntity()
 	
@@ -323,13 +328,15 @@ local function ColorAsParamInt( color )
 end
 
 
-
+//FIXME not getting player or performing trace...
 local function OnCommandGetEntityColorInfo()
 	
 	if Shared.GetCheatsEnabled() then
 		
 		local player = Client.GetLocalPlayer()
 		if player then
+			
+			//TODO testing using player:GetCrossHairTarget()
 			
 			local viewCoords = player:GetViewAngles():GetCoords()	//FIXME This is not working in this context
 			
@@ -470,7 +477,7 @@ Event.Hook( "Console_skins", OnCommandToggleColoredSkins )			//Toggle
 Event.Hook( "Console_skinsindex", OnCommandChangeColorMapIndex )	//Toggle/Cycler
 Event.Hook( "Console_skins_colors", OnCommandOverrideSkinColor )	//Toggle and value setter
 
-Event.Hook( "Console_skins_entinfo", OnCommandGetEntityColorInfo )	//FIXME not getting player or performing trace...
+Event.Hook( "Console_skins_entinfo", OnCommandGetEntityColorInfo )	
 
 
 

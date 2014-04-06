@@ -9,9 +9,10 @@ Script.Load("lua/mvm/WeldableMixin.lua")
 Script.Load("lua/mvm/ConstructMixin.lua")
 Script.Load("lua/mvm/SelectableMixin.lua")
 Script.Load("lua/mvm/GhostStructureMixin.lua")
-
 Script.Load("lua/mvm/FireMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+Script.Load("lua/mvm/NanoshieldMixin.lua")
+
 if Client then
 	Script.Load("lua/mvm/CommanderGlowMixin.lua")
 end
@@ -24,14 +25,14 @@ local newNetworkVars = {
 }
 
 
-AddMixinNetworkVars(FireMixin, newNetworkVars)
+AddMixinNetworkVars( FireMixin, newNetworkVars )
 AddMixinNetworkVars( ElectroMagneticMixin, newNetworkVars )
 
 
 if Client then
 	
-	PowerPoint.kDisabledColor = Color(0.005, 0.005, 0.005)		//Move to globals.lua? Balance?
-	PowerPoint.kDisabledCommanderColor = Color(0.1, 0.1, 0.1)
+	PowerPoint.kDisabledColor = Color(0.0075, 0.0075, 0.0075)		//Move to globals.lua? Balance?
+	PowerPoint.kDisabledCommanderColor = Color(0.11, 0.11, 0.11)
 	
 	// chance of a aux light flickering when powering up
 	PowerPoint.kAuxFlickerChance = 0
@@ -58,7 +59,7 @@ if Client then
 	// how long time a light takes to go from full aux power to dead (last 1/3 of that time is spent flickering)
 	PowerPoint.kAuxLightDyingTime = 20
 	
-	PowerPoint.kImpulseEffectFrequency = 25
+	PowerPoint.kImpulseEffectFrequency = 25     //Unused, essentially
 	
 end
 
@@ -69,30 +70,27 @@ local kUnsocketedAnimationGraph = nil
 local kSocketedModelName = PrecacheAsset("models/system/editor/power_node.model")
 local kSocketedAnimationGraph = PrecacheAsset("models/system/editor/power_node.animation_graph")
 
-local kDamagedEffect = PrecacheAsset("cinematics/common/powerpoint_damaged.cinematic")
-local kOfflineEffect = PrecacheAsset("cinematics/common/powerpoint_offline.cinematic")
+local kDamagedEffect = PrecacheAsset("cinematics/common/powerpoint_damaged.cinematic")  //TODO add to damage event
+local kOfflineEffect = PrecacheAsset("cinematics/common/powerpoint_offline.cinematic")  //TODO add to destroyed event
 
-local kTakeDamageSound = PrecacheAsset("sound/NS2.fev/marine/power_node/take_damage")
-local kDamagedSound = PrecacheAsset("sound/NS2.fev/marine/power_node/damaged")
-local kDestroyedSound = PrecacheAsset("sound/NS2.fev/marine/power_node/destroyed")
-local kDestroyedPowerDownSound = PrecacheAsset("sound/NS2.fev/marine/power_node/destroyed_powerdown")
-local kAuxPowerBackupSound = PrecacheAsset("sound/NS2.fev/marine/power_node/backup")
 
-local kDamagedPercentage = 0.4
+local kTakeDamageFlagUpdateRate = 0.4
+
+local kDamagedPercentage = 0.4	//Move to BalanceMisc?
 
 // Re-build only possible when X seconds have passed after destruction (when aux power kicks in)
 local kDestructionBuildDelay = 15
 
 // The amount of time that must pass since the last time a PP was attacked until
 // the team will be notified. This makes sure the team isn't spammed.
-local kUnderAttackTeamMessageLimit = 4
+local kUnderAttackTeamMessageLimit = 10
 
 // max amount of "attack" the powerpoint has suffered (?)
 local kMaxAttackTime = 10
 
 local kDefaultUpdateRange = 200
 
-local kSightedUpdateRate = 1.5	//seconds	//2
+local kSightedUpdateRate = 1.5	//seconds	//2 - NS2
 //PowerPoint.kPowerState = enum( { "unsocketed", "socketed", "destroyed" } )
 
 
@@ -128,15 +126,15 @@ if Client then
 				// for all of them at all times, we restrict it to powerpoints inside the updateRange. The
 				// updateRange should be long enough that players can't see the lights being updated by the
 				// powerpoint when outside this range, and short enough not to waste too much cpu.
-				//local inRange = (powerPoint:GetOrigin() - playerPos):GetLengthSquared() < kDefaultUpdateRangeSq
+				local inRange = (powerPoint:GetOrigin() - playerPos):GetLengthSquared() < kDefaultUpdateRangeSq
 				
 				local isComm = player:isa("Commander")
 				
 				// Ignore range check if the player is a commander since they are high above
 				// the lights in a lot of cases and see through ceilings and some walls.
-				//if inRange or isComm then
+				if inRange or isComm then
 					powerPoint:UpdatePoweredLights( isComm )
-				//end
+				end
 				
 			end
 			
@@ -151,7 +149,7 @@ if Client then
 		
 		if not self.lightHandler then    
 			
-			self.lightHandler = PowerPointLightHandler():Init( self )
+			self.lightHandler = PowerPointLightHandler():Init( self )	//isCommander
 	   
 		end
 		
@@ -159,8 +157,8 @@ if Client then
 		
 		local updateRate = ConditionalValue(
 			isCommander,
-			0.05,	//40 per second, too much?
-			0.05	//20 per second
+			0.05,	//50+ too much?
+			0.05	//50 per second
 		)
 		
 		if self.lastUpdatedTime == nil or time - self.lastUpdatedTime > updateRate then   
@@ -177,6 +175,125 @@ end
 
 
 //-----------------------------------------------------------------------------
+
+//Below is a shitfest hack...this creates an average of 98 total entites per map (assuming 14 nodes)
+
+local kPowerNodeSoundsDistance = 30	//??? Ideally always limited to prevent always propagating out
+
+
+local kTakeDamageSound = PrecacheAsset("sound/NS2.fev/marine/power_node/take_damage")
+local kDamagedSound = PrecacheAsset("sound/NS2.fev/marine/power_node/damaged")
+local kDestroyedPowerDownSound = PrecacheAsset("sound/NS2.fev/marine/power_node/destroyed_powerdown")
+local kAuxPowerBackupSound = PrecacheAsset("sound/NS2.fev/marine/power_node/backup")
+local kPowerRestoredSound = PrecacheAsset("sound/NS2.fev/marine/power_node/fixed_powerup")
+
+
+local function SetupSoundEntities( self )	
+// *facepalm* god this is horribly hacky and wasteful...6 ents per node, ffs...
+//BUT...normal Effects manager doesn't handle relevancy and entity trigger sound well...
+	
+	if Server then
+		
+		local defaultMask = bit.bor( kRelevantToTeam1Unit, kRelevantToTeam2Unit )
+		
+		self.takeDamageSound = Server.CreateEntity( SoundEffect.kMapName )	//this one especially is horrible...results is LOTS of messages...just horrid.
+		self.takeDamageSound:SetAsset( kTakeDamageSound )
+		self.takeDamageSound:SetRelevancyDistance( kPowerNodeSoundsDistance )
+		self.takeDamageSound:SetExcludeRelevancyMask( defaultMask )
+		self.takeDamageSound:SetKeepAlive( true )
+		self.takeDamageSound:SetVolume(1)
+		
+		//Must be SetRelevancyDistance( Math.infinity ) from here on, or Comm view gets cut-off
+		//and repeating sounds
+		self.damagedSound = Server.CreateEntity( SoundEffect.kMapName )
+		self.damagedSound:SetAsset( kDamagedSound )
+		self.damagedSound:SetRelevancyDistance( Math.infinity )
+		self.damagedSound:SetExcludeRelevancyMask( defaultMask )
+		self.damagedSound:SetKeepAlive( true )
+		self.damagedSound:SetVolume(0.7)
+		
+		self.destroyedPowerDownSound = Server.CreateEntity( SoundEffect.kMapName )
+		self.destroyedPowerDownSound:SetAsset( kDestroyedPowerDownSound )
+		self.destroyedPowerDownSound:SetRelevancyDistance( Math.infinity )
+		self.destroyedPowerDownSound:SetExcludeRelevancyMask( defaultMask )
+		self.destroyedPowerDownSound:SetKeepAlive( true )
+		self.destroyedPowerDownSound:SetVolume(0.75)
+		
+		self.auxBackupSound = Server.CreateEntity( SoundEffect.kMapName )
+		self.auxBackupSound:SetAsset( kAuxPowerBackupSound )
+		self.auxBackupSound:SetRelevancyDistance( Math.infinity )
+		self.auxBackupSound:SetExcludeRelevancyMask( defaultMask )
+		self.auxBackupSound:SetKeepAlive( true )
+		self.auxBackupSound:SetVolume(0.6)
+		
+		self.powerRestoredSound = Server.CreateEntity( SoundEffect.kMapName )
+		self.powerRestoredSound:SetAsset( kPowerRestoredSound )
+		self.powerRestoredSound:SetRelevancyDistance( kPowerNodeSoundsDistance )
+		self.powerRestoredSound:SetExcludeRelevancyMask( Math.infinity )
+		self.powerRestoredSound:SetKeepAlive( true )
+		self.powerRestoredSound:SetVolume(0.7)
+		
+	end
+	
+end
+
+/*
+local function UpdateInitialSoundParams( self )
+//Holy shit this is nasty...
+	
+	if self:GetNumChildren() > 0 then
+	
+		for i = 1, self:GetNumChildren() do
+			
+            local child = self:GetChildAtIndex(i - 1)
+            
+            if child and child:isa("SoundEffect") then
+				
+				if child.soundEffectInstance then
+					child.soundEffectInstance:SetRolloff( SoundSystem.Rolloff_Linear )
+				end
+				
+				//child:SetOrigin( self:GetOrigin() )
+				
+            else
+				Print("ERROR: Failed to initialize PowerPoint SoundEffect for client at index: " .. tostring(i) )
+            end
+            
+        end
+	
+	end		
+	
+	return false
+	
+end
+*/
+
+local function InitializeSoundEntities( self )
+
+	if Server then
+		
+		local powerNodeOrigin = self:GetOrigin()	//Never moves, safe to use now
+		
+		self.takeDamageSound:SetOrigin( powerNodeOrigin )
+		self.damagedSound:SetOrigin( powerNodeOrigin )
+		self.destroyedPowerDownSound:SetOrigin( powerNodeOrigin )
+		self.powerRestoredSound:SetOrigin( powerNodeOrigin )
+		self.auxBackupSound:SetOrigin( powerNodeOrigin )
+		
+		self.takeDamageSound:SetPositional( true )
+		self.damagedSound:SetPositional( true )
+		self.destroyedPowerDownSound:SetPositional( true )
+		self.powerRestoredSound:SetPositional( true )
+		self.auxBackupSound:SetPositional( true )
+	
+	end
+	
+	if Client then
+		//self:AddTimedCallback( UpdateInitialSoundParams, 0.5 )
+		//FIXME Should NOT be a timed callback
+	end
+
+end
 
 
 function PowerPoint:OnCreate()	//OVERRIDES
@@ -219,13 +336,33 @@ function PowerPoint:OnCreate()	//OVERRIDES
 	self.scoutedForTeam2 = false
 	self.isStartingPoint = false
 	
-	
 	if Server then
-		
 		self:SetUpdates(true)
 		self:SetPropagate(Entity.Propagate_Mask)
-		
+		self.canTakeDamageFlag = false
+		self.timeLastDamageFlagUpdate = 0
 	end
+	
+	SetupSoundEntities( self )
+	
+end
+
+
+local function PlayAuxSound(self)
+		
+	if self:GetIsDisabled() and not self.auxBackupSound:GetIsPlaying() then
+		self.auxBackupSound:Start()
+	end
+	
+	if self.auxBackupSound:GetIsPlaying() and self:GetIsDisabled() then
+		return true
+	end
+	
+	if not self:GetIsDisabled() then
+		self.auxBackupSound:Stop()
+	end
+	
+	return false
 	
 end
 
@@ -241,7 +378,7 @@ local function SetupWithInitialSettings(self)	//Called in Reset()
     
     else
 		
-        self:SetModel(kUnsocketedSocketModelName, kUnsocketedAnimationGraph)
+        self:SetModel(kUnsocketedSocketModelName, kUnsocketedAnimationGraph)	//Hacky, but it works
         
         self:SetLightMode( kLightMode.NoPower )
         self.powerState = PowerPoint.kPowerState.unsocketed
@@ -251,6 +388,7 @@ local function SetupWithInitialSettings(self)	//Called in Reset()
         
             self.startsBuilt = false
             self.attackTime = 0.0
+            self:AddTimedCallback( PlayAuxSound, 4 )
             
         elseif Client then 
         
@@ -291,10 +429,82 @@ function PowerPoint:OnInitialized()		//OVERRIDES
     
     self:UpdateRelevancy()
     
+    InitializeSoundEntities( self )
+    
 end
+
+
+local orgPowernodeDestroy = PowerPoint.OnDestroy
+function PowerPoint:OnDestroy()
+
+	orgPowernodeDestroy( self )
+	
+	if Server then
+	//This is stupid...just fucking stupid...
+		DestroyEntity( self.takeDamageSound )
+		self.takeDamageSound = nil
+		
+		DestroyEntity( self.destroyedPowerDownSound )
+		self.destroyedPowerDownSound = nil
+		
+		DestroyEntity( self.damagedSound )
+		self.damagedSound = nil
+		
+		DestroyEntity( self.auxBackupSound )
+		self.auxBackupSound = nil
+		
+		DestroyEntity( self.powerRestoredSound )
+		self.powerRestoredSound = nil
+	
+	end
+
+end
+
+
+function PowerPoint:GetIsDisabled()
+    return (
+		self:GetPowerState() == PowerPoint.kPowerState.destroyed or
+		self:GetPowerState() == PowerPoint.kPowerState.unsocketed
+	)
+end
+
 
 function PowerPoint:OnResetComplete()
 end
+
+
+function PowerPoint:GetDestroyMapBlipOnKill()
+	return false
+end
+
+
+local function GetSoundRelevancyMask( self )
+	
+	local mask = bit.bor( kRelevantToTeam1Unit, kRelevantToTeam2Unit )
+	if self.scoutedForTeam1 ~= false then
+		mask = bit.bor( mask, kRelevantToTeam1Commander )
+	end
+	if self.scoutedForTeam2 ~= false then
+		mask = bit.bor( mask, kRelevantToTeam2Commander )
+	end
+	
+	return mask
+
+end
+
+
+local function UpdateAllSoundRelevancies( self )
+
+	local mask = GetSoundRelevancyMask( self )
+	
+	self.takeDamageSound:SetExcludeRelevancyMask( mask )
+	self.damagedSound:SetExcludeRelevancyMask( mask )
+	self.destroyedPowerDownSound:SetExcludeRelevancyMask( mask )
+	self.auxBackupSound:SetExcludeRelevancyMask( mask )
+	self.powerRestoredSound:SetExcludeRelevancyMask( mask )
+
+end
+
 
 function PowerPoint:Reset()		//OVERRIDES
 
@@ -303,14 +513,18 @@ function PowerPoint:Reset()		//OVERRIDES
 	self.isStartingPoint = false
 
 	if Server then
-	
-		Print("PowerPoint:Reset()")
+		
 		ScriptActor.Reset(self)
 		
 		SetupWithInitialSettings(self)
 		self:MarkBlipDirty()
-		
 		self:UpdateRelevancy()
+		
+		UpdateAllSoundRelevancies( self )
+		//???? Stop sounds?
+		
+		self.canTakeDamageFlag = false
+		self.timeLastDamageFlagUpdate = 0
 		
 	end
 	
@@ -357,16 +571,26 @@ function PowerPoint:GetCanBeNanoShieldedOverride(resultTable)
 	
 end
 
+
 function PowerPoint:GetReceivesStructuralDamage()
-    return true	//false? To slow-down friendly fire? Eh...not a very good idea. Needs true capturing...
+    return true	
+	//false? To slow-down friendly fire? Eh...not a very good idea. Needs true capturing...
     //If above set to false, MASSIVE change needed to HP/AR
 end
+
 
 function PowerPoint:GetCanConstructOverride(player)
     return not self:GetIsBuilt() and self:GetPowerState() ~= PowerPoint.kPowerState.unsocketed
 end
 
 
+//Change to bool flag and run at X interval in OnUpdate?
+function PowerPoint:GetCanTakeDamageOverride()
+	return false
+end
+
+
+//FIXME Revise function, not having intended behavior
 function PowerPoint:GetTechAllowed(techId, techNode, player)
 	
 	if player:isa("MarineCommander") and techId == kTechId.SocketPowerNode then
@@ -392,9 +616,10 @@ function PowerPoint:GetTechAllowed(techId, techNode, player)
 		
 	end
 	
-	return false, false	//Default to "NAY! I think, not"
+	return false, false
 	
 end
+
 
 function PowerPoint:OverrideVisionRadius()
 	return 2
@@ -404,7 +629,7 @@ end
 
 if Client then
 	
-	function PowerPoint:GetIsVisible()	//This makes the dark magic happen
+	function PowerPoint:GetIsVisible()	//This makes the dark/scouting magic happen
 		
 		local player = Client.GetLocalPlayer()
 		
@@ -425,10 +650,10 @@ end
 
 
 function PowerPoint:UpdateRelevancy()
+//Must always propogate to teams because difference in 1P and Comm light handling
 	
 	local mask = 0
 	mask = bit.bor( mask, kRelevantToTeam1, kRelevantToTeam2 )
-	//Must make relevant to both teams to propogate lighting info to commanders
 	self:SetExcludeRelevancyMask( mask )
 
 end
@@ -445,7 +670,7 @@ function PowerPoint:IsScouted( byTeamNumber )
 end
 
 
-if Server then	
+if Server then
 	
 	
 	function PowerPoint:SetIsSightedOverride( seen, viewer )
@@ -454,7 +679,7 @@ if Server then
 		
 			if not viewer:isa("ARC") and not viewer:isa("Structure") and not viewer:isa("Commander") then
 			//Only players, scans, and MACs can scout things
-				
+				//Deployed ARCs?
 				local viewerTeam = viewer:GetTeamNumber()
 				
 				if viewerTeam == kTeam1Index then
@@ -462,6 +687,8 @@ if Server then
 				elseif viewerTeam == kTeam2Index then
 					self.scoutedForTeam2 = true
 				end
+				
+				UpdateAllSoundRelevancies( self )
 				
 			end
 			
@@ -477,13 +704,32 @@ if Server then
 	
 	end
 	
-	local function PowerUp(self)
+	
+	local function PowerUp( self )
 		
         self:SetInternalPowerState( PowerPoint.kPowerState.socketed )
         self:SetLightMode( kLightMode.Normal )
-        self:StopSound( kAuxPowerBackupSound )
-		self:TriggerEffects( "fixed_power_up", { ismarine = self.scoutedFormTeam1, isalien = self.scoutedForTeam2 } )
+		
+		self.powerRestoredSound:Start()
+		
         self:SetPoweringState( true )
+        
+    end
+	
+	
+	function PowerPoint:OnConstructionComplete()	//OVERRIDES
+
+        self:StopDamagedSound()
+        
+        self.health = kPowerPointHealth
+        self.armor = kPowerPointArmor
+        
+        self:SetMaxHealth(kPowerPointHealth)
+        self:SetMaxArmor(kPowerPointArmor)
+        
+        self.alive = true
+        
+        PowerUp(self)
         
     end
 	
@@ -519,7 +765,8 @@ if Server then
             
         end
         
-        if self:GetHealthScalar() == 1 and self:GetPowerState() == PowerPoint.kPowerState.destroyed then
+        local powerState = self:GetPowerState()
+        if self:GetHealthScalar() == 1 and ( powerState == PowerPoint.kPowerState.destroyed or powerState == PowerPoint.kPowerState.unsocketed ) then
         
             self:StopDamagedSound()
             
@@ -531,7 +778,7 @@ if Server then
             
             self.alive = true
             
-            PowerUp(self)
+            PowerUp( self )
             
         end
         
@@ -543,8 +790,6 @@ if Server then
     
     
     // send a message every kUnderAttackTeamMessageLimit seconds when a base power node is under attack
-    //TODO Examine adding in delay to these messages. Currently happens anytime PN takes ANY damage
-    // - May need a 'Only when HP below X AND timeInterval > Y'
     local function MvM_CheckSendDamageTeamMessage(self)
 		
         if not self.timePowerNodeAttackAlertSent or self.timePowerNodeAttackAlertSent + kUnderAttackTeamMessageLimit < Shared.GetTime() then
@@ -575,31 +820,52 @@ if Server then
     end
     
     
-    //FIXME Need anti-spam limiter to team messages
-    function PowerPoint:OnTakeDamage(damage, attacker, doer, point)
+    function PowerPoint:StopDamagedSound()		//OVERRIDES
+    
+        if self.playingLoopedDamaged then
+			
+            self.damagedSound:Stop()
+            self.playingLoopedDamaged = false
+            
+        end
+        
+    end
+    
+    
+    function PowerPoint:StartDamagedSound()	//ADDED
+    
+		self.damagedSound:Start()
+		self.playingLoopedDamaged = true
+    
+    end
+    
+    
+    function PowerPoint:OnTakeDamage(damage, attacker, doer, point)		//OVERRIDES
 		
         if self:GetIsPowering() then
 			
-            self:PlaySound(kTakeDamageSound)
+			if self.attackTime == 0.0 or math.fmod( math.floor(self.attackTime), 2 ) == 0 then
+			//FIXME This is a craptastic condition
+				self.takeDamageSound:Start()
+			end
             
             local healthScalar = self:GetHealthScalar()
             
             if healthScalar < kDamagedPercentage then
 				
-                self:SetLightMode(kLightMode.LowPower)
+                self:SetLightMode( kLightMode.LowPower )
                 
                 if not self.playingLoopedDamaged then
-                    self:PlaySound(kDamagedSound)
-                    self.playingLoopedDamaged = true
+					
+                    self:StartDamagedSound()
+                    
                 end
                 
             else
-                self:SetLightMode(kLightMode.Damaged)
+                self:SetLightMode( kLightMode.Damaged )
             end
             
-            if not preventAlert then
-				MvM_CheckSendDamageTeamMessage(self)
-			end
+			MvM_CheckSendDamageTeamMessage(self)
             
         end
         
@@ -608,11 +874,24 @@ if Server then
     end
     
     
-    
-    local function PlayAuxSound(self)
-	//FIXME Need way to prevent this from being played if not scouted
-        if not self:GetIsDisabled() then
-			self:PlaySound(kAuxPowerBackupSound)
+    local function MvM_CheckSendPowerDestroyedTeamMessage( self )
+		
+        // Check if there is a built Command Station in the same location as this PowerPoint.
+        local foundStation = false
+        local targetCommandStation = nil
+        
+        for _, commStation in ientitylist( Shared.GetEntitiesWithClassname("CommandStation") ) do
+            
+            if commStation:GetIsBuilt() and commStation:GetLocationName() == self:GetLocationName() then
+                foundStation = true
+                targetCommandStation = commStation
+            end
+        
+        end
+        
+        // Only send the message if there is a CommandStation found at this same location.
+        if foundStation and targetCommandStation ~= nil then
+            SendTeamMessage( targetCommandStation:GetTeam(), kTeamMessageTypes.PowerLost, self:GetLocationId() )
         end
         
     end
@@ -626,30 +905,72 @@ if Server then
         
         self:MarkBlipDirty()
         
-        self:PlaySound( kDestroyedSound )
-        self:PlaySound( kDestroyedPowerDownSound )
+        self.destroyedPowerDownSound:Start()
         
-        self:SetInternalPowerState(PowerPoint.kPowerState.destroyed)
+        self:SetInternalPowerState( PowerPoint.kPowerState.destroyed )
         //self.constructionComplete = false
         self:SetLightMode( kLightMode.NoPower )
         
         // Remove effects such as parasite when destroyed.
         self:ClearGameEffects()
         
-        //No scoring from neutral PNs
+        //No scoring from neutral PNs - This will change once ownership added (PowerGrids)
         //if attacker and attacker:isa("Player") and GetEnemyTeamNumber(self:GetTeamNumber()) == attacker:GetTeamNumber() then
         //    attacker:AddScore(self:GetPointValue())
         //end
         
         // Let the team know the power is down.
-        //FIXME Do lookup for CSs and notify accordingly
         //SendTeamMessage(self:GetTeam(), kTeamMessageTypes.PowerLost, self:GetLocationId())
+        MvM_CheckSendPowerDestroyedTeamMessage( self )
         
         // A few seconds later, switch on aux power.
-        self:AddTimedCallback(PlayAuxSound, 4)
+        self:AddTimedCallback( PlayAuxSound, 4 )
         self.timeOfDestruction = Shared.GetTime()
         
     end
+
+	
+	function PowerPoint:UpdateTakeDamageState()	//this is slow and wasteful...just bad...
+		
+		local canBeDamaged = false
+		local nodeLocation = GetLocationForPoint( self:GetOrigin() )
+		local teamStructures = GetEntitiesWithinRange( "Structure", self:GetOrigin(), 850 )
+		self.timeLastDamageFlagUpdate = Shared.GetTime()
+		
+		if teamStructures and #teamStructures > 0 then
+			
+			local teamNumPrev = 0
+			local canBeDamaged = false
+			local multiTeams = false
+			
+			for _, ent in ipairs(teamStructures) do
+				
+				if ent:GetLocationName() == nodeLocation:GetName() and HasMixin( ent, "Team") then
+					
+					if not ent:isa("Mine") then	//remove if can
+						
+						if teamNumPrev == 0 then
+							teamNumPrev = ent:GetTeamNumber()
+						else
+							multiTeams = ent:GetTeamNumber() ~= teamNumPrev and MvM_GetIsUnitActive(ent)
+						end
+						
+						if multiTeams then
+							canBeDamaged = self.powerState ~= PowerPoint.kPowerState.unsocketed and self:GetIsBuilt() and self:GetHealth() > 0
+						end
+					
+					end
+					
+				end
+				
+			end
+			
+		end
+		
+		self.canTakeDamageFlag = canBeDamaged
+
+	end
+
 
 end //Server
 
@@ -761,6 +1082,10 @@ function PowerPoint:OnUpdate(deltaTime)	//OVERRIDES
 	end
 	
 	if Server then
+		
+		//if self.timeLastDamageFlagUpdate + kTakeDamageFlagUpdateRate < Shared.GetTime() or self.timeLastDamageFlagUpdate == 0 then
+			//self:UpdateTakeDamageState()
+		//end
 		
 		if self.mapBlipId and self.mapBlipId ~= Entity.invalidId and GetGamerules():GetGameStarted() then
 			

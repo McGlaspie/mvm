@@ -107,7 +107,7 @@ function GUIMarineStatus:Initialize()
     self.teamNumber = PlayerUI_GetTeamNumber()
     
     local ui_baseColor = ConditionalValue(
-		playerTeam == kTeam1Index,
+		self.teamNumber == kTeam1Index,
 		kGUI_Team1_BaseColor,
 		kGUI_Team2_BaseColor
     )

@@ -10,9 +10,9 @@ numColumns = 1
 numRows = 1
 colorMapIndex = 0
 
-modelColorAccentR=1
-modelColorAccentG=0
-modelColorAccentR=0
+modelColorAccentR = 0.756
+modelColorAccentG = 0.982
+modelColorAccentB = 1
 
 
 surface = "organic"

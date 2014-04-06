@@ -1,11 +1,15 @@
 
+Script.Load("lua/mvm/ScriptActor.lua")
 Script.Load("lua/mvm/LiveMixin.lua")
 Script.Load("lua/mvm/TeamMixin.lua")
 Script.Load("lua/mvm/DamageMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
 Script.Load("lua/mvm/WeldableMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+Script.Load("lua/EntityChangeMixin.lua")
+Script.Load("lua/mvm/LOSMixin.lua")
 //Script.Load("lua/mvm/DetectableMixin.lua")
+
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 	Script.Load("lua/mvm/CommanderGlowMixin.lua")
@@ -27,81 +31,11 @@ local kMineMaxShakeIntensity = 0.13
 local newNetworkVars = {}
 
 AddMixinNetworkVars(FireMixin, newNetworkVars)
+AddMixinNetworkVars(LOSMixin, newNetworkVars)
 AddMixinNetworkVars(ElectroMagneticMixin, newNetworkVars)
 
 
 //-----------------------------------------------------------------------------
-
-
-function Mine:OnCreate()	//OVERRIDES
-
-	ScriptActor.OnCreate(self)
-    
-    InitMixin(self, BaseModelMixin)
-    InitMixin(self, ClientModelMixin)
-    InitMixin(self, LiveMixin)
-    InitMixin(self, GameEffectsMixin)
-    InitMixin(self, StunMixin)
-    InitMixin(self, TeamMixin)
-    InitMixin(self, DamageMixin)
-    InitMixin(self, VortexAbleMixin)
-    InitMixin(self, ParasiteMixin)
-    
-    InitMixin(self, FireMixin)
-    InitMixin(self, ElectroMagneticMixin)
-    
-    if Server then
-    
-        // init after OwnerMixin since 'OnEntityChange' is expected callback
-        InitMixin(self, EntityChangeMixin)
-        InitMixin(self, SleeperMixin)
-        
-        self:SetUpdates(true)
-        
-    end
-	
-	if Client then
-		InitMixin(self, CommanderGlowMixin)
-		InitMixin(self, ColoredSkinsMixin)
-	end
-
-end
-
-local orgMineInit = Mine.OnInitialized
-function Mine:OnInitialized()
-	
-	orgMineInit(self)
-
-	if Client then
-		self:InitializeSkin()
-	end
-
-end
-
-
-if Client then
-	
-	function Mine:InitializeSkin()
-		self.skinBaseColor = self:GetBaseSkinColor()
-		self.skinAccentColor = self:GetAccentSkinColor()
-		self.skinTrimColor = self:GetTrimSkinColor()
-		self.skinAtlasIndex = 0
-	end
-
-	function Mine:GetBaseSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
-	end
-
-	function Mine:GetAccentSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
-	end
-	
-	function Mine:GetTrimSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
-	end
-
-end
-
 
 
 local function SineFalloff(distanceFraction)
@@ -196,6 +130,7 @@ local function MvM_CheckEntityExplodesMine(self, entity)
     
 end
 
+
 local function MvM_CheckAllEntsInTriggerExplodeMine(self)
 
     local ents = self:GetEntitiesInTrigger()
@@ -207,7 +142,45 @@ local function MvM_CheckAllEntsInTriggerExplodeMine(self)
 end
 
 
-function Mine:OnInitialized()
+
+function Mine:OnCreate()	//OVERRIDES
+
+	ScriptActor.OnCreate(self)
+    
+    InitMixin(self, BaseModelMixin)
+    InitMixin(self, ClientModelMixin)
+    InitMixin(self, LiveMixin)
+    InitMixin(self, GameEffectsMixin)
+    InitMixin(self, StunMixin)
+    InitMixin(self, TeamMixin)
+    InitMixin(self, EntityChangeMixin)
+    InitMixin(self, LOSMixin)
+    InitMixin(self, DamageMixin)
+    InitMixin(self, VortexAbleMixin)
+    InitMixin(self, ParasiteMixin)
+    
+    InitMixin(self, FireMixin)
+    InitMixin(self, ElectroMagneticMixin)
+    
+    if Server then
+    
+        // init after OwnerMixin since 'OnEntityChange' is expected callback
+        //InitMixin(self, EntityChangeMixin)
+        InitMixin(self, SleeperMixin)
+        
+        self:SetUpdates(true)
+        
+    end
+	
+	if Client then
+		InitMixin(self, CommanderGlowMixin)
+		InitMixin(self, ColoredSkinsMixin)
+	end
+
+end
+
+
+function Mine:OnInitialized()   //OVERRIDES
     
     ScriptActor.OnInitialized(self)
     
@@ -224,7 +197,10 @@ function Mine:OnInitialized()
         self.armed = false
         self:SetHealth(self:GetMaxHealth())
         self:SetArmor(self:GetMaxArmor())
-        self:TriggerEffects("mine_spawn")
+        
+        self:TriggerEffects( "mine_spawn", {
+            ismarine = ( self.teamNumber == kTeam1Index ), isalien = ( self.teamNumber == kTeam2Index )
+        })
         
         InitMixin(self, TriggerMixin)
         self:SetSphere(kMineTriggerRange)
@@ -233,7 +209,49 @@ function Mine:OnInitialized()
     
     self:SetModel(Mine.kModelName)
     
+    if Client then
+		self:InitializeSkin()
+	end
+    
 end
+
+
+//function Mine:OverrideCheckVision()
+//	return false
+//end
+
+function Mine:OverrideVisionRadius()
+	return 0
+end
+
+function Mine:GetIsVulnerableToEMP()
+    return true
+end
+
+
+if Client then
+	
+	function Mine:InitializeSkin()
+		self.skinBaseColor = self:GetBaseSkinColor()
+		self.skinAccentColor = self:GetAccentSkinColor()
+		self.skinTrimColor = self:GetTrimSkinColor()
+		self.skinAtlasIndex = 0
+	end
+
+	function Mine:GetBaseSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
+	end
+
+	function Mine:GetAccentSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+	end
+	
+	function Mine:GetTrimSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
+	end
+
+end
+
 
 
 if Server then

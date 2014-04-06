@@ -5,19 +5,26 @@ Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
 Script.Load("lua/mvm/WeldableMixin.lua")
 Script.Load("lua/mvm/GhostStructureMixin.lua")
+Script.Load("lua/mvm/NanoshieldMixin.lua")
+Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
 end
 
+
 //-----------------------------------------------------------------------------
+
 
 local newNetworkVars = {}
 
-AddMixinNetworkVars(FireMixin, newNetworkVars)
-AddMixinNetworkVars(DetectableMixin, newNetworkVars)
+AddMixinNetworkVars( FireMixin, newNetworkVars )
+AddMixinNetworkVars( DetectableMixin, newNetworkVars )
+AddMixinNetworkVars( ElectroMagneticMixin, newNetworkVars )
 
-local kCommandStationState = enum( { "Normal", "Locked", "Welcome" } )
 
+local kAnimationGraph = PrecacheAsset("models/marine/command_station/command_station.animation_graph")
+local kLoginAttachPoint = "login"
 
 //-----------------------------------------------------------------------------
 
@@ -32,6 +39,7 @@ function CommandStation:OnCreate()	//OVERRIDES
 
 	InitMixin(self, FireMixin)
 	InitMixin(self, DetectableMixin)
+	InitMixin(self, ElectroMagneticMixin)
 
 	if Client then
 		InitMixin(self, ColoredSkinsMixin)
@@ -40,15 +48,48 @@ function CommandStation:OnCreate()	//OVERRIDES
 end
 
 
-local orgCommandStationInit = CommandStation.OnInitialized
 function CommandStation:OnInitialized()
 
-	orgCommandStationInit(self)
-	
-	if Client then
-		self:InitializeSkin()
-	end
+	CommandStructure.OnInitialized(self)
+    
+    InitMixin(self, WeldableMixin)
+    InitMixin(self, NanoShieldMixin)
+    InitMixin(self, DissolveMixin)
+    InitMixin(self, VortexAbleMixin)
+    InitMixin(self, RecycleMixin)
+    InitMixin(self, HiveVisionMixin)
+    
+    self:SetModel(CommandStation.kModelName, kAnimationGraph)
+    
+    if Server then
+    
+        if not HasMixin(self, "MapBlip") then
+            InitMixin(self, MapBlipMixin)
+        end
+        
+        InitMixin(self, StaticTargetMixin)
+        InitMixin(self, InfestationTrackerMixin)
+    
+    elseif Client then
+    
+        InitMixin(self, UnitStatusMixin)
+        
+        self:InitializeSkin()
+        
+    end
+    
+    InitMixin(self, IdleMixin)
 
+end
+
+
+function CommandStation:OverrideVisionRadius()
+	return 5
+end
+
+
+function CommandStation:GetIsVulnerableToEMP()
+	return false
 end
 
 
@@ -81,9 +122,27 @@ end
 //End Team Skins
 
 
+local kHelpArrowsCinematicName = PrecacheAsset("cinematics/marine/commander_arrow.cinematic")
+local kHelpArrowsCinematicNameTeam2 = PrecacheAsset("cinematics/marine/commander_arrow_team2.cinematic")
+PrecacheAsset("models/misc/commander_arrow.model")
+PrecacheAsset("models/misc/commander_arrow_team2.model")
 
-//Overrides original
-function CommandStation:OnUpdateRender()
+if Client then
+
+    function CommandStation:GetHelpArrowsCinematicName()
+        return ConditionalValue(
+            self:GetTeamNumber() == kTeam1Index,
+            kHelpArrowsCinematicName,
+            kHelpArrowsCinematicNameTeam2
+        )
+    end
+    
+end
+
+
+local kCommandStationState = enum( { "Normal", "Locked", "Welcome" } )
+
+function CommandStation:OnUpdateRender()    //OVERRIDES
 
 	PROFILE("CommandStation:OnUpdateRender")
 
@@ -117,6 +176,11 @@ function CommandStation:OnUpdateRender()
 			
 		end
         
+        local accentColor = self:GetBaseSkinColor()
+        
+        model:SetMaterialParameter("displayColorAccentR", accentColor.r )
+        model:SetMaterialParameter("displayColorAccentG", accentColor.g )
+        model:SetMaterialParameter("displayColorAccentB", accentColor.b )
         model:SetMaterialParameter("state", state)
         
     end
@@ -125,6 +189,7 @@ end
 
 
 //-----------------------------------------------------------------------------
+
 
 if Server then
 	
@@ -150,6 +215,7 @@ if Server then
 	
 	
 end
+
 
 //-----------------------------------------------------------------------------
 

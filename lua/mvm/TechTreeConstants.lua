@@ -1,10 +1,7 @@
-// ======= Copyright (c) 2003-2012, Unknown Worlds Entertainment, Inc. All rights reserved. =======
-//
-// lua\TechTreeConstants.lua
-//
-//    Created by:   Charlie Cleveland (charlie@unknownworlds.com)
-//
-// ========= For more information, visit us at http://www.unknownworlds.com =====================
+
+
+Script.Load("lua/TechTreeConstants.lua")
+
 
 local gTechIdToString = {}
 
@@ -18,6 +15,8 @@ local function createTechIdEnum(table)
 
 end
 
+
+kTechId = nil
 kTechId = createTechIdEnum({
     
     'None', 'PingLocation',
@@ -78,6 +77,7 @@ kTechId = createTechIdEnum({
     'AdvancedWeaponry', 'ShotgunTech', 'HeavyRifleTech', 'DetonationTimeTech', 'FlamethrowerRangeTech', 'GrenadeLauncherTech', 'FlamethrowerTech', 'FlamethrowerAltTech', 'WelderTech', 'MinesTech',
     'GrenadeTech', 'ClusterGrenade', 'ClusterGrenadeProjectile', 'GasGrenade', 'GasGrenadeProjectile', 'PulseGrenade', 'PulseGrenadeProjectile',
     'DropWelder', 'DropMines', 'DropShotgun', 'DropGrenadeLauncher', 'DropFlamethrower',
+    'NerveGasCloud',
     
     // Marine buys
     'FlamethrowerAlt',
@@ -117,6 +117,8 @@ kTechId = createTechIdEnum({
     // those are available at the hive
     'ResearchBioMassOne', 'ResearchBioMassTwo', 'ResearchBioMassThree', 'ResearchBioMassFour',
 
+    'DrifterEgg', 'Drifter', 
+
     // Alien lifeforms 
     'Skulk', 'Gorge', 'Lerk', 'Fade', 'Onos', "AlienCommander", "AllAliens", "Hallucination", "DestroyHallucination",
     
@@ -128,7 +130,7 @@ kTechId = createTechIdEnum({
     'LifeFormMenu', 'SkulkMenu', 'GorgeMenu', 'LerkMenu', 'FadeMenu', 'OnosMenu',
 
     // Alien structures 
-    'Hive', 'HiveHeal', 'CragHive', 'ShadeHive', 'ShiftHive','Harvester', 'DrifterEgg', 'Drifter', 'Egg', 'Embryo', 'Hydra', 'Cyst', 'Clog', 'GorgeTunnel',
+    'Hive', 'HiveHeal', 'CragHive', 'ShadeHive', 'ShiftHive','Harvester', 'Egg', 'Embryo', 'Hydra', 'Cyst', 'Clog', 'GorgeTunnel',
     'GorgeEgg', 'LerkEgg', 'FadeEgg', 'OnosEgg',
     
     // Infestation upgrades
@@ -153,11 +155,13 @@ kTechId = createTechIdEnum({
     
     'UpgradeSkulk', 'UpgradeGorge', 'UpgradeLerk', 'UpgradeFade', 'UpgradeOnos',
     
+    'ContaminationTech', 'RuptureTech', 'BoneWallTech',
+    
     // Skulk abilities    
     'Bite', 'Sneak', 'Parasite', 'Leap', 'Xenocide',
     
     // gorge abilities
-    'Spit', 'Spray', 'BellySlide', 'BabblerTech', 'BuildAbility', 'BabblerAbility', 'Babbler', 'BabblerEgg', 'GorgeTunnelTech', 'BileBomb',  'WebTech', 'Web',
+    'Spit', 'Spray', 'BellySlide', 'BabblerTech', 'BuildAbility', 'BabblerAbility', 'Babbler', 'BabblerEgg', 'GorgeTunnelTech', 'BileBomb',  'WebTech', 'Web', 'HydraTech',
 
     // lerk abilities
     'LerkBite', 'Cling', 'Spikes', 'Umbra', 'Spores',
@@ -178,7 +182,7 @@ kTechId = createTechIdEnum({
     'Carapace', 'Regeneration', 'Aura', 'Silence', 'Feint', 'Camouflage', 'Phantom', 'Celerity', 'Adrenaline', 'HyperMutation',  
     
     // Alien alerts
-    'AlienAlertNeedHarvester', 'AlienAlertNeedMist', 'AlienAlertNeedEnzyme', 'AlienAlertNeedHealing', 'AlienAlertStructureUnderAttack', 'AlienAlertHiveUnderAttack', 'AlienAlertHiveDying', 'AlienAlertHarvesterUnderAttack',
+    'AlienAlertNeedHarvester', 'AlienAlertNeedMist', 'AlienAlertNeedDrifter', 'AlienAlertNeedHealing', 'AlienAlertStructureUnderAttack', 'AlienAlertHiveUnderAttack', 'AlienAlertHiveDying', 'AlienAlertHarvesterUnderAttack',
     'AlienAlertLifeformUnderAttack', 'AlienAlertGorgeBuiltHarvester', 'AlienCommanderEjected',
     'AlienAlertOrderComplete',
     'AlienAlertNotEnoughResources', 'AlienAlertResearchComplete', 'AlienAlertManufactureComplete', 'AlienAlertUpgradeComplete', 'AlienAlertHiveComplete',
@@ -190,7 +194,7 @@ kTechId = createTechIdEnum({
     'Infestation',
     
     // Commander abilities
-    'NutrientMist', 'Rupture', 'BoneWall', 'Contamination', 'SelectDrifter', 'HealWave', 'CragUmbra', 'ShadeInk', 'EnzymeCloud', 'Hallucinate', 'Storm',
+    'NutrientMist', 'Rupture', 'BoneWall', 'Contamination', 'SelectDrifter', 'HealWave', 'CragUmbra', 'ShadeInk', 'EnzymeCloud', 'Hallucinate', 'SelectHallucinations', 'Storm',
     
     // Alien Commander hallucinations
     'HallucinateDrifter', 'HallucinateSkulk', 'HallucinateGorge', 'HallucinateLerk', 'HallucinateFade', 'HallucinateOnos',
@@ -206,20 +210,4 @@ kTechId = createTechIdEnum({
     // Maximum index
     'Max'
     
-    })
-    
-function StringToTechId(string)
-    return gTechIdToString[string] or kTechId.None
-end    
-
-// Increase techNode network precision if more needed
-kTechIdMax  = kTechId.Max
-
-// Tech types
-kTechType = enum({ 'Invalid', 'Order', 'Research', 'Upgrade', 'Action', 'Buy', 'Build', 'EnergyBuild', 'Manufacture', 'Activation', 'Menu', 'EnergyManufacture', 'PlasmaManufacture', 'Special', 'Passive' })
-
-// Button indices
-kRecycleCancelButtonIndex   = 12
-kMarineUpgradeButtonIndex   = 5
-kAlienBackButtonIndex       = 8
-
+})

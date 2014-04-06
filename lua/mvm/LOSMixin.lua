@@ -43,9 +43,31 @@ local function MvM_UpdateLOS(self)
 end
 
 
-if Server then
+function LOSMixin:__initmixin()
 
-//-------------------------------------
+    if Server then
+    
+        self.sighted = false
+        self.lastTimeLookedForEnemies = 0
+        self.updateLOS = true
+        self.timeLastLOSUpdate = 0
+        self.dirtyLOS = true
+        self.timeLastLOSDirty = 0
+        self.prevLOSorigin = Vector(0,0,0)
+    
+        self:SetIsSighted(false)
+        
+        MvM_UpdateLOS(self)
+        
+        self.oldSighted = true
+        self.lastViewerId = Entity.invalidId
+        
+    end
+    
+end
+
+
+if Server then
 
 	
 	local function GetCanSee(viewer, entity)
@@ -265,6 +287,14 @@ if Server then
     end
 	
 	
+	function LOSMixin:OnTeamChange()
+    
+        MvM_UpdateLOS(self)
+        self:SetIsSighted(false)
+        
+    end
+	
+	
 	function LOSMixin:OnUpdate(deltaTime)
         MvM_SharedUpdate(self, deltaTime)
     end
@@ -316,21 +346,4 @@ if Server then
 
 
 end	//Server
-
-
-//-----------------------------------------------------------------------------
-
-
-if Server then
-	
-	//WEIRD: Apparently using Lua upvalues prevent actual execution or it is handled differently
-	// uncomment below with print statement in MvM_SharedUpdate via upvalues, and print won't work...muh?
-	//ReplaceLocals( LOSMixin.OnUpdate , { SharedUpdate = MvM_SharedUpdate } )
-	//ReplaceLocals( LOSMixin.OnProcessMove , { SharedUpdate = MvM_SharedUpdate } )
-	ReplaceLocals( LOSMixin.OnTeamChange , { UpdateLOS = MvM_UpdateLOS } )
-	
-end
-
-ReplaceLocals( LOSMixin.__initmixin , { UpdateLOS = MvM_UpdateLOS } )
-
 

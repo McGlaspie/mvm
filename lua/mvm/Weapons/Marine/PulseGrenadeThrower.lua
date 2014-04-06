@@ -1,5 +1,5 @@
 
-
+Script.Load("lua/mvm/Weapons/Marine/GrenadeThrower.lua")
 Script.Load("lua/mvm/Weapons/Marine/PulseGrenade.lua")
 
 

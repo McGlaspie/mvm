@@ -9,10 +9,6 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
-kWorkersPerTechpoint = 5
-
-kArcsPerTechpoint = 3
-
 
 kPoisonDamageThreshhold = 5
 
@@ -51,7 +47,7 @@ kArmoryWeaponAttachRange = 10
 // Minimum distance that initial IP spawns away from team location
 kInfantryPortalMinSpawnDistance = 4
 
-kItemStayTime = 20	//30
+kItemStayTime = 25	//30
 
 // For power points
 kMarineRepairHealthPerSecond = 600
@@ -131,7 +127,7 @@ kNumMines = 3
 kMineActiveTime = 3	//4
 kMineAlertTime = 8
 kMineDetonateRange = 4.5
-kMineTriggerRange = 1.5
+kMineTriggerRange = 2	//1.5
 
 // Onos
 kGoreMarineFallTime = 1
@@ -198,10 +194,10 @@ kOnosBackBackwardSpeedScalar = .2
 
 
 kPistolWeight = 0.08
-kRifleWeight = 0.11				//.13
-kGrenadeLauncherWeight = 0.18
-kFlamethrowerWeight = 0.2		//.25
-kShotgunWeight = 0.14			
+kRifleWeight = 0.10				//.13
+kGrenadeLauncherWeight = 0.2
+kFlamethrowerWeight = 0.18		//.25
+kShotgunWeight = 0.11			//0.14			
 
 
 // set to -1 to disable or a positive number

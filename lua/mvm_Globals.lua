@@ -13,7 +13,6 @@ kTeam2Name = "Gold Team"
 
 //TODO Remove below
 kInventoryIconsTexture = "ui/inventory_icons.dds"
-kInventoryIconsTextureTeam2 = "ui/inventory_icons_team2.dds"
 
 
 //MvM: Change later for Team Directives, or add new
@@ -21,6 +20,7 @@ kInventoryIconsTextureTeam2 = "ui/inventory_icons_team2.dds"
 kAIMoveOrderCompleteDistance = 0.01
 kPlayerMoveOrderCompleteDistance = 1.5
 
+kMaxRelevancyDistance = 50	//NS2 40 - This WILL have performance impact
 
 kPlayerLOSDistance = 30		//NS2: 20	????: Performance hit through blips?
 kStructureLOSDistance = 5	//NS2 3.5
@@ -58,22 +58,43 @@ kIconColors = {
 }
 
 
-kMinimapBlipType = enum( 
-	{
-		'Undefined', 'TechPoint', 'ResourcePoint', 'Scan', 'EtherealGate', 'HighlightWorld',
-		'Sentry', 'CommandStation',
-        'Extractor', 'InfantryPortal', 'Armory', 'AdvancedArmory', 'PhaseGate', 'Observatory',
-        'RoboticsFactory', 'ArmsLab', 'PrototypeLab',
-        'Hive', 'Harvester', 'Hydra', 'Egg', 'Embryo', 'Crag', 'Whip', 'Shade', 'Shift', 'Shell', 'Veil', 'Spur', 'TunnelEntrance',
-        'Marine', 'JetpackMarine', 'Exo', 'Skulk', 'Lerk', 'Onos', 'Fade', 'Gorge',
-        'Door', 'PowerPoint', 'DestroyedPowerPoint',
-        'ARC', 'Drifter', 'MAC', 'Infestation', 'InfestationDying', 'MoveOrder', 'AttackOrder', 'BuildOrder', 'SensorBlip', 'SentryBattery' 
-	} 
-)
+kMinimapBlipType = enum({
+	'Undefined', 'TechPoint', 'ResourcePoint', 'Scan', 'EtherealGate', 'HighlightWorld',
+	'Sentry', 'CommandStation',
+	'Extractor', 'InfantryPortal', 'Armory', 'AdvancedArmory', 'PhaseGate', 'Observatory',
+	'RoboticsFactory', 'ArmsLab', 'PrototypeLab',
+	'Hive', 'Harvester', 'Hydra', 'Egg', 'Embryo', 'Crag', 'Whip', 'Shade', 'Shift', 'Shell', 'Veil', 'Spur', 'TunnelEntrance',
+	'Marine', 'JetpackMarine', 'Exo', 'Skulk', 'Lerk', 'Onos', 'Fade', 'Gorge',
+	'Door', 'PowerPoint', 'DestroyedPowerPoint',
+	'ARC', 'Drifter', 'MAC', 'Infestation', 'InfestationDying', 'MoveOrder', 'AttackOrder', 'BuildOrder', 'SensorBlip', 'SentryBattery' 
+})
 
+kMinimapBlipTeam = enum({
+	'Friendly', 'Enemy', 'Neutral', 
+	'Alien', 'Marine', 
+	'FriendAlien', 'FriendMarine', 
+	'InactiveAlien', 'InactiveMarine' 
+})
 
+//FIXME change IsPulsed to Shocked
 kGameEffect = CreateBitMask( {"InUmbra", "Fury", "Cloaked", "Parasite", "NearDeath", "OnFire", "OnInfestation", "Beacon", "Energize", "IsPulsed" } )
 kGameEffectMax = bit.lshift( 1, GetBitMaskNumBits(kGameEffect) )
+
+
+
+// Death message indices 
+kDeathMessageIcon = enum( { 
+	'None', 
+	'Rifle', 'RifleButt', 'Pistol', 'Axe', 'Shotgun',
+	'Flamethrower', 'ARC', 'Grenade', 'Sentry', 'Welder',
+	'Bite', 'HydraSpike', 'Spray', 'Spikes', 'Parasite',
+	'SporeCloud', 'Swipe', 'BuildAbility', 'Whip', 'BileBomb',
+	'Mine', 'Gore', 'Spit', 'Jetpack', 'Claw',
+	'Minigun', 'Vortex', 'LerkBite', 'Umbra', 
+	'Xenocide', 'Blink', 'Leap', 'Stomp',
+	'Consumed', 'GL', 'Recycled', 'Babbler', 'Railgun', 'BabblerAbility', 'GorgeTunnel', 'BoneShield',
+	'ClusterGrenade', 'GasGrenade', 'PulseGrenade', 'Stab', 'WhipBomb',
+})
 
 
 
@@ -82,21 +103,12 @@ kGameEffectMax = bit.lshift( 1, GetBitMaskNumBits(kGameEffect) )
 // This file is only here to separate these settings into its own file.
 // Typically for most mods, these settings would be placed in Global.lua
 //
-/*
-kTeam1_BaseColor = Color(0.078, 0.878, 0.984, 1)
-kTeam1_AccentColor = Color(0.756, 0.982, 1, 1)
-kTeam1_TrimColor = Color(0.725, 0.921, 0.949, 1)
-
-kTeam2_BaseColor = Color(0.61, 0.43, 0.16, 1)
-kTeam2_AccentColor = Color(1.0, 0.0, 0.0, 1)
-kTeam2_TrimColor = Color(0.576, 0.194, 0.011, 1)
-*/
-kTeam1_BaseColor = Color(0.040, 0.058, 0.087, 1)
+kTeam1_BaseColor = Color(0.042, 0.06, 0.095, 1)
 //kTeam1_BaseColor = Color(0.048, 0.178, 0.484, 1)
 kTeam1_AccentColor = Color(0.756, 0.982, 1, 1)
 kTeam1_TrimColor = Color(0.725, 0.921, 0.949, 1)
 
-kTeam2_BaseColor = Color(0.139, 0.073, 0.005, 1)
+kTeam2_BaseColor = Color(0.14, 0.074, 0.015, 1)
 kTeam2_AccentColor = Color(1.0, 0.0, 0.0, 1)
 kTeam2_TrimColor = Color(0.179, 0.141, 0.095, 1)
 

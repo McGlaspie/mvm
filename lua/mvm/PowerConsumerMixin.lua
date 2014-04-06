@@ -10,11 +10,13 @@ local unpoweredColor = Color( 0, 0, 0, 1 )
 
 function PowerConsumerMixin:OnUpdate( deltaTime )
 	
-	self.powerSurge = self.timePowerSurgeEnds > Shared.GetTime()
+	if Server then
+        self.powerSurge = self.timePowerSurgeEnds > Shared.GetTime()
+    end
 	
 	if Client and HasMixin(self, "ColoredSkins") then
 		
-		if not self:isa("Sentry") and not self:isa("SentryBattery") and not self:isa("Player") then
+		if not self:isa("Sentry") and not self:isa("Player") then
 			
 			self.skinAccentColor = ConditionalValue(
 				self:GetIsPowered(),
@@ -35,13 +37,11 @@ function PowerConsumerMixin:OnUpdateRender()
 		
         if not self.timeLastPowerSurgeEffect or self.timeLastPowerSurgeEffect + 1 < Shared.GetTime() then
 			
-			local surgeEffect = ConditionalValue(
-				self:GetTeamNumber() == kTeam2Index,
-				"power_surge_team2",
-				"power_surge"
-			)
+			local surgeEffectTeam = self:GetTeamNumber()
 			
-			self:TriggerEffects( surgeEffect )
+			self:TriggerEffects( "power_surge", {
+                ismarine = ( surgeEffectTeam == kTeam1Index ), isalien = ( surgeEffectTeam == kTeam2Index )
+            })
 			
             self.timeLastPowerSurgeEffect = Shared.GetTime()
         

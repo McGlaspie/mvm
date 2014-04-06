@@ -132,7 +132,11 @@ function DetectableMixin:__initmixin()
         self.timeLastDetectEffect = 0
         self.clientDetected = false
         
+        self.reduceViewModelFx = false
+        self.detectedFxTeamParam = kTeamReadyRoom
+        
     end
+    
     
 end
 
@@ -185,21 +189,38 @@ function DetectableMixin:SetDetected(state)
         self.timeWasDetected = nil
     end
     
+    if Client then
+		self.detectedFxTeamParam = self:GetTeamNumber()
+		self.reduceViewModelFx = ( self.detected and self:isa("Exo") )
+	end
+    
 end
 
 function DetectableMixin:OnUpdateRender()
 
     PROFILE("DetectableMixin:OnUpdateRender")
-    
+	
     if self:isa("Player") and self:GetIsLocalPlayer() then
     
         local viewModelEnt = self:GetViewModelEntity()
         local viewModel = viewModelEnt and viewModelEnt:GetRenderModel()
         
         if viewModel then
-        
+			
             if not self.detectedMaterial then
                 self.detectedMaterial = AddMaterial(viewModel, kDetectedMaterialName)
+            end
+            
+            if self.detectedFxTeamParam == kTeam1Index then
+				self.detectedMaterial:SetParameter( "teamNumber" , 1.0 )
+            else
+				self.detectedMaterial:SetParameter( "teamNumber" , 2.0 )
+            end
+            
+            if self.reduceViewModelFx then
+				self.detectedMaterial:SetParameter( "reduceFx", 1.0 )	//Hack, tone FX down for Exos
+			else
+				self.detectedMaterial:SetParameter( "reduceFx", 0.0 )
             end
             
             if self.clientDetected ~= self:GetIsDetected() then

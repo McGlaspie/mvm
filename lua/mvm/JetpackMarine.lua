@@ -1,28 +1,39 @@
 
-
-//Script.Load("lua/mvm/FireMixin.lua")
-Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+Script.Load("lua/mvm/Marine.lua")
 
 
-local newNetworkVars = {}
+local newNetworkVars = {
+	jetpackFuel = "float (0 to 1 by 0.01)"
+}
 
 
 //TODO Move below into Balance file(s)?
-JetpackMarine.kJetpackFuelReplenishDelay = .8	//.7
-JetpackMarine.kJetpackGravity = -11		//-12
+
+JetpackMarine.kJetpackFuelReplenishDelay = .8		//.7
+
+//FIXME Below values are NOT used
 JetpackMarine.kVerticalThrustAccelerationMod = 2
-JetpackMarine.kVerticalFlyAccelerationMod = 1.5	//1.45
-JetpackMarine.kJetpackAcceleration = 17.5		//16
+JetpackMarine.kVerticalFlyAccelerationMod = 1.5		//1.45
+JetpackMarine.kJetpackAcceleration = 17.5			//16
+
+JetpackMarine.kJetpackGravity = -11					//-16
+JetpackMarine.kJetpackTakeOffTime = .39
 
 JetpackMarine.kJetpackArmorBonus = kJetpackArmor
 
-JetpackMarine.kJetpackTakeOffTime = .25		//.39
+JetpackMarine.kJetpackTakeOffTime = .25				//.39
 
-JetpackMarine.kFlySpeed = 9	//8
+JetpackMarine.kFlySpeed = 9
+/*
+Actual used from vanilla, velocity and acceleration are locals in self:ModifyVelocity()
+JetpackMarine.kJetpackFuelReplenishDelay = .4
+JetpackMarine.kJetpackGravity = -16
+JetpackMarine.kJetpackTakeOffTime = .39
 
-
-
-AddMixinNetworkVars( ElectroMagneticMixin, newNetworkVars )
+local kFlySpeed = 9
+local kFlyFriction = 0.0
+local kFlyAcceleration = 28
+*/
 
 
 //-----------------------------------------------------------------------------
@@ -31,40 +42,27 @@ AddMixinNetworkVars( ElectroMagneticMixin, newNetworkVars )
 local orgJpMarineCreate = JetpackMarine.OnCreate
 function JetpackMarine:OnCreate()
 
-	orgJpMarineCreate( self )
+	Marine.OnCreate(self)
+    
+    self.jetpackMode = JetpackMarine.kJetpackMode.Disabled
+    
+    self.jetpackLoopId = Entity.invalidId
 	
-	InitMixin( self, ElectroMagneticMixin )
+	if Server then
+		self.jetpackFuel = 1	//Full tank
+	end
 	
 end
 
 local orgJpMarineInit = JetpackMarine.OnInitialized
 function JetpackMarine:OnInitialized()
 
-	orgJpMarineInit( self )	
+	orgJpMarineInit( self )
 	
 end
 
 
-function JetpackMarine:GetAirFrictionForce()
-    return .5
-end
-
-function JetpackMarine:GetAcceleration()
-
-    local acceleration = 0
-
-    if self:GetIsJetpacking() then
-
-        acceleration = JetpackMarine.kJetpackAcceleration
-        acceleration = acceleration * self:GetInventorySpeedScalar()
-
-    else
-        acceleration = Marine.GetAcceleration(self)
-    end
-    
-    return acceleration * self:GetSlowSpeedModifier()
-    
-end
+//???? Add modifyvelocity func?
 
 
 function JetpackMarine:GetMaxBackwardSpeedScalar()
@@ -73,37 +71,58 @@ function JetpackMarine:GetMaxBackwardSpeedScalar()
         return 1
     end
 
-    return 0.85	//FIXME Move to BalanceMisc
+    return 0.85	//TODO Move to BalanceMisc
     
 end
 
 
-function JetpackMarine:GetIsVulnerableToEMP()
+function JetpackMarine:GetIsVulnerableToEMP()	//OVERRIDES Marine
 	return true
 end
 
+
 function JetpackMarine:OnEmpDamaged()
-	Print("JP Marine EMP Dmged")
+	//TODO trigger JP sputter/choke sound
 end
 
-function JetpackMarine:GetFuel()	//OVERRIDES
 
+function JetpackMarine:GetFuel()	//OVERRIDES
+	
+	//Moving out of pure server allows update to happen
+	//but unsure if this will allow for consistent behavior
+	
+	local fuelRechargePrevent = ( self:GetIsUnderEmpEffect() or self:GetIsOnFire() )
 	local deltaTime = Shared.GetTime() - self.timeJetpackingChanged
+	local rate = -kJetpackUseFuelRate
+	local fuel = self.jetpackFuel
+	
+	if not self.jetpacking then
+		
+		rate = kJetpackReplenishFuelRate
+		deltaTime = math.max( 0, deltaTime - JetpackMarine.kJetpackFuelReplenishDelay )
+		
+	end
+	
+	if fuelRechargePrevent and rate == kJetpackReplenishFuelRate then
+		self.jetpackFuel = Clamp( self.jetpackFuelOnChange, 0, 1 )
+	else
+		self.jetpackFuel = Clamp( self.jetpackFuelOnChange + (rate * deltaTime), 0, 1 )
+	end
+	
+	
+	/* Org
+	local dt = Shared.GetTime() - self.timeJetpackingChanged
     local rate = -kJetpackUseFuelRate
     
     if not self.jetpacking then
-		
-		rate = ConditionalValue(
-			( self:GetIsUnderEmpEffect() or self:GetIsOnFire() ),
-			0,
-			kJetpackReplenishFuelRate
-		)
-        
-        deltaTime = math.max( 0, deltaTime - JetpackMarine.kJetpackFuelReplenishDelay )
-        
+        rate = kJetpackReplenishFuelRate
+        dt = math.max(0, dt - JetpackMarine.kJetpackFuelReplenishDelay)
     end
-    
-    return Clamp( self.jetpackFuelOnChange + rate * deltaTime, 0, 1 )
+    return Clamp(self.jetpackFuelOnChange + rate * dt, 0, 1)
+	
+	*/
+	
+	return self.jetpackFuel
 
 end
 
