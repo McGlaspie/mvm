@@ -19,7 +19,7 @@ kExosuitHealth = 100	kExosuitArmor = 300	kExosuitPointValue = 25
 kMarineWeaponHealth = 400
 
 kArmorPerUpgradeLevel = 20
-kExosuitArmorPerUpgradeLevel = 125
+kExosuitArmorPerUpgradeLevel = 100
 kArmorHealScalar = 1
 
 kBuildPointValue = 5

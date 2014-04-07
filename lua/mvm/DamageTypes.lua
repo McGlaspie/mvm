@@ -10,7 +10,8 @@ kDamageType = enum({	//OVERRIDES
 	'Normal', 'Light', 'Heavy', 'Puncture', 'Structural', 
 	'StructuralHeavy', 'Splash', 'Gas', 'NerveGas', 'StructuresOnly', 
 	'Falling', 'Door', 'Flame', 'Infestation', 'Corrode', 'ArmorOnly', 
-	'Biological', 'StructuresOnlyLight', 'Spreading', 'ElectroMagnetic'
+	'Biological', 'StructuresOnlyLight', 'Spreading', 'ElectroMagnetic',
+	'Melee'
 })
 
 
@@ -32,7 +33,8 @@ kDamageTypeDesc = {		//OVERRIDES
     "StructuresOnlyLight: Damages structures only, light damage.",
     "Splash: same as structures only but always affects ARCs (friendly fire).",
     "Spreading: Does less damage against small targets.",
-    "ElectroMagnetic Damage: Disrupts smaller structures and Mechanized Units"
+    "ElectroMagnetic Damage: Disrupts smaller structures and Mechanized Units",
+    "Melee: Special damage type for attacks that is reduced for structures"
 }
 
 
@@ -53,6 +55,8 @@ kFlameableMultiplier = 2.5
 kElectroMagneticMultiplier = 2.5
 kCorrodeDamagePlayerArmorScalar = 0.23
 kCorrodeDamageExoArmorScalar = 0.3
+
+kReduceForStructuresScalar = 0.25
 
 
 // deal only 33% of damage to friendlies
@@ -234,6 +238,14 @@ local function ReduceGreatlyForPlayers(target, attacker, doer, damage, armorFrac
         damage = damage * kCorrodeDamageExoArmorScalar
     elseif target:isa("Player") then
         damage = damage * kCorrodeDamagePlayerArmorScalar
+    end
+    return damage, armorFractionUsed, healthPerArmor
+end
+
+
+local function ReduceGreatlyForStructures(target, attacker, doer, damage, armorFractionUsed, healthPerArmor, damageType, hitPoint)
+    if target:isa("Structure") then
+        damage = damage * kReduceForStructuresScalar
     end
     return damage, armorFractionUsed, healthPerArmor
 end
@@ -451,6 +463,10 @@ local function BuildDamageTypeRules()
 	table.insert( kDamageTypeRules[kDamageType.ElectroMagnetic], IgnoreHealthForPlayersUnlessExo )
     // ------------------------------
     
+    // Melee Damage Rules
+	kDamageTypeRules[kDamageType.Melee] = {}
+    table.insert( kDamageTypeRules[kDamageType.Melee], ReduceGreatlyForStructures )
+    // ------------------------------
 
 end
 

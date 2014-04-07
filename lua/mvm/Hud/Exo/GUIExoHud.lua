@@ -13,6 +13,7 @@ local kSheet1 = PrecacheAsset("ui/exosuit_HUD1.dds")
 local kSheet2 = PrecacheAsset("ui/exosuit_HUD2.dds")
 local kSheet3 = PrecacheAsset("ui/exosuit_HUD3.dds")
 local kSheet4 = PrecacheAsset("ui/exosuit_HUD4.dds")
+local kCrosshair = PrecacheAsset("ui/exo_crosshair.dds")
 
 local kTargetingReticuleCoords = { 185, 0, 354, 184 }
 
@@ -26,6 +27,7 @@ local kInnerRingCoords = { 0, 316, 330, 646 }
 local kOuterRingCoords = { 0, 0, 800, 490 }
 
 local kCrosshairCoords = { 495, 403, 639, 547 }
+local kCrosshairSize = Vector(64, 64, 0)
 
 local kTrackEntityDistance = 30
 
@@ -114,14 +116,21 @@ function GUIExoHUD:Initialize()
     self.background:AddChild(self.outerRing)
     
     self.crosshair = GUIManager:CreateGraphicItem()
-    self.crosshair:SetTexture(kSheet1)
-    self.crosshair:SetColor( ui_baseColor )
-    self.crosshair:SetTexturePixelCoordinates(unpack(kCrosshairCoords))
-    size = CoordsToSize(kCrosshairCoords)
-    self.crosshair:SetSize(size)
+    self.crosshair:SetTexture(kCrosshair)
+    self.crosshair:SetSize(kCrosshairSize)
+    self.crosshair:SetAnchor(GUIItem.Middle, GUIItem.Center)
+    self.crosshair:SetPosition(Vector(-kCrosshairSize.x / 2, -kCrosshairSize.y / 2, 0))
     self.crosshair:SetLayer(kGUILayerPlayerHUDForeground1)
-    self.crosshair:SetIsVisible(false)
     self.background:AddChild(self.crosshair)
+    
+    self.targetcrosshair = GUIManager:CreateGraphicItem()
+    self.targetcrosshair:SetTexture(kSheet1)
+    self.targetcrosshair:SetTexturePixelCoordinates(unpack(kCrosshairCoords))
+    size = CoordsToSize(kCrosshairCoords)
+    self.targetcrosshair:SetSize(size)
+    self.targetcrosshair:SetLayer(kGUILayerPlayerHUDForeground1)
+    self.targetcrosshair:SetIsVisible(false)
+    self.background:AddChild(self.targetcrosshair)
     
     self.targets = { }
     
@@ -254,15 +263,15 @@ local function UpdateTargets(self)
     
     if closestToCrosshair ~= nil and closestDistToCrosshair < 50 then
     
-        self.crosshair:SetIsVisible(true)
+        self.targetcrosshair:SetIsVisible(true)
         local size = CoordsToSize(kCrosshairCoords) * (0.75 + (0.25 * ((math.sin(Shared.GetTime() * 7) + 1) / 2)))
         local scaledSize = size * closestToCrosshairScale
-        self.crosshair:SetSize(scaledSize)
-        self.crosshair:SetPosition(closestToCrosshair - scaledSize / 2)
-        self.crosshair:SetColor(Color(1, 1, 1, closestToCrosshairOpacity))
+        self.targetcrosshair:SetSize(scaledSize)
+        self.targetcrosshair:SetPosition(closestToCrosshair - scaledSize / 2)
+        self.targetcrosshair:SetColor(Color(1, 1, 1, closestToCrosshairOpacity))
         
     else
-        self.crosshair:SetIsVisible(false)
+        self.targetcrosshair:SetIsVisible(false)
     end
     
 end

@@ -29,8 +29,8 @@ local kMinigunSpread = Math.Radians(5)
 
 local kBulletSize = 0.03
 
-local kHeatUpRate = 0.3		//0.2
-local kDualGunHeatUpRate = 0.2	//0.15
+local kHeatUpRate = 0.35		//0.2
+local kDualGunHeatUpRate = 0.15	//0.15
 local kCoolDownRate = 0.4
 
 local kMinigunMovementSlowdown = 0.6
