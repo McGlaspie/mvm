@@ -7,6 +7,8 @@ Script.Load("lua/mvm/LiveMixin.lua")
 local newNetworkVars = {}
 
 local kNumberOfVariants = 3
+local kRange = 100
+local kButtRange = 1.1
 
 
 //-----------------------------------------------------------------------------
@@ -32,6 +34,25 @@ end
 
 function Rifle:GetSpread()
     return ClipWeapon.kCone4Degrees	//3		//Move to Balance
+end
+
+
+function Rifle:GetDamageType()	//doesn't seem to do damned thing, not called
+	
+	if self:GetSecondaryAttacking() then
+		return kRifleMeleeDamageType
+	end
+	
+	return kRifleDamageType
+
+end
+
+function Rifle:PerformMeleeAttack(player)
+
+    player:TriggerEffects("rifle_alt_attack")
+    
+    AttackMeleeCapsule(self, player, kRifleMeleeDamage, kButtRange, nil, true)
+    
 end
 
 

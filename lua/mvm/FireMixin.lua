@@ -46,15 +46,7 @@ end
 
 function FireMixin:SetOnFire( attacker, doer )
 
-	if ( self:isa("Exo") or self:isa("Exosuit") ) then
-		//Print("Exo - FireMixin:SetOnFire()")
-	end
-
 	if Server and not self:GetIsDestroyed() then
-    
-		if ( self:isa("Exo") or self:isa("Exosuit") ) then
-			//Print("[Server] Exo - FireMixin:SetOnFire()")
-		end
     
         if not self:GetCanBeSetOnFire() then
             return
@@ -72,10 +64,6 @@ function FireMixin:SetOnFire( attacker, doer )
         
         self.timeBurnInit = Shared.GetTime()
         self.isOnFire = true
-        
-        if ( self:isa("Exo") or self:isa("Exosuit") ) and not self.isOnFire then
-			//Print("[Server]\t Failed to set Exo on fire!")
-		end
         
     end	
 
@@ -114,7 +102,7 @@ function UpdateFireMaterial(self)
                 self.viewFireMaterial:SetMaterial("cinematics/vfx_materials/burning_view.material")
                 
                 if self:isa("Exo") then
-					self.viewFireMaterial:SetParameter( "opacityOverride", 0.025 )
+					self.viewFireMaterial:SetParameter( "opacityOverride", 0.02 )
                 end
                 
                 viewModel:AddMaterial(self.viewFireMaterial)
@@ -157,10 +145,9 @@ local function MvM_SharedUpdate(self, deltaTime)
                 damageOverTime = damageOverTime * kFlameableMultiplier
             end
             
-            //if self:isa("Exo") or self:isa("Exosuit") then
-				//Print("FireMixin:MvM_SharedUpdate() - Reduced fire DOT to Exo")
-				//damageOverTime = damageOverTime * kBurnDamageExoReduction
-            //end
+            if self:isa("Exo") or self:isa("Exosuit") then
+				damageOverTime = damageOverTime * kBurnDamageExoReduction
+            end
             
             local attacker = nil
             if self.fireAttackerId ~= Entity.invalidId then

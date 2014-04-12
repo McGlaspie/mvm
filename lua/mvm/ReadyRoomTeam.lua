@@ -1,7 +1,9 @@
 
+Script.Load("lua/mvm/ReadyRoomPlayer.lua")
 
 
 //-----------------------------------------------------------------------------
+
 
 function ReadyRoomTeam:GetRespawnMapName(player)
 
@@ -80,4 +82,6 @@ end
 
 //-----------------------------------------------------------------------------
 
+
 Class_Reload("ReadyRoomTeam", {})
+

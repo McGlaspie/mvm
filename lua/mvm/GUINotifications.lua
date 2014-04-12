@@ -30,6 +30,7 @@ GUINotifications.kTooltipTextColor = Color(1, 1, 1, 1)
 // Score popup constants.
 GUINotifications.kScoreDisplayFontName = "fonts/AgencyFB_medium.fnt"
 GUINotifications.kScoreDisplayTextColor = Color(0.75, 0.75, 0.1, 1)
+GUINotifications.kScoreDisplayKillTextColor = Color(0.1, 1, 0.1, 1)
 GUINotifications.kScoreDisplayFontHeight = 80
 GUINotifications.kScoreDisplayMinFontHeight = 50
 GUINotifications.kScoreDisplayYOffset = -96
@@ -68,6 +69,12 @@ function GUINotifications:Initialize()
     self:InitializeTooltip()
     
     self:InitializeScoreDisplay()
+    
+    if PlayerUI_GetTeamNumber() == kTeam2Index then
+        self:EnableAlienStyle()
+    else
+        self:EnableMarineStyle()
+    end
 
 end
 
@@ -79,7 +86,7 @@ function GUINotifications:EnableMarineStyle()
     self.locationText:SetFontName( GUINotifications.kMarineFont )
     self.tooltipBackground:SetColor(Color(1,1,1,0))
     self.tooltipText:SetColor(GUINotifications.kMarineColor)
-    self.scoreDisplay:SetColor(GUINotifications.kMarineColor)
+    //self.scoreDisplay:SetColor(GUINotifications.kMarineColor)
     self.tooltipBackground:SetAnchor(GUIItem.Middle, GUIItem.Bottom)
     local currentWidth = self.tooltipBackground:GetSize().x
     self.tooltipBackground:SetPosition(Vector(-currentWidth / 2, GUINotifications.kTooltipMarineYOffset, 0))
@@ -99,7 +106,7 @@ function GUINotifications:EnableAlienStyle()
     self.locationText:SetFontName( GUINotifications.kMarineFont )
     self.tooltipBackground:SetColor( Color(1,1,1,0) )
     self.tooltipText:SetColor( kGUI_HealthBarColors[kTeam2Index] )
-    self.scoreDisplay:SetColor( kGUI_HealthBarColors[kTeam2Index] )
+    //self.scoreDisplay:SetColor( kGUI_HealthBarColors[kTeam2Index] )
     self.tooltipBackground:SetAnchor(GUIItem.Middle, GUIItem.Bottom)
     local currentWidth = self.tooltipBackground:GetSize().x
     self.tooltipBackground:SetPosition(Vector(-currentWidth / 2, GUINotifications.kTooltipMarineYOffset, 0))
@@ -188,7 +195,7 @@ function GUINotifications:InitializeScoreDisplay()
     self.scoreDisplay:SetPosition(Vector(0, GUINotifications.kScoreDisplayYOffset, 0))
     self.scoreDisplay:SetTextAlignmentX(GUIItem.Align_Center)
     self.scoreDisplay:SetTextAlignmentY(GUIItem.Align_Center)
-    self.scoreDisplay:SetColor( GUINotifications.kScoreDisplayTextColor )
+    //self.scoreDisplay:SetColor( GUINotifications.kScoreDisplayTextColor )
     self.scoreDisplay:SetIsVisible(false)
     
     self.scoreDisplayPopupTime = 0
@@ -248,9 +255,11 @@ local function UpdateScoreDisplay(self, deltaTime)
         
     end
     
-    local newScore, resAwarded = ScoreDisplayUI_GetNewScore()
-    if newScore > 0 then
     
+    local newScore, resAwarded, wasKill = MvM_ScoreDisplayUI_GetNewScore()
+    
+    if newScore > 0 then
+		
         // Restart the animation sequence.
         self.scoreDisplayPopupTime = GUINotifications.kScoreDisplayPopTimer
         self.scoreDisplayPopdownTime = 0
@@ -264,7 +273,13 @@ local function UpdateScoreDisplay(self, deltaTime)
         
         self.scoreDisplay:SetText(string.format("+%s%s", tostring(newScore), resAwardedString))
         self.scoreDisplay:SetScale(Vector(0.5, 0.5, 0.5))
-        self.scoreDisplay:SetColor(GUINotifications.kScoreDisplayTextColor)
+        
+        if wasKill then
+			self.scoreDisplay:SetColor( GUINotifications.kScoreDisplayKillTextColor )
+		else
+			self.scoreDisplay:SetColor( GUINotifications.kScoreDisplayTextColor )
+		end
+		
         self.scoreDisplay:SetIsVisible(true)
         
     end
@@ -295,13 +310,16 @@ function GUINotifications:Update(deltaTime)
     
     self:UpdateTeamColors()
     
+    self.locationText:SetIsVisible(false)
+    /*
     // The commander has their own location text.
-    if PlayerUI_IsACommander() or PlayerUI_IsOnMarineTeam() then
-        self.locationText:SetIsVisible(false)
+    if PlayerUI_IsACommander() then	// or PlayerUI_IsOnMarineTeam()
+        
     else
         self.locationText:SetIsVisible(true)
         self.locationText:SetText(PlayerUI_GetLocationName())
     end
+    */
     
     if PlayerUI_GetTeamNumber() == kTeam1Index then
         self:EnableMarineStyle()

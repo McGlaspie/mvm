@@ -2,6 +2,7 @@
 
 Script.Load("lua/NS2ConsoleCommands_Server.lua")
 
+
 //-----------------------------------------------------------------------------
 
 
@@ -125,6 +126,40 @@ local function OnCommandShockAll(client)
 end
 
 
+local function MvM_OnCommandDistressBeacon(client, whichTeam)
 
+    if Shared.GetCheatsEnabled() then
+		
+		local targetTeam = tonumber(whichTeam)
+		assert( type(targetTeam) == "number" )
+		
+		local player = client:GetControllingPlayer()  
+		local forTeam = ConditionalValue(
+			targetTeam == kTeam1Index or targetTeam == kTeam2Index,
+			targetTeam,
+			player:GetTeamNumber()
+		)
+		
+        local ent = GetNearest( player:GetOrigin(), "Observatory", forTeam )
+        
+        if ent and ent.TriggerDistressBeacon then
+			Print("Beacon triggered for Team " .. tostring(forTeam) )
+            ent:TriggerDistressBeacon()
+        end
+        
+    end
+
+end
+
+
+local function MvM_Spectate(player)    
+end
+
+
+//ReplaceLocals( _G[OnCommandSpectate], { Spectate = MvM_Spectate } )
+
+
+//Event.Hook( "Console_spectate", MvM_OnCommandSpectate )
 Event.Hook( "Console_spawnd", MvM_OnCommandSpawn )
+Event.Hook( "Console_bacond", MvM_OnCommandDistressBeacon )
 Event.Hook( "Console_shockall", OnCommandShockAll )

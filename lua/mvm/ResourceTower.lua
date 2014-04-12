@@ -4,6 +4,7 @@ Script.Load("lua/mvm/TeamMixin.lua")
 Script.Load("lua/mvm/SelectableMixin.lua")
 Script.Load("lua/mvm/LOSMixin.lua")
 Script.Load("lua/mvm/ConstructMixin.lua")
+Script.Load("lua/mvm/RagdollMixin.lua")
 
 //-----------------------------------------------------------------------------
 

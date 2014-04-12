@@ -664,7 +664,20 @@ function BuildTechData()	//OVERRIDES
         
         { [kTechDataId] = kTechId.FlamethrowerTech,      [kTechDataCostKey] = kFlamethrowerTechResearchCost,     [kTechDataResearchTimeKey] = kFlamethrowerTechResearchTime, [kTechDataDisplayName] = "RESEARCH_FLAMETHROWERS", [kTechDataTooltipInfo] =  "FLAMETHROWER_TECH_TOOLTIP"},
         { [kTechDataId] = kTechId.FlamethrowerRangeTech,      [kTechDataCostKey] = kFlamethrowerRangeTechResearchCost,     [kTechDataResearchTimeKey] = kFlamethrowerRangeTechResearchTime, [kTechDataDisplayName] = "FLAMETHROWER_RANGE", [kTechDataTooltipInfo] =  "FLAMETHROWER_RANGE_TOOLTIP"},
-        { [kTechDataId] = kTechId.Flamethrower,     [kTechDataMaxHealth] = kMarineWeaponHealth, [kTechDataPointValue] = kFlamethrowerPointValue,  [kTechDataMapName] = Flamethrower.kMapName,             [kTechDataDisplayName] = "FLAMETHROWER", [kTechDataTooltipInfo] = "FLAMETHROWER_TOOLTIP", [kTechDataModel] = Flamethrower.kModelName,  [kTechDataDamageType] = kFlamethrowerDamageType, [kTechDataCostKey] = kFlamethrowerCost, [kStructureAttachId] = kTechId.Armory, [kStructureAttachRange] = kArmoryWeaponAttachRange, [kStructureAttachRequiresPower] = true},
+        { 
+			[kTechDataId] = kTechId.Flamethrower,     
+			[kTechDataMaxHealth] = kMarineWeaponHealth, 
+			[kTechDataPointValue] = kFlamethrowerPointValue,  
+			[kTechDataMapName] = Flamethrower.kMapName,             
+			[kTechDataDisplayName] = "FLAMETHROWER", 
+			[kTechDataTooltipInfo] = "FLAMETHROWER_TOOLTIP", 
+			[kTechDataModel] = Flamethrower.kModelName,  
+			[kTechDataDamageType] = kFlamethrowerDamageType, 
+			[kTechDataCostKey] = kFlamethrowerCost, 
+			[kStructureAttachId] = kTechId.Armory, 
+			[kStructureAttachRange] = kArmoryWeaponAttachRange, 
+			[kStructureAttachRequiresPower] = true
+		},
         { 
 			[kTechDataId] = kTechId.DualMinigunTech,   
 			[kTechDataCostKey] = kDualMinigunTechResearchCost,      

@@ -51,12 +51,12 @@ kLightHealthPerArmor = 4
 kHealthPointsPerArmor = 2
 kHeavyHealthPerArmor = 1
 
-kFlameableMultiplier = 2.5
+kFlameableMultiplier = 2
 kElectroMagneticMultiplier = 2.5
 kCorrodeDamagePlayerArmorScalar = 0.23
 kCorrodeDamageExoArmorScalar = 0.3
 
-kReduceForStructuresScalar = 0.25
+kReduceForStructuresScalar = 0.4
 
 
 // deal only 33% of damage to friendlies
@@ -244,7 +244,7 @@ end
 
 
 local function ReduceGreatlyForStructures(target, attacker, doer, damage, armorFractionUsed, healthPerArmor, damageType, hitPoint)
-    if target:isa("Structure") then
+    if not target:isa("Player") then
         damage = damage * kReduceForStructuresScalar
     end
     return damage, armorFractionUsed, healthPerArmor

@@ -25,6 +25,7 @@ Script.Load("lua/mvm/Balance.lua")
 Script.Load("lua/mvm/BalanceHealth.lua")
 Script.Load("lua/mvm/BalanceMisc.lua")
 
+Script.Load("lua/mvm/TeamJoin.lua")
 
 Script.Load("lua/mvm/LiveMixin.lua")
 Script.Load("lua/mvm/LOSMixin.lua")

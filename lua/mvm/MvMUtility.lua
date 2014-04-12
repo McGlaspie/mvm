@@ -179,7 +179,9 @@ local kExplosionDirections =
     Vector(0, 0, -1),
 }
 
+
 //FIXME Prevent drawing of decals (visible) when no LOS, but still Create them...mmm, fun...
+// - This will likely require modifying the CreateDecal network message(s) and associated hooks
 function CreateExplosionDecals( triggeringEntity, effectName )	//OVERRIDES
 
     effectName = effectName or "explosion_decal"

@@ -25,6 +25,7 @@
 // http://en.wikipedia.org/wiki/Texture_atlas
 //
 // FIXME This and its associated shaders are NOT compatible with OpenGL renderer
+// TODO Speed up this mixin and move Initskin to __initmixin
 //
 //=============================================================================
 
@@ -108,18 +109,18 @@ function ColoredSkinsMixin:GetAtlasIndex()
 end
 
 
-function ColoredSkinsMixin:SetAtlasIndex( newIdx )	//Incomplete, don't use
+function ColoredSkinsMixin:SetAtlasIndex( index )
 	
-    assert(  )  //TODO Add type check/numeric
-
-	if newIdx ~= nil and newIdx >= 0 then
-		self.skinAtlasIndex = newIdx
-	end
+    assert( type(index) == "number" )
+	assert( index >= 0 )
+	assert( index <= gColorMapMaxIndex )
+	
+	self.skinAtlaxIndex = index
 	
 end
 
 
-function ColoredSkinsMixin:ResetSkin()
+function ColoredSkinsMixin:ResetSkin()	//Unused
 	self:InitializeSkin()
 	self:InstanceMaterials()
 end

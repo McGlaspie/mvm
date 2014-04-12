@@ -18,7 +18,7 @@ kShowOnTeam["all"] = {
 	GUIScoreboard = true, 
 	["mvm/GUIDeathMessages"] = true, 
 	["mvm/GUIChat"] = true,
-	GUIVoiceChat = true, 
+	GUIVoiceChat = true, //May need to update for hacking
 	["mvm/GUIMinimapFrame"] = true, 
 	GUIMapAnnotations = true,
 	GUICommunicationStatusIcons = true, 
@@ -69,7 +69,8 @@ kShowAsClass["Marine"] = {
 	["mvm/Hud/GUIObjectiveDisplay"] = true, 
 	["mvm/Hud/GUIProgressBar"] = true, 
 	["mvm/Hud/GUIRequestMenu"] = true,
-	["mvm/GUIWaypoints"] = true 
+	["mvm/GUIWaypoints"] = true,
+	["mvm/Hud/GUIDistressBeacon"] = false
 }
 
 kShowAsClass["JetpackMarine"] = { 
@@ -83,13 +84,14 @@ kShowAsClass["Exo"] = {
 	["mvm/Hud/GUIProgressBar"] = true, 
 	["mvm/Hud/GUIRequestMenu"] = true, 
 	["mvm/GUIWaypoints"] = true, 
-	["mvm/Hud/Exo/GUIExoEject"] = true
+	["mvm/Hud/Exo/GUIExoEject"] = true,
+	["mvm/Hud/GUIDistressBeacon"] = false
 }
 
 kShowAsClass["MarineSpectator"] = { GUIRequestMenu = true }
 
 kShowAsClass["Commander"] = { 
-	["mvm/GUICommanderOrders"] = true 
+	["mvm/GUICommanderOrders"] = true
 }
 kShowAsClass["MarineCommander"] = { 
 	GUICommanderTutorial = true, 

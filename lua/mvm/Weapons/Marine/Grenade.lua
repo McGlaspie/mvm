@@ -58,7 +58,7 @@ if Server then
 						and entity:GetTeamNumber() ~= self:GetTeamNumber()
 						and entity ~= self:GetOwner() 
 					)
-					or ( entity:isa("PowerPoint") and entity:GetIsBuilt() )		//FIXME Check is failing
+					//or ( entity:isa("PowerPoint") and entity:GetIsBuilt() )
 			end
 		)
         

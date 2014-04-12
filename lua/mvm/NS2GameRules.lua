@@ -10,7 +10,61 @@ local kPauseToSocializeBeforeMapcycle = 30		//TODO - This should notify players 
 local kGameStartMessageInterval = 10
 
 // How often to send the "No commander" message to players in seconds.
-local kSendNoCommanderMessageRate = 50
+local kSendNoCommanderMessageRate = 35
+
+
+
+
+
+// Find team start with team 0 or for specified team. Remove it from the list so other teams don't start there. Return nil if there are none.
+function NS2Gamerules:ChooseTechPoint(techPoints, teamNumber)
+
+    local validTechPoints = { }
+    local totalTechPointWeight = 0
+    
+    //local changeSpawnsMaps = { 'ns2_biodome', 'ns2_eclipse', 'ns2_' }
+    
+    // Build list of valid starts (marked as "neutral" or for this team in map)
+    for _, currentTechPoint in pairs(techPoints) do
+    
+        // Always include tech points with team 0 and never include team 3 into random selection process
+        local teamNum = currentTechPoint:GetTeamNumberAllowed()
+        if teamNum ~= 3 then	//(teamNum == 0 or teamNum == teamNumber) and 
+			
+            table.insert(validTechPoints, currentTechPoint)
+            totalTechPointWeight = totalTechPointWeight + 1	//currentTechPoint:GetChooseWeight()
+            
+        end
+        
+    end
+    
+    local chosenTechPointWeight = self.techPointRandomizer:random(0, totalTechPointWeight)
+    local chosenTechPoint = nil
+    local currentWeight = 0
+    
+    for _, currentTechPoint in pairs(validTechPoints) do
+    
+        currentWeight = currentWeight + currentTechPoint:GetChooseWeight()
+        if chosenTechPointWeight - currentWeight <= 0 then
+        
+            chosenTechPoint = currentTechPoint
+            break
+            
+        end
+        
+    end
+    
+    // Remove it from the list so it isn't chosen by other team
+    if chosenTechPoint ~= nil then
+        table.removevalue(techPoints, chosenTechPoint)
+    else
+        assert(false, "ChooseTechPoint couldn't find a tech point for team " .. teamNumber)
+    end
+    
+    return chosenTechPoint
+    
+end
+
 
 
 if Server then
@@ -495,6 +549,7 @@ if Server then
         
         local team1TechPoint = nil
         local team2TechPoint = nil
+        /*
         if Server.spawnSelectionOverrides then
         
             local selectedSpawn = self.techPointRandomizer:random(1, #Server.spawnSelectionOverrides)
@@ -512,12 +567,12 @@ if Server then
             end
             
         else
-        
+        */
             // Reset teams (keep players on them)
-            team1TechPoint = self:ChooseTechPoint(techPoints, kTeam1Index)
-            team2TechPoint = self:ChooseTechPoint(techPoints, kTeam2Index)
+            team1TechPoint = self:ChooseTechPoint(techPoints, kTeam1Index, nil)
+            team2TechPoint = self:ChooseTechPoint(techPoints, kTeam2Index, team2TechPoint)
             
-        end
+        //end
         
         self.team1:ResetPreservePlayers(team1TechPoint)
         self.team2:ResetPreservePlayers(team2TechPoint)
@@ -872,4 +927,6 @@ end
 
 //-----------------------------------------------------------------------------
 
-Class_Reload("NS2Gamerules", {})
+
+Class_Reload( "NS2Gamerules", {} )
+

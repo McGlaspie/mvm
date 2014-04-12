@@ -584,9 +584,8 @@ function PowerPoint:GetCanConstructOverride(player)
 end
 
 
-//Change to bool flag and run at X interval in OnUpdate?
 function PowerPoint:GetCanTakeDamageOverride()
-	return false
+	return self:GetPowerState() == PowerPoint.kPowerState.socketed
 end
 
 

@@ -14,12 +14,12 @@
 // HEALTH AND ARMOR		
 kMarineHealth = 100	kMarineArmor = 30	kMarinePointValue = 5
 kJetpackHealth = 100	kJetpackArmor = 30	kJetpackPointValue = 10
-kExosuitHealth = 100	kExosuitArmor = 300	kExosuitPointValue = 25
+kExosuitHealth = 100	kExosuitArmor = 350	kExosuitPointValue = 25
 
 kMarineWeaponHealth = 400
 
 kArmorPerUpgradeLevel = 20
-kExosuitArmorPerUpgradeLevel = 100
+kExosuitArmorPerUpgradeLevel = 150
 kArmorHealScalar = 1
 
 kBuildPointValue = 5
@@ -51,7 +51,7 @@ kMineHealth = 50	kMineArmor = 10	kMinePointValue = 2		//80, 10, 2
 
 kExtractorHealth = 2000	kExtractorArmor = 350	kExtractorPointValue = 15	//3500, 500
 
-kSentryHealth = 550	kSentryArmor = 80	kSentryPointValue = 10		//500, 100, 10
+kSentryHealth = 550	kSentryArmor = 100	kSentryPointValue = 10		//500, 100, 10
 kARCHealth = 1250	kARCArmor = 300	kARCPointValue = 20		//2000, 500, 20
 kARCDeployedHealth = 1250	kARCDeployedArmor = 0	kARCPointValue = 20		//2000, 0, 20
 

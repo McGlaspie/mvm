@@ -7,6 +7,8 @@ Script.Load("lua/mvm/WeldableMixin.lua")
 Script.Load("lua/mvm/DissolveMixin.lua")
 Script.Load("lua/mvm/NanoshieldMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+Script.Load("lua/mvm/ScoringMixin.lua")
+Script.Load("lua/mvm/RagdollMixin.lua")
 
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
@@ -50,7 +52,7 @@ Marine.kAirStrafeWeight = 0		//May need to add back in for JP - Can stop on a di
 
 
 local newNetworkVars = {
-	commanderLoginTime = "time"
+	commanderLoginTime = "time"		//Required here for use in PowerLightsHandler, for LightState overrides
 }
 
 AddMixinNetworkVars( FireMixin, newNetworkVars )
@@ -110,8 +112,6 @@ function Marine:OnCreate()	//OVERRIDE
 		
         InitMixin(self, DisorientableMixin)
         InitMixin(self, CommanderGlowMixin)
-        
-		InitMixin(self, ColoredSkinsMixin)
 		
 		if self.flashlight ~= nil then
 			Client.DestroyRenderLight(self.flashlight)
@@ -227,22 +227,47 @@ end
 if Client then
 
 	function Marine:InitializeSkin()
-		self.skinBaseColor = self:GetBaseSkinColor()
-		self.skinAccentColor = self:GetAccentSkinColor()
-		self.skinTrimColor = self:GetTrimSkinColor()
-		self.skinAtlasIndex = self:GetTeamNumber() - 1
+		local teamNum = self:GetTeamNumber()
+		
+		self.skinBaseColor = self:GetBaseSkinColor(teamNum)
+		self.skinAccentColor = self:GetAccentSkinColor(teamNum)
+		self.skinTrimColor = self:GetTrimSkinColor(teamNum)
+		
+		if teamNum == kTeamReadyRoom then
+			self.skinAtlasIndex = 0
+		else
+			self.skinAtlasIndex = teamNum - 1
+		end
 	end
 	
-	function Marine:GetBaseSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
+	function Marine:GetBaseSkinColor(teamNum)
+		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
+			return ConditionalValue( self.previousTeamNumber == kTeam1Index, kTeam1_BaseColor, kTeam2_BaseColor )
+		elseif teamNum == kTeam1Index or teamNum == kTeam2Index then
+			return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_BaseColor, kTeam2_BaseColor )
+		else
+			return kNeutral_BaseColor
+		end
 	end
 
-	function Marine:GetAccentSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+	function Marine:GetAccentSkinColor(teamNum)
+		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
+			return ConditionalValue( self.previousTeamNumber == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
+		elseif teamNum == kTeam1Index or teamNum == kTeam2Index then
+			return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
+		else
+			return kNeutral_AccentColor
+		end
 	end
 	
-	function Marine:GetTrimSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
+	function Marine:GetTrimSkinColor(teamNum)
+		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
+			return ConditionalValue( self.previousTeamNumber == kTeam1Index, kTeam1_TrimColor, kTeam2_TrimColor )
+		elseif teamNum == kTeam1Index or teamNum == kTeam2Index then
+			return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_TrimColor, kTeam2_TrimColor )
+		else
+			return kNeutral_TrimColor
+		end
 	end
 
 end

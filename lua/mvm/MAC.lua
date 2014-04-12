@@ -11,6 +11,7 @@ Script.Load("lua/mvm/ElectroMagneticMixin.lua")
 Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/NanoshieldMixin.lua")
 Script.Load("lua/mvm/SupplyUserMixin.lua")
+Script.Load("lua/mvm/RagdollMixin.lua")
 
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
@@ -290,8 +291,7 @@ function MAC:OnCreate()		//OVERRIDES
     self:SetUpdates(true)
     self:SetLagCompensated(true)
     self:SetPhysicsType(PhysicsType.Kinematic)
-    self:SetPhysicsGroup(PhysicsGroup.WhipGroup)
-    //self:SetPhysicsGroup(PhysicsGroup.SmallStructuresGroup)
+    self:SetPhysicsGroup(PhysicsGroup.SmallStructuresGroup)
     
 end
 
@@ -321,8 +321,8 @@ function MAC:OnInitialized()	//OVERRIDES
         self.jetsSound:SetAsset(kJetsSound)
         self.jetsSound:SetParent(self)
 
-		InitMixin(self, ControllerMixin)
-		self:CreateController(PhysicsGroup.WhipGroup)
+		//InitMixin(self, ControllerMixin)
+		//self:CreateController(PhysicsGroup.WhipGroup)
 
     elseif Client then
     
@@ -867,11 +867,10 @@ function MAC:OnUpdate( deltaTime )	//OVERRIDES
 		
 	end
 	
-	//FIXME This is NOT toggling MAC light per location powered status
-	// - This is due to MACs not impacting Location triggers (Physics/Collision issue(s))
+	/*
 	if Server then
-		/*
-		local location = GetLocationForPoint( self:GetOrigin() )
+		
+		local location = GetLocationForPoint( self:GetOrigin() ) or nil
 		
 		if location and location:isa("Location") then
 			
@@ -883,13 +882,13 @@ function MAC:OnUpdate( deltaTime )	//OVERRIDES
 			end
 			
 		end
-		*/
+		
 	end
 	
 	if Client and self.headlightCinematic then
 		self.headlightCinematic:SetIsActive( self.headlightActive )
 	end
-	
+	*/
 	
 //Original OnUpdate -----------------------------
     if Server and self:GetIsAlive() then
@@ -992,7 +991,7 @@ end
 
 
 if Server then
-
+	/*
 	// Required by ControllerMixin.
 	function MAC:GetControllerSize()
 		return GetTraceCapsuleFromExtents( self:GetExtents() )    
@@ -1004,9 +1003,9 @@ if Server then
 	end
 	
 	function MAC:GetControllerPhysicsGroup()
-		return PhysicsGroup.WhipGroup	//???
+		return PhysicsGroup.SmallStructuresGroup	//???
 	end
-	
+	*/
 	
 	function MAC:GetMoveSpeed()		//OVERRIDES
 	

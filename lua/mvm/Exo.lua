@@ -7,10 +7,13 @@ Script.Load("lua/mvm/WeldableMixin.lua")
 Script.Load("lua/mvm/SelectableMixin.lua")
 Script.Load("lua/mvm/NanoshieldMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+Script.Load("lua/mvm/ScoringMixin.lua")
+Script.Load("lua/mvm/RagdollMixin.lua")
 
 if Client then
 	Script.Load("lua/mvm/CommanderGlowMixin.lua")
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+	Script.Load("lua/mvm/TeamMessageMixin.lua")
 	//TODO Add IFFMixin
 end
 
@@ -49,6 +52,7 @@ local kAcceleration = 35        //20
 
 local kIdle2D = PrecacheAsset("sound/NS2.fev/marine/heavy/idle_2D")
 
+local kFlareCinematicNeutral = PrecacheAsset("cinematics/marine/exo/lens_flares_neutral.cinematic")
 local kFlareCinematicTeam1 = PrecacheAsset("cinematics/marine/exo/lens_flares_team1.cinematic")
 local kFlareCinematicTeam2 = PrecacheAsset("cinematics/marine/exo/lens_flares_team2.cinematic")
 
@@ -131,7 +135,9 @@ function Exo:OnCreate()	//OVERRIDES
         
     elseif Client then
     
-        InitMixin(self, ColoredSkinsMixin)
+		InitMixin(self, TeamMessageMixin, { kGUIScriptName = "mvm/Hud/Marine/GUIMarineTeamMessage" })
+    
+        //InitMixin(self, ColoredSkinsMixin)
         InitMixin(self, CommanderGlowMixin)
 		
 		self.flashlight = Client.CreateRenderLight()
@@ -209,13 +215,16 @@ function Exo:OnInitialized()	//OVERRIDES
         self.thrusterRightCinematic:SetIsVisible(false)
         
         self.flares = Client.CreateCinematic(RenderScene.Zone_Default)
-        self.flares:SetCinematic(
-			ConditionalValue(
-				self:GetTeamNumber() == kTeam1Index,
+        local flareCinematic = kFlareCinematicNeutral
+		local teamNum = self:GetTeamNumber()
+        if self.previousTeamNumber ~= kTeamReadyRoom and teamNum ~= kTeamReadyRoom then
+			flareCinematic = ConditionalValue(
+				teamNum == kTeam1Index or self.previousTeamNumber == kTeam1Index,
 				kFlareCinematicTeam1,
 				kFlareCinematicTeam2
 			)
-		)
+		end
+        self.flares:SetCinematic( flareCinematic )
         self.flares:SetRepeatStyle(Cinematic.Repeat_Endless)
         self.flares:SetParent(self)
         self.flares:SetCoords(Coords.GetIdentity())
@@ -247,22 +256,48 @@ end
 if Client then
 
 	function Exo:InitializeSkin()
-		self.skinBaseColor = self:GetBaseSkinColor()
-		self.skinAccentColor = self:GetAccentSkinColor()
-		self.skinTrimColor = self:GetTrimSkinColor()
-		self.skinAtlasIndex = self:GetTeamNumber() - 1
+		local teamNum = self:GetTeamNumber()
+		
+		self.skinBaseColor = self:GetBaseSkinColor(teamNum)
+		self.skinAccentColor = self:GetAccentSkinColor(teamNum)
+		self.skinTrimColor = self:GetTrimSkinColor(teamNum)
+		
+		if teamNum == kTeamReadyRoom then
+			self.skinAtlasIndex = 0
+		else
+			self.skinAtlasIndex = teamNum - 1
+		end
+		
+	end
+	
+	function Exo:GetBaseSkinColor(teamNum)
+		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
+			return ConditionalValue( self.previousTeamNumber == kTeam1Index, kTeam1_BaseColor, kTeam2_BaseColor )
+		elseif teamNum == kTeam1Index or teamNum == kTeam2Index then
+			return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_BaseColor, kTeam2_BaseColor )
+		else
+			return kNeutral_BaseColor
+		end
+	end
+	
+	function Exo:GetAccentSkinColor(teamNum)
+		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
+			return ConditionalValue( self.previousTeamNumber == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
+		elseif teamNum == kTeam1Index or teamNum == kTeam2Index then
+			return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
+		else
+			return kNeutral_AccentColor
+		end
 	end
 
-	function Exo:GetBaseSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_BaseColor, kTeam2_BaseColor )
-	end
-
-	function Exo:GetAccentSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
-	end
-
-	function Exo:GetTrimSkinColor()
-		return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_TrimColor, kTeam2_TrimColor )
+	function Exo:GetTrimSkinColor(teamNum)
+		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
+			return ConditionalValue( self.previousTeamNumber == kTeam1Index, kTeam1_TrimColor, kTeam2_TrimColor )
+		elseif teamNum == kTeam1Index or teamNum == kTeam2Index then
+			return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_TrimColor, kTeam2_TrimColor )
+		else
+			return kNeutral_TrimColor
+		end
 	end
 
 end

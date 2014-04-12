@@ -17,7 +17,7 @@ Script.Load("lua/BalanceMisc.lua")
 //-----------------------------------------------------------------------------
 // MARINE DAMAGE
 
-kNanoShieldDamageReductionDamage = 0.7	//0.75	ns2-0.68
+kNanoShieldDamageReductionDamage = 0.65	//0.75	ns2-0.68
 
 kInfestationCorrodeDamagePerSecond = 15
 
@@ -27,17 +27,16 @@ kEmpDamageEffectsDuration = 3
 kRifleDamage = 12	//10
 kRifleDamageType = kDamageType.Normal
 kRifleClipSize = 50		//Note: changing this is can break rifle animation timing
-kRifleMeleeDamage = 35	//NS2 - 20
-kRifleMeleeDamageType = kDamageType.Normal
+kRifleMeleeDamage = 30	//NS2 - 20
+kRifleMeleeDamageType = kDamageType.Melee
 
 kPistolDamage = 26	//NS2 - 25
 kPistolDamageType = kDamageType.Light
 kPistolClipSize = 10
 kPistolAltDamage = 40
 
-kWelderDamagePerSecond = 45	//NS2 - 30
+kWelderDamagePerSecond = 40	//NS2 - 30
 kWelderDamageType = kDamageType.Structural
-kWelderFireDelay = 0.2		//.2	Does this affect repair rates?
 kWelderWeldDelay = 0.3
 kSelfWeldAmount = 5
 kPlayerArmorWeldRate = 20
@@ -53,11 +52,11 @@ kPulseGrenadeDamage = 80	//125
 kPulseGrenadeEnergyDamage = 50
 kPulseGrenadeDamageType = kDamageType.ElectroMagnetic
 
+kClusterGrenadeDamage = 75
 kClusterGrenadeDamageRadius = 10
-kClusterGrenadeDamage = 65		//55
-kClusterFragmentDamageRadius = 5	//6
 kClusterFragmentDamage = 25		//20
-kClusterGrenadeDamageType = kDamageType.Flame	//Structural?
+kClusterFragmentDamageRadius = 6
+kClusterGrenadeDamageType = kDamageType.Structural		//kDamageType.Flame
 
 kNerveGasDamagePerSecond = 12	//50
 kNerveGasDamageType = kDamageType.Gas	//I.e. Lerk Spores, HP only
@@ -66,27 +65,25 @@ kShotgunFireRate = 0.88
 kShotgunDamage = 17
 kShotgunDamageType = kDamageType.Normal
 kShotgunClipSize = 8
-kShotgunBulletsPerShot = 11	//ns2-10
+kShotgunBulletsPerShot = 12	//ns2-10
 kShotgunRange = 60	//NS2 - 30
 
 kGrenadeLauncherGrenadeDamage = 120
 kGrenadeLauncherGrenadeDamageType = kDamageType.Structural
 kGrenadeLauncherClipSize = 4
-kGrenadeLauncherGrenadeDamageRadius = 4	//4.8
-kGrenadeLifetime = 2	//2.5
+kGrenadeLauncherGrenadeDamageRadius = 4.5 //4	 ns2-4.8
+kGrenadeLifetime = 1.5	//2  ns2 2.5
 kGrenadeUpgradedLifetime = 1.5
 
-kFlamethrowerDamage = 18
+kFlamethrowerDamage = 20
 kFlamethrowerDamageType = kDamageType.Flame
-kFlamethrowerClipSize = 40			//50
+kFlamethrowerClipSize = 40
 kFlamethrowerRange = 10				//9
 kFlamethrowerUpgradedRange = 12		//11.5
-kBurnDamagePerStackPerSecond = 5	//3
-kFlamethrowerMaxStacks = 30			//20
+kBurnDamagePerSecond = 12			//2
 kFlamethrowerBurnDuration = 6
-kFlamethrowerStackRate = 0.75		//0.4
 kFlameRadius = 1.75					//1.8
-kFlameDamageStackWeight = 0.01		//0.5
+kFlameDamageStackWeight = 0.005		//0.5
 
 kWhileBurningWeldEffectReduction = 0.5
 kBurnDamageMarineStructureReduction = 1	//0.15
@@ -233,10 +230,10 @@ kGrenadeLauncherCost = 30
 kJetpackCost = 15
 
 
-kExosuitCost = 45
+kExosuitCost = 50
 kExosuitDropCost = 50
 kDualExosuitCost = 60
-kClawRailgunExosuitCost = 45
+kClawRailgunExosuitCost = 50
 kDualRailgunExosuitCost = 60
 
 kUpgradeToDualMinigunCost = 25
@@ -339,7 +336,7 @@ kWeapons2ResearchCost = 30
 kWeapons3ResearchCost = 40
 
 kArmor1ResearchCost = 20
-kArmor2ResearchCost = 40
+kArmor2ResearchCost = 30
 kArmor3ResearchCost = 40
 
 kResourceUpgradeResearchCost = 5

@@ -182,6 +182,21 @@ function GUIResourceDisplay:UpdateTeamColors()
 end
 
 
+local supplyWarningLimit = 10
+
+local function PulseRed()
+
+    local anim = (math.cos(Shared.GetTime() * 5) + 1) * 0.5
+    local color = Color()
+    
+    color.r = 1
+    color.g = anim
+    color.b = anim
+    
+    return color
+
+end
+
 function GUIResourceDisplay:Update(deltaTime)
 
     PROFILE("GUIResourceDisplay:Update")
@@ -206,13 +221,20 @@ function GUIResourceDisplay:Update(deltaTime)
     local numHarvesters = CommanderUI_GetTeamHarvesterCount()
     self.towerText:SetText(ToString(numHarvesters))
     
-    local supplyUsed = MvM_GetSupplyUsedByTeam(Client.GetLocalPlayer():GetTeamNumber())
-    local maxSupply = MvM_GetMaxSupplyForTeam(Client.GetLocalPlayer():GetTeamNumber())
+    local supplyUsed = MvM_GetSupplyUsedByTeam( Client.GetLocalPlayer():GetTeamNumber() )
+    local maxSupply = MvM_GetMaxSupplyForTeam( Client.GetLocalPlayer():GetTeamNumber() )
     
-    local useColor = ConditionalValue( supplyUsed < maxSupply, kWhite, kRed)
+    local targetColor = ConditionalValue( supplyUsed < maxSupply, kWhite, kRed)
+    
+    if maxSupply - supplyUsed <= supplyWarningLimit and maxSupply ~= supplyUsed then
+		currentSupplyColor = PulseRed()
+	else
+		currentSupplyColor = targetColor
+	end
+	
+	self.workerText:SetColor( currentSupplyColor )
+    self.workerIcon:SetColor( currentSupplyColor )
     
     self.workerText:SetText(string.format("%d / %d", supplyUsed, maxSupply))
-    self.workerText:SetColor(useColor)
-    self.workerIcon:SetColor(useColor)
     
 end

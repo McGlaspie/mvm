@@ -16,6 +16,7 @@ local kNanoDamageSound = PrecacheAsset("sound/NS2.fev/marine/commander/nano_dama
 
 //-----------------------------------------------------------------------------
 
+
 function NanoShieldMixin:__initmixin()
 
     if Server then
@@ -25,6 +26,7 @@ function NanoShieldMixin:__initmixin()
     end
     
 end
+
 
 local function ClearNanoShield(self, destroySound)
 
@@ -44,6 +46,7 @@ local function ClearNanoShield(self, destroySound)
     
 end
 
+
 function NanoShieldMixin:OnDestroy()
 
     if self:GetIsNanoShielded() then
@@ -51,6 +54,7 @@ function NanoShieldMixin:OnDestroy()
     end
     
 end
+
 
 function NanoShieldMixin:ActivateNanoShield( shieldLifetime )
 	
@@ -160,9 +164,11 @@ local function SharedUpdate(self)
     
 end
 
+
 function NanoShieldMixin:OnUpdate(deltaTime)   
     SharedUpdate(self)
 end
+
 
 function NanoShieldMixin:OnProcessMove(input)   
     SharedUpdate(self)

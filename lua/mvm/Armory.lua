@@ -13,6 +13,7 @@ Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/NanoshieldMixin.lua")
 Script.Load("lua/mvm/SupplyUserMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+Script.Load("lua/mvm/RagdollMixin.lua")
 
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
@@ -318,11 +319,11 @@ if Server then
             TEST_EVENT("Armory resupplied health")
             
             resuppliedPlayer = true
-            /*
-            if HasMixin(player, "ParasiteAble") and player:GetIsParasited() then
-            
-                player:RemoveParasite()
-                TEST_EVENT("Armory removed Parasite")
+            /* Removed - too easy to armory hump and dimish FT
+            if HasMixin(player, "Fire") and player:GetIsOnFire() and not player:isa("Exo") then
+				
+                player:SetGameEffectMask(kGameEffect.OnFire, false)
+                //TEST_EVENT("Armory removed Fire")
                 
             end
             */

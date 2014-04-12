@@ -73,6 +73,23 @@ function Railgun:OnPrimaryAttack(player)
 end
 
 
+if Server then
+
+	function Railgun:OnDamageDone(doer, target)
+    
+        if doer == self then
+			
+            if HasMixin(target, "Ragdoll") and target:isa("Player") and not target:GetIsAlive() then
+                target:SetBypassRagdoll(true)
+            end
+            
+        end
+        
+    end
+
+end
+
+
 
 
 function Railgun:OnUpdateRender()
@@ -137,4 +154,6 @@ end
 
 //-----------------------------------------------------------------------------
 
+
 Class_Reload("Railgun", {})
+

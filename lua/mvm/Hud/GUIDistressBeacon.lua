@@ -8,6 +8,10 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
+Script.Load("lua/mvm/GUIColorGlobals.lua")
+
+//TODO Update to handle TeamSpectator?
+
 class 'GUIDistressBeacon' (GUIScript)
 
 GUIDistressBeacon.kBeaconTextFontSize = 24
@@ -55,7 +59,7 @@ function GUIDistressBeacon:UpdateDistressBeacon(deltaTime)
             
         end
         
-        if self.beacon:GetIsVisible() then
+        if self.beacon:GetIsVisible() then	//FIXME Not showing for Exos
         
             if localPlayer:isa("Commander") then
             
@@ -70,7 +74,7 @@ function GUIDistressBeacon:UpdateDistressBeacon(deltaTime)
             end
             
             // Fade alpha in and out dramatically
-            local sin = math.sin((Shared.GetTime() - self.beaconTime) * 5/(math.pi/2))
+            local sin = math.sin((Shared.GetTime() - self.beaconTime) * 5 / ( math.pi / 2 ))
             alpha = math.abs(sin)
             
             local ui_baconColor = ConditionalValue(

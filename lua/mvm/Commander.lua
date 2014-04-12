@@ -1,6 +1,7 @@
 
 Script.Load("lua/Commander.lua")
-
+Script.Load("lua/mvm/ScoringMixin.lua")
+Script.Load("lua/mvm/BuildingMixin.lua")
 
 if Client then
 	Script.Load("lua/mvm/Commander_Client.lua")
@@ -8,6 +9,51 @@ end
 
 
 //-----------------------------------------------------------------------------
+
+//Overridden just to use mvm ScoringMixin....dumb
+function Commander:OnInitialized()	//OVERRIDES
+
+    InitMixin(self, OverheadMoveMixin)
+    InitMixin(self, MinimapMoveMixin)
+    InitMixin(self, HotkeyMoveMixin)
+    
+    InitMixin(self, BuildingMixin)
+    InitMixin(self, ScoringMixin, { kMaxScore = kMaxScore })
+    
+    Player.OnInitialized(self)
+    
+    self:SetIsVisible(false)
+    
+    if Client then
+    
+        self.drawResearch = false
+
+        if self:GetIsLocalPlayer() then
+            self:SetCurrentTech(kTechId.RootMenu)
+        end
+        
+    end
+    
+    if Server then
+    
+        // Wait a short time before sending hotkey groups to make sure
+        // client has been replaced by commander
+        self.timeToSendHotkeyGroups = Shared.GetTime() + 0.5
+        
+    end
+
+    self.timeScoreboardPressed = 0
+    self.focusGroupIndex = 1
+    self.numIdleWorkers = 0
+    self.numPlayerAlerts = 0
+    self.positionBeforeJump = Vector(0, 0, 0)
+    self.selectMode = Commander.kSelectMode.None
+    self.commandStationId = Entity.invalidId
+    
+    self:SetWeaponsProcessMove(false)
+
+end
+
 
 
 function Commander:GetCurrentTechButtons(techId, entity)

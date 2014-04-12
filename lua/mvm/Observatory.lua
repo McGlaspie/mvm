@@ -13,6 +13,7 @@ Script.Load("lua/mvm/DissolveMixin.lua")
 Script.Load("lua/mvm/PowerConsumerMixin.lua")
 Script.Load("lua/mvm/SupplyUserMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+Script.Load("lua/mvm/RagdollMixin.lua")
 
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
@@ -33,8 +34,8 @@ AddMixinNetworkVars(FireMixin, newNetworkVars)
 AddMixinNetworkVars(DetectableMixin, newNetworkVars)
 AddMixinNetworkVars(ElectroMagneticMixin, newNetworkVars)
 
-local kDistressBeaconSoundMarine = PrecacheAsset("sound/NS2.fev/marine/common/distress_beacon_marine")
-//local kDistressBeaconSoundAlien = PrecacheAsset("sound/NS2.fev/marine/common/distress_beacon_alien")
+local kDistressBeaconSoundFriendlies = PrecacheAsset("sound/NS2.fev/marine/common/distress_beacon_marine")
+local kDistressBeaconSoundEnemies = PrecacheAsset("sound/NS2.fev/marine/common/distress_beacon_alien")
 
 local kObservatoryTechButtons = { 
 	kTechId.Scan, kTechId.DistressBeacon, kTechId.Detector, kTechId.None,
@@ -87,35 +88,18 @@ function Observatory:OnCreate()		//OVERRIDES
     self:SetPhysicsType(PhysicsType.Kinematic)
     self:SetPhysicsGroup(PhysicsGroup.MediumStructuresGroup) 
 
-	/*
+	
 	if Server then
     
-        self.distressBeaconSoundMarine = Server.CreateEntity(SoundEffect.kMapName)
-        self.distressBeaconSoundMarine:SetAsset(kDistressBeaconSoundMarine)
-        self.distressBeaconSoundMarine:SetRelevancyDistance(Math.infinity)
+        self.distressBeaconSoundFriendlies = Server.CreateEntity(SoundEffect.kMapName)
+        self.distressBeaconSoundFriendlies:SetAsset( kDistressBeaconSoundFriendlies )
+        self.distressBeaconSoundFriendlies:SetRelevancyDistance( Math.infinity )
+        self.distressBeaconSoundFriendlies:SetKeepAlive(true)	//allow this ent to be reused
 		
-        self.distressBeaconSoundAlien = Server.CreateEntity(SoundEffect.kMapName)
-        self.distressBeaconSoundAlien:SetAsset(kDistressBeaconSoundAlien)
-        self.distressBeaconSoundAlien:SetRelevancyDistance(Math.infinity)
-        
-        if self:GetTeamNumber() == kTeam2Index then
-			self.distressBeaconSoundMarine:SetExcludeRelevancyMask(kRelevantToTeam2)
-			self.distressBeaconSoundAlien:SetExcludeRelevancyMask(kRelevantToTeam1)
-		else
-			self.distressBeaconSoundMarine:SetExcludeRelevancyMask(kRelevantToTeam1)
-			self.distressBeaconSoundAlien:SetExcludeRelevancyMask(kRelevantToTeam2)
-		end
-        
-    end
-    */
-    
-    if Server then
-    
-        self.distressBeaconSound = Server.CreateEntity(SoundEffect.kMapName)
-        self.distressBeaconSound:SetAsset(kDistressBeaconSoundMarine)
-        self.distressBeaconSound:SetRelevancyDistance(Math.infinity)
-        
-        //self:AddTimedCallback(Observatory.RevealCysts, 0.4)
+        self.distressBeaconSoundEnemies = Server.CreateEntity(SoundEffect.kMapName)
+        self.distressBeaconSoundEnemies:SetAsset( kDistressBeaconSoundEnemies )
+        self.distressBeaconSoundEnemies:SetRelevancyDistance( Math.infinity )
+		self.distressBeaconSoundEnemies:SetKeepAlive(true)
         
     end
 
@@ -142,6 +126,18 @@ function Observatory:OnInitialized()	//OVERRIDES
         //InitMixin(self, InfestationTrackerMixin)
         
         InitMixin(self, SupplyUserMixin)
+        
+        if self:GetTeamNumber() == kTeam2Index then
+			self.distressBeaconSoundFriendlies:SetExcludeRelevancyMask(kRelevantToTeam2)
+			self.distressBeaconSoundEnemies:SetExcludeRelevancyMask(kRelevantToTeam1)
+		else
+			self.distressBeaconSoundFriendlies:SetExcludeRelevancyMask(kRelevantToTeam1)
+			self.distressBeaconSoundEnemies:SetExcludeRelevancyMask(kRelevantToTeam2)
+		end
+		
+		local obsOrigin = self:GetOrigin()
+		self.distressBeaconSoundFriendlies:SetOrigin( obsOrigin )
+		self.distressBeaconSoundEnemies:SetOrigin( obsOrigin )
     
     elseif Client then
     
@@ -158,7 +154,7 @@ end
 
 
 function Observatory:OverrideVisionRadius()
-	return 4
+	return 5
 end
 
 function Observatory:GetIsVulnerableToEMP()
@@ -222,8 +218,8 @@ local function GetPlayersToBeacon(self, toOrigin)
     local players = { }
     
     for index, player in ipairs( self:GetTeam():GetPlayers() ) do
-    
-        // Don't affect Commanders or Heavies
+		
+        // Don't affect Commanders
         if player:isa("Marine") or player:isa("Exo") then
         
             // Don't respawn players that are already nearby.
@@ -284,7 +280,8 @@ end
 
 function Observatory:PerformDistressBeacon()	//OVERRIDES
 
-    self.distressBeaconSound:Stop()
+    self.distressBeaconSoundFriendlies:Stop()
+    self.distressBeaconSoundEnemies:Stop()
     
     local anyPlayerWasBeaconed = false
     local successfullPositions = {}
@@ -358,13 +355,12 @@ function Observatory:TriggerDistressBeacon()	//OVERRIDES
     
     if not self:GetIsBeaconing() then
 
-        self.distressBeaconSound:Start()
+        self.distressBeaconSoundFriendlies:Start()
+        self.distressBeaconSoundEnemies:Start()
 
         local origin = self:GetDistressOrigin()
         
         if origin then
-        
-            self.distressBeaconSound:SetOrigin(origin)
 
             // Beam all faraway players back in a few seconds!
             self.distressBeaconTime = Shared.GetTime() + Observatory.kDistressBeaconTime

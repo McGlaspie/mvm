@@ -45,3 +45,18 @@ kGUI_NameTagFontColors = {
 	[kGUI_Team2Index] = Color(0.901, 0.623, 0.215, 1)
 }
 
+
+
+//compares color2 equivilent to color1 within byMargin
+function CompareColors( color1, color2, byMargin )
+
+	return (
+		color2.r - color1.r <= byMargin and
+		color2.g - color1.g <= byMargin and
+		color2.b - color1.b <= byMargin and
+		color2.a - color1.a <= byMargin
+	)
+    
+end
+
+
