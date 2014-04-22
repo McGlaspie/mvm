@@ -18,5 +18,12 @@ function CatPack:OnInitialized()
 end
 
 
+function CatPack:GetIsValidRecipient(recipient)
+	//not GetIsVortexed(recipient) 
+    return self:GetTeamNumber() == recipient:GetTeamNumber() 
+		and (recipient.GetCanUseCatPack and recipient:GetCanUseCatPack())    
+end
+
+
 Class_Reload( "CatPack", {} )
 

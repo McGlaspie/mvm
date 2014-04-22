@@ -7,6 +7,36 @@ Script.Load("lua/mvm/PickupableWeaponMixin.lua")
 
 
 
+// higher numbers reduces the spread
+local kMvMSpreadDistance = 18
+local kStartOffset = 0
+local kMvMSpreadVectors =
+{
+    GetNormalizedVector(Vector(-0.01, 0.01, kMvMSpreadDistance)),
+    
+    GetNormalizedVector(Vector(-0.45, 0.45, kMvMSpreadDistance)),
+    GetNormalizedVector(Vector(0.45, 0.45, kMvMSpreadDistance)),
+    GetNormalizedVector(Vector(0.45, -0.45, kMvMSpreadDistance)),
+    GetNormalizedVector(Vector(-0.45, -0.45, kMvMSpreadDistance)),
+    
+    GetNormalizedVector(Vector(-1, 0, kMvMSpreadDistance)),
+    GetNormalizedVector(Vector(1, 0, kMvMSpreadDistance)),
+    GetNormalizedVector(Vector(0, -1, kMvMSpreadDistance)),
+    GetNormalizedVector(Vector(0, 1, kMvMSpreadDistance)),
+    
+    GetNormalizedVector(Vector(-0.35, 0, kMvMSpreadDistance)),
+    GetNormalizedVector(Vector(0.35, 0, kMvMSpreadDistance)),
+    GetNormalizedVector(Vector(0, -0.35, kMvMSpreadDistance)),
+    GetNormalizedVector(Vector(0, 0.35, kMvMSpreadDistance)),
+    
+    GetNormalizedVector(Vector(-0.8, -0.8, kMvMSpreadDistance)),
+    GetNormalizedVector(Vector(-0.8, 0.8, kMvMSpreadDistance)),
+    GetNormalizedVector(Vector(0.8, 0.8, kMvMSpreadDistance)),
+    GetNormalizedVector(Vector(0.8, -0.8, kMvMSpreadDistance)),
+    
+}
+
+
 //-----------------------------------------------------------------------------
 
 
@@ -38,4 +68,8 @@ end
 
 //-----------------------------------------------------------------------------
 
+
+ReplaceLocals( Shotgun.FirePrimary, { kShotgunDamage = kShotgunDamage, kSpreadVectors = kMvMSpreadVectors } )
+
 Class_Reload("Shotgun", {})
+

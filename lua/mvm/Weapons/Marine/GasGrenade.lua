@@ -3,6 +3,7 @@ Script.Load("lua/mvm/LOSMixin.lua")
 Script.Load("lua/EntityChangeMixin.lua")
 Script.Load("lua/mvm/PickupableWeaponMixin.lua")
 Script.Load("lua/mvm/DamageMixin.lua")
+Script.Load("lua/mvm/PredictedProjectile.lua")
 
 
 //Gas cloud
@@ -240,8 +241,8 @@ function NerveGasCloud:OverrideVisionRadius()
 	return 0
 end
 
-function NerveGasCloud:GetDeathIconIndex()	//Useful one burn away function added
-	return kDeathMessageIcon.GasGrenade
+function NerveGasCloud:GetDeathIconIndex()	//Useful once burn away function added
+	return kDeathMessageIcon.GasGrenade	//TODO Change to Spores Icon
 end
 
 

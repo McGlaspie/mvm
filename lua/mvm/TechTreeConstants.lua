@@ -1,8 +1,5 @@
 
 
-Script.Load("lua/TechTreeConstants.lua")
-
-
 local gTechIdToString = {}
 
 local function createTechIdEnum(table)
@@ -17,6 +14,7 @@ end
 
 
 kTechId = nil
+
 kTechId = createTechIdEnum({
     
     'None', 'PingLocation',
@@ -26,7 +24,8 @@ kTechId = createTechIdEnum({
     'SpawnMarine', 'SpawnAlien', 'CollectResources', 'TransformResources', 'Research',
     
     // General orders and actions ("Default" is right-click)
-    'Default', 'Move', 'Patrol', 'Attack', 'Build', 'Construct', 'AutoConstruct', 'Grow', 'Cancel', 'Recycle', 'Weld', 'AutoWeld', 'Stop', 'SetRally', 'SetTarget', 'Follow', 'HoldPosition', 'FollowAlien',
+    'Default', 'Move', 'Patrol', 'Attack', 'Build', 'Construct', 'AutoConstruct', 'Grow', 'Cancel', 
+	'Recycle', 'Weld', 'AutoWeld', 'Stop', 'SetRally', 'SetTarget', 'Follow', 'HoldPosition', 'FollowAlien',
     // special mac order (follows the target, welds the target as priority and others in range)
     'FollowAndWeld',
     
@@ -55,15 +54,19 @@ kTechId = createTechIdEnum({
     'Marine', 'Exo', 'MarineCommander', 'JetpackMarine', 'Spectator', 'AlienSpectator',
     
     // Marine alerts (specified alert sound and text in techdata if any)
-    'MarineAlertAcknowledge', 'MarineAlertNeedMedpack', 'MarineAlertNeedAmmo', 'MarineAlertNeedOrder', 'MarineAlertHostiles', 'MarineCommanderEjected', 'MACAlertConstructionComplete',    
+    'MarineAlertAcknowledge', 'MarineAlertNeedMedpack', 'MarineAlertNeedAmmo', 'MarineAlertNeedOrder', 'MarineAlertHostiles', 
+	'MarineCommanderEjected', 'MACAlertConstructionComplete',    
     'MarineAlertSentryFiring', 'MarineAlertCommandStationUnderAttack',  'MarineAlertSoldierLost', 'MarineAlertCommandStationComplete',
     
-    'MarineAlertInfantryPortalUnderAttack', 'MarineAlertSentryUnderAttack', 'MarineAlertStructureUnderAttack', 'MarineAlertExtractorUnderAttack', 'MarineAlertSoldierUnderAttack',
+    'MarineAlertInfantryPortalUnderAttack', 'MarineAlertSentryUnderAttack', 'MarineAlertStructureUnderAttack', 'MarineAlertExtractorUnderAttack', 
+	'MarineAlertSoldierUnderAttack',
     
-    'MarineAlertResearchComplete', 'MarineAlertManufactureComplete', 'MarineAlertUpgradeComplete', 'MarineAlertOrderComplete', 'MarineAlertWeldingBlocked', 'MarineAlertMACBlocked', 'MarineAlertNotEnoughResources', 'MarineAlertObjectiveCompleted', 'MarineAlertConstructionComplete',
+    'MarineAlertResearchComplete', 'MarineAlertManufactureComplete', 'MarineAlertUpgradeComplete', 'MarineAlertOrderComplete', 
+	'MarineAlertWeldingBlocked', 'MarineAlertMACBlocked', 'MarineAlertNotEnoughResources', 'MarineAlertObjectiveCompleted', 
+	'MarineAlertConstructionComplete',
     
     // Marine orders 
-    'Defend',
+    'Defend', //???Attack?
     
     // Special tech
     'TwoCommandStations', 'ThreeCommandStations',
@@ -99,8 +102,10 @@ kTechId = createTechIdEnum({
     'Jetpack', 'JetpackFuelTech', 'JetpackArmorTech', 'Exosuit', 'ExosuitLockdownTech', 'ExosuitUpgradeTech',
     
     // Marine upgrades
-    'Weapons1', 'Weapons2', 'Weapons3', 'CatPackTech',
-    'Armor1', 'Armor2', 'Armor3', 'NanoArmor',
+    'Weapons1', 'Weapons2', 'Weapons3', 'Weapons4',
+	'CatPackTech',
+    'Armor1', 'Armor2', 'Armor3', 'Armor4',
+	'NanoArmor',
     
     // Activations
     'ARCDeploy', 'ARCUndeploy',
@@ -211,3 +216,29 @@ kTechId = createTechIdEnum({
     'Max'
     
 })
+
+
+
+function StringToTechId(string)
+    return gTechIdToString[string] or kTechId.None
+end    
+
+// Increase techNode network precision if more needed
+kTechIdMax  = kTechId.Max
+
+// Tech types
+kTechType = enum({ 
+	'Invalid', 'Order', 'Research', 'Upgrade', 
+	'Action', 'Buy', 'Build', 
+	'EnergyBuild', 'Manufacture', 'Activation', 
+	'Menu', 
+	'EnergyManufacture', 'PlasmaManufacture', 
+	'Special', 'Passive' 
+})
+
+// Button indices
+kRecycleCancelButtonIndex   = 12
+kMarineUpgradeButtonIndex   = 5
+kAlienBackButtonIndex       = 8
+
+

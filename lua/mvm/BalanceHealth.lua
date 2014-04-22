@@ -11,22 +11,21 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================		
 
-// HEALTH AND ARMOR		
+// HEALTH AND ARMOR
 kMarineHealth = 100	kMarineArmor = 30	kMarinePointValue = 5
-kJetpackHealth = 100	kJetpackArmor = 30	kJetpackPointValue = 10
-kExosuitHealth = 100	kExosuitArmor = 350	kExosuitPointValue = 25
+kJetpackHealth = 100	kJetpackArmor = 40	kJetpackPointValue = 15
+kExosuitHealth = 100	kExosuitArmor = 600	kExosuitPointValue = 30
 
 kMarineWeaponHealth = 400
 
-kArmorPerUpgradeLevel = 20
-kExosuitArmorPerUpgradeLevel = 150
+kArmorPerUpgradeLevel = 15
+kExosuitArmorPerUpgradeLevel = 100
 kArmorHealScalar = 1
 
 kBuildPointValue = 5
 kRecyclePaybackScalar = 0.75
 kRepairMarineArmorPointValue = 1
 
-kExosuitAbsorption = 0.95
 kBalanceInfestationHurtPercentPerSecond = 2
 
 // used for structures

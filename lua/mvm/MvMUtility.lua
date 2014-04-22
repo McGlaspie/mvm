@@ -1,5 +1,59 @@
 
 
+
+function GetDisplayNameForAlert(techId, defaultText)
+	local displayName = LookupTechData(techId, kTechDataAlertText, defaultText)
+  
+	local localizedName = nil
+	if displayName ~= nil then
+		localizedName = Locale.ResolveString(displayName)
+	end
+    
+	if type(localizedName) == "string" then
+		displayName = localizedName
+	else
+		if (displayName ~= nil) then
+			displayName = "#" .. displayName
+		else
+			displayName = "#" .. ToString(EnumToString(kTechId, techId))
+		end
+	
+	end
+            
+	return displayName
+	
+end
+
+
+// Get localized name for tech data display name's
+function GetDisplayNameForTechId(techId, defaultText)
+
+    local displayName = LookupTechData(techId, kTechDataDisplayName, defaultText)
+    
+    // Now localize.
+    local localizedName = nil
+    if displayName ~= nil then
+        localizedName = Locale.ResolveString(displayName)
+    end
+    
+    if type(localizedName) == "string" then
+        displayName = localizedName
+    else
+    
+        if displayName ~= nil then
+            displayName = "#" .. displayName
+        elseif techId ~= kTechId.None then
+            displayName = "#" .. ToString(EnumToString(kTechId, techId))
+        end
+        
+    end
+    
+    return displayName
+    
+end
+
+
+
 function GetEntitiesByLocation( location, entityType )
 
 	assert( location:isa("Location") )

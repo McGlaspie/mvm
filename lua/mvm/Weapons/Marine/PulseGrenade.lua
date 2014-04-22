@@ -4,6 +4,7 @@ Script.Load("lua/mvm/LOSMixin.lua")
 Script.Load("lua/EntityChangeMixin.lua")
 Script.Load("lua/mvm/PickupableWeaponMixin.lua")
 Script.Load("lua/mvm/DamageMixin.lua")
+Script.Load("lua/mvm/PredictedProjectile.lua")
 
 
 local kLifeTime = 1.2

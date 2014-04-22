@@ -19,7 +19,7 @@ Script.Load("lua/mvm/Hud/Marine/GUIMarineStatus.lua")
 Script.Load("lua/mvm/Hud/GUIEvent.lua")
 Script.Load("lua/Hud/Marine/GUIMarineFuel.lua")
 Script.Load("lua/mvm/Hud/GUIInventory.lua")
-Script.Load("lua/TechTreeConstants.lua")
+Script.Load("lua/mvm/TechTreeConstants.lua")
 
 
 class 'GUIMarineHUD' (GUIAnimatedScript)
@@ -40,6 +40,7 @@ local function GetTechIdForArmorLevel(level)
     armorTechId[1] = kTechId.Armor1
     armorTechId[2] = kTechId.Armor2
     armorTechId[3] = kTechId.Armor3
+    armorTechId[4] = kTechId.Armor4
     
     return armorTechId[level]
 
@@ -52,6 +53,7 @@ local function GetTechIdForWeaponLevel(level)
     weaponTechId[1] = kTechId.Weapons1
     weaponTechId[2] = kTechId.Weapons2
     weaponTechId[3] = kTechId.Weapons3
+    weaponTechId[4] = kTechId.Weapons4
     
     return weaponTechId[level]
 
@@ -805,7 +807,7 @@ function GUIMarineHUD:Update(deltaTime)
     // Update passive upgrades
     local armorLevel = 0
     local weaponLevel = 0
-
+	
     armorLevel = PlayerUI_GetArmorLevel()
     weaponLevel = PlayerUI_GetWeaponLevel()
 

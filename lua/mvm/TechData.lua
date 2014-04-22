@@ -602,8 +602,29 @@ function BuildTechData()	//OVERRIDES
 
         { [kTechDataId] = kTechId.Rifle,      [kTechDataMaxHealth] = kMarineWeaponHealth, [kTechDataTooltipInfo] = "RIFLE_TOOLTIP",    [kTechDataMapName] = Rifle.kMapName,                    [kTechDataDisplayName] = "RIFLE",         [kTechDataModel] = Rifle.kModelName, [kTechDataDamageType] = kRifleDamageType, [kTechDataCostKey] = kRifleCost, },
         { [kTechDataId] = kTechId.Pistol,     [kTechDataMaxHealth] = kMarineWeaponHealth,       [kTechDataMapName] = Pistol.kMapName,                   [kTechDataDisplayName] = "PISTOL",         [kTechDataModel] = Pistol.kModelName, [kTechDataDamageType] = kPistolDamageType, [kTechDataCostKey] = kPistolCost, [kTechDataTooltipInfo] = "PISTOL_TOOLTIP"},
-        { [kTechDataId] = kTechId.Axe,                   [kTechDataMapName] = Axe.kMapName,                      [kTechDataDisplayName] = "SWITCH_AX",         [kTechDataModel] = Axe.kModelName, [kTechDataDamageType] = kAxeDamageType, [kTechDataCostKey] = kAxeCost, [kTechDataTooltipInfo] = "AXE_TOOLTIP"},
-        { [kTechDataId] = kTechId.Shotgun,     [kTechDataMaxHealth] = kMarineWeaponHealth,    [kTechDataPointValue] = kShotgunPointValue,      [kTechDataMapName] = Shotgun.kMapName,                  [kTechDataDisplayName] = "SHOTGUN",             [kTechDataTooltipInfo] =  "SHOTGUN_TOOLTIP", [kTechDataModel] = Shotgun.kModelName, [kTechDataDamageType] = kShotgunDamageType, [kTechDataCostKey] = kShotgunCost, [kStructureAttachId] = kTechId.Armory, [kStructureAttachRange] = kArmoryWeaponAttachRange, [kStructureAttachRequiresPower] = true },
+        { 
+			[kTechDataId] = kTechId.Axe,                   
+			[kTechDataMapName] = Axe.kMapName,                      
+			[kTechDataDisplayName] = "SWITCH_AX",         
+			[kTechDataModel] = Axe.kModelName, 
+			[kTechDataDamageType] = kAxeDamageType, 
+			[kTechDataCostKey] = kAxeCost, 
+			[kTechDataTooltipInfo] = "AXE_TOOLTIP"
+		},
+        { 
+			[kTechDataId] = kTechId.Shotgun,     
+			[kTechDataMaxHealth] = kMarineWeaponHealth,    
+			[kTechDataPointValue] = kShotgunPointValue,      
+			[kTechDataMapName] = Shotgun.kMapName,                  
+			[kTechDataDisplayName] = "SHOTGUN",             
+			[kTechDataTooltipInfo] =  "SHOTGUN_TOOLTIP", 
+			[kTechDataModel] = Shotgun.kModelName, 
+			[kTechDataDamageType] = kShotgunDamageType, 
+			[kTechDataCostKey] = kShotgunCost, 
+			[kStructureAttachId] = kTechId.Armory, 
+			[kStructureAttachRange] = kArmoryWeaponAttachRange, 
+			[kStructureAttachRequiresPower] = true 
+		},
         { [kTechDataId] = kTechId.HeavyRifle,      [kTechDataMaxHealth] = kMarineWeaponHealth, [kTechDataTooltipInfo] = "HEAVY_RIFLE_TOOLTIP", [kTechDataPointValue] = kWeaponPointValue,    [kTechDataMapName] = HeavyRifle.kMapName,     [kTechDataDisplayName] = "HEAVY_RIFLE",         [kTechDataModel] = HeavyRifle.kModelName, [kTechDataDamageType] = kHeavyRifleDamageType, [kTechDataCostKey] = kHeavyRifleCost, },
 
         // hand grenades
@@ -662,8 +683,20 @@ function BuildTechData()	//OVERRIDES
  
         // dropped by commander:
         
-        { [kTechDataId] = kTechId.FlamethrowerTech,      [kTechDataCostKey] = kFlamethrowerTechResearchCost,     [kTechDataResearchTimeKey] = kFlamethrowerTechResearchTime, [kTechDataDisplayName] = "RESEARCH_FLAMETHROWERS", [kTechDataTooltipInfo] =  "FLAMETHROWER_TECH_TOOLTIP"},
-        { [kTechDataId] = kTechId.FlamethrowerRangeTech,      [kTechDataCostKey] = kFlamethrowerRangeTechResearchCost,     [kTechDataResearchTimeKey] = kFlamethrowerRangeTechResearchTime, [kTechDataDisplayName] = "FLAMETHROWER_RANGE", [kTechDataTooltipInfo] =  "FLAMETHROWER_RANGE_TOOLTIP"},
+        { 
+			[kTechDataId] = kTechId.FlamethrowerTech,      
+			[kTechDataCostKey] = kFlamethrowerTechResearchCost,     
+			[kTechDataResearchTimeKey] = kFlamethrowerTechResearchTime, 
+			[kTechDataDisplayName] = "RESEARCH_FLAMETHROWERS", 
+			[kTechDataTooltipInfo] =  "FLAMETHROWER_TECH_TOOLTIP"
+		},
+        { 
+			[kTechDataId] = kTechId.FlamethrowerRangeTech,      
+			[kTechDataCostKey] = kFlamethrowerRangeTechResearchCost,     
+			[kTechDataResearchTimeKey] = kFlamethrowerRangeTechResearchTime, 
+			[kTechDataDisplayName] = "FLAMETHROWER_RANGE", 
+			[kTechDataTooltipInfo] =  "FLAMETHROWER_RANGE_TOOLTIP"
+		},
         { 
 			[kTechDataId] = kTechId.Flamethrower,     
 			[kTechDataMaxHealth] = kMarineWeaponHealth, 
@@ -730,7 +763,15 @@ function BuildTechData()	//OVERRIDES
         { [kTechDataId] = kTechId.JetpackArmorTech,       [kTechDataCostKey] = kJetpackArmorTechResearchCost,         [kTechDataResearchTimeKey] = kJetpackArmorTechResearchTime,     [kTechDataDisplayName] = "JETPACK_ARMOR_TECH", [kTechDataImplemented] = false, [kTechDataHotkey] = Move.S, [kTechDataTooltipInfo] = "JETPACK_ARMOR_TOOLTIP"},
 
         
-        { [kTechDataId] = kTechId.Exosuit,           [kTechDataDisplayName] = "EXOSUIT", [kTechDataMapName] = "exo",               [kTechDataCostKey] = kExosuitCost, [kTechDataHotkey] = Move.E, [kTechDataTooltipInfo] = "EXOSUIT_TECH_TOOLTIP", [kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight},
+        { 
+			[kTechDataId] = kTechId.Exosuit,           
+			[kTechDataDisplayName] = "EXOSUIT", 
+			[kTechDataMapName] = "exo",               
+			[kTechDataCostKey] = kExosuitCost, 
+			[kTechDataHotkey] = Move.E, 
+			[kTechDataTooltipInfo] = "EXOSUIT_TECH_TOOLTIP", 
+			[kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight
+		},
         { [kTechDataId] = kTechId.DualMinigunExosuit,     [kTechIDShowEnables] = false,       [kTechDataDisplayName] = "DUALMINIGUN_EXOSUIT", [kTechDataMapName] = "exo",               [kTechDataCostKey] = kDualExosuitCost, [kTechDataHotkey] = Move.E, [kTechDataTooltipInfo] = "DUALMINIGUN_EXOSUIT_TECH_TOOLTIP", [kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight},
         { [kTechDataId] = kTechId.ClawRailgunExosuit,     [kTechIDShowEnables] = false,       [kTechDataDisplayName] = "CLAWRAILGUN_EXOSUIT", [kTechDataMapName] = "exo",               [kTechDataCostKey] = kClawRailgunExosuitCost, [kTechDataHotkey] = Move.E, [kTechDataTooltipInfo] = "CLAWRAILGUN_EXOSUIT_TECH_TOOLTIP", [kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight},
         { [kTechDataId] = kTechId.DualRailgunExosuit,     [kTechIDShowEnables] = false,       [kTechDataDisplayName] = "DUALRAILGUN_EXOSUIT", [kTechDataMapName] = "exo",               [kTechDataCostKey] = kDualRailgunExosuitCost, [kTechDataHotkey] = Move.E, [kTechDataTooltipInfo] = "DUALRAILGUN_EXOSUIT_TECH_TOOLTIP", [kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight},
@@ -741,9 +782,35 @@ function BuildTechData()	//OVERRIDES
         { [kTechDataId] = kTechId.UpgradeToDualRailgun, [kTechIDShowEnables] = false, [kTechDataCostKey] = kUpgradeToDualRailgunCost,   [kTechDataDisplayName] = "DUALRAILGUN_EXOSUIT" },
         
         // Armor research
-        { [kTechDataId] = kTechId.Armor1,                [kTechDataCostKey] = kArmor1ResearchCost,                   [kTechDataResearchTimeKey] = kArmor1ResearchTime,     [kTechDataDisplayName] = "MARINE_ARMOR1",  [kTechDataTooltipInfo] = "MARINE_ARMOR1_TOOLTIP"},
-        { [kTechDataId] = kTechId.Armor2,                [kTechDataCostKey] = kArmor2ResearchCost,                   [kTechDataResearchTimeKey] = kArmor2ResearchTime,     [kTechDataDisplayName] = "MARINE_ARMOR2",  [kTechDataTooltipInfo] = "MARINE_ARMOR2_TOOLTIP"},
-        { [kTechDataId] = kTechId.Armor3,                [kTechDataCostKey] = kArmor3ResearchCost,                   [kTechDataResearchTimeKey] = kArmor3ResearchTime,     [kTechDataDisplayName] = "MARINE_ARMOR3",  [kTechDataTooltipInfo] = "MARINE_ARMOR3_TOOLTIP"},
+        { 
+			[kTechDataId] = kTechId.Armor1,                
+			[kTechDataCostKey] = kArmor1ResearchCost,                   
+			[kTechDataResearchTimeKey] = kArmor1ResearchTime,     
+			[kTechDataDisplayName] = "MARINE_ARMOR1",  
+			[kTechDataTooltipInfo] = "MARINE_ARMOR1_TOOLTIP"
+		},
+        { 
+			[kTechDataId] = kTechId.Armor2,                
+			[kTechDataCostKey] = kArmor2ResearchCost,                   
+			[kTechDataResearchTimeKey] = kArmor2ResearchTime,     
+			[kTechDataDisplayName] = "MARINE_ARMOR2",  
+			[kTechDataTooltipInfo] = "MARINE_ARMOR2_TOOLTIP"
+		},
+        { 
+			[kTechDataId] = kTechId.Armor3,                
+			[kTechDataCostKey] = kArmor3ResearchCost,                   
+			[kTechDataResearchTimeKey] = kArmor3ResearchTime,     
+			[kTechDataDisplayName] = "MARINE_ARMOR3",  
+			[kTechDataTooltipInfo] = "MARINE_ARMOR3_TOOLTIP"
+		},
+		{ 
+			[kTechDataId] = kTechId.Armor4,                
+			[kTechDataCostKey] = kArmor4ResearchCost,                   
+			[kTechDataResearchTimeKey] = kArmor4ResearchTime,     
+			[kTechDataDisplayName] = "MARINE_ARMOR4",  
+			[kTechDataTooltipInfo] = "MARINE_ARMOR4_TOOLTIP"
+		},
+		
         { [kTechDataId] = kTechId.NanoArmor,             
 			[kTechDataCostKey] = kNanoArmorResearchCost,                
 			[kTechDataResearchTimeKey] = kNanoArmorResearchTime,     
@@ -752,9 +819,38 @@ function BuildTechData()	//OVERRIDES
 		},
 
         // Weapons research
-        { [kTechDataId] = kTechId.Weapons1,              [kTechDataCostKey] = kWeapons1ResearchCost,                 [kTechDataResearchTimeKey] = kWeapons1ResearchTime,     [kTechDataDisplayName] = "MARINE_WEAPONS1", [kTechDataHotkey] = Move.Z, [kTechDataTooltipInfo] = "MARINE_WEAPONS1_TOOLTIP"},
-        { [kTechDataId] = kTechId.Weapons2,              [kTechDataCostKey] = kWeapons2ResearchCost,                 [kTechDataResearchTimeKey] = kWeapons2ResearchTime,     [kTechDataDisplayName] = "MARINE_WEAPONS2", [kTechDataHotkey] = Move.Z, [kTechDataTooltipInfo] = "MARINE_WEAPONS2_TOOLTIP"},
-        { [kTechDataId] = kTechId.Weapons3,              [kTechDataCostKey] = kWeapons3ResearchCost,                 [kTechDataResearchTimeKey] = kWeapons3ResearchTime,     [kTechDataDisplayName] = "MARINE_WEAPONS3", [kTechDataHotkey] = Move.Z, [kTechDataTooltipInfo] = "MARINE_WEAPONS3_TOOLTIP"},
+        { 
+			[kTechDataId] = kTechId.Weapons1,              
+			[kTechDataCostKey] = kWeapons1ResearchCost,                 
+			[kTechDataResearchTimeKey] = kWeapons1ResearchTime,     
+			[kTechDataDisplayName] = "MARINE_WEAPONS1", 
+			[kTechDataHotkey] = Move.Z, 
+			[kTechDataTooltipInfo] = "MARINE_WEAPONS1_TOOLTIP"
+		},
+        { 
+			[kTechDataId] = kTechId.Weapons2,              
+			[kTechDataCostKey] = kWeapons2ResearchCost,                 
+			[kTechDataResearchTimeKey] = kWeapons2ResearchTime,     
+			[kTechDataDisplayName] = "MARINE_WEAPONS2", 
+			[kTechDataHotkey] = Move.Z, 
+			[kTechDataTooltipInfo] = "MARINE_WEAPONS2_TOOLTIP"
+		},
+        { 
+			[kTechDataId] = kTechId.Weapons3,              
+			[kTechDataCostKey] = kWeapons3ResearchCost,                 
+			[kTechDataResearchTimeKey] = kWeapons3ResearchTime,     
+			[kTechDataDisplayName] = "MARINE_WEAPONS3", 
+			[kTechDataHotkey] = Move.Z, 
+			[kTechDataTooltipInfo] = "MARINE_WEAPONS3_TOOLTIP"
+		},
+		{ 
+			[kTechDataId] = kTechId.Weapons4,              
+			[kTechDataCostKey] = kWeapons4ResearchCost,                 
+			[kTechDataResearchTimeKey] = kWeapons4ResearchTime,     
+			[kTechDataDisplayName] = "MARINE_WEAPONS4", 
+			[kTechDataHotkey] = Move.Z, 
+			[kTechDataTooltipInfo] = "MARINE_WEAPONS4_TOOLTIP"
+		},
 
         { [kTechDataId] = kTechId.ShotgunTech,           
 			[kTechDataCostKey] = kShotgunTechResearchCost,           
@@ -780,11 +876,35 @@ function BuildTechData()	//OVERRIDES
 			[kTechDataDisplayName] = "RESEARCH_GRENADES", 
 			[kTechDataTooltipInfo] = "GRENADES_TOOLTIP"
 		},
-        { [kTechDataId] = kTechId.AdvancedWeaponry,      [kTechDataCostKey] = kAdvancedWeaponryResearchCost,      [kTechDataResearchTimeKey] = kAdvancedWeaponryResearchTime, [kTechDataDisplayName] = "ADVANCED_WEAPONRY", [kTechDataHotkey] = Move.G, [kTechDataTooltipInfo] = "ADVANCED_WEAPONRY_TOOLTIP"},
+		
+        { 
+			[kTechDataId] = kTechId.AdvancedWeaponry,      
+			[kTechDataCostKey] = kAdvancedWeaponryResearchCost,      
+			[kTechDataResearchTimeKey] = kAdvancedWeaponryResearchTime, 
+			[kTechDataDisplayName] = "ADVANCED_WEAPONRY", 
+			[kTechDataHotkey] = Move.G, 
+			[kTechDataTooltipInfo] = "ADVANCED_WEAPONRY_TOOLTIP"
+		},
         
         // ARC abilities
-        { [kTechDataId] = kTechId.ARCDeploy, [kTechIDShowEnables] = false, [kTechDataResearchTimeKey] = kARCDeployTime, [kTechDataDisplayName] = "ARC_DEPLOY",                     [kTechDataMenuPriority] = 1, [kTechDataHotkey] = Move.D, [kTechDataTooltipInfo] = "ARC_DEPLOY_TOOLTIP"},
-        { [kTechDataId] = kTechId.ARCUndeploy,  [kTechIDShowEnables] = false,  [kTechDataResearchTimeKey] = kARCUndeployTime, [kTechDataDisplayName] = "ARC_UNDEPLOY",                    [kTechDataMenuPriority] = 2, [kTechDataHotkey] = Move.D, [kTechDataTooltipInfo] = "ARC_UNDEPLOY_TOOLTIP"},
+        { 
+			[kTechDataId] = kTechId.ARCDeploy, 
+			[kTechIDShowEnables] = false, 
+			[kTechDataResearchTimeKey] = kARCDeployTime, 
+			[kTechDataDisplayName] = "ARC_DEPLOY",                     
+			[kTechDataMenuPriority] = 1, 
+			[kTechDataHotkey] = Move.D, 
+			[kTechDataTooltipInfo] = "ARC_DEPLOY_TOOLTIP"
+		},
+        { 
+			[kTechDataId] = kTechId.ARCUndeploy,  
+			[kTechIDShowEnables] = false,  
+			[kTechDataResearchTimeKey] = kARCUndeployTime, 
+			[kTechDataDisplayName] = "ARC_UNDEPLOY",                    
+			[kTechDataMenuPriority] = 2, 
+			[kTechDataHotkey] = Move.D, 
+			[kTechDataTooltipInfo] = "ARC_UNDEPLOY_TOOLTIP"
+		},
 
         // upgradeable life forms
         { [kTechDataId] = kTechId.LifeFormMenu,           [kTechDataDisplayName] = "BASIC_LIFE_FORMS", [kTechDataTooltipInfo] = "BASIC_LIFE_FORMS_TOOLTIP", },
@@ -1054,8 +1174,13 @@ function BuildTechData()	//OVERRIDES
         { [kTechDataId] = kTechId.AlienAlertGorgeBuiltHarvester,                [kTechDataAlertType] = kAlertType.Info,                                                                                 [kTechDataAlertText] = "ALIEN_ALERT_GORGEBUILT_HARVESTER"},
         { [kTechDataId] = kTechId.AlienAlertNotEnoughResources,                 [kTechDataAlertSound] = Alien.kNotEnoughResourcesSound,                     [kTechDataAlertType] = kAlertType.Info,     [kTechDataAlertText] = "ALIEN_ALERT_NOTENOUGH_RESOURCES"},
         { [kTechDataId] = kTechId.AlienCommanderEjected,                        [kTechDataAlertSound] = AlienCommander.kCommanderEjectedSoundName,          [kTechDataAlertType] = kAlertType.Info,     [kTechDataAlertText] = "ALIEN_ALERT_COMMANDER_EJECTED",    [kTechDataAlertTeam] = true},        
-
-        { [kTechDataId] = kTechId.DeathTrigger,                                 [kTechDataDisplayName] = "DEATH_TRIGGER",                                   [kTechDataMapName] = DeathTrigger.kMapName, [kTechDataModel] = ""},
+		
+        { 
+			[kTechDataId] = kTechId.DeathTrigger,                                 
+			[kTechDataDisplayName] = "DEATH_TRIGGER",                                   
+			[kTechDataMapName] = DeathTrigger.kMapName, 
+			[kTechDataModel] = ""
+		},
 
     }
 

@@ -6,7 +6,7 @@
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 Script.Load("lua/Commander_Hotkeys.lua")
-Script.Load("lua/TechTreeButtons.lua")
+Script.Load("lua/mvm/TechTreeButtons.lua")
 
 // Maps tech buttons to keys in "grid" system
 kGridHotkeys =
@@ -212,6 +212,7 @@ function CommanderUI_MenuButtonAction(index)
     
 end
 
+
 local function GetIsMenu(techId)
 
     local techTree = GetTechTree()
@@ -225,6 +226,7 @@ local function GetIsMenu(techId)
     return false
 
 end
+
 
 function CommanderUI_MenuButtonOffset(index)
 

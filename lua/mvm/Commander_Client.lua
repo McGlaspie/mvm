@@ -7,6 +7,20 @@ Script.Load("lua/mvm/Commander_Ping.lua")
 //-----------------------------------------------------------------------------
 
 
+function GetTechIdFromButtonIndex(index)
+
+    local techId = kTechId.None
+    local player = Client.GetLocalPlayer()
+    
+    if(index <= table.count(player.menuTechButtons)) then
+        techId = player.menuTechButtons[index]
+    end
+       
+    return techId
+    
+end
+
+
 
 function CommanderUI_MenuButtonRequiresTarget(index)
 

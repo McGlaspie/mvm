@@ -4,6 +4,7 @@ Script.Load("lua/mvm/LOSMixin.lua")
 Script.Load("lua/mvm/PickupableWeaponMixin.lua")
 Script.Load("lua/mvm/DamageMixin.lua")
 Script.Load("lua/mvm/TeamMixin.lua")
+Script.Load("lua/mvm/PredictedProjectile.lua")
 
 
 local newNetworkVars = {}
@@ -62,7 +63,7 @@ function ClusterGrenade:OverrideVisionRadius()
 end
 
 
-local function CreateFragments(self)
+local function CreateFragments(self)	//???? Create additional fragements as upgrade?
 
     local origin = self:GetOrigin()
     local player = self:GetOwner()

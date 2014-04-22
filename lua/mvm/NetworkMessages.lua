@@ -2,15 +2,14 @@
 
 Script.Load("lua/NetworkMessages.lua")
 
-//Script.Load("lua/mvm/TechTreeConstants.lua")
+Script.Load("lua/mvm/TechTreeConstants.lua")
 Script.Load("lua/mvm/InsightNetworkMessages.lua")
 
 
 //-----------------------------------------------------------------------------
 
 
-local kScoreUpdate =
-{
+local kScoreUpdate = {
     points = "integer (0 to " .. kMaxScore .. ")",
     res = "integer (0 to " .. kMaxPersonalResources .. ")",
     wasKill = "boolean"
@@ -27,5 +26,17 @@ if Client then
 	end
 	
 	Client.HookNetworkMessage("MvM_ScoreUpdate", MvM_OnScoreUpdate)
+
+	
+	
+	function OnTeamConceded(message)
+		
+		if message.teamNumber == kMarineTeamType then
+			ChatUI_AddSystemMessage(Locale.ResolveString("TEAM_MARINES_CONCEDED"))
+		else
+			ChatUI_AddSystemMessage(Locale.ResolveString("TEAM_ALIENS_CONCEDED"))
+		end
+		
+	end
 
 end

@@ -33,6 +33,43 @@ function Flame:OverrideVisionRadius()
 end
 
 
+if Server then
+
+	function Flame:Detonate(targetHit)
+    
+    	local player = self:GetOwner()
+	    local ents = GetEntitiesWithMixinWithinRange("Live", self:GetOrigin(), Flame.kDamageRadius)
+	    
+	    if targetHit ~= nil then
+	    	table.insert(ents, targetHit)
+	    end
+	    
+	    for index, ent in ipairs(ents) do
+        
+            if ent ~= self:GetOwner() or GetGamerules():GetFriendlyFire() then
+				
+				if ent.GetModelOrigin then
+				
+					local toEnemy = GetNormalizedVector(ent:GetModelOrigin() - self:GetOrigin())
+					self:DoDamage(Flame.kDamage, ent, ent:GetModelOrigin(), toEnemy)
+				
+				else
+				
+					local toEnemy = GetNormalizedVector(ent:Origin() - self:GetOrigin())
+					self:DoDamage(Flame.kDamage, ent, ent:Origin(), toEnemy)
+									
+				end
+				
+                
+                
+            end
+            
+	    end
+        
+    end
+
+end
+
 
 
 Class_Reload( "Flame", {} )

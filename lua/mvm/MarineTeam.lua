@@ -68,7 +68,7 @@ function MarineTeam:InitTechTree()	//OVERRIDES
     self.techTree:AddBuildNode(kTechId.Sentry,                    kTechId.RoboticsFactory,     kTechId.SentryBattery, true)
     self.techTree:AddBuildNode(kTechId.Armory,                    kTechId.CommandStation,      kTechId.None)  
     self.techTree:AddBuildNode(kTechId.ArmsLab,                   kTechId.CommandStation,                kTechId.None)  
-    self.techTree:AddManufactureNode( kTechId.MAC,                 kTechId.RoboticsFactory,                kTechId.None,  true) 
+    self.techTree:AddManufactureNode( kTechId.MAC,                kTechId.RoboticsFactory,                kTechId.None,  true) 
 	
     self.techTree:AddBuyNode(kTechId.Axe,                         kTechId.None,              kTechId.None)
     self.techTree:AddBuyNode(kTechId.Pistol,                      kTechId.None,                kTechId.None)
@@ -97,17 +97,19 @@ function MarineTeam:InitTechTree()	//OVERRIDES
     
     self.techTree:AddResearchNode(kTechId.Armor1,                 kTechId.ArmsLab)
     self.techTree:AddResearchNode(kTechId.Armor2,                 kTechId.Armor1, kTechId.None)
-    self.techTree:AddResearchNode(kTechId.Armor3,                 kTechId.Armor2, kTechId.None)    
+    self.techTree:AddResearchNode(kTechId.Armor3,                 kTechId.Armor2, kTechId.None)
+    self.techTree:AddResearchNode(kTechId.Armor4,                 kTechId.Armor3, kTechId.None)
     self.techTree:AddResearchNode(kTechId.NanoArmor,              kTechId.None)
     
     self.techTree:AddResearchNode(kTechId.Weapons1,               kTechId.ArmsLab)
     self.techTree:AddResearchNode(kTechId.Weapons2,               kTechId.Weapons1, kTechId.None)
     self.techTree:AddResearchNode(kTechId.Weapons3,               kTechId.Weapons2, kTechId.None)
+    self.techTree:AddResearchNode(kTechId.Weapons4,               kTechId.Weapons3, kTechId.None)
     
     // Marine tier 2
-    self.techTree:AddBuildNode(kTechId.AdvancedArmory,               kTechId.Armory,        kTechId.None)
-    self.techTree:AddResearchNode(kTechId.PhaseTech,                    kTechId.Observatory,        kTechId.None)
-    self.techTree:AddBuildNode(kTechId.PhaseGate,                    kTechId.PhaseTech,        kTechId.None, true)
+    self.techTree:AddBuildNode(kTechId.AdvancedArmory,            kTechId.Armory, kTechId.None )
+    self.techTree:AddResearchNode(kTechId.PhaseTech,              kTechId.Observatory, kTechId.None )
+    self.techTree:AddBuildNode(kTechId.PhaseGate,                 kTechId.PhaseTech, kTechId.None, true )
 
 
     self.techTree:AddBuildNode(kTechId.Observatory,               kTechId.InfantryPortal,       kTechId.Armory)      
@@ -131,8 +133,6 @@ function MarineTeam:InitTechTree()	//OVERRIDES
     
     self.techTree:AddTargetedBuyNode(kTechId.GrenadeLauncher,  	 kTechId.AdvancedWeaponry, kTechId.GrenadeLauncherTech, kTechId.None)
     self.techTree:AddTargetedActivation(kTechId.DropGrenadeLauncher,  kTechId.AdvancedWeaponry, kTechId.GrenadeLauncherTech, kTechId.None)
-    //self.techTree:AddTargetedBuyNode(kTechId.GrenadeLauncher,  kTechId.AdvancedWeaponry)
-    //self.techTree:AddTargetedActivation(kTechId.DropGrenadeLauncher,  kTechId.AdvancedWeaponry)
     
     self.techTree:AddResearchNode(kTechId.GrenadeTech,           kTechId.Armory,                   kTechId.None)
     self.techTree:AddTargetedBuyNode(kTechId.ClusterGrenade,     kTechId.GrenadeTech)

@@ -36,7 +36,7 @@ kShowOnTeam[kTeam1Index] = { }
 kShowOnTeam[kTeam2Index] = { }
 kShowOnTeam[kSpectatorIndex] = { 
 	["mvm/GUIGameEnd"] = true, 
-	GUISpectator = true 
+	["mvm/Hud/GUISpectator"] = true 
 }
 
 local kBothAlienAndMarine = { 

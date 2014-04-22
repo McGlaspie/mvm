@@ -8,6 +8,50 @@ local newNetworkVars = {
 	supplyUsed = "integer (0 to " .. kMaxSupply .. ")"		//OVERRIDES
 }
 
+
+
+// Relevant techs must be ordered with children techs coming after their parents
+TeamInfo.kRelevantTechIdsMarine =
+{
+
+    kTechId.ShotgunTech,
+    kTechId.MinesTech,
+    kTechId.WelderTech,
+    kTechId.GrenadeTech,
+    
+    kTechId.AdvancedArmory,
+    kTechId.AdvancedArmoryUpgrade,
+    kTechId.AdvancedWeaponry,
+
+    kTechId.Weapons1,
+    kTechId.Weapons2,
+    kTechId.Weapons3,
+    kTechId.Weapons4,
+    kTechId.Armor1,
+    kTechId.Armor2,
+    kTechId.Armor3,
+    kTechId.Armor4,
+
+    kTechId.PrototypeLab,
+    kTechId.JetpackTech,
+    kTechId.ExosuitTech,
+    kTechId.DualMinigunTech,
+
+    kTechId.ARCRoboticsFactory,
+    kTechId.UpgradeRoboticsFactory,
+    kTechId.MACEMPTech,
+    kTechId.MACSpeedTech,
+    
+    kTechId.Observatory,
+    kTechId.PhaseTech,
+    
+    kTechId.CatPackTech,
+    kTechId.NanoShieldTech,
+    
+}
+
+
+
 function TeamInfo:GetRelevantTech()
     return TeamInfo.kRelevantIdMaskMarine, TeamInfo.kRelevantTechIdsMarine
 end

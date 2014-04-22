@@ -129,6 +129,57 @@ function ArmsLab:GetIsVulnerableToEMP()
 	return false
 end
 
+//Rolls upgrades into single buttons
+//Makes room for additional tech
+function ArmsLab:GetTechButtons(techId)
+
+	local upgrades = { 
+		kTechId.Weapons1, kTechId.None, kTechId.None, kTechId.None,
+		kTechId.Armor1, kTechId.None, kTechId.None, kTechId.None 
+	}
+
+	local teamNum = self:GetTeamNumber()
+	//FIXME Change to a team Lookup of current level, and switch on that value
+	
+//Weapons
+	if GetIsTechResearched(teamNum, kTechId.Weapons1) then
+		upgrades[1] = kTechId.Weapons2
+	end
+	
+	if GetIsTechResearched(teamNum, kTechId.Weapons2) then
+		upgrades[1] = kTechId.Weapons3
+	end
+	
+	if GetIsTechResearched(teamNum, kTechId.Weapons3) then
+		upgrades[1] = kTechId.Weapons4
+	end
+	
+	if GetIsTechResearched(teamNum, kTechId.Weapons4) then
+		upgrades[1] = kTechId.None
+	end 
+	
+//Armor
+	if GetIsTechResearched(teamNum, kTechId.Armor1) then
+		upgrades[5] = kTechId.Armor2
+	end
+	
+	if GetIsTechResearched(teamNum, kTechId.Armor2) then
+		upgrades[5] = kTechId.Armor3
+	end
+	
+	if GetIsTechResearched(teamNum, kTechId.Armor3) then
+		upgrades[5] = kTechId.Armor4
+	end
+
+	if GetIsTechResearched(teamNum, kTechId.Armor4) then
+		upgrades[5] = kTechId.None
+	end
+    
+    return upgrades
+
+end
+
+
 
 if Client then
 	

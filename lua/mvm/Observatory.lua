@@ -153,12 +153,39 @@ function Observatory:OnInitialized()	//OVERRIDES
 end
 
 
+function Observatory:OnDestroy()	//OVERRIDES
+
+    ScriptActor.OnDestroy(self)
+    
+    if Server then
+    
+        DestroyEntity(self.distressBeaconSoundFriendlies)
+        DestroyEntity(self.distressBeaconSoundEnemies)
+        self.distressBeaconSoundFriendlies = nil
+		self.distressBeaconSoundEnemies = nil
+        
+    end
+    
+end
+
+
 function Observatory:OverrideVisionRadius()
 	return 5
 end
 
 function Observatory:GetIsVulnerableToEMP()
 	return false
+end
+
+
+function Observatory:GetTechButtons(techId)	//OVERRIDES
+
+    if techId == kTechId.RootMenu then
+        return kObservatoryTechButtons
+    end
+    
+    return nil
+    
 end
 
 
@@ -258,6 +285,15 @@ local function RespawnPlayer(self, player, distressOrigin)
     
     return spawnPoint ~= nil
     
+end
+
+
+function Observatory:CancelDistressBeacon()
+
+    self.distressBeaconTime = nil
+    self.distressBeaconSoundFriendlies:Stop()
+    self.distressBeaconSoundEnemies:Stop()
+
 end
 
 

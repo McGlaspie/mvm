@@ -12,7 +12,9 @@ Script.Load("lua/mvm/MvMEffects.lua")
 
 Script.Load("lua/mvm/NetworkMessages.lua")
 
+Script.Load("lua/mvm/TechTreeConstants.lua")
 Script.Load("lua/mvm/TechData.lua")
+
 Script.Load("lua/mvm/ScriptActor.lua")	//Yup...even had to modify this...fuckn-a
 										//Going to be surprising if this doesn't cause big bugs in the long run
 										//....much less, the pain of updates
@@ -52,6 +54,8 @@ Script.Load("lua/mvm/ResourcePoint.lua")
 Script.Load("lua/mvm/ResourceTower.lua")
 
 Script.Load("lua/mvm/Location.lua")
+
+Script.Load("lua/mvm/DeathTrigger.lua")
 
 Script.Load("lua/mvm/NS2Gamerules.lua")
 
@@ -104,7 +108,7 @@ Script.Load("lua/mvm/Weapons/Marine/Shotgun.lua")
 //Script.Load("lua/mvm/Weapons/Marine/Axe.lua")
 Script.Load("lua/mvm/Weapons/Marine/Minigun.lua")
 Script.Load("lua/mvm/Weapons/Marine/Railgun.lua")
-//Script.Load("lua/mvm/Weapons/Marine/Claw.lua")
+Script.Load("lua/mvm/Weapons/Marine/Claw.lua")
 Script.Load("lua/mvm/Weapons/Marine/GrenadeLauncher.lua")
 Script.Load("lua/mvm/Weapons/Marine/Flamethrower.lua")
 Script.Load("lua/mvm/Weapons/Marine/LayMines.lua")

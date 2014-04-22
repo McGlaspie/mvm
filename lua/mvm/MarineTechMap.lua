@@ -33,8 +33,8 @@ kMarineTechMap =
         { kTechId.DualMinigunTech, 3, 9 },{ kTechId.TwoCommandStations, 5, 9 },
         
         
-        { kTechId.ArmsLab, 9, 7 },{ kTechId.Weapons1, 10, 6.5 },{ kTechId.Weapons2, 11, 6.5 },{ kTechId.Weapons3, 12, 6.5 },
-                                  { kTechId.Armor1, 10, 7.5 },{ kTechId.Armor2, 11, 7.5 },{ kTechId.Armor3, 12, 7.5 },
+        { kTechId.ArmsLab, 9, 7 },{ kTechId.Weapons1, 10, 6.5 },{ kTechId.Weapons2, 11, 6.5 },{ kTechId.Weapons3, 12, 6.5 }, { kTechId.Weapons4, 13, 6.5 },
+                                  { kTechId.Armor1, 10, 7.5 },{ kTechId.Armor2, 11, 7.5 },{ kTechId.Armor3, 12, 7.5 }, { kTechId.Armor4, 13, 7.5 },
                                   
                                   
         { kTechId.NanoShieldTech, 8, 4.5 },
@@ -81,10 +81,12 @@ kMarineLines =
     GetLinePositionForTechMap(kMarineTechMap, kTechId.ArmsLab, kTechId.Weapons1),
     GetLinePositionForTechMap(kMarineTechMap, kTechId.Weapons1, kTechId.Weapons2),
     GetLinePositionForTechMap(kMarineTechMap, kTechId.Weapons2, kTechId.Weapons3),
+    GetLinePositionForTechMap(kMarineTechMap, kTechId.Weapons3, kTechId.Weapons4),
     
     GetLinePositionForTechMap(kMarineTechMap, kTechId.ArmsLab, kTechId.Armor1),
     GetLinePositionForTechMap(kMarineTechMap, kTechId.Armor1, kTechId.Armor2),
     GetLinePositionForTechMap(kMarineTechMap, kTechId.Armor2, kTechId.Armor3),
+    GetLinePositionForTechMap(kMarineTechMap, kTechId.Armor3, kTechId.Armor4),
     
     { 7, 3, 9, 3 },
     GetLinePositionForTechMap(kMarineTechMap, kTechId.RoboticsFactory, kTechId.ARCRoboticsFactory),

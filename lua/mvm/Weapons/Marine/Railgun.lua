@@ -1,5 +1,10 @@
 
 Script.Load("lua/mvm/Weapons/BulletsMixin.lua")
+Script.Load("lua/mvm/TechMixin.lua")
+Script.Load("lua/mvm/TeamMixin.lua")
+Script.Load("lua/mvm/EffectsMixin.lua")
+Script.Load("lua/mvm/DamageMixin.lua")
+
 
 local kChargeSound = PrecacheAsset("sound/NS2.fev/marine/heavy/railgun_charge")
 

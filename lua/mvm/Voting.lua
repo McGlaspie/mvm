@@ -41,6 +41,18 @@ kVoteCannotStartReasonStrings[kVoteCannotStartReason.DisabledByAdmin] = "VOTE_DI
 
 if Server then
 
+	//Re-map MvM vote types to vanilla
+	local votingSettings = Server.GetConfigSetting("voting")
+	local function convertVoteTypeName( voteName )
+
+		assert( voteName )
+		assert( type(voteName) == "string" )
+		
+		return string.sub( string.lower(voteName), 5 )
+
+	end
+
+
     local activeVoteName = nil
     local activeVoteData = nil
     local activeVoteResults = nil
@@ -53,7 +65,9 @@ if Server then
     local startVoteHistory = { }
     
     local function GetStartVoteAllowed(voteName, client)
-    
+		
+		voteName = convertVoteTypeName( voteName )	//remove "MvM_"
+		
         -- Check that there is no current vote.
         if activeVoteName then
             return kVoteCannotStartReason.VoteInProgress
@@ -78,8 +92,8 @@ if Server then
             
         end
         
-        local votingSettings = Server.GetConfigSetting("voting")
-        if votingSettings and votingSettings[string.lower(voteName)] == false then
+        //if votingSettings and votingSettings[string.lower(voteName)] == false then
+        if votingSettings and votingSettings[voteName] == false then
             return kVoteCannotStartReason.DisabledByAdmin
         end
         
@@ -91,7 +105,10 @@ if Server then
     local function StartVote(voteName, client, data)
     
         local voteCanStart = GetStartVoteAllowed(voteName, client)
+		
         if voteCanStart == kVoteCannotStartReason.VoteAllowedToStart then
+			
+			voteName = "MvM_" .. voteName	//hacky much?
         
             activeVoteId = activeVoteId + 1
             activeVoteName = voteName

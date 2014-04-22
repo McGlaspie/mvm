@@ -26,7 +26,7 @@ GUINotificationItem.kNotificationYMargin = 5
 GUINotificationItem.kNotificationScale = 1.2
 
 GUINotificationItem.kIconSize = Vector(40, 40, 0)
-GUINotificationItem.kIconAlpha = 0.5
+GUINotificationItem.kIconAlpha = 0.4	//.5
 
 GUINotificationItem.kNotificationSize = Vector( GUINotificationItem.kNotificationBorderCoords[3] - GUINotificationItem.kNotificationBorderCoords[1], 32, 0 )
 GUINotificationItem.kNotificationStackOffset = Vector( -10, -2, 0) * GUINotificationItem.kNotificationScale
@@ -74,9 +74,7 @@ function GUINotificationItem:Initialize()
     
     self.background:Pause(0.2, nil, AnimateLinear, 
         function (script, item)
-        
             item:SetIsVisible(true)
-        
         end
     )
     
@@ -159,7 +157,11 @@ function GUINotificationItem:ShiftDown()
 
     self.position = self.position + 1
     self.background:DestroyAnimation("SHIFT_DOWN")
-    self.background:SetPosition( Vector(0, GUINotificationItem.kNotificationSize.y + GUINotificationItem.kNotificationYMargin, 0) * self.position, 0.5, "SHIFT_DOWN", AnimateSin)
+    self.background:SetPosition( 
+		Vector( 0, GUINotificationItem.kNotificationSize.y + GUINotificationItem.kNotificationYMargin, 0 ) * self.position, 0.5, 
+		"SHIFT_DOWN", 
+		AnimateSin
+	)
 
 end
 

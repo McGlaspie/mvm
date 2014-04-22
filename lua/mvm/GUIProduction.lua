@@ -179,7 +179,9 @@ function GUIProduction:Initialize()
     self.Background = background
     self.InProgress = inProgress
     self.Complete = complete
+    
 end
+
 
 function GUIProduction:Uninitialize()
 	
@@ -197,12 +199,14 @@ function GUIProduction:Uninitialize()
     
 end
 
+
 function GUIProduction:SetSpectatorRight()
     self.Background:SetAnchor(GUIItem.Right, GUIItem.Bottom)
     self.Background:SetPosition(Vector(-GUIScale(280),-100,0))
     self.InProgress:SetAlignment(GUIList.kAlignment.Right)
     self.Complete:SetAlignment(GUIList.kAlignment.Right)
 end
+
 
 function GUIProduction:SetSpectatorLeft()
     self.Background:SetAnchor(GUIItem.Left, GUIItem.Bottom)
@@ -211,9 +215,11 @@ function GUIProduction:SetSpectatorLeft()
     self.Complete:SetAlignment(GUIList.kAlignment.Left)
 end
 
+
 function GUIProduction:OnResolutionChanged(oldX, oldY, newX, newY)
 
 end
+
 
 function GUIProduction:SetTeam(teamIndex)
 
@@ -278,6 +284,7 @@ local function updateProgress(tech)
             tech.ResearchBarBack:SetIsVisible(false)
         end
     end
+    
 end
 
 

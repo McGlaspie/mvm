@@ -24,7 +24,7 @@ gServerBots = { }
 
 class 'Bot'
 
-Script.Load("lua/TechMixin.lua")
+Script.Load("lua/mvm/TechMixin.lua")
 Script.Load("lua/ExtentsMixin.lua")
 Script.Load("lua/PathingMixin.lua")
 Script.Load("lua/OrdersMixin.lua")

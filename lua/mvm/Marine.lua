@@ -241,30 +241,30 @@ if Client then
 	end
 	
 	function Marine:GetBaseSkinColor(teamNum)
-		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
+		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index and teamNum == kTeamReadyRoom then
 			return ConditionalValue( self.previousTeamNumber == kTeam1Index, kTeam1_BaseColor, kTeam2_BaseColor )
 		elseif teamNum == kTeam1Index or teamNum == kTeam2Index then
-			return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_BaseColor, kTeam2_BaseColor )
+			return ConditionalValue( teamNum == kTeam1Index, kTeam1_BaseColor, kTeam2_BaseColor )
 		else
 			return kNeutral_BaseColor
 		end
 	end
 
 	function Marine:GetAccentSkinColor(teamNum)
-		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
+		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index and teamNum == kTeamReadyRoom then
 			return ConditionalValue( self.previousTeamNumber == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
 		elseif teamNum == kTeam1Index or teamNum == kTeam2Index then
-			return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
+			return ConditionalValue( teamNum == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
 		else
 			return kNeutral_AccentColor
 		end
 	end
 	
 	function Marine:GetTrimSkinColor(teamNum)
-		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
+		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index and teamNum == kTeamReadyRoom then
 			return ConditionalValue( self.previousTeamNumber == kTeam1Index, kTeam1_TrimColor, kTeam2_TrimColor )
 		elseif teamNum == kTeam1Index or teamNum == kTeam2Index then
-			return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_TrimColor, kTeam2_TrimColor )
+			return ConditionalValue( teamNum == kTeam1Index, kTeam1_TrimColor, kTeam2_TrimColor )
 		else
 			return kNeutral_TrimColor
 		end
@@ -415,6 +415,33 @@ end	//Server
 if Client then
 	
 	
+	// Bring up buy menu
+	function Marine:BuyMenu(structure)
+		
+		// Don't allow display in the ready room
+		if self:GetTeamNumber() ~= 0 and Client.GetLocalPlayer() == self then
+		
+			if not self.buyMenu then
+			
+				self.buyMenu = GetGUIManager():CreateGUIScript("mvm/Hud/Marine/GUIMarineBuyMenu")
+				
+				MarineUI_SetHostStructure(structure)
+				
+				if structure then
+					self.buyMenu:SetHostStructure(structure)
+				end
+				
+				self:TriggerEffects("marine_buy_menu_open")
+				
+				TEST_EVENT("Marine buy menu displayed")
+				
+			end
+			
+		end
+		
+	end
+	
+	
 	function Marine:OnCountDown()
 	
 		Player.OnCountDown(self)
@@ -481,6 +508,109 @@ if Client then
 		//end
 		
 	end
+	
+	
+	
+	// returns 0 - 4
+	function PlayerUI_GetArmorLevel(researched)
+		
+		local armorLevel = 0
+		
+		if Client.GetLocalPlayer().gameStarted then
+		
+			local techTree = GetTechTree()
+		
+			if techTree then
+				
+				local armor4Node = techTree:GetTechNode(kTechId.Armor4)
+				local armor3Node = techTree:GetTechNode(kTechId.Armor3)
+				local armor2Node = techTree:GetTechNode(kTechId.Armor2)
+				local armor1Node = techTree:GetTechNode(kTechId.Armor1)
+				
+				if researched then
+			
+					if armor4Node and armor4Node:GetResearched() then
+						armorLevel = 4
+					elseif armor3Node and armor3Node:GetResearched() then
+						armorLevel = 3
+					elseif armor2Node and armor2Node:GetResearched()  then
+						armorLevel = 2
+					elseif armor1Node and armor1Node:GetResearched()  then
+						armorLevel = 1
+					end
+				
+				else
+				
+					if armor4Node and armor4Node:GetHasTech() then
+						armorLevel = 4
+					elseif armor3Node and armor3Node:GetHasTech() then
+						armorLevel = 3
+					elseif armor2Node and armor2Node:GetHasTech()  then
+						armorLevel = 2
+					elseif armor1Node and armor1Node:GetHasTech()  then
+						armorLevel = 1
+					end
+				
+				end
+				
+			end
+		
+		end
+
+		return armorLevel
+		
+	end
+	
+
+	function PlayerUI_GetWeaponLevel(researched)
+		
+		local weaponLevel = 0
+		
+		if Client.GetLocalPlayer().gameStarted then
+		
+			local techTree = GetTechTree()
+		
+			if techTree then
+			
+				local weapon4Node = techTree:GetTechNode(kTechId.Weapons4)
+				local weapon3Node = techTree:GetTechNode(kTechId.Weapons3)
+				local weapon2Node = techTree:GetTechNode(kTechId.Weapons2)
+				local weapon1Node = techTree:GetTechNode(kTechId.Weapons1)
+			
+				if researched then
+			
+					if weapon4Node and weapon4Node:GetResearched() then
+						weaponLevel = 4
+					elseif weapon3Node and weapon3Node:GetResearched() then
+						weaponLevel = 3
+					elseif weapon2Node and weapon2Node:GetResearched()  then
+						weaponLevel = 2
+					elseif weapon1Node and weapon1Node:GetResearched()  then
+						weaponLevel = 1
+					end
+				
+				else
+				
+					if weapon4Node and weapon4Node:GetHasTech() then
+						weaponLevel = 4
+					elseif weapon3Node and weapon3Node:GetHasTech() then
+						weaponLevel = 3
+					elseif weapon2Node and weapon2Node:GetHasTech()  then
+						weaponLevel = 2
+					elseif weapon1Node and weapon1Node:GetHasTech()  then
+						weaponLevel = 1
+					end
+					
+				end
+				
+			end  
+		
+		end
+		
+		return weaponLevel
+		
+	end
+	
 
 	
 	//lowered flashlight haze

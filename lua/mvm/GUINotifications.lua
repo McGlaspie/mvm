@@ -195,7 +195,6 @@ function GUINotifications:InitializeScoreDisplay()
     self.scoreDisplay:SetPosition(Vector(0, GUINotifications.kScoreDisplayYOffset, 0))
     self.scoreDisplay:SetTextAlignmentX(GUIItem.Align_Center)
     self.scoreDisplay:SetTextAlignmentY(GUIItem.Align_Center)
-    //self.scoreDisplay:SetColor( GUINotifications.kScoreDisplayTextColor )
     self.scoreDisplay:SetIsVisible(false)
     
     self.scoreDisplayPopupTime = 0

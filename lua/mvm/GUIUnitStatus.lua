@@ -21,6 +21,7 @@ And the inverse for darkness.
 */
 
 Shared.PrecacheSurfaceShader("shaders/GUI_TeamThemed.surface_shader")
+Script.Load("lua/mvm/GUIColorGlobals.lua")
 
 
 Script.Load("lua/Badges_Shared.lua")
@@ -203,6 +204,11 @@ local function CreateBlipItem(self)
 		ui_BaseColor = kTeam2_BaseColor
     elseif teamNumber == kTeam1Index then
 		ui_BaseColor = kTeam1_BaseColor
+    end
+    
+    //Spectator hack
+    if teamNumber == kSpectatorIndex then
+		teamNumber = kNeutralTeamType
     end
     
     local texture = kStatusBgTexture[ teamNumber ]

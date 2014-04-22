@@ -148,6 +148,14 @@ function PrototypeLab:GetIsVulnerableToEMP()
 end
 
 
+function PrototypeLab:GetTechButtons(techId)
+    return { 
+		kTechId.JetpackTech, kTechId.None, kTechId.None, kTechId.None, 
+		kTechId.ExosuitTech, kTechId.DualMinigunTech, kTechId.None, kTechId.None 
+	} // kTechId.DualRailgunTech
+end
+
+
 if Client then
 	
 	function PrototypeLab:InitializeSkin()

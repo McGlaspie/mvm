@@ -3,7 +3,7 @@ Script.Load("lua/mvm/DropPack.lua")
 Script.Load("lua/mvm/PickupableMixin.lua")
 
 
-local kPickupDelay = 0.65	//0.53
+local kPickupDelay = 0.7		//v3.2 beta 0.65	//0.53
 
 
 function MedPack:OnInitialized()
@@ -26,6 +26,7 @@ function MedPack:GetIsValidRecipient(recipient)
 			and ( 
 				not recipient.timeLastMedpack or recipient.timeLastMedpack + kPickupDelay <= Shared.GetTime() 
 			)
+			and self:GetTeamNumber() == recipient:GetTeamNumber()
 end
 
 

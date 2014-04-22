@@ -1,5 +1,12 @@
 
 
+Script.Load("lua/mvm/TechMixin.lua")
+Script.Load("lua/mvm/TeamMixin.lua")
+Script.Load("lua/mvm/DamageMixin.lua")
+Script.Load("lua/mvm/Weapons/BulletsMixin.lua")
+
+
+
 local kSpinUpSoundNames = { [ExoWeaponHolder.kSlotNames.Left] = PrecacheAsset("sound/NS2.fev/marine/heavy/spin_up_2"),
                             [ExoWeaponHolder.kSlotNames.Right] = PrecacheAsset("sound/NS2.fev/marine/heavy/spin_up") }
 
@@ -37,6 +44,29 @@ local kMinigunMovementSlowdown = 0.6
 
 
 //-----------------------------------------------------------------------------
+
+
+function Minigun:OnCreate()
+
+    Entity.OnCreate(self)
+    
+    InitMixin(self, TechMixin)
+    InitMixin(self, TeamMixin)
+    InitMixin(self, DamageMixin)
+    InitMixin(self, BulletsMixin)
+    InitMixin(self, ExoWeaponSlotMixin)
+    InitMixin(self, PointGiverMixin)
+    
+    self.minigunAttacking = false
+    self.shooting = false
+    self.heatAmount = 0
+    self.overheated = false
+    
+    if Client then
+        InitMixin(self, ClientWeaponEffectsMixin)
+    end
+    
+end
 
 
 

@@ -52,7 +52,7 @@ kHealthPointsPerArmor = 2
 kHeavyHealthPerArmor = 1
 
 kFlameableMultiplier = 2
-kElectroMagneticMultiplier = 2.5
+kElectroMagneticMultiplier = 3	//2.5
 kCorrodeDamagePlayerArmorScalar = 0.23
 kCorrodeDamageExoArmorScalar = 0.3
 
@@ -470,6 +470,35 @@ local function BuildDamageTypeRules()
 
 end
 
+
+
+// Use this function to change damage according to current upgrades
+function NS2Gamerules_GetUpgradedDamage(attacker, doer, damage, damageType, hitPoint)	//OVERRIDES
+
+    local damageScalar = 1
+
+    if attacker ~= nil then
+    
+        // Damage upgrades only affect weapons, not ARCs, Sentries, MACs, Mines, etc.
+        if doer.GetIsAffectedByWeaponUpgrades and doer:GetIsAffectedByWeaponUpgrades() then
+			
+			if GetHasTech(attacker, kTechId.Weapons4, true) then            
+                damageScalar = kWeapons4DamageScalar
+            elseif GetHasTech(attacker, kTechId.Weapons3, true) then            
+                damageScalar = kWeapons3DamageScalar
+            elseif GetHasTech(attacker, kTechId.Weapons2, true) then            
+                damageScalar = kWeapons2DamageScalar                
+            elseif GetHasTech(attacker, kTechId.Weapons1, true) then            
+                damageScalar = kWeapons1DamageScalar                
+            end
+            
+        end
+        
+    end
+	
+    return damage * damageScalar
+    
+end
 
 
 

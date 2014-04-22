@@ -62,11 +62,11 @@ kNerveGasDamagePerSecond = 12	//50
 kNerveGasDamageType = kDamageType.Gas	//I.e. Lerk Spores, HP only
 
 kShotgunFireRate = 0.88
-kShotgunDamage = 17
+kShotgunDamage = 16
 kShotgunDamageType = kDamageType.Normal
 kShotgunClipSize = 8
 kShotgunBulletsPerShot = 12	//ns2-10
-kShotgunRange = 60	//NS2 - 30
+kShotgunRange = 80	//NS2 - 30
 
 kGrenadeLauncherGrenadeDamage = 120
 kGrenadeLauncherGrenadeDamageType = kDamageType.Structural
@@ -78,10 +78,10 @@ kGrenadeUpgradedLifetime = 1.5
 kFlamethrowerDamage = 20
 kFlamethrowerDamageType = kDamageType.Flame
 kFlamethrowerClipSize = 40
-kFlamethrowerRange = 10				//9
-kFlamethrowerUpgradedRange = 12		//11.5
-kBurnDamagePerSecond = 12			//2
-kFlamethrowerBurnDuration = 6
+kFlamethrowerRange = 12				//NS2-9
+kFlamethrowerUpgradedRange = 15		//11.5
+kBurnDamagePerSecond = 10			//2
+kFlamethrowerBurnDuration = 5	//6
 kFlameRadius = 1.75					//1.8
 kFlameDamageStackWeight = 0.005		//0.5
 
@@ -137,10 +137,11 @@ kARCRange = 24
 kARCMinRange = 8
 
 
-local kDamagePerUpgradeScalar = 0.1
-kWeapons1DamageScalar = 1 + kDamagePerUpgradeScalar
-kWeapons2DamageScalar = 1 + kDamagePerUpgradeScalar * 2
-kWeapons3DamageScalar = 1 + kDamagePerUpgradeScalar * 3
+local kDamagePerUpgradeScalar = 0.075		//0.1
+kWeapons1DamageScalar = 1 + kDamagePerUpgradeScalar	//+7.5%
+kWeapons2DamageScalar = 1 + kDamagePerUpgradeScalar * 2	//+15%
+kWeapons3DamageScalar = 1 + kDamagePerUpgradeScalar * 3	//+22.5%
+kWeapons4DamageScalar = 1 + kDamagePerUpgradeScalar * 4	//+30%
 
 
 
@@ -276,7 +277,7 @@ kRecycleTime = 12
 
 kCommandStationBuildTime = 25	//NS2 - 15
 kInfantryPortalBuildTime = 7
-kArmoryBuildTime = 15	//12
+kArmoryBuildTime = 14	//v3.2 15		NS2-12
 
 kSentryBuildTime = 4			//NS2 - 3
 kSentryBatteryBuildTime = 5
@@ -289,7 +290,7 @@ kMACBuildTime = 4
 kExtractorBuildTime = 15		//NS2 - 12
 
 kRoboticsFactoryBuildTime = 15	//NS2 - 13
-kARCBuildTime = 15				//NS2 - 10
+kARCBuildTime = 12				//v3.2 15  NS2 - 10
 
 kObservatoryBuildTime = 14		//NS2 - 15
 kPhaseGateBuildTime = 12
@@ -331,13 +332,15 @@ kDualMinigunTechResearchCost = 25
 kClawRailgunTechResearchCost = 20
 kDualRailgunTechResearchCost = 30
 
-kWeapons1ResearchCost = 20
-kWeapons2ResearchCost = 30
-kWeapons3ResearchCost = 40
+kWeapons1ResearchCost = 15
+kWeapons2ResearchCost = 25
+kWeapons3ResearchCost = 35
+kWeapons4ResearchCost = 45
 
-kArmor1ResearchCost = 20
-kArmor2ResearchCost = 30
-kArmor3ResearchCost = 40
+kArmor1ResearchCost = 15
+kArmor2ResearchCost = 25
+kArmor3ResearchCost = 35
+kArmor4ResearchCost = 45
 
 kResourceUpgradeResearchCost = 5
 
@@ -375,13 +378,15 @@ kCatPackTechResearchTime = 20	//15
 
 kPhaseTechResearchTime = 45
 
-kWeapons1ResearchTime = 90	//80
-kWeapons2ResearchTime = 110	//100
-kWeapons3ResearchTime = 130	//120
+kWeapons1ResearchTime = 60
+kWeapons2ResearchTime = 80
+kWeapons3ResearchTime = 100
+kWeapons4ResearchTime = 120
 
-kArmor1ResearchTime = 90	//80
-kArmor2ResearchTime = 110	//100
-kArmor3ResearchTime = 130	//120
+kArmor1ResearchTime = 60
+kArmor2ResearchTime = 80
+kArmor3ResearchTime = 100
+kArmor4ResearchTime = 120
 
 kResourceUpgradeResearchTime = 30
 

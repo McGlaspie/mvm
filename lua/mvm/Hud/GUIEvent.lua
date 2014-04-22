@@ -65,10 +65,12 @@ local function GetUnlockIconParams(unlockId)
         kUnlockIconParams[kTechId.Armor1] = { description = "EVT_ARMOR_LEVEL_1_RESEARCHED" }
         kUnlockIconParams[kTechId.Armor2] = { description = "EVT_ARMOR_LEVEL_2_RESEARCHED" }
         kUnlockIconParams[kTechId.Armor3] = { description = "EVT_ARMOR_LEVEL_3_RESEARCHED" }
+        kUnlockIconParams[kTechId.Armor4] = { description = "EVT_ARMOR_LEVEL_4_RESEARCHED" }
         
         kUnlockIconParams[kTechId.Weapons1] = { description = "EVT_WEAPON_LEVEL_1_RESEARCHED" }
         kUnlockIconParams[kTechId.Weapons2] = { description = "EVT_WEAPON_LEVEL_2_RESEARCHED" }
         kUnlockIconParams[kTechId.Weapons3] = { description = "EVT_WEAPON_LEVEL_3_RESEARCHED" }
+        kUnlockIconParams[kTechId.Weapons4] = { description = "EVT_WEAPON_LEVEL_4_RESEARCHED" }
         
         kUnlockIconParams[kTechId.Leap] = { description = "EVT_LEAP_RESEARCHED" }
         kUnlockIconParams[kTechId.BileBomb] = { description = "EVT_BILE_BOMB_RESEARCHED" }
@@ -125,7 +127,7 @@ GUIEvent.kMaxNumDisplayedNotifications = 4
 // maximum number of stacked notifications
 GUIEvent.kMaxNumStackedNotifications = 5
 
-GUIEvent.kNotificationLifeTime = 4
+GUIEvent.kNotificationLifeTime = 2	//4
 
 GUIEvent.kNotificationHeight = 95
 
@@ -360,16 +362,27 @@ function GUIEvent:Update(deltaTime, parameters)
     
         // if the new notification matches with the last one, we add it as a child (stack it up) and don't trigger a shift down
         if table.count(self.displayedNotifications) > 0 and self.displayedNotifications[1]:MatchesTo(notification.LocationName, notification.TechId) then
+			
             if self.displayedNotifications[1]:GetNumChildren() < GUIEvent.kMaxNumStackedNotifications - 1 then
                 self.displayedNotifications[1]:AddNotification()
             else
                 self.displayedNotifications[1]:ResetLifeTime()
             end
+            
         else
-            local newNotification = CreateNotificationItem(self.script, notification.LocationName, notification.TechId, self.scale, self.notificationAlign, self.useMarineStyle)
+			
+            local newNotification = CreateNotificationItem(
+										self.script, 
+										notification.LocationName, 
+										notification.TechId, 
+										self.scale, 
+										self.notificationAlign, 
+										self.useMarineStyle
+									)
             newNotification:FadeIn(0.5)
             table.insert(self.displayedNotifications, 1, newNotification)
             shiftDown = true
+            
         end
         
     end

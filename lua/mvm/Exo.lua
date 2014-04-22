@@ -271,30 +271,30 @@ if Client then
 	end
 	
 	function Exo:GetBaseSkinColor(teamNum)
-		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
+		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index and teamNum == kTeamReadyRoom then
 			return ConditionalValue( self.previousTeamNumber == kTeam1Index, kTeam1_BaseColor, kTeam2_BaseColor )
 		elseif teamNum == kTeam1Index or teamNum == kTeam2Index then
-			return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_BaseColor, kTeam2_BaseColor )
+			return ConditionalValue( teamNum == kTeam1Index, kTeam1_BaseColor, kTeam2_BaseColor )
 		else
 			return kNeutral_BaseColor
 		end
 	end
 	
 	function Exo:GetAccentSkinColor(teamNum)
-		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
+		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index and teamNum == kTeamReadyRoom then
 			return ConditionalValue( self.previousTeamNumber == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
 		elseif teamNum == kTeam1Index or teamNum == kTeam2Index then
-			return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
+			return ConditionalValue( teamNum == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
 		else
 			return kNeutral_AccentColor
 		end
 	end
 
 	function Exo:GetTrimSkinColor(teamNum)
-		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
+		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index and teamNum == kTeamReadyRoom then
 			return ConditionalValue( self.previousTeamNumber == kTeam1Index, kTeam1_TrimColor, kTeam2_TrimColor )
 		elseif teamNum == kTeam1Index or teamNum == kTeam2Index then
-			return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_TrimColor, kTeam2_TrimColor )
+			return ConditionalValue( teamNum == kTeam1Index, kTeam1_TrimColor, kTeam2_TrimColor )
 		else
 			return kNeutral_TrimColor
 		end
@@ -353,6 +353,32 @@ end
 
 
 if Client then	//Required to override Armor display
+
+	
+	function Exo:BuyMenu(structure)
+        
+        // Don't allow display in the ready room
+        if self:GetTeamNumber() ~= 0 and Client.GetLocalPlayer() == self then
+        
+            if not self.buyMenu then
+				
+                self.buyMenu = GetGUIManager():CreateGUIScript("mvm/Hud/Marine/GUIMarineBuyMenu")
+                
+                MarineUI_SetHostStructure(structure)
+                
+                if structure then
+                    self.buyMenu:SetHostStructure(structure)
+                end
+                
+                self:TriggerEffects("marine_buy_menu_open")
+                
+                TEST_EVENT("Exo buy menu displayed")
+                
+            end
+            
+        end
+        
+    end
 
 	
     function Exo:OnUpdateRender()

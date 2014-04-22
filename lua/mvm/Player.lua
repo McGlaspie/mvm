@@ -1,5 +1,9 @@
 
+
+Script.Load("lua/mvm/TechTreeConstants.lua")
 Script.Load("lua/mvm/TechData.lua")
+Script.Load("lua/mvm/MvMUtility.lua")
+
 
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
@@ -425,6 +429,73 @@ if Client then
 		end
 		
 		return unitStates
+
+	end
+
+	
+	local gPreviousTechId = kTechId.None
+	function PlayerUI_GetRecentPurchaseable()
+
+		local player = Client.GetLocalPlayer()
+		
+		if player ~= nil then
+			local teamInfo = GetEntitiesForTeam("TeamInfo", player:GetTeamNumber())
+			if table.count(teamInfo) > 0 then
+			
+				local newTechId = teamInfo[1]:GetLatestResearchedTech()
+				local playSound = newTechId ~= gPreviousTechId
+				
+				gPreviousTechId = newTechId
+				return newTechId, playSound
+				
+			end
+		end
+		
+		return 0, false
+
+	end
+	
+		
+	function PlayerUI_GetTooltipDataFromTechId(techId, hotkeyIndex)
+
+		local techTree = GetTechTree()
+
+		if techTree then
+		
+			local tooltipData = {}
+			local techNode = techTree:GetTechNode(techId)
+
+			tooltipData.text = GetDisplayNameForTechId(techId, "TIP")
+			tooltipData.info = GetTooltipInfoText(techId)
+			tooltipData.costNumber = LookupTechData(techId, kTechDataCostKey, 0)                
+			tooltipData.requires = techTree:GetRequiresText(techId)
+			tooltipData.enabled = techTree:GetEnablesText(techId)          
+			tooltipData.techNode = techTree:GetTechNode(techId)
+			
+			tooltipData.resourceType = 0
+			
+			if techNode then
+				tooltipData.resourceType = techNode:GetResourceType()
+			end
+
+			if hotkeyIndex then
+			
+				tooltipData.hotKey = kGridHotkeys[hotkeyIndex]
+				
+				if tooltipData.hotKey ~= "" then
+					tooltipData.hotKey = gHotkeyDescriptions[tooltipData.hotKey]
+				end
+			
+			end
+			
+			tooltipData.hotKey = tooltipData.hotKey or ""
+			tooltipData.supply = LookupTechData(techId, kTechDataSupply, 0)
+			
+			tooltipData.biomass = LookupTechData(techId, kTechDataBioMass, 0)
+
+			return tooltipData
+		
+		end
 
 	end
 
