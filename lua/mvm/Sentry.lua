@@ -14,6 +14,7 @@ Script.Load("lua/mvm/ElectroMagneticMixin.lua")
 Script.Load("lua/mvm/SupplyUserMixin.lua")
 Script.Load("lua/mvm/NanoshieldMixin.lua")
 Script.Load("lua/mvm/RagdollMixin.lua")
+Script.Load("lua/mvm/OrdersMixin.lua")
 
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
@@ -42,14 +43,14 @@ Sentry.kMaxYaw = Sentry.kFov / 2
 
 Sentry.kBaseROF = kSentryAttackBaseROF
 Sentry.kRandROF = kSentryAttackRandROF
-Sentry.kSpread = Math.Radians(6)
+Sentry.kSpread = Math.Radians(5)
 Sentry.kBulletsPerSalvo = kSentryAttackBulletsPerSalvo
-Sentry.kBarrelScanRate = 90      		// Degrees per second to scan back and forth with no target
-Sentry.kBarrelMoveRate = 180			//150    // Degrees per second to move sentry orientation towards target or back to flat when targeted
-Sentry.kRange = 38.5					//NS2 - 20
-Sentry.kReorientSpeed = .5	//0.05
+Sentry.kBarrelScanRate = 60   // Degrees per second to scan back and forth with no target
+Sentry.kBarrelMoveRate = 150  // Degrees per second to move sentry orientation towards target or back to flat when targeted
+Sentry.kRange = 40			  //NS2 - 20
+Sentry.kReorientSpeed = 0.05
 
-Sentry.kTargetAcquireTime = 0.25
+Sentry.kTargetAcquireTime = 0.15
 Sentry.kConfuseDuration = 3	//4
 Sentry.kAttackEffectIntervall = 0.2
 Sentry.kConfusedAttackEffectInterval = kConfusedSentryBaseROF

@@ -128,7 +128,7 @@ if Client then
 				// powerpoint when outside this range, and short enough not to waste too much cpu.
 				local inRange = (powerPoint:GetOrigin() - playerPos):GetLengthSquared() < kDefaultUpdateRangeSq
 				
-				local isComm = player:isa("Commander")
+				local isComm = ( player:isa("Commander") or ( player.GetTeamNumber and player:GetTeamNumber() == kSpectatorIndex ) )
 				
 				// Ignore range check if the player is a commander since they are high above
 				// the lights in a lot of cases and see through ceilings and some walls.
@@ -224,7 +224,7 @@ local function SetupSoundEntities( self )
 		self.auxBackupSound:SetRelevancyDistance( Math.infinity )
 		self.auxBackupSound:SetExcludeRelevancyMask( defaultMask )
 		self.auxBackupSound:SetKeepAlive( true )
-		self.auxBackupSound:SetVolume(0.6)
+		self.auxBackupSound:SetVolume(0.65)
 		
 		self.powerRestoredSound = Server.CreateEntity( SoundEffect.kMapName )
 		self.powerRestoredSound:SetAsset( kPowerRestoredSound )
@@ -659,7 +659,11 @@ end
 
 
 function PowerPoint:IsScouted( byTeamNumber )
-
+	
+	if byTeamNumber == kSpectatorIndex then
+		return true
+	end
+	
 	return ConditionalValue(
 		byTeamNumber == kTeam2Index,
 		self.scoutedForTeam2,

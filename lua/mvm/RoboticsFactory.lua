@@ -14,6 +14,7 @@ Script.Load("lua/mvm/SupplyUserMixin.lua")
 Script.Load("lua/mvm/NanoshieldMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
 Script.Load("lua/mvm/RagdollMixin.lua")
+Script.Load("lua/mvm/OrdersMixin.lua")
 
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
@@ -72,7 +73,10 @@ function RoboticsFactory:OnCreate()	//OVERRIDES
     self:SetLagCompensated(true)
     self:SetPhysicsType(PhysicsType.Kinematic)
     self:SetPhysicsGroup(PhysicsGroup.BigStructuresGroup)
-        
+	
+	if Server then
+		self.arcFactoryUpgrade = false
+	end
     self.open = false
 
 end
@@ -174,6 +178,40 @@ function RoboticsFactory:OverrideCreateManufactureEntity(techId)
         
     end
     
+end
+
+
+function RoboticsFactory:OnResearchComplete(researchId)
+	
+	if researchId == kTechId.UpgradeRoboticsFactory then
+		self:UpgradeToTechId(kTechId.ARCRoboticsFactory)
+		
+		local team = self:GetTeam()
+		if team then
+			self.arcFactoryUpgrade = true
+			team:AddSupplyUsed( kARCRoboticsFactorySupply )
+		end
+		
+	end
+	
+end
+
+
+function RoboticsFactory:OverrideRemoveSupply( team )
+
+	if team then
+		
+		if self.arcFactoryUpgrade then
+			
+			local supplyAmount = kRoboticsFactorySupply + kARCRoboticsFactorySupply
+			team:RemoveSupplyUsed( supplyAmount )
+			
+		else
+			team:RemoveSupplyUsed( LookupTechData( self:GetTechId(), kTechDataSupply, 0) )
+		end
+	
+	end
+
 end
 
 

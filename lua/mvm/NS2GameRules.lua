@@ -68,7 +68,8 @@ end
 
 
 if Server then
-
+	
+	Script.Load("lua/mvm/PlayingTeam.lua")
     Script.Load("lua/mvm/ReadyRoomTeam.lua")
     Script.Load("lua/mvm/NS2ConsoleCommands_Server.lua")
 	
@@ -299,7 +300,7 @@ if Server then
         
     
     
-    
+    //Note: this now has hard coded conditions only applicable to MvM
     function NS2Gamerules:OnEntityCreate(entity)
 		
         self:OnEntityChange( nil, entity:GetId() )
@@ -313,6 +314,11 @@ if Server then
                 if entity:isa("Player") then
 					
 					entity:SetUpdates(true)
+					
+					//This suck a shit hack...horrid
+					if HasMixin( entity, "MarineVariant" ) and not entity:isa("Exo") then
+						entity:SetModel( entity:GetVariantModel() , MarineVariantMixin.kMarineAnimationGraph )
+					end
 					
                     if team:AddPlayer(entity) then
 

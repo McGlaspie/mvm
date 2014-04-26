@@ -17,7 +17,8 @@ Script.Load("lua/BalanceMisc.lua")
 //-----------------------------------------------------------------------------
 // MARINE DAMAGE
 
-kNanoShieldDamageReductionDamage = 0.65	//0.75	ns2-0.68
+//40% reduction
+kNanoShieldDamageReductionDamage = 0.6	//0.75	ns2-0.68
 
 kInfestationCorrodeDamagePerSecond = 15
 
@@ -48,11 +49,11 @@ kHandGrenadeWeight = 0.05	//0.1
 
 kPulseGrenadeDamageRadius = 6
 kPulseGrenadeEnergyDamageRadius = 10
-kPulseGrenadeDamage = 80	//125
+kPulseGrenadeDamage = 90	//125
 kPulseGrenadeEnergyDamage = 50
 kPulseGrenadeDamageType = kDamageType.ElectroMagnetic
 
-kClusterGrenadeDamage = 75
+kClusterGrenadeDamage = 85	//v3.2 75
 kClusterGrenadeDamageRadius = 10
 kClusterFragmentDamage = 25		//20
 kClusterFragmentDamageRadius = 6
@@ -61,17 +62,18 @@ kClusterGrenadeDamageType = kDamageType.Structural		//kDamageType.Flame
 kNerveGasDamagePerSecond = 12	//50
 kNerveGasDamageType = kDamageType.Gas	//I.e. Lerk Spores, HP only
 
-kShotgunFireRate = 0.88
+kShotgunFireRate = 0.88	//Dead, doesn't Actually do anything
 kShotgunDamage = 16
 kShotgunDamageType = kDamageType.Normal
 kShotgunClipSize = 8
 kShotgunBulletsPerShot = 12	//ns2-10
-kShotgunRange = 80	//NS2 - 30
+kShotgunBulletsPerShotUpgrade = 16
+kShotgunRange = 80	//v3.2 60 	NS2 - 30
 
-kGrenadeLauncherGrenadeDamage = 120
+kGrenadeLauncherGrenadeDamage = 130	//120
 kGrenadeLauncherGrenadeDamageType = kDamageType.Structural
 kGrenadeLauncherClipSize = 4
-kGrenadeLauncherGrenadeDamageRadius = 4.5 //4	 ns2-4.8
+kGrenadeLauncherGrenadeDamageRadius = 4	 //ns2-4.8
 kGrenadeLifetime = 1.5	//2  ns2 2.5
 kGrenadeUpgradedLifetime = 1.5
 
@@ -81,7 +83,7 @@ kFlamethrowerClipSize = 40
 kFlamethrowerRange = 12				//NS2-9
 kFlamethrowerUpgradedRange = 15		//11.5
 kBurnDamagePerSecond = 10			//2
-kFlamethrowerBurnDuration = 5	//6
+kFlamethrowerBurnDuration = 3	//6
 kFlameRadius = 1.75					//1.8
 kFlameDamageStackWeight = 0.005		//0.5
 
@@ -131,10 +133,10 @@ kConfusedSentryBaseROF = 2.5
 kElectrifiedSentryBaseROF = 2.5
 
 
-kARCDamage = 450	//450
+kARCDamage = 450
 kARCDamageType = kDamageType.Splash // splash damage hits friendlies (that take structural dmg) as well
-kARCRange = 24
-kARCMinRange = 8
+kARCRange = 25	//v3.2 - 24
+kARCMinRange = 7	//v3.2 - 8
 
 
 local kDamagePerUpgradeScalar = 0.075		//0.1
@@ -148,17 +150,17 @@ kWeapons4DamageScalar = 1 + kDamagePerUpgradeScalar * 4	//+30%
 //-----------------------------------------------------------------------------
 // ECONOMY
 
-kPlayingTeamInitialTeamRes = 50
+kPlayingTeamInitialTeamRes = 50	//Lower?
 kMaxTeamResources = 200
 
-kPlayerInitialIndivRes = 20
+kPlayerInitialIndivRes = 20	//Lower?
 kMaxPersonalResources = 100
 
-kResourceTowerResourceInterval = 7	//NS2 - 6
+kResourceTowerResourceInterval = 6
 kTeamResourcePerTick = 1
 kPlayerResPerInterval = 0.1
 
-kCommanderResourceBlockTime = 60
+kCommanderResourceBlockTime = 0
 
 kKillRewardMin = 0
 kKillRewardMax = 0
@@ -178,10 +180,11 @@ kSupplyPerResourceNode = 10
 kMACSupply = 5
 kArmorySupply = 15
 kAdvancedArmorySupply = 5
-kARCSupply = 20
+kARCSupply = 10
 kSentrySupply = 5
 kSentryBatterySupply = 5
-kRoboticsFactorySupply = 5	//ARCFact?
+kRoboticsFactorySupply = 5
+kARCRoboticsFactorySupply = 5
 kInfantryPortalSupply = 5
 kPhaseGateSupply = 10
 kArmsLabSupply = 10
@@ -200,7 +203,7 @@ kNanoShieldOnSpawnLength = 2
 //-----------------------------------------------------------------------------
 // BUILDING / ABILITY COSTS
 
-kCommandStationCost = 20
+kCommandStationCost = 15
 kExtractorCost = 10
 kInfantryPortalCost = 15
 kArmoryCost = 10
@@ -219,32 +222,31 @@ kSentryBatteryCost = 5
 
 kWelderCost = 5
 
-kClusterGrenadeCost = 4
-kGasGrenadeCost = 4
-kPulseGrenadeCost = 4
+kClusterGrenadeCost = 5
+kGasGrenadeCost = 5
+kPulseGrenadeCost = 5
 
 kMineCost = 10
-kShotgunCost = 20
+kShotgunCost = 15
 kFlamethrowerCost = 20
-kGrenadeLauncherCost = 30
+kGrenadeLauncherCost = 35
 
 kJetpackCost = 15
 
-
 kExosuitCost = 50
-kExosuitDropCost = 50
-kDualExosuitCost = 60
+kExosuitDropCost = 50	//Unused
+kDualMinigunExosuitCost = 80	//Unused
 kClawRailgunExosuitCost = 50
-kDualRailgunExosuitCost = 60
+kDualRailgunExosuitCost = 80	//Unused
 
 kUpgradeToDualMinigunCost = 25
 kUpgradeToDualRailgunCost = 25
 
 
-kGrenadeLauncherDropCost = 25
+kGrenadeLauncherDropCost = 35
 kFlamethrowerDropCost = 20
-kShotgunDropCost = 20
-kDropMineCost = 15
+kShotgunDropCost = 15
+kDropMineCost = 10
 kWelderDropCost = 5
 kJetpackDropCost = 15
 kExosuitDropCost = 50

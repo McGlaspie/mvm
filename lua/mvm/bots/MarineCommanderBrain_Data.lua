@@ -42,10 +42,13 @@ kMarineComBrainActions =
     CreateUpgradeStructureAction( kTechId.Weapons1 , 1.0+math.random() ) , 
     CreateUpgradeStructureAction( kTechId.Weapons2 , 1.0+math.random() ) , 
     CreateUpgradeStructureAction( kTechId.Weapons3 , 1.0+math.random() ) , 
+    CreateUpgradeStructureAction( kTechId.Weapons4 , 1.0+math.random() ) , 
     CreateUpgradeStructureAction( kTechId.Armor1   , 1.0+math.random() ) , 
     CreateUpgradeStructureAction( kTechId.Armor2   , 1.0+math.random() ) , 
     CreateUpgradeStructureAction( kTechId.Armor3   , 1.0+math.random() ) , 
-
+    CreateUpgradeStructureAction( kTechId.Armor4   , 1.0+math.random() ) , 
+	
+	
     function(bot, brain)
 
         local name = "extractor"
@@ -129,6 +132,8 @@ function CreateMarineComSenses()
             end)
 
     return s
+	
+	//TODO Add TeampSupply sense
 
 end
 

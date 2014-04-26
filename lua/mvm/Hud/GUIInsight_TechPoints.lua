@@ -313,14 +313,8 @@ function GUIInsight_TechPoints:UpdateTechPoint(techPoint, techPointRecord, curre
                 infoText = string.format("%d%%", math.ceil(healthFraction*100))
             
                 if not built then
-                
-                    local builtStr
-                    if team == kTeam1Index then
-                        builtStr = "Built"
-                    else
-                        builtStr = "Grown"
-                    end
-                    local constructionStr = string.format(" (%d%% %s)", math.ceil(builtFraction*100), builtStr)
+					
+                    local constructionStr = string.format(" (%d%% %s)", math.ceil(builtFraction * 100), "Built")
                     infoText = infoText .. constructionStr
                     
                 elseif storedValues.Built < builtFraction then -- just finished building

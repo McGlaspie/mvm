@@ -1,0 +1,13 @@
+shader = "shaders/ColoredSkins_emissive_alpha.surface_shader"
+
+albedoMap = "models/marine/catpack/catpack.dds"
+normalMap = "models/marine/catpack/catpack_normal.dds"
+emissiveMap = "models/marine/catpack/catpack_illum.dds"
+specularMap = "models/marine/catpack/catpack_spec.dds"
+opacityMap = "models/marine/catpack/catpack_opac2.dds"
+
+modelColorMap = "models/marine/catpack/catpack_colormap.dds"
+
+numColumns = 1
+numRows = 1
+colorMapIndex = 0

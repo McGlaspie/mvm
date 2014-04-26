@@ -1,15 +1,8 @@
-// ======= Copyright (c) 2003-2011, Unknown Worlds Entertainment, Inc. All rights reserved. =======
-//
-// lua\TechMixin.lua
-//
-//    Created by:   Brian Cronin (brianc@unknownworlds.com) and
-//                  Andreas Urwalek (andi@unknownworlds.com)
-//
-//    Updates tech availability.
-//
-// ========= For more information, visit us at http://www.unknownworlds.com =====================
+
+
 Script.Load("lua/mvm/TechTreeConstants.lua")
 Script.Load("lua/MixinUtility.lua")
+
 
 TechMixin = CreateMixin(TechMixin)
 TechMixin.type = "Tech"

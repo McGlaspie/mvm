@@ -27,8 +27,6 @@ Script.Load("lua/mvm/Balance.lua")
 Script.Load("lua/mvm/BalanceHealth.lua")
 Script.Load("lua/mvm/BalanceMisc.lua")
 
-Script.Load("lua/mvm/TeamJoin.lua")
-
 Script.Load("lua/mvm/LiveMixin.lua")
 Script.Load("lua/mvm/LOSMixin.lua")
 Script.Load("lua/mvm/TeamMixin.lua")
@@ -55,7 +53,7 @@ Script.Load("lua/mvm/ResourceTower.lua")
 
 Script.Load("lua/mvm/Location.lua")
 
-Script.Load("lua/mvm/DeathTrigger.lua")
+//Script.Load("lua/mvm/DeathTrigger.lua")
 
 Script.Load("lua/mvm/NS2Gamerules.lua")
 
@@ -64,6 +62,8 @@ Script.Load("lua/mvm/TechPoint.lua")
 Script.Load("lua/mvm/Player.lua")
 
 Script.Load("lua/mvm/MarineSpectator.lua")
+
+Script.Load("lua/mvm/Ragdoll.lua")
 
 Script.Load("lua/mvm/MarineCommander.lua")
 

@@ -59,15 +59,27 @@ function Exosuit:OnCreate ()
 end
 
 
-local orgExosuitInit = Exosuit.OnInitialized
 function Exosuit:OnInitialized()
 
-	orgExosuitInit(self)
-	
-	if Client then
+    ScriptActor.OnInitialized(self)
+    
+    if Server then
+        
+        self:SetModel(Exosuit.kModelName, kAnimationGraph)
+        
+        self:SetIgnoreHealth(true)
+        self:SetMaxArmor(kExosuitArmor)
+        self:SetArmor(kExosuitArmor)
+    
+    end
+    
+    if Client then
 		self:InitializeSkin()
 	end
-
+    
+    InitMixin(self, HiveVisionMixin)
+    InitMixin(self, WeldableMixin)
+    
 end
 
 

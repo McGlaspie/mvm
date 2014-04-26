@@ -19,7 +19,7 @@ local kBackgroundTexture = "ui/topbar.dds"
 //local kIconTextureAlien = "ui/alien_commander_textures.dds"
 //local kIconTextureAlien = "ui/marine_commander_textures.dds"
 //local kIconTextureMarine = "ui/marine_commander_textures.dds"
-local kResourcesIconsTexture = "ui/marine_commander_textures.dds"
+local kIconsTexture = "ui/marine_commander_resources_icons.dds"
 local kTeamResourceIconCoords = {64, 0, 128, 64}
 local kResourceTowerIconCoords = {128, 0, 192, 64}
 local kTeamSupplyIconCoords = {192, 0, 256, 64}
@@ -71,8 +71,8 @@ local alienHarvesters
 local alienSupply
 //local alienBiomass
 
-local function CreateIconTextItem(team, parent, position, texture, coords)
-
+local function CreateIconTextItem(team, parent, position, texture, coords, iconHorzAnchor, isSupplyItem)
+	
     local background = GUIManager:CreateGraphicItem()
     if team == kTeam1Index then
         background:SetAnchor(GUIItem.Left, GUIItem.Top)
@@ -92,10 +92,23 @@ local function CreateIconTextItem(team, parent, position, texture, coords)
 	
     local icon = GUIManager:CreateGraphicItem()
     icon:SetSize(kIconSize)
-    icon:SetAnchor(GUIItem.Left, GUIItem.Top)
+    if team == kTeam1Index and isSupplyItem == true then
+		icon:SetAnchor(GUIItem.Right, GUIItem.Top)
+	else
+		icon:SetAnchor(GUIItem.Left, GUIItem.Top)
+	end
     icon:SetPosition(position)
     icon:SetTexture(texture)
     icon:SetShader("shaders/GUI_TeamThemed.surface_shader")
+    if isSupplyItem == true then
+		icon:SetFloatParameter( "teamBaseColorR", kGUI_TeamThemes_BaseColor[team].r )
+		icon:SetFloatParameter( "teamBaseColorG", kGUI_TeamThemes_BaseColor[team].g )
+		icon:SetFloatParameter( "teamBaseColorB", kGUI_TeamThemes_BaseColor[team].b )
+	else
+		icon:SetFloatParameter( "teamBaseColorR", kGUI_NameTagFontColors[team].r )
+		icon:SetFloatParameter( "teamBaseColorG", kGUI_NameTagFontColors[team].g )
+		icon:SetFloatParameter( "teamBaseColorB", kGUI_NameTagFontColors[team].b )
+	end
     icon:SetTexturePixelCoordinates(unpack(coords))
     background:AddChild(icon)
     
@@ -103,10 +116,20 @@ local function CreateIconTextItem(team, parent, position, texture, coords)
     value:SetFontName(kInfoFontName)
     value:SetScale(kInfoFontScale)
     value:SetAnchor(GUIItem.Left, GUIItem.Center)
-    value:SetTextAlignmentX(GUIItem.Align_Min)
+    if team == kTeam1Index and isSupplyItem == true then
+		value:SetTextAlignmentX(GUIItem.Align_Max)
+	else
+		value:SetTextAlignmentX(GUIItem.Align_Min)
+	end
     value:SetTextAlignmentY(GUIItem.Align_Center)
     value:SetColor(Color(1, 1, 1, 1))
-    value:SetPosition(position + Vector(kIconSize.x + GUIScale(5), 0, 0))
+    if team == kTeam1Index and isSupplyItem == true then
+		value:SetPosition(position + Vector(kIconSize.x + -GUIScale(50), 0, 0))
+	elseif team == kTeam2Index and isSupplyItem == true then
+		value:SetPosition(position + Vector(kIconSize.x + GUIScale(50), 0, 0))
+	else
+		value:SetPosition(position + Vector(kIconSize.x + GUIScale(5), 0, 0))
+	end
     background:AddChild(value)
     
     return value
@@ -137,8 +160,10 @@ local function GetTeamInfoStrings(teamInfo)
     if constructingRTs > 0 then
         rtString = rtString .. string.format(" (%d)", constructingRTs)
     end
+    
+    local tsString = teamInfo:GetSupplyUsed() .. " of " .. MvM_GetMaxSupplyForTeam(teamInfo:GetTeamNumber())
 
-    return resString, rtString
+    return resString, rtString, tsString
     
 end
 
@@ -155,10 +180,10 @@ end
 function GUIInsight_TopBar:Initialize()
 
     isVisible = true
-        
-    local texSize = GUIScale(Vector(512,57,0))
+	
+    local texSize = GUIScale( Vector( 512,57,0 ) )
     local texCoord = {0,0,512,57}
-    local texPos = Vector(-texSize.x/2,0,0)
+    local texPos = Vector( -texSize.x / 2, 0, 0 )
     background = GUIManager:CreateGraphicItem()
     background:SetAnchor(GUIItem.Middle, GUIItem.Top)
     background:SetTexture(kBackgroundTexture)
@@ -231,13 +256,13 @@ function GUIInsight_TopBar:Initialize()
     scoresBackground:AddChild(alienTeamName)
     
     local yoffset = GUIScale(4)
-    marineResources = CreateIconTextItem(kTeam1Index, background, Vector(GUIScale(130),yoffset,0), kResourcesIconsTexture, kTeamResourceIconCoords)
-    marineExtractors = CreateIconTextItem(kTeam1Index, background, Vector(GUIScale(50),yoffset,0), kResourcesIconsTexture, kResourceTowerIconCoords)
-	marineSupply = CreateIconTextItem(kTeam1Index, background, Vector(GUIScale(10),yoffset,0), kResourcesIconsTexture, kTeamSupplyIconCoords)
+    marineResources = CreateIconTextItem(kTeam1Index, background, Vector(GUIScale(130),yoffset,0), kIconsTexture, kTeamResourceIconCoords, false)
+    marineExtractors = CreateIconTextItem(kTeam1Index, background, Vector(GUIScale(50),yoffset,0), kIconsTexture, kResourceTowerIconCoords, false)
+	marineSupply = CreateIconTextItem(kTeam1Index, background, Vector(-GUIScale(80),yoffset,0), kIconsTexture, kTeamSupplyIconCoords, true)
 	
-    alienResources = CreateIconTextItem(kTeam2Index, background, Vector(-GUIScale(195),yoffset,0), kResourcesIconsTexture, kTeamResourceIconCoords)
-    alienHarvesters = CreateIconTextItem(kTeam2Index, background, Vector(-GUIScale(115),yoffset,0), kResourcesIconsTexture, kResourceTowerIconCoords)
-    alienSupply = CreateIconTextItem(kTeam2Index, background, Vector(-GUIScale(50),yoffset,0), kResourcesIconsTexture, kTeamSupplyIconCoords)
+    alienResources = CreateIconTextItem(kTeam2Index, background, Vector(-GUIScale(195),yoffset,0), kIconsTexture, kTeamResourceIconCoords, false)
+    alienHarvesters = CreateIconTextItem(kTeam2Index, background, Vector(-GUIScale(115),yoffset,0), kIconsTexture, kResourceTowerIconCoords, false)
+    alienSupply = CreateIconTextItem(kTeam2Index, background, Vector(-GUIScale(10),yoffset,0), kIconsTexture, kTeamSupplyIconCoords, true)
     //"alienSupply" ...um, yeah
     //alienBiomass = CreateIconTextItem(kTeam2Index, background, Vector(-GUIScale(5),yoffset,0), kBuildMenuTexture, kBiomassIconCoords)
     
@@ -346,20 +371,20 @@ function GUIInsight_TopBar:Update(deltaTime)
     local marineTeamInfo = GetTeamInfoEntity(kTeam1Index)
     if marineTeamInfo then
     
-        resString, rtString = GetTeamInfoStrings(marineTeamInfo)
+        resString, rtString, tsString = GetTeamInfoStrings(marineTeamInfo)
         marineResources:SetText(resString)
         marineExtractors:SetText(rtString)
-        marineSupply:SetText( marineTeamInfo:GetSupplyUsed() .. " of " .. MvM_GetMaxSupplyForTeam(kTeam1Index) )
+        marineSupply:SetText( tsString )
         
     end
 	
     local alienTeamInfo = GetTeamInfoEntity(kTeam2Index)
     if alienTeamInfo then
 		
-        resString, rtString = GetTeamInfoStrings(alienTeamInfo)
+        resString, rtString, tsString = GetTeamInfoStrings(alienTeamInfo)
         alienResources:SetText(resString)
         alienHarvesters:SetText(rtString)
-        alienSupply:SetText( marineTeamInfo:GetSupplyUsed() .. " of " .. MvM_GetMaxSupplyForTeam(kTeam2Index) )
+        alienSupply:SetText( tsString )
         //alienBiomass:SetText(GetBioMassString(alienTeamInfo))
         
     end
@@ -376,12 +401,20 @@ function GUIInsight_TopBar:Update(deltaTime)
 end
 
 function GUIInsight_TopBar:SetTeams(team1Name, team2Name)
-
-    if team1Name == nil and team2Name == nil then
-    
+	
+	if team1Name == nil and team2Name == nil then
         scoresBackground:SetIsVisible(false)
-            
-    else
+	end
+	
+	if team1Name == nil then
+		team1Name = "Blue Team"
+	end
+	if team2Name == nil then
+		team2Name = "Gold Team"
+	end
+
+    
+    if team1Name ~= nil and team2Name ~= nil then
 
         scoresBackground:SetIsVisible(true)
         if team1Name == nil then

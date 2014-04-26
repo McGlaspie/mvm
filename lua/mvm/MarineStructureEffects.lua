@@ -390,14 +390,14 @@ kMarineStructureEffects =
             {sound = "sound/NS2.fev/marine/structures/infantry_portal_player_spawn"},
         },
     },    
-
+	
     // Played when a player enters a phase gate (at the source)
     phase_gate_player_enter = 
     {
         pgSpawnEffect =
         {
             {player_sound = "sound/NS2.fev/marine/structures/phase_gate_teleport"},
-            {player_cinematic = "cinematics/marine/infantryportal/player_spawn.cinematic"},            
+            {player_cinematic = "cinematics/marine/infantryportal/player_spawn.cinematic"},
         },
     }, 
 
@@ -407,7 +407,27 @@ kMarineStructureEffects =
         pgSpawnEffect =
         {
             {player_sound = "sound/NS2.fev/marine/structures/phase_gate_teleport"},
-            {player_cinematic = "cinematics/marine/infantryportal/player_spawn.cinematic"},            
+            {player_cinematic = "cinematics/marine/infantryportal/player_spawn.cinematic"},
+        },
+    },
+    
+    // Played when a player enters a phase gate (at the source)
+    phase_gate_player_enter_team2 = 
+    {
+        pgSpawnEffect =
+        {
+            {player_sound = "sound/NS2.fev/marine/structures/phase_gate_teleport"},
+            {player_cinematic = "cinematics/marine/infantryportal/player_spawn_team2.cinematic"},
+        },
+    }, 
+	
+    // Played when a player goes through a phase gate (at the destination)
+    phase_gate_player_exit_team2 = 
+    {
+        pgSpawnEffect =
+        {
+            {player_sound = "sound/NS2.fev/marine/structures/phase_gate_teleport"},
+            {player_cinematic = "cinematics/marine/infantryportal/player_spawn_team2.cinematic"},
         },
     },
     
@@ -418,6 +438,7 @@ kMarineStructureEffects =
         {
             // Play spin for spinning infantry portal
             {looping_cinematic = "cinematics/marine/phasegate/phasegate.cinematic"},
+            {parented_sound = "sound/NS2.fev/marine/structures/phase_gate_active"},
         },
     },
     
@@ -426,6 +447,7 @@ kMarineStructureEffects =
         pgLinkedEffects = 
         {
             // Destroy it if not spinning
+            {stop_sound = "sound/NS2.fev/marine/structures/phase_gate_active"},
             {stop_cinematic = "cinematics/marine/phasegate/phasegate.cinematic", done = true},            
         },
     },
@@ -470,6 +492,15 @@ kMarineStructureEffects =
         {
             {private_sound = "sound/NS2.fev/marine/common/mega_teleport_2D"},
             {cinematic = "cinematics/marine/infantryportal/player_spawn.cinematic"},
+        },
+    },
+    
+    distress_beacon_spawn_team2 = 
+    {
+        playerSpawnEffect =
+        {
+            {private_sound = "sound/NS2.fev/marine/common/mega_teleport_2D"},
+            {cinematic = "cinematics/marine/infantryportal/player_spawn_team2.cinematic"},
         },
     },
     

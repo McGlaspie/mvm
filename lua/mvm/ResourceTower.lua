@@ -42,12 +42,17 @@ end
 
 if Server then
 
-	function ResourceTower:CollectResources()
+	function ResourceTower:CollectResources()	//which is called this or PlayingTeam:addPresXYZ?
 
 		for _, player in ipairs(GetEntitiesForTeam("Player", self:GetTeamNumber())) do
-			if not player:isa("Commander") then
-				player:AddResources( kPlayerResPerInterval )
+			local presAmount = kPlayerResPerInterval
+			
+			if player:isa("Commander") then
+				presAmount = presAmount * 0.5	//TODO Move to balance
 			end
+			
+			player:AddResources( presAmount )
+			
 		end
 		
 		local team = self:GetTeam()

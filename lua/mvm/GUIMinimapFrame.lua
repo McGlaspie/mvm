@@ -173,16 +173,22 @@ function GUIMinimapFrame:Update(deltaTime)
     PROFILE("GUIMinimapFrame:Update")
     
     local showMouse = self.background:GetIsVisible() and isRespawning
+    local playerTeam = PlayerUI_GetTeamNumber()
+    
     if showMouse ~= self.showingMouse then
     
-        MouseTracker_SetIsVisible(showMouse, "ui/Cursor_MenuDefault.dds", true)
+		if playerTeam == kTeam1Index then
+			MouseTracker_SetIsVisible(showMouse, "ui/Cursor_MarineCommanderDefault.dds", true)
+		else
+			MouseTracker_SetIsVisible(showMouse, "ui/Cursor_MenuDefault.dds", true)
+		end
         self.showingMouse = showMouse
         
     end
 
 	
 	local ui_baseColor = ConditionalValue(
-		PlayerUI_GetTeamNumber() == kTeam1Index,
+		playerTeam == kTeam1Index,
 		kGUI_Team1_BaseColor,
 		kGUI_Team2_BaseColor
 	)

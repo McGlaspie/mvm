@@ -3,9 +3,23 @@
 Script.Load("lua/mvm/DropPack.lua")
 Script.Load("lua/mvm/PickupableMixin.lua")
 
+if Client then
+	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
+end
+
 
 //-----------------------------------------------------------------------------
 
+local orgAmmoPackCreate = AmmoPack.OnCreate
+function AmmoPack:OnCreate()
+
+	orgAmmoPackCreate(self)
+
+	if Client then
+		InitMixin(self, ColoredSkinsMixin)
+	end
+
+end
 
 
 function AmmoPack:OnInitialized()
@@ -15,7 +29,11 @@ function AmmoPack:OnInitialized()
     self:SetModel( AmmoPack.kModelName )
     
     if Client then
+		
         InitMixin(self, PickupableMixin, { kRecipientType = "Marine" })
+        
+        self:InitializeSkin()
+        
     end
 
 end
@@ -43,4 +61,32 @@ function AmmoPack:GetIsValidRecipient(recipient)
 end
 
 
+if Client then
+	
+	function AmmoPack:InitializeSkin()
+		self.skinBaseColor = self:GetBaseSkinColor()
+		self.skinAccentColor = self:GetAccentSkinColor()
+		self.skinTrimColor = self:GetTrimSkinColor()
+		self.skinAtlasIndex = 0
+	end
+	
+	function AmmoPack:GetBaseSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_BaseColor, kTeam1_BaseColor )
+	end
+	
+	function AmmoPack:GetAccentSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_AccentColor, kTeam1_AccentColor )
+	end
+
+	function AmmoPack:GetTrimSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
+	end
+
+end		//End Client
+
+
+
+
 Class_Reload( "AmmoPack", {} )
+
+

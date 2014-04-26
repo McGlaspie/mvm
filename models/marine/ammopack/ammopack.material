@@ -1,0 +1,12 @@
+shader = "shaders/ColoredSkins.surface_shader"
+
+albedoMap = "models/marine/ammopack/ammopack.dds"
+emissiveMap = "models/system/256x256_blank_illum.dds"
+normalMap = "models/marine/ammopack/ammopack_normal.dds"
+specularMap = "models/marine/ammopack/ammopack_spec.dds"
+
+modelColorMap = "models/marine/ammopack/ammopack_colormap.dds"
+
+numColumns = 1
+numRows = 1
+colorMapIndex=0

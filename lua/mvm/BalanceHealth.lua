@@ -13,7 +13,7 @@
 
 // HEALTH AND ARMOR
 kMarineHealth = 100	kMarineArmor = 30	kMarinePointValue = 5
-kJetpackHealth = 100	kJetpackArmor = 40	kJetpackPointValue = 15
+kJetpackHealth = 100	kJetpackArmor = 30	kJetpackPointValue = 15		//JP base armor doesn't seem to be used
 kExosuitHealth = 100	kExosuitArmor = 600	kExosuitPointValue = 30
 
 kMarineWeaponHealth = 400
@@ -54,5 +54,5 @@ kSentryHealth = 550	kSentryArmor = 100	kSentryPointValue = 10		//500, 100, 10
 kARCHealth = 1250	kARCArmor = 300	kARCPointValue = 20		//2000, 500, 20
 kARCDeployedHealth = 1250	kARCDeployedArmor = 0	kARCPointValue = 20		//2000, 0, 20
 
-kPowerPointHealth = 1400	kPowerPointArmor = 650	kPowerPointPointValue = 0	//2000, 1000, 15
+kPowerPointHealth = 1400	kPowerPointArmor = 750	kPowerPointPointValue = 0	//2000, 1000, 15
 kDoorHealth = 1200	kDoorArmor = 500	kDoorPointValue = 0	//2000, 1000, 15

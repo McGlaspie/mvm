@@ -262,38 +262,38 @@ function BuildTechData()	//OVERRIDES
         // Misc.
         { 
 			[kTechDataId] = kTechId.PowerPoint,
-				[kTechDataHint] = "POWERPOINT_HINT",
-				[kTechDataMapName] = PowerPoint.kMapName,
-				[kTechDataDisplayName] = "POWER_NODE",
-				[kTechDataCostKey] = 0,
-				[kTechDataMaxHealth] = kPowerPointHealth,
-				[kTechDataMaxArmor] = kPowerPointArmor,
-				[kTechDataBuildTime] = kPowerPointBuildTime,
-				[kTechDataPointValue] = kPowerPointPointValue,
-				[kTechDataTooltipInfo] = "POWERPOINT_TOOLTIP"
+			[kTechDataHint] = "POWERPOINT_HINT",
+			[kTechDataMapName] = PowerPoint.kMapName,
+			[kTechDataDisplayName] = "POWER_NODE",
+			[kTechDataCostKey] = 0,
+			[kTechDataMaxHealth] = kPowerPointHealth,
+			[kTechDataMaxArmor] = kPowerPointArmor,
+			[kTechDataBuildTime] = kPowerPointBuildTime,
+			[kTechDataPointValue] = kPowerPointPointValue,
+			[kTechDataTooltipInfo] = "POWERPOINT_TOOLTIP"
 		},        
         { 
 			[kTechDataId] = kTechId.SocketPowerNode,
-				[kTechDataDisplayName] = "SOCKET_POWER_NODE",
-				[kTechDataCostKey] = kPowerNodeCost,
-				[kTechDataBuildTime] = 0.1,
+			[kTechDataDisplayName] = "SOCKET_POWER_NODE",
+			[kTechDataCostKey] = kPowerNodeCost,
+			[kTechDataBuildTime] = 0.1,
 		},
 
         { 
 			[kTechDataId] = kTechId.ResourcePoint,
-				[kTechDataHint] = "RESOURCE_NOZZLE_TOOLTIP",
-				[kTechDataMapName] = ResourcePoint.kPointMapName,
-				[kTechDataDisplayName] = "RESOURCE_NOZZLE",
-				[kTechDataModel] = ResourcePoint.kModelName,
-				[kTechDataObstacleRadius] = 1.0
+			[kTechDataHint] = "RESOURCE_NOZZLE_TOOLTIP",
+			[kTechDataMapName] = ResourcePoint.kPointMapName,
+			[kTechDataDisplayName] = "RESOURCE_NOZZLE",
+			[kTechDataModel] = ResourcePoint.kModelName,
+			[kTechDataObstacleRadius] = 1.0
 		},
         { 
 			[kTechDataId] = kTechId.TechPoint,
-				[kTechDataHint] = "TECH_POINT_HINT",
-				[kTechDataTooltipInfo] = "TECH_POINT_TOOLTIP",
-				[kTechDataMapName] = TechPoint.kMapName,
-				[kTechDataDisplayName] = "TECH_POINT",
-				[kTechDataModel] = TechPoint.kModelName
+			[kTechDataHint] = "TECH_POINT_HINT",
+			[kTechDataTooltipInfo] = "TECH_POINT_TOOLTIP",
+			[kTechDataMapName] = TechPoint.kMapName,
+			[kTechDataDisplayName] = "TECH_POINT",
+			[kTechDataModel] = TechPoint.kModelName
 		},
         { [kTechDataId] = kTechId.Door,                  [kTechDataDisplayName] = "DOOR", [kTechDataTooltipInfo] = "DOOR_TOOLTIP", [kTechDataMapName] = Door.kMapName, [kTechDataMaxHealth] = kDoorHealth, [kTechDataMaxArmor] = kDoorArmor, [kTechDataPointValue] = kDoorPointValue },
         { [kTechDataId] = kTechId.DoorOpen,              [kTechDataDisplayName] = "OPEN_DOOR", [kTechDataHotkey] = Move.O, [kTechDataTooltipInfo] = "OPEN_DOOR_TOOLTIP"},
@@ -517,9 +517,56 @@ function BuildTechData()	//OVERRIDES
         { [kTechDataId] = kTechId.Observatory, [kTechDataSupply] = kObservatorySupply, [kTechDataHint] = "OBSERVATORY_HINT", [kTechDataGhostModelClass] = "MarineGhostModel",  [kTechDataRequiresPower] = true,        [kTechDataMapName] = Observatory.kMapName,    [kTechDataDisplayName] = "OBSERVATORY",  [kVisualRange] = Observatory.kDetectionRange, [kTechDataCostKey] = kObservatoryCost,       [kTechDataModel] = Observatory.kModelName,            [kTechDataBuildTime] = kObservatoryBuildTime, [kTechDataMaxHealth] = kObservatoryHealth,   [kTechDataEngagementDistance] = kObservatoryEngagementDistance, [kTechDataMaxArmor] = kObservatoryArmor,   [kTechDataInitialEnergy] = kObservatoryInitialEnergy,      [kTechDataMaxEnergy] = kObservatoryMaxEnergy, [kTechDataPointValue] = kObservatoryPointValue, [kTechDataHotkey] = Move.O, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataTooltipInfo] = "OBSERVATORY_TOOLTIP", [kTechDataObstacleRadius] = 0.25},
         { [kTechDataId] = kTechId.DistressBeacon,    [kTechDataBuildTime] = 0.1,    [kTechDataDisplayName] = "DISTRESS_BEACON",   [kTechDataHotkey] = Move.B, [kTechDataCostKey] = kObservatoryDistressBeaconCost, [kTechDataTooltipInfo] =  "DISTRESS_BEACON_TOOLTIP"},
 
-        { [kTechDataId] = kTechId.RoboticsFactory, [kTechDataSupply] = kRoboticsFactorySupply, [kTechDataHint] = "ROBOTICS_FACTORY_HINT", [kTechDataGhostModelClass] = "MarineGhostModel",    [kTechDataRequiresPower] = true,   [kTechDataDisplayName] = "ROBOTICS_FACTORY",  [kTechDataMapName] = RoboticsFactory.kMapName, [kTechDataCostKey] = kRoboticsFactoryCost,       [kTechDataModel] = RoboticsFactory.kModelName,    [kTechDataEngagementDistance] = kRoboticsFactorEngagementDistance,        [kTechDataSpecifyOrientation] = true, [kTechDataBuildTime] = kRoboticsFactoryBuildTime, [kTechDataMaxHealth] = kRoboticsFactoryHealth,    [kTechDataMaxArmor] = kRoboticsFactoryArmor, [kTechDataPointValue] = kRoboticsFactoryPointValue, [kTechDataHotkey] = Move.R, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataTooltipInfo] = "ROBOTICS_FACTORY_TOOLTIP", [kTechDataObstacleRadius] = 2},        
-        { [kTechDataId] = kTechId.UpgradeRoboticsFactory, [kTechDataDisplayName] = "UPGRADE_ROBOTICS_FACTORY", [kTechIDShowEnables] = false, [kTechDataCostKey] = kUpgradeRoboticsFactoryCost,   [kTechDataResearchTimeKey] = kUpgradeRoboticsFactoryTime, [kTechDataTooltipInfo] = "UPGRADE_ROBOTICS_FACTORY_TOOLTIP"},        
-        { [kTechDataId] = kTechId.ARCRoboticsFactory, [kTechDataCostKey] = kRoboticsFactoryCost + kUpgradeRoboticsFactoryCost, [kTechDataHint] = "ARC_ROBOTICS_FACTORY_HINT", [kTechDataRequiresPower] = true,  [kTechIDShowEnables] = false,  [kTechDataDisplayName] = "ARC_ROBOTICS_FACTORY",  [kTechDataMapName] = ARCRoboticsFactory.kMapName, [kTechDataModel] = RoboticsFactory.kModelName,   [kTechDataEngagementDistance] = kRoboticsFactorEngagementDistance,        [kTechDataSpecifyOrientation] = true, [kTechDataBuildTime] = kRoboticsFactoryBuildTime, [kTechDataMaxHealth] = kARCRoboticsFactoryHealth,    [kTechDataMaxArmor] = kARCRoboticsFactoryArmor, [kTechDataPointValue] = kARCRoboticsFactoryPointValue, [kTechDataHotkey] = Move.R, [kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, [kTechDataTooltipInfo] = "ARC_ROBOTICS_FACTORY_TOOLTIP"},        
+        { 
+			[kTechDataId] = kTechId.RoboticsFactory, 
+			[kTechDataSupply] = kRoboticsFactorySupply, 
+			[kTechDataHint] = "ROBOTICS_FACTORY_HINT", 
+			[kTechDataGhostModelClass] = "MarineGhostModel",    
+			[kTechDataRequiresPower] = true,   
+			[kTechDataDisplayName] = "ROBOTICS_FACTORY",  
+			[kTechDataMapName] = RoboticsFactory.kMapName, 
+			[kTechDataCostKey] = kRoboticsFactoryCost,       
+			[kTechDataModel] = RoboticsFactory.kModelName,    
+			[kTechDataEngagementDistance] = kRoboticsFactorEngagementDistance,        
+			[kTechDataSpecifyOrientation] = true, 
+			[kTechDataBuildTime] = kRoboticsFactoryBuildTime, 
+			[kTechDataMaxHealth] = kRoboticsFactoryHealth,    
+			[kTechDataMaxArmor] = kRoboticsFactoryArmor, 
+			[kTechDataPointValue] = kRoboticsFactoryPointValue, 
+			[kTechDataHotkey] = Move.R, 
+			[kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, 
+			[kTechDataTooltipInfo] = "ROBOTICS_FACTORY_TOOLTIP", 
+			[kTechDataObstacleRadius] = 2
+		},        
+        { 
+			[kTechDataId] = kTechId.UpgradeRoboticsFactory, 
+			[kTechDataSupply] = kARCRoboticsFactorySupply, 
+			[kTechDataDisplayName] = "UPGRADE_ROBOTICS_FACTORY", 
+			[kTechIDShowEnables] = false, 
+			[kTechDataCostKey] = kUpgradeRoboticsFactoryCost,   
+			[kTechDataResearchTimeKey] = kUpgradeRoboticsFactoryTime, 
+			[kTechDataTooltipInfo] = "UPGRADE_ROBOTICS_FACTORY_TOOLTIP"
+		},        
+        { 
+			[kTechDataId] = kTechId.ARCRoboticsFactory, 
+			[kTechDataSupply] = kARCRoboticsFactorySupply, 
+			[kTechDataCostKey] = kRoboticsFactoryCost + kUpgradeRoboticsFactoryCost, 
+			[kTechDataHint] = "ARC_ROBOTICS_FACTORY_HINT", 
+			[kTechDataRequiresPower] = true,  
+			[kTechIDShowEnables] = false,  
+			[kTechDataDisplayName] = "ARC_ROBOTICS_FACTORY",  
+			[kTechDataMapName] = ARCRoboticsFactory.kMapName, 
+			[kTechDataModel] = RoboticsFactory.kModelName,   
+			[kTechDataEngagementDistance] = kRoboticsFactorEngagementDistance,        
+			[kTechDataSpecifyOrientation] = true, 
+			[kTechDataBuildTime] = kRoboticsFactoryBuildTime, 
+			[kTechDataMaxHealth] = kARCRoboticsFactoryHealth,    
+			[kTechDataMaxArmor] = kARCRoboticsFactoryArmor, 
+			[kTechDataPointValue] = kARCRoboticsFactoryPointValue, 
+			[kTechDataHotkey] = Move.R, 
+			[kTechDataNotOnInfestation] = kPreventMarineStructuresOnInfestation, 
+			[kTechDataTooltipInfo] = "ARC_ROBOTICS_FACTORY_TOOLTIP"
+		},        
 
         { [kTechDataId] = kTechId.ARC,   
 			[kTechDataSupply] = kARCSupply,   
@@ -757,10 +804,37 @@ function BuildTechData()	//OVERRIDES
         { [kTechDataId] = kTechId.DropExosuit,   [kTechDataMapName] = Exosuit.kMapName, [kTechDataDisplayName] = "EXOSUIT", [kTechIDShowEnables] = false, [kTechDataTooltipInfo] =  "EXOSUIT_TOOLTIP", [kTechDataModel] = Exosuit.kModelName, [kTechDataCostKey] = kExosuitDropCost, [kStructureAttachId] = kTechId.PrototypeLab, [kStructureAttachRange] = kArmoryWeaponAttachRange, [kStructureAttachRequiresPower] = true },
        
         // Armor and upgrades
-        { [kTechDataId] = kTechId.Jetpack,   [kTechDataMapName] = Jetpack.kMapName,                   [kTechDataDisplayName] = "JETPACK", [kTechDataModel] = Jetpack.kModelName, [kTechDataCostKey] = kJetpackCost, [kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight },
-        { [kTechDataId] = kTechId.JetpackTech,    [kTechDataCostKey] = kJetpackTechResearchCost,               [kTechDataResearchTimeKey] = kJetpackTechResearchTime,     [kTechDataDisplayName] = "JETPACK_TECH" },
-        { [kTechDataId] = kTechId.JetpackFuelTech,       [kTechDataCostKey] = kJetpackFuelTechResearchCost,           [kTechDataResearchTimeKey] = kJetpackFuelTechResearchTime,     [kTechDataDisplayName] = "JETPACK_FUEL_TECH", [kTechDataHotkey] = Move.F, [kTechDataTooltipInfo] =  "JETPACK_FUEL_TOOLTIP"},
-        { [kTechDataId] = kTechId.JetpackArmorTech,       [kTechDataCostKey] = kJetpackArmorTechResearchCost,         [kTechDataResearchTimeKey] = kJetpackArmorTechResearchTime,     [kTechDataDisplayName] = "JETPACK_ARMOR_TECH", [kTechDataImplemented] = false, [kTechDataHotkey] = Move.S, [kTechDataTooltipInfo] = "JETPACK_ARMOR_TOOLTIP"},
+        { 
+			[kTechDataId] = kTechId.Jetpack,   
+			[kTechDataMapName] = Jetpack.kMapName,                   
+			[kTechDataDisplayName] = "JETPACK", 
+			[kTechDataModel] = Jetpack.kModelName, 
+			[kTechDataCostKey] = kJetpackCost, 
+			[kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight 
+		},
+        { 
+			[kTechDataId] = kTechId.JetpackTech,    
+			[kTechDataCostKey] = kJetpackTechResearchCost,               
+			[kTechDataResearchTimeKey] = kJetpackTechResearchTime,     
+			[kTechDataDisplayName] = "JETPACK_TECH" 
+		},
+        { 
+			[kTechDataId] = kTechId.JetpackFuelTech,       
+			[kTechDataCostKey] = kJetpackFuelTechResearchCost,           
+			[kTechDataResearchTimeKey] = kJetpackFuelTechResearchTime,     
+			[kTechDataDisplayName] = "JETPACK_FUEL_TECH", 
+			[kTechDataHotkey] = Move.F, 
+			[kTechDataTooltipInfo] =  "JETPACK_FUEL_TOOLTIP"
+		},
+        { 
+			[kTechDataId] = kTechId.JetpackArmorTech,       
+			[kTechDataCostKey] = kJetpackArmorTechResearchCost,         
+			[kTechDataResearchTimeKey] = kJetpackArmorTechResearchTime,     
+			[kTechDataDisplayName] = "JETPACK_ARMOR_TECH", 
+			[kTechDataImplemented] = false, 
+			[kTechDataHotkey] = Move.S, 
+			[kTechDataTooltipInfo] = "JETPACK_ARMOR_TOOLTIP"
+		},
 
         
         { 
@@ -772,14 +846,70 @@ function BuildTechData()	//OVERRIDES
 			[kTechDataTooltipInfo] = "EXOSUIT_TECH_TOOLTIP", 
 			[kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight
 		},
-        { [kTechDataId] = kTechId.DualMinigunExosuit,     [kTechIDShowEnables] = false,       [kTechDataDisplayName] = "DUALMINIGUN_EXOSUIT", [kTechDataMapName] = "exo",               [kTechDataCostKey] = kDualExosuitCost, [kTechDataHotkey] = Move.E, [kTechDataTooltipInfo] = "DUALMINIGUN_EXOSUIT_TECH_TOOLTIP", [kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight},
-        { [kTechDataId] = kTechId.ClawRailgunExosuit,     [kTechIDShowEnables] = false,       [kTechDataDisplayName] = "CLAWRAILGUN_EXOSUIT", [kTechDataMapName] = "exo",               [kTechDataCostKey] = kClawRailgunExosuitCost, [kTechDataHotkey] = Move.E, [kTechDataTooltipInfo] = "CLAWRAILGUN_EXOSUIT_TECH_TOOLTIP", [kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight},
-        { [kTechDataId] = kTechId.DualRailgunExosuit,     [kTechIDShowEnables] = false,       [kTechDataDisplayName] = "DUALRAILGUN_EXOSUIT", [kTechDataMapName] = "exo",               [kTechDataCostKey] = kDualRailgunExosuitCost, [kTechDataHotkey] = Move.E, [kTechDataTooltipInfo] = "DUALRAILGUN_EXOSUIT_TECH_TOOLTIP", [kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight},
-        { [kTechDataId] = kTechId.ExosuitTech,        [kTechDataDisplayName] = "RESEARCH_EXOSUITS", [kTechDataCostKey] = kExosuitTechResearchCost,  [kTechDataResearchTimeKey] = kExosuitTechResearchTime},
-        { [kTechDataId] = kTechId.ExosuitLockdownTech,  [kTechDataCostKey] = kExosuitLockdownTechResearchCost,               [kTechDataResearchTimeKey] = kExosuitLockdownTechResearchTime,     [kTechDataDisplayName] = "EXOSUIT_LOCKDOWN_TECH", [kTechDataImplemented] = false, [kTechDataHotkey] = Move.L, [kTechDataTooltipInfo] = "EXOSUIT_LOCKDOWN_TOOLTIP"},
-        { [kTechDataId] = kTechId.ExosuitUpgradeTech,  [kTechDataCostKey] = kExosuitUpgradeTechResearchCost,               [kTechDataResearchTimeKey] = kExosuitUpgradeTechResearchTime,     [kTechDataDisplayName] = "EXOSUIT_UPGRADE_TECH", [kTechDataImplemented] = false },
-        { [kTechDataId] = kTechId.UpgradeToDualMinigun, [kTechIDShowEnables] = false, [kTechDataCostKey] = kUpgradeToDualMinigunCost,   [kTechDataDisplayName] = "DUALMINIGUN_EXOSUIT" },
-        { [kTechDataId] = kTechId.UpgradeToDualRailgun, [kTechIDShowEnables] = false, [kTechDataCostKey] = kUpgradeToDualRailgunCost,   [kTechDataDisplayName] = "DUALRAILGUN_EXOSUIT" },
+        { 
+			[kTechDataId] = kTechId.DualMinigunExosuit,     
+			[kTechIDShowEnables] = false,       
+			[kTechDataDisplayName] = "DUALMINIGUN_EXOSUIT", 
+			[kTechDataMapName] = "exo",               
+			[kTechDataCostKey] = kDualMinigunExosuitCost, 
+			[kTechDataHotkey] = Move.E, 
+			[kTechDataTooltipInfo] = "DUALMINIGUN_EXOSUIT_TECH_TOOLTIP", 
+			[kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight
+		},
+        { 
+			[kTechDataId] = kTechId.ClawRailgunExosuit,     
+			[kTechIDShowEnables] = false,       
+			[kTechDataDisplayName] = "CLAWRAILGUN_EXOSUIT", 
+			[kTechDataMapName] = "exo",               
+			[kTechDataCostKey] = kClawRailgunExosuitCost, 
+			[kTechDataHotkey] = Move.E, 
+			[kTechDataTooltipInfo] = "CLAWRAILGUN_EXOSUIT_TECH_TOOLTIP", 
+			[kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight
+		},
+        { 
+			[kTechDataId] = kTechId.DualRailgunExosuit,     
+			[kTechIDShowEnables] = false,       
+			[kTechDataDisplayName] = "DUALRAILGUN_EXOSUIT", 
+			[kTechDataMapName] = "exo",               
+			[kTechDataCostKey] = kDualRailgunExosuitCost, 
+			[kTechDataHotkey] = Move.E, 
+			[kTechDataTooltipInfo] = "DUALRAILGUN_EXOSUIT_TECH_TOOLTIP", 
+			[kTechDataSpawnHeightOffset] = kCommanderEquipmentDropSpawnHeight
+		},
+        { 
+			[kTechDataId] = kTechId.ExosuitTech,        
+			[kTechDataDisplayName] = "RESEARCH_EXOSUITS", 
+			[kTechDataCostKey] = kExosuitTechResearchCost,  
+			[kTechDataResearchTimeKey] = kExosuitTechResearchTime
+		},
+        { 
+			[kTechDataId] = kTechId.ExosuitLockdownTech,  
+			[kTechDataCostKey] = kExosuitLockdownTechResearchCost,               
+			[kTechDataResearchTimeKey] = kExosuitLockdownTechResearchTime,     
+			[kTechDataDisplayName] = "EXOSUIT_LOCKDOWN_TECH", 
+			[kTechDataImplemented] = false, 
+			[kTechDataHotkey] = Move.L, 
+			[kTechDataTooltipInfo] = "EXOSUIT_LOCKDOWN_TOOLTIP"
+		},
+        { 
+			[kTechDataId] = kTechId.ExosuitUpgradeTech,  
+			[kTechDataCostKey] = kExosuitUpgradeTechResearchCost,               
+			[kTechDataResearchTimeKey] = kExosuitUpgradeTechResearchTime,     
+			[kTechDataDisplayName] = "EXOSUIT_UPGRADE_TECH", 
+			[kTechDataImplemented] = false 
+		},
+        { 
+			[kTechDataId] = kTechId.UpgradeToDualMinigun, 
+			[kTechIDShowEnables] = false, 
+			[kTechDataCostKey] = kUpgradeToDualMinigunCost,   
+			[kTechDataDisplayName] = "DUALMINIGUN_EXOSUIT" 
+		},
+        { 
+			[kTechDataId] = kTechId.UpgradeToDualRailgun, 
+			[kTechIDShowEnables] = false, 
+			[kTechDataCostKey] = kUpgradeToDualRailgunCost,   
+			[kTechDataDisplayName] = "DUALRAILGUN_EXOSUIT" 
+		},
         
         // Armor research
         { 

@@ -5,37 +5,42 @@ Script.Load("lua/PowerConsumerMixin.lua")
 
 //-----------------------------------------------------------------------------
 
-
+local kDissolveAccentOnLimit = 0.18
+local kDissolveSpeed = 0.75
+local kDissolveDelay = 5	//move to global?
 local unpoweredColor = Color( 0, 0, 0, 1 )
 
+
+//FIXME Make routine in this func a optional callback via mixin def
 function PowerConsumerMixin:OnUpdate( deltaTime )
+
+	PROFILE("PowerConsumerMixin:OnUpdate")
 	
 	if Server then
         self.powerSurge = self.timePowerSurgeEnds > Shared.GetTime()
     end
 	
-	if Client and HasMixin(self, "ColoredSkins") then
-		
-		if not self:isa("Sentry") and not self:isa("Player") then
+	if Client then
+
+		if self.GetAccentSkinColor and self.GetIsAlive then
 			
-			self.skinAccentColor = ConditionalValue(
-				self:GetIsPowered(),
-				self:GetAccentSkinColor(),
-				unpoweredColor
-			)
-		
+			if not self:isa("Sentry") and not self:isa("SentryBattery") and not self:isa("Player") and self:GetIsAlive() then
+				
+				self.skinAccentColor = ConditionalValue(
+					self:GetIsPowered(),
+					self:GetAccentSkinColor(),
+					unpoweredColor
+				)
+			
+			end
+			
 		end
 		
 	end
 	
-end
-
-
-function PowerConsumerMixin:OnUpdateRender()
-	
-    if self.powerSurge then		
+	if self.powerSurge then		
 		
-        if not self.timeLastPowerSurgeEffect or self.timeLastPowerSurgeEffect + 1 < Shared.GetTime() then
+        if not self.timeLastPowerSurgeEffect or self.timeLastPowerSurgeEffect + 0.5 < Shared.GetTime() then
 			
 			local surgeEffectTeam = self:GetTeamNumber()
 			
@@ -44,22 +49,36 @@ function PowerConsumerMixin:OnUpdateRender()
             })
 			
             self.timeLastPowerSurgeEffect = Shared.GetTime()
-        
+			
+			if Client then
+			
+				if self.GetAccentSkinColor and self:GetIsAlive() then
+					self.skinAccentColor = self:GetAccentSkinColor()
+				end
+			
+			end
+			
         end
     
     end
     
-    if HasMixin( self, "ColoredSkins" ) and not self:GetIsAlive() then
+    
+    if Client then
 		
-		self.skinAccentColor = unpoweredColor	//FIXME preventing dissolve from being colorized
-		
-		if HasMixin( self, "Dissolve" ) then
-			if self.dissolveStart ~= nil and self.dissolveStart <= Shared.GetTime() then
-				self.skinAcentColor = self:GetAccentSkinColor()
+		if self.GetAccentSkinColor and not self:GetIsAlive() then
+			
+			if self.dissolveAmount and self.dissolveAmount < kDissolveAccentOnLimit then
+				self.skinAccentColor = unpoweredColor
 			end
+			
 		end
 		
 	end
-
+	
 end
 
+/*
+function PowerConsumerMixin:OnUpdateRender()
+	PROFILE("PowerConsumerMixin:OnUpdateRender")
+end
+*/

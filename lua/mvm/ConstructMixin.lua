@@ -91,7 +91,7 @@ function ConstructMixin:OnConstructionComplete( builder )
 
 	orgConstructComplete( self, builder )
 	
-	if Client then
+	if Client then	//could this be moved to Power
 	
 		if HasMixin( self, "ColoredSkins" ) then
 		
@@ -287,7 +287,3 @@ function ConstructMixin:OnUse(player, elapsedTime, useSuccessTable)
 end
 
 
-
-//-----------------------------------------------------------------------------
-
-//ReplaceLocals( ConstructMixin.Construct, { kBuildEffectsInterval = 1 } )

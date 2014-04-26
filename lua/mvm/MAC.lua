@@ -12,6 +12,7 @@ Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/NanoshieldMixin.lua")
 Script.Load("lua/mvm/SupplyUserMixin.lua")
 Script.Load("lua/mvm/RagdollMixin.lua")
+Script.Load("lua/mvm/OrdersMixin.lua")
 
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")

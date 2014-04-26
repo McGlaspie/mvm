@@ -1,5 +1,13 @@
 
 Script.Load("lua/mvm/ScoringMixin.lua")
+Script.Load("lua/MarineVariantMixin.lua")
+Script.Load("lua/Mixins/BaseMoveMixin.lua")
+Script.Load("lua/Mixins/GroundMoveMixin.lua")
+Script.Load("lua/Mixins/JumpMoveMixin.lua")
+Script.Load("lua/Mixins/CrouchMoveMixin.lua")
+Script.Load("lua/Mixins/LadderMoveMixin.lua")
+Script.Load("lua/Mixins/CameraHolderMixin.lua")
+Script.Load("lua/mvm/ScoringMixin.lua")
 
 
 //-----------------------------------------------------------------------------
@@ -25,6 +33,10 @@ function ReadyRoomPlayer:OnInitialized()	//OVERRIDES
 
     Player.OnInitialized(self)
     
+    //Below (as in NS2) is always setting default model. If a player was copied
+    //after the OnClientUpdate change kicked in (just before or during team join)
+    //the variant data could be lost, and the server think one AnimationGraphState
+    //was set but the client another. Resulting in T-pose players.
     self:SetModel( MarineVariantMixin.kDefaultModelName, MarineVariantMixin.kMarineAnimationGraph )
     
     if Client then

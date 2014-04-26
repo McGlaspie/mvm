@@ -196,6 +196,95 @@ if Client then
 		table.insert(self.ghostGuides, {origin, guide})
 
 	end
+	
+	
+	// Set the context-sensitive mouse cursor 
+	// Marine Commander default (like arrow from Starcraft 2, pointing to upper-left, MarineCommanderDefault.dds)
+	// Alien Commander default (like arrow from Starcraft 2, pointing to upper-left, AlienCommanderDefault.dds)
+	// Valid for friendly action (green "brackets" in Starcraft 2, FriendlyAction.dds)
+	// Valid for neutral action (yellow "brackets" in Starcraft 2, NeutralAction.dds)
+	// Valid for enemy action (red "brackets" in Starcraft 2, EnemyAction.dds)
+	// Build/target default (white crosshairs, BuildTargetDefault.dds)
+	// Build/target enemy (red crosshairs, BuildTargetEnemy.dds)
+	function Commander:UpdateCursor()
+
+		local playerTeam = self:GetTeamNumber()
+
+		// By default, use side-specific default cursor
+		local baseCursor = ConditionalValue(playerTeam == kTeam2Index, "AlienCommanderDefault", "MarineCommanderDefault")
+		
+		// By default, the "click" spot on the cursor graphic is in the top left corner.
+		local hotspot = Vector(0, 0, 0)
+		
+		// Update highlighted unit under cursor
+		local xScalar, yScalar = Client.GetCursorPos()
+		
+		local entityUnderCursor = nil
+		
+		if self.entityIdUnderCursor ~= Entity.invalidId then
+		
+			hotspot = Vector(16, 16, 0)
+			
+			entityUnderCursor = Shared.GetEntity(self.entityIdUnderCursor)
+			baseCursor = "NeutralAction"
+			
+			if HasMixin(entityUnderCursor, "Team") then
+			
+				if entityUnderCursor:GetTeamNumber() == self:GetTeamNumber() then
+					baseCursor = "FriendlyAction"
+				elseif entityUnderCursor:GetTeamNumber() == GetEnemyTeamNumber(self:GetTeamNumber()) then
+					baseCursor = "EnemyAction"
+				end
+				
+			end
+			
+		end
+		
+		// If we're building or in a targeted mode, use a special targeting cursor
+		if GetCommanderGhostStructureEnabled() then
+		
+			hotspot = Vector(16, 16, 0)
+			baseCursor = "BuildTargetDefault"
+			
+		// Or if we're targeting an ability
+		elseif self.currentTechId ~= nil and self.currentTechId ~= kTechId.None then
+		
+			local techNode = GetTechNode(self.currentTechId)
+			
+			if techNode ~= nil and techNode:GetRequiresTarget() then
+			
+				hotspot = Vector(16, 16, 0)
+				baseCursor = "BuildTargetDefault"
+				
+				if entityUnderCursor and HasMixin(entityUnderCursor, "Team") and (entityUnderCursor:GetTeamNumber() == GetEnemyTeamNumber(self:GetTeamNumber())) then
+					baseCursor = "BuildTargetEnemy"
+				end
+				
+			end
+			
+		end
+		
+		// Set the cursor if it changed
+		local cursorTexture = string.format("ui/Cursor_%s.dds", baseCursor)
+		if CommanderUI_GetMouseIsOverUI() and self.currentTechId == kTechId.None then
+			
+			hotspot = Vector(0, 0, 0)
+			if playerTeam == kTeam1Index then
+				cursorTexture = "ui/Cursor_MenuDefault_team1_hover.dds"
+			else
+				cursorTexture = "ui/Cursor_MenuDefault_team2_hover.dds"
+			end
+			
+		end
+		
+		if cursorTexture ~= self.lastCursorTexture then
+		
+			Client.SetCursor(cursorTexture, hotspot.x, hotspot.y)
+			self.lastCursorTexture = cursorTexture
+			
+		end
+		
+	end
 		
 	
 	local function MvM_UpdateSentryBatteryLine(self, fromPoint)

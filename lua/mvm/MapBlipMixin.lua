@@ -153,7 +153,9 @@ function MapBlipMixin:GetMapBlipInfo()
         blipType = kMinimapBlipType.TechPoint
     // Don't display PowerPoints unless they are in an unpowered state.
     elseif self:isa("PowerPoint") then
-    
+		
+		//TODO Denote difference between Scouted and UnScouted (via color)
+		
         blipType = ConditionalValue( self:GetIsDisabled(), kMinimapBlipType.DestroyedPowerPoint, kMinimapBlipType.PowerPoint)
         blipTeam = self:GetTeamNumber()
         

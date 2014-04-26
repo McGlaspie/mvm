@@ -56,6 +56,36 @@ function Rifle:PerformMeleeAttack(player)
 end
 
 
+local function UpdateSoundType(self, player)
+
+    local upgradeLevel = 0
+    
+    if player.GetWeaponUpgradeLevel then
+		playerWepLevel = player:GetWeaponUpgradeLevel()	- 1	//Seems dumb, but keeps 4-Tier wep 
+															//levels in 3 tier bound. Also only
+															//makes sound change on Level1 or higher
+        upgradeLevel = math.max(0, playerWepLevel - 1)
+    end
+	
+    self.soundType = self.soundVariant + upgradeLevel * kNumberOfVariants
+
+end
+
+function Rifle:OnPrimaryAttack(player)
+
+    if not self:GetIsReloading() then
+    
+        if Server then
+            UpdateSoundType(self, player)
+        end
+        
+        ClipWeapon.OnPrimaryAttack(self, player)
+        
+    end    
+
+end
+
+
 if Client then
 	
 	function Rifle:GetUIDisplaySettings()

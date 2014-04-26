@@ -212,8 +212,9 @@ if Server then
 		
 			local addTime = math.max(0, 30 - GetGamerules():GetGameTimeChanged())
 			
-			client.timeUntilResourceBlock = Shared.GetTime() + addTime + kCommanderResourceBlockTime
-			client.blockPersonalResources = true
+			//client.timeUntilResourceBlock = Shared.GetTime() + addTime + kCommanderResourceBlockTime
+			client.timeUntilResourceBlock = 0
+			client.blockPersonalResources = false
 			
 		end
 

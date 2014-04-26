@@ -104,7 +104,7 @@ function NanoShieldMixin:GetCanBeNanoShielded()
 end
 
 
-//Override - neede to use MvM balance data
+//Override - needed to use MvM balance data
 function NanoShieldMixin:ComputeDamageOverrideMixin(attacker, damage, damageType, time)
 
     if self.nanoShielded == true then

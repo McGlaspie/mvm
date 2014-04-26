@@ -1,4 +1,37 @@
 
+Script.Load("lua/mvm/Player.lua")
+Script.Load("lua/Mixins/BaseMoveMixin.lua")
+Script.Load("lua/Mixins/GroundMoveMixin.lua")
+Script.Load("lua/Mixins/JumpMoveMixin.lua")
+Script.Load("lua/Mixins/CrouchMoveMixin.lua")
+Script.Load("lua/Mixins/LadderMoveMixin.lua")
+Script.Load("lua/Mixins/CameraHolderMixin.lua")
+Script.Load("lua/OrderSelfMixin.lua")
+Script.Load("lua/MarineActionFinderMixin.lua")
+Script.Load("lua/StunMixin.lua")
+Script.Load("lua/mvm/NanoShieldMixin.lua")
+Script.Load("lua/SprintMixin.lua")
+Script.Load("lua/InfestationTrackerMixin.lua")
+Script.Load("lua/mvm/WeldableMixin.lua")
+Script.Load("lua/mvm/ScoringMixin.lua")
+Script.Load("lua/UnitStatusMixin.lua")
+
+Script.Load("lua/VortexAbleMixin.lua")
+Script.Load("lua/HiveVisionMixin.lua")
+Script.Load("lua/DisorientableMixin.lua")
+
+Script.Load("lua/CombatMixin.lua")
+Script.Load("lua/ParasiteMixin.lua")
+Script.Load("lua/mvm/OrdersMixin.lua")
+
+Script.Load("lua/WebableMixin.lua")
+Script.Load("lua/CorrodeMixin.lua")
+Script.Load("lua/TunnelUserMixin.lua")
+Script.Load("lua/PhaseGateUserMixin.lua")
+Script.Load("lua/Weapons/PredictedProjectile.lua")
+
+Script.Load("lua/MarineOutlineMixin.lua")
+
 Script.Load("lua/mvm/SelectableMixin.lua")
 Script.Load("lua/mvm/LOSMixin.lua")
 Script.Load("lua/mvm/DetectableMixin.lua")
@@ -17,6 +50,13 @@ if Client then
 end
 //Script.Load("lua/mvm/SprintMixin.lua")	//Future use
 
+
+/*
+Marine is the only thing that seems to get stuck in t-pose
+Using the spawn command replicates this problem
+ - Trace differences from NS2 and MvM's spawn cmd, may lead
+ to the cause.
+*/
 
 
 if Client then
@@ -49,10 +89,12 @@ Marine.kSprintAcceleration = 190 // 70
 Marine.kGroundFrictionForce = 16
 Marine.kAirStrafeWeight = 0		//May need to add back in for JP - Can stop on a dime with JP...
 
+Marine.kArmorPerUpgradeLevel = kArmorPerUpgradeLevel
 
 
 local newNetworkVars = {
-	commanderLoginTime = "time"		//Required here for use in PowerLightsHandler, for LightState overrides
+	commanderLoginTime = "time",		//Required here for use in PowerLightsHandler, for LightState overrides
+	weaponUpgradeLevel = "integer (0 to 4)",	//Overrides
 }
 
 AddMixinNetworkVars( FireMixin, newNetworkVars )
@@ -181,6 +223,12 @@ function Marine:OnInitialized()	//OVERRIDE
         if not HasMixin(self, "MapBlip") then
             InitMixin(self, MapBlipMixin)
         end
+        
+        self.timeRuptured = 0
+        self.interruptStartTime = 0
+        self.timeLastPoisonDamage = 0
+        
+        self.lastPoisonAttackerId = Entity.invalidId
        
     elseif Client then
     
@@ -193,8 +241,6 @@ function Marine:OnInitialized()	//OVERRIDE
         self:AddHelpWidget("GUIMapHelp", 1)
         
 		self.notifications = { }
-		
-		self:InitializeSkin()	//Colorized skins system
 		
     end
     
@@ -221,6 +267,10 @@ function Marine:OnInitialized()	//OVERRIDE
     
     self.flashlightLastFrame = false
     
+    if Client then
+		self:InitializeSkin()
+    end
+    
 end
 
 
@@ -234,10 +284,11 @@ if Client then
 		self.skinTrimColor = self:GetTrimSkinColor(teamNum)
 		
 		if teamNum == kTeamReadyRoom then
-			self.skinAtlasIndex = 0
+			self.skinAtlasIndex = Clamp( self.previousTeamNumber - 1, 0, kTeam2Index )
 		else
 			self.skinAtlasIndex = teamNum - 1
 		end
+		
 	end
 	
 	function Marine:GetBaseSkinColor(teamNum)
@@ -320,6 +371,29 @@ function Marine:OnWeldOverride(doer, elapsedTime)
 end
 
 
+function Marine:GetArmorAmount(armorLevels)
+
+    if not armorLevels then
+    
+        armorLevels = 0
+		
+		if GetHasTech(self, kTechId.Armor4, true) then
+            armorLevels = 4
+        elseif GetHasTech(self, kTechId.Armor3, true) then
+            armorLevels = 3
+        elseif GetHasTech(self, kTechId.Armor2, true) then
+            armorLevels = 2
+        elseif GetHasTech(self, kTechId.Armor1, true) then
+            armorLevels = 1
+        end
+    
+    end
+    
+    return Marine.kBaseArmor + armorLevels * Marine.kArmorPerUpgradeLevel
+    
+end
+
+
 function Marine:OnProcessMove( input )		//OVERRIDES
 
     if self.catpackboost then
@@ -327,15 +401,15 @@ function Marine:OnProcessMove( input )		//OVERRIDES
     end
 	
     if Server then
-    
-		//self.ruptured = Shared.GetTime() - self.timeRuptured < Rupture.kDuration
-		//self.interruptAim  = Shared.GetTime() - self.interruptStartTime < Gore.kAimInterruptDuration
+		
+		self.ruptured = Shared.GetTime() - self.timeRuptured < Rupture.kDuration
+		self.interruptAim  = Shared.GetTime() - self.interruptStartTime < Gore.kAimInterruptDuration
         
         if self.unitStatusPercentage ~= 0 and self.timeLastUnitPercentageUpdate + 2 < Shared.GetTime() then
             self.unitStatusPercentage = 0
         end    
         
-        /*
+        
         if self.poisoned then
         
             if self:GetIsAlive() and self.timeLastPoisonDamage + 1 < Shared.GetTime() then
@@ -363,7 +437,7 @@ function Marine:OnProcessMove( input )		//OVERRIDES
             end
             
         end
-        */
+        
         
         // check nano armor
         if not self:GetIsInCombat() and self.hasNanoArmor then            
@@ -405,14 +479,187 @@ if Server then
 		
 	end
 	
+	
+	
+	local function GetHostSupportsTechId(forPlayer, host, techId)
 
-end	//Server
+		if Shared.GetCheatsEnabled() then
+			return true
+		end
+		
+		local techFound = false
+		
+		if host.GetItemList then
+		
+			for index, supportedTechId in ipairs(host:GetItemList(forPlayer)) do
+			
+				if supportedTechId == techId then
+				
+					techFound = true
+					break
+					
+				end
+				
+			end
+			
+		end
+		
+		return techFound
+		
+	end
+	
+	
+	function GetHostStructureFor(entity, techId)
+
+		local hostStructures = {}
+		table.copy(GetEntitiesForTeamWithinRange("Armory", entity:GetTeamNumber(), entity:GetOrigin(), Armory.kResupplyUseRange), hostStructures, true)
+		table.copy(GetEntitiesForTeamWithinRange("PrototypeLab", entity:GetTeamNumber(), entity:GetOrigin(), PrototypeLab.kResupplyUseRange), hostStructures, true)
+		
+		if table.count(hostStructures) > 0 then
+		
+			for index, host in ipairs(hostStructures) do
+			
+				// check at first if the structure is hostign the techId:
+				if GetHostSupportsTechId(entity,host, techId) then
+					return host
+				end
+			
+			end
+				
+		end
+		
+		return nil
+
+	end
+	
+	
+	
+	local function BuyExo(self, techId)
+
+		local maxAttempts = 100
+		for index = 1, maxAttempts do
+		
+			// Find open area nearby to place the big guy.
+			local capsuleHeight, capsuleRadius = self:GetTraceCapsule()
+			local extents = Vector(Exo.kXZExtents, Exo.kYExtents, Exo.kXZExtents)
+
+			local spawnPoint        
+			local checkPoint = self:GetOrigin() + Vector(0, 0.02, 0)
+			
+			if GetHasRoomForCapsule(extents, checkPoint + Vector(0, extents.y, 0), CollisionRep.Move, PhysicsMask.Evolve, self) then
+				spawnPoint = checkPoint
+			else
+				spawnPoint = GetRandomSpawnForCapsule(extents.y, extents.x, checkPoint, 0.5, 5, EntityFilterOne(self))
+			end    
+				
+			local weapons 
+
+			if spawnPoint then
+			
+				self:AddResources(-GetCostForTech(techId))
+				local weapons = self:GetWeapons()
+				for i = 1, #weapons do            
+					weapons[i]:SetParent(nil)            
+				end
+				
+				local exo = nil
+				
+				if techId == kTechId.Exosuit then
+					exo = self:GiveExo(spawnPoint)
+				elseif techId == kTechId.DualMinigunExosuit then
+					exo = self:GiveDualExo(spawnPoint)
+				elseif techId == kTechId.ClawRailgunExosuit then
+					exo = self:GiveClawRailgunExo(spawnPoint)
+				elseif techId == kTechId.DualRailgunExosuit then
+					exo = self:GiveDualRailgunExo(spawnPoint)
+				end
+				
+				if exo then                
+					for i = 1, #weapons do
+						exo:StoreWeapon(weapons[i])
+					end            
+				end
+				
+				exo:TriggerEffects("spawn_exo")
+				
+				return
+				
+			end
+			
+		end
+		
+		Print("Error: Could not find a spawn point to place the Exo")
+		
+	end
+	
+	kIsExoTechId = { 
+		[kTechId.Exosuit] = true, [kTechId.DualMinigunExosuit] = true,
+		[kTechId.ClawRailgunExosuit] = true, [kTechId.DualRailgunExosuit] = true 
+	}
+	
+	function Marine:AttemptToBuy(techIds)
+
+		local techId = techIds[1]
+		
+		local hostStructure = GetHostStructureFor(self, techId)
+
+		if hostStructure then
+		
+			local mapName = LookupTechData(techId, kTechDataMapName)
+			
+			if mapName then
+			
+				Shared.PlayPrivateSound(self, Marine.kSpendResourcesSoundName, nil, 1.0, self:GetOrigin())
+				
+				if self:GetTeam() and self:GetTeam().OnBought then
+					self:GetTeam():OnBought(techId)
+				end
+				
+				if techId == kTechId.Jetpack then
+
+					// Need to apply this here since we change the class.
+					self:AddResources(-GetCostForTech(techId))
+					self:GiveJetpack()
+					
+				elseif kIsExoTechId[techId] then
+					BuyExo(self, techId)    
+				else
+				
+					// Make sure we're ready to deploy new weapon so we switch to it properly.
+					if self:GiveItem(mapName) then
+					
+						StartSoundEffectAtOrigin(Marine.kGunPickupSound, self:GetOrigin())                    
+						return true
+						
+					end
+					
+				end
+				
+				return false
+				
+			end
+			
+		end
+		
+		return false
+		
+	end
+	
+	
+
+end	//End Server
 
 
 //-------------------------------------
 
 
 if Client then
+	
+	//Stubbed here for checking if player already has grenades, etc
+	function MarineBuy_GetHas(techId)
+		//TODO: check if local player already has the item / upgrades    
+		return false
+	end
 	
 	
 	// Bring up buy menu
@@ -507,112 +754,12 @@ if Client then
 		//if self._renderModel then
 		//end
 		
-	end
-	
-	
-	
-	// returns 0 - 4
-	function PlayerUI_GetArmorLevel(researched)
-		
-		local armorLevel = 0
-		
-		if Client.GetLocalPlayer().gameStarted then
-		
-			local techTree = GetTechTree()
-		
-			if techTree then
-				
-				local armor4Node = techTree:GetTechNode(kTechId.Armor4)
-				local armor3Node = techTree:GetTechNode(kTechId.Armor3)
-				local armor2Node = techTree:GetTechNode(kTechId.Armor2)
-				local armor1Node = techTree:GetTechNode(kTechId.Armor1)
-				
-				if researched then
-			
-					if armor4Node and armor4Node:GetResearched() then
-						armorLevel = 4
-					elseif armor3Node and armor3Node:GetResearched() then
-						armorLevel = 3
-					elseif armor2Node and armor2Node:GetResearched()  then
-						armorLevel = 2
-					elseif armor1Node and armor1Node:GetResearched()  then
-						armorLevel = 1
-					end
-				
-				else
-				
-					if armor4Node and armor4Node:GetHasTech() then
-						armorLevel = 4
-					elseif armor3Node and armor3Node:GetHasTech() then
-						armorLevel = 3
-					elseif armor2Node and armor2Node:GetHasTech()  then
-						armorLevel = 2
-					elseif armor1Node and armor1Node:GetHasTech()  then
-						armorLevel = 1
-					end
-				
-				end
-				
-			end
-		
-		end
-
-		return armorLevel
-		
-	end
-	
-
-	function PlayerUI_GetWeaponLevel(researched)
-		
-		local weaponLevel = 0
-		
-		if Client.GetLocalPlayer().gameStarted then
-		
-			local techTree = GetTechTree()
-		
-			if techTree then
-			
-				local weapon4Node = techTree:GetTechNode(kTechId.Weapons4)
-				local weapon3Node = techTree:GetTechNode(kTechId.Weapons3)
-				local weapon2Node = techTree:GetTechNode(kTechId.Weapons2)
-				local weapon1Node = techTree:GetTechNode(kTechId.Weapons1)
-			
-				if researched then
-			
-					if weapon4Node and weapon4Node:GetResearched() then
-						weaponLevel = 4
-					elseif weapon3Node and weapon3Node:GetResearched() then
-						weaponLevel = 3
-					elseif weapon2Node and weapon2Node:GetResearched()  then
-						weaponLevel = 2
-					elseif weapon1Node and weapon1Node:GetResearched()  then
-						weaponLevel = 1
-					end
-				
-				else
-				
-					if weapon4Node and weapon4Node:GetHasTech() then
-						weaponLevel = 4
-					elseif weapon3Node and weapon3Node:GetHasTech() then
-						weaponLevel = 3
-					elseif weapon2Node and weapon2Node:GetHasTech()  then
-						weaponLevel = 2
-					elseif weapon1Node and weapon1Node:GetHasTech()  then
-						weaponLevel = 1
-					end
-					
-				end
-				
-			end  
-		
-		end
-		
-		return weaponLevel
-		
-	end
-	
+	end	
 
 	
+local kDissolveAccentOnLimit = 0.18
+local kDissolveSpeed = 0.75
+local kDissolveDelay = 5	//move to global
 	//lowered flashlight haze
 	function Marine:OnUpdateRender()
 	
@@ -640,6 +787,16 @@ if Client then
 			end
 			*/
 			self.flashlight:SetAtmosphericDensity(density)
+			
+		end
+		
+		if self.GetAccentSkinColor and not self:GetIsAlive() then
+		
+			local dissolveAmount = math.min( 1, ( Shared.GetTime() - self.dissolveStart) / kDissolveSpeed )
+			
+			if dissolveAmount < kDissolveAccentOnLimit then
+				self.skinAccentColor = Color(0,0,0,1)
+			end
 			
 		end
 		

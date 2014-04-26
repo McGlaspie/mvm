@@ -98,11 +98,8 @@ kDeathMessageIcon = enum( {
 
 
 
-// 
+
 // ColorSkinMixin Globals
-// This file is only here to separate these settings into its own file.
-// Typically for most mods, these settings would be placed in Global.lua
-//
 kTeam1_BaseColor = Color(0.042, 0.06, 0.095, 1)
 //kTeam1_BaseColor = Color(0.048, 0.178, 0.484, 1)
 kTeam1_AccentColor = Color(0.756, 0.982, 1, 1)
@@ -112,8 +109,6 @@ kTeam2_BaseColor = Color(0.14, 0.074, 0.015, 1)
 kTeam2_AccentColor = Color(1.0, 0.0, 0.0, 1)
 kTeam2_TrimColor = Color(0.179, 0.141, 0.095, 1)
 
-kNeutral_BaseColor = Color( 0.5, 0.5, 0.5, 1 )
+kNeutral_BaseColor = Color( 0.65, 0.65, 0.65, 1 )
 kNeutral_AccentColor = Color( 1, 1, 1, 1 )
 kNeutral_TrimColor = Color( 0, 0, 0, 1 )
-//TODO Devise color [sets] for UI based shaders
-

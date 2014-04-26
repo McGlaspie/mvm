@@ -16,6 +16,36 @@ local newNetworkVars = {
 }
 
 
+// This is how far the player can turn with their feet standing on the same ground before
+// they start to rotate in the direction they are looking.
+local kBodyYawTurnThreshold = Math.Radians(85)
+
+// The 3rd person model angle is lagged behind the first person view angle a bit.
+// This is how fast it turns to catch up. Radians per second.
+local kTurnDelaySpeed = 8
+local kTurnRunDelaySpeed = 2.5
+// Controls how fast the body_yaw pose parameter used for turning while standing
+// still blends back to default when the player starts moving.
+local kTurnMoveYawBlendToMovingSpeed = 5
+
+// This is used to push players away from each other.
+local kPlayerRepelForce = 7
+// Eyes a bit below the top of the head. NS1 marine was 64" tall.
+local kViewOffsetHeight = Player.kYExtents * 2 - 0.2
+
+// Slow down players when crouching
+Player.kCrouchSpeedScalar = 0.5
+// Percentage change in height when full crouched
+local kCrouchShrinkAmount = 0.7
+local kExtentsCrouchShrinkAmount = 0.5
+
+local kUseBoxSize = Vector(0.5, 0.5, 0.5)
+local kDownwardUseRange = 2.2
+
+local kDoublePI = math.pi * 2
+local kHalfPI = math.pi / 2
+
+
 //-----------------------------------------------------------------------------
 
 
@@ -46,6 +76,7 @@ end
 if Client then
 	
 	function Player:InitializeSkin()
+		
 		self.skinBaseColor = self:GetBaseSkinColor()
 		self.skinAccentColor = self:GetAccentSkinColor()
 		self.skinTrimColor = self:GetTrimSkinColor()
@@ -55,6 +86,9 @@ if Client then
 		else
 			self.skinAtlasIndex = 0
 		end
+		
+		self.skinColoringEnabled = true
+		
 	end
 	
 	function Player:GetBaseSkinColor()
@@ -89,7 +123,7 @@ function Player:AddResources(amount)	//OVERRIDES
 
     local resReward = 0
 	
-    if amount <= 0 or not self.blockPersonalResources then	//Shared.GetCheatsEnabled() or (
+    if amount <= 0 or not self.blockPersonalResources then //Shared.GetCheatsEnabled() or (
 
         resReward = math.min(amount, kMaxPersonalResources - self:GetResources())
         local oldRes = self.resources
@@ -99,6 +133,18 @@ function Player:AddResources(amount)	//OVERRIDES
     
     return resReward
     
+end
+
+
+function Player:TriggerBeaconEffects()
+
+    self.timeLastBeacon = Shared.GetTime()
+    if self.GetTeamNumber and self:GetTeamNumber() == kTeam2Index then
+		self:TriggerEffects("distress_beacon_spawn_team2")
+	else
+		self:TriggerEffects("distress_beacon_spawn")
+	end
+
 end
 
 
@@ -124,12 +170,182 @@ if Server then
 	function Player:OnCommanderStructureLogin( commandStructure )
 		self.commanderLoginTime = Shared.GetTime()
 	end
+	
+	
+	function Player:UpdateClientRelevancyMask()
+
+		local mask = 0xFFFFFFFF
+		
+		if self:GetTeamNumber() == 1 then
+		
+			if self:GetIsCommander() then
+				mask = kRelevantToTeam1Commander
+			else
+				mask = kRelevantToTeam1Unit
+			end
+			
+		elseif self:GetTeamNumber() == 2 then
+		
+			if self:GetIsCommander() then
+				mask = kRelevantToTeam2Commander
+			else
+				mask = kRelevantToTeam2Unit
+			end
+			
+		// Spectators should see all map blips.
+		elseif self:GetTeamNumber() == kSpectatorIndex then
+		
+			if self:GetIsOverhead() then
+				mask = bit.bor(kRelevantToTeam1Commander, kRelevantToTeam2Commander, kRelevantToReadyRoom)	//Fix for PowerNodes an SpecOverheadMode
+			else
+				mask = bit.bor(kRelevantToTeam1Unit, kRelevantToTeam2Unit, kRelevantToReadyRoom)
+			end
+			
+		// ReadyRoomPlayers should not see any blips.
+		elseif self:GetTeamNumber() == kTeamReadyRoom then
+			mask = kRelevantToReadyRoom
+		end
+		
+		local client = Server.GetOwner(self)
+		// client may be nil if the server is shutting down.
+		if client then
+			client:SetRelevancyMask(mask)
+		end
+		
+	end
+	
+	
+	function Player:UpdateMisc(input)
+
+		// Set near death mask so we can add sound/visual effects.
+		self:SetGameEffectMask(kGameEffect.NearDeath, self:GetHealth() < 0.2 * self:GetMaxHealth())
+		
+		if self:GetTeamType() == kMarineTeamType then
+		
+			self.weaponUpgradeLevel = 0
+			
+			if GetHasTech(self, kTechId.Weapons4, true) then
+				self.weaponUpgradeLevel = 4
+			elseif GetHasTech(self, kTechId.Weapons3, true) then
+				self.weaponUpgradeLevel = 3
+			elseif GetHasTech(self, kTechId.Weapons2, true) then
+				self.weaponUpgradeLevel = 2
+			elseif GetHasTech(self, kTechId.Weapons1, true) then
+				self.weaponUpgradeLevel = 1
+			end
+			
+		end
+		
+	end
+	
 
 end
 
 
 
 if Client then
+	
+	
+	
+	// returns 0 - 4
+	function PlayerUI_GetArmorLevel(researched)
+		
+		local armorLevel = 0
+		
+		if Client.GetLocalPlayer().gameStarted then
+		
+			local techTree = GetTechTree()
+		
+			if techTree then
+				
+				local armor4Node = techTree:GetTechNode(kTechId.Armor4)
+				local armor3Node = techTree:GetTechNode(kTechId.Armor3)
+				local armor2Node = techTree:GetTechNode(kTechId.Armor2)
+				local armor1Node = techTree:GetTechNode(kTechId.Armor1)
+				
+				if researched then
+			
+					if armor4Node and armor4Node:GetResearched() then
+						armorLevel = 4
+					elseif armor3Node and armor3Node:GetResearched() then
+						armorLevel = 3
+					elseif armor2Node and armor2Node:GetResearched()  then
+						armorLevel = 2
+					elseif armor1Node and armor1Node:GetResearched()  then
+						armorLevel = 1
+					end
+				
+				else
+				
+					if armor4Node and armor4Node:GetHasTech() then
+						armorLevel = 4
+					elseif armor3Node and armor3Node:GetHasTech() then
+						armorLevel = 3
+					elseif armor2Node and armor2Node:GetHasTech()  then
+						armorLevel = 2
+					elseif armor1Node and armor1Node:GetHasTech()  then
+						armorLevel = 1
+					end
+				
+				end
+				
+			end
+		
+		end
+
+		return armorLevel
+		
+	end
+	
+
+	function PlayerUI_GetWeaponLevel(researched)
+		
+		local weaponLevel = 0
+		
+		if Client.GetLocalPlayer().gameStarted then
+		
+			local techTree = GetTechTree()
+		
+			if techTree then
+			
+				local weapon4Node = techTree:GetTechNode(kTechId.Weapons4)
+				local weapon3Node = techTree:GetTechNode(kTechId.Weapons3)
+				local weapon2Node = techTree:GetTechNode(kTechId.Weapons2)
+				local weapon1Node = techTree:GetTechNode(kTechId.Weapons1)
+			
+				if researched then
+			
+					if weapon4Node and weapon4Node:GetResearched() then
+						weaponLevel = 4
+					elseif weapon3Node and weapon3Node:GetResearched() then
+						weaponLevel = 3
+					elseif weapon2Node and weapon2Node:GetResearched()  then
+						weaponLevel = 2
+					elseif weapon1Node and weapon1Node:GetResearched()  then
+						weaponLevel = 1
+					end
+				
+				else
+				
+					if weapon4Node and weapon4Node:GetHasTech() then
+						weaponLevel = 4
+					elseif weapon3Node and weapon3Node:GetHasTech() then
+						weaponLevel = 3
+					elseif weapon2Node and weapon2Node:GetHasTech()  then
+						weaponLevel = 2
+					elseif weapon1Node and weapon1Node:GetHasTech()  then
+						weaponLevel = 1
+					end
+					
+				end
+				
+			end  
+		
+		end
+		
+		return weaponLevel
+		
+	end
 	
 	
 	function Player:ShowMap(showMap, showBig, forceReset)
@@ -577,7 +793,7 @@ if Client then
 		if player then
 
 			local playerTeam = player:GetTeamNumber()
-			local playerNoTeam = playerTeam == kRandomTeamType or playerTeam == kNeutralTeamType
+			local playerNoTeam = playerTeam == kRandomTeamType or playerTeam == kSpectatorIndex
 			local playerEnemyTeam = GetEnemyTeamNumber(playerTeam)
 			local playerId = player:GetId()
 			
@@ -643,7 +859,14 @@ if Client then
 					blipsData[i + 3] = GetMapBlipRotation(blip)
 					blipsData[i + 4] = 0
 					blipsData[i + 5] = 0
-					blipsData[i + 6] = GetMapBlipType(blip)
+					
+					local blipType = GetMapBlipType(blip)
+					if blipType == kMinimapBlipType.PowerPoint or blipType == kMinimapBlipType.DestroyedPowerPoint and playerTeam == kTeamReadyRoom then
+						blipsData[i + 6] = kMinimapBlipType.PowerPoint
+					else
+						blipsData[i + 6] = blipType
+					end
+					
 					blipsData[i + 7] = blipTeam
 					blipsData[i + 8] = GetMapBlipIsInCombat(blip)
 					blipsData[i + 9] = isSteamFriend

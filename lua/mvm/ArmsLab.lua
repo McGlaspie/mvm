@@ -140,6 +140,7 @@ function ArmsLab:GetTechButtons(techId)
 
 	local teamNum = self:GetTeamNumber()
 	//FIXME Change to a team Lookup of current level, and switch on that value
+	// - see TeamInfo.GetTeamTechTreeInfo and TeamInfo.GetRelevantTech
 	
 //Weapons
 	if GetIsTechResearched(teamNum, kTechId.Weapons1) then

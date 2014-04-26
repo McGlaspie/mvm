@@ -2,6 +2,14 @@
 
 Script.Load("lua/MarineTeam.lua")
 Script.Load("lua/mvm/Marine.lua")
+Script.Load("lua/mvm/PlayingTeam.lua")
+
+
+// How often to send the "No IPs" message to the Marine team in seconds.
+local kSendNoIPsMessageRate = 20
+
+local kCannotSpawnSound = PrecacheAsset("sound/NS2.fev/marine/voiceovers/commander/need_ip")
+
 
 //-----------------------------------------------------------------------------
 
@@ -100,7 +108,7 @@ function MarineTeam:InitTechTree()	//OVERRIDES
     self.techTree:AddResearchNode(kTechId.Armor3,                 kTechId.Armor2, kTechId.None)
     self.techTree:AddResearchNode(kTechId.Armor4,                 kTechId.Armor3, kTechId.None)
     self.techTree:AddResearchNode(kTechId.NanoArmor,              kTechId.None)
-    
+    //Note: NanoArmor is supposed to Heal Armor Only...but with MACs, and Welders...why?
     self.techTree:AddResearchNode(kTechId.Weapons1,               kTechId.ArmsLab)
     self.techTree:AddResearchNode(kTechId.Weapons2,               kTechId.Weapons1, kTechId.None)
     self.techTree:AddResearchNode(kTechId.Weapons3,               kTechId.Weapons2, kTechId.None)
@@ -110,8 +118,7 @@ function MarineTeam:InitTechTree()	//OVERRIDES
     self.techTree:AddBuildNode(kTechId.AdvancedArmory,            kTechId.Armory, kTechId.None )
     self.techTree:AddResearchNode(kTechId.PhaseTech,              kTechId.Observatory, kTechId.None )
     self.techTree:AddBuildNode(kTechId.PhaseGate,                 kTechId.PhaseTech, kTechId.None, true )
-
-
+	
     self.techTree:AddBuildNode(kTechId.Observatory,               kTechId.InfantryPortal,       kTechId.Armory)      
     self.techTree:AddActivation(kTechId.DistressBeacon,           kTechId.Observatory)         
     
@@ -127,20 +134,18 @@ function MarineTeam:InitTechTree()	//OVERRIDES
     self.techTree:AddTargetedBuyNode(kTechId.Shotgun,            kTechId.ShotgunTech,         kTechId.None)
     self.techTree:AddTargetedActivation(kTechId.DropShotgun,     kTechId.ShotgunTech,         kTechId.None)
     
-    self.techTree:AddResearchNode(kTechId.AdvancedWeaponry,      kTechId.AdvancedArmory,      kTechId.None)
-    
     self.techTree:AddResearchNode(kTechId.GrenadeLauncherTech,   kTechId.AdvancedArmory, kTechId.None )
+    self.techTree:AddTargetedBuyNode(kTechId.GrenadeLauncher,  	 kTechId.AdvancedArmory, kTechId.GrenadeLauncherTech, kTechId.None)
+    self.techTree:AddTargetedActivation(kTechId.DropGrenadeLauncher,  kTechId.AdvancedArmory, kTechId.GrenadeLauncherTech, kTechId.None)
     
-    self.techTree:AddTargetedBuyNode(kTechId.GrenadeLauncher,  	 kTechId.AdvancedWeaponry, kTechId.GrenadeLauncherTech, kTechId.None)
-    self.techTree:AddTargetedActivation(kTechId.DropGrenadeLauncher,  kTechId.AdvancedWeaponry, kTechId.GrenadeLauncherTech, kTechId.None)
+    self.techTree:AddResearchNode(kTechId.GrenadeTech,           kTechId.Armory, kTechId.None)
+    self.techTree:AddTargetedBuyNode(kTechId.ClusterGrenade,     kTechId.GrenadeTech, kTechId.None)
+    self.techTree:AddTargetedBuyNode(kTechId.GasGrenade,         kTechId.GrenadeTech, kTechId.None)
+    self.techTree:AddTargetedBuyNode(kTechId.PulseGrenade,       kTechId.GrenadeTech, kTechId.None)
     
-    self.techTree:AddResearchNode(kTechId.GrenadeTech,           kTechId.Armory,                   kTechId.None)
-    self.techTree:AddTargetedBuyNode(kTechId.ClusterGrenade,     kTechId.GrenadeTech)
-    self.techTree:AddTargetedBuyNode(kTechId.GasGrenade,         kTechId.GrenadeTech)
-    self.techTree:AddTargetedBuyNode(kTechId.PulseGrenade,       kTechId.GrenadeTech)
-    
-    self.techTree:AddTargetedBuyNode(kTechId.Flamethrower,     kTechId.AdvancedWeaponry)
-    self.techTree:AddTargetedActivation(kTechId.DropFlamethrower,    kTechId.AdvancedWeaponry)
+    self.techTree:AddResearchNode(kTechId.FlamethrowerTech,      	kTechId.AdvancedArmory, kTechId.None)
+    self.techTree:AddTargetedBuyNode(kTechId.Flamethrower,     		kTechId.AdvancedArmory, kTechId.None)
+    self.techTree:AddTargetedActivation(kTechId.DropFlamethrower,   kTechId.AdvancedArmory, kTechId.None)
     
     self.techTree:AddResearchNode(kTechId.MinesTech,            kTechId.Armory,           kTechId.None)
     self.techTree:AddTargetedBuyNode(kTechId.LayMines,          kTechId.MinesTech,        kTechId.None)
@@ -197,9 +202,75 @@ function MarineTeam:InitTechTree()	//OVERRIDES
 end
 
 
+local function CheckForNoIPs(self)
+
+    PROFILE("MarineTeam:CheckForNoIPs")
+
+    if Shared.GetTime() - self.lastTimeNoIPsMessageSent >= kSendNoIPsMessageRate then
+		
+        self.lastTimeNoIPsMessageSent = Shared.GetTime()
+        local ips = GetEntitiesForTeam("InfantryPortal", self:GetTeamNumber())
+        if #ips == 0 then
+        
+            self:ForEachPlayer(function(player) StartSoundEffectForPlayer(kCannotSpawnSound, player) end)
+            SendTeamMessage(self, kTeamMessageTypes.CannotSpawn)
+            
+        end
+        
+    end
+    
+end
+
+
+local function GetArmorLevel(self)
+
+    local armorLevels = 0
+    
+    local techTree = self:GetTechTree()
+    if techTree then
+    
+		if techTree:GetHasTech(kTechId.Armor4) then
+            armorLevels = 4
+        elseif techTree:GetHasTech(kTechId.Armor3) then
+            armorLevels = 3
+        elseif techTree:GetHasTech(kTechId.Armor2) then
+            armorLevels = 2
+        elseif techTree:GetHasTech(kTechId.Armor1) then
+            armorLevels = 1
+        end
+    
+    end
+    
+    return armorLevels
+
+end
+
+
+function MarineTeam:Update(timePassed)
+
+    PROFILE("MarineTeam:Update")
+
+    PlayingTeam.Update(self, timePassed)
+    
+    // Update distress beacon mask
+    self:UpdateGameMasks(timePassed)    
+	
+    if GetGamerules():GetGameStarted() then
+        CheckForNoIPs(self)
+    end
+    
+    local armorLevel = GetArmorLevel(self)
+    //XXX Will have to update this if anything else gets armor upgrades. ARC? Strucutres?
+    for index, player in ipairs(GetEntitiesForTeam("Player", self:GetTeamNumber())) do
+        player:UpdateArmorAmount(armorLevel)
+    end
+    
+end
+
+
 
 //-----------------------------------------------------------------------------
 
 
-Class_Reload("MarineTeam", {})
+Class_Reload( "MarineTeam", {} )
 

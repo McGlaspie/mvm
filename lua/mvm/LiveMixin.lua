@@ -45,7 +45,8 @@ local function MvM_GetHealViewMaterialName(self)
 
 end
 
-//Below solves PN selection bug, but MAC still cannot repair
+//Below solves PN selection bug, but MAC still cannot repair automatically
+//4/25/14 - Is above still an issue?
 function LiveMixin:OnGetIsSelectable(result, byTeamNumber)
     result.selectable = (
 		result.selectable 

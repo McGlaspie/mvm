@@ -29,7 +29,8 @@
 //
 //=============================================================================
 
-if Client then
+
+if Client then	//Entire Mixin only executes on Client
 	
 	
 Shared.PrecacheSurfaceShader("shaders/ColoredSkins.surface_shader")
@@ -101,6 +102,11 @@ function ColoredSkinsMixin:__initmixin()
 	
 	self.skinColoringEnabled = true	//Allows for colored skins to be toggled on per-entity basis
 	
+	//OnRenderUpdate flags
+	self.hasModel = false
+	self.hasViewModel = false
+	self.hasEquipmentModel = false
+	
 end
 
 
@@ -129,8 +135,14 @@ end
 function ColoredSkinsMixin:OnKillClient()
 end
 
+/*
+function ColoredSkinsMixin:OnUpdate( deltaTime )
+	PROFILE("ColoredSkinsMixin:OnUpdate")
+end
+*/
 
-function ColoredSkinsMixin:OnUpdateRender()
+function ColoredSkinsMixin:OnUpdateRender()		//??? Is this having an impact or introducing a race
+												//condition for animated models?
 	
 	PROFILE("ColoredSkinsMixin:OnUpdateRender()")
 	
@@ -162,55 +174,9 @@ function ColoredSkinsMixin:OnUpdateRender()
 		self.skinAtlasIndex
 	)
 	
-	
-	local model = self:GetRenderModel()		//self._renderModel instead?
-	
-	if model then
-		
-		/*
-		//Example of how color layers can be set via code
-		// - This could easily be done in an entity's update routine(s)
-		//Just be sure and wrap any changes in a HasMixin(entity, "ColoredSkin") condition
-		local ts = math.floor( Shared.GetTime() )
-		if math.fmod( ts , 3 ) == 0 and ts < 240 then
+	local model = self:GetRenderModel()
+	if model ~= nil then
 			
-			local rc = {
-				[1] = Color(1, 1, 0),
-				[2] = Color(0, 1, 0),
-				[3] = Color(1, 0, 0),
-				[4] = Color(0, 0, 1),
-				[5] = Color(1, 1, 1),
-				[6] = Color(0, 0, 0)
-			}
-			
-			self.skinBaseColor = LerpColor( self.skinBaseColor, rc[ math.random(1,6) ] , 0.025 )
-			self.skinAccentColor = LerpColor( self.skinAccentColor, rc[ math.random(6,1) ] , 0.5 )
-			self.skinTrimColor = LerpColor( self.skinTrimColor, rc[ math.random(6,1) ] , 0.01 )
-			
-		else
-			
-			self.skinBaseColor = LerpColor( self.skinBaseColor, self:GetBaseSkinColor(), 0.001 )
-			self.skinAccentColor = LerpColor( self.skinAccentColor, self:GetAccentSkinColor() , 0.01 )
-			self.skinTrimColor = LerpColor( self.skinTrimColor, self:GetTrimSkinColor() , 0.005 )
-			
-		end
-		*/
-		
-		//Note: This will apply to all child materials, but ONLY IF they are
-		//		all using the same Material Shader.
-		//		That means for players (I.e. A marine) the male_face.material 
-		//		and male_visor.material need the colored_skins.surface_shader)
-		//		set as the shader file in said materials. Each entity needs to
-		//		be setup accordingly. Setting the color once will propogate to
-		//		"child" materials.
-		
-		//The RGB values MUST be added to materials due to lack of Vector/Float3/Color parameter support.
-		//This appears to be a limitation of current material system.
-		//The Alpha value of the Color object is not used, nor supported by the shader(s).
-		
-		//If these values do NOT have a distinct color. The implementing Entity WILL appear black
-		//Because no color specified will amount to setting Color(0,0,0) as the material parameter
-		
 		model:SetMaterialParameter( "modelColorBaseR", baseColor.r )
 		model:SetMaterialParameter( "modelColorBaseG", baseColor.g )
 		model:SetMaterialParameter( "modelColorBaseB", baseColor.b )
@@ -237,51 +203,46 @@ function ColoredSkinsMixin:OnUpdateRender()
 	// - Should be dependent upon the implementing class to handle via expectedCallbacks
 	
 	//Attachment based equipment
-	if self.GetHasEquipment and self:GetHasEquipment() then
+	if self.GetHasEquipment and self.GetJetpack then
 		
-		//Handle equipment by type	
-		if self:isa("JetpackMarine") then
+		local jetpack = self:GetJetpack()	//Faster way to get JP/Equip?
 		
-			local jetpack = self:GetJetpack()
+		if jetpack ~= nil then
+		
+			local jpModel = jetpack:GetRenderModel()
 			
-			if jetpack then
-			
-				local jpModel = jetpack:GetRenderModel()
+			if jpModel ~= nil then
 				
-				if jpModel then
-					
-					jpModel:SetMaterialParameter( "modelColorBaseR", baseColor.r )
-					jpModel:SetMaterialParameter( "modelColorBaseG", baseColor.g )
-					jpModel:SetMaterialParameter( "modelColorBaseB", baseColor.b )
-					jpModel:SetMaterialParameter( "modelColorAccentR", accentColor.r )
-					jpModel:SetMaterialParameter( "modelColorAccentG", accentColor.g )
-					jpModel:SetMaterialParameter( "modelColorAccentB", accentColor.b )
-					jpModel:SetMaterialParameter( "modelColorTrimR", trimColor.r )
-					jpModel:SetMaterialParameter( "modelColorTrimG", trimColor.g )
-					jpModel:SetMaterialParameter( "modelColorTrimB", trimColor.b )
-					
-					//Set enabled state
-					jpModel:SetMaterialParameter( "colorizeModel", enabled )
-					
-					//Set Color Map Index of atlas texture
-					jpModel:SetMaterialParameter( "colorMapIndex", colorMapAtlasIndex )
-					
-				end
+				jpModel:SetMaterialParameter( "modelColorBaseR", baseColor.r )
+				jpModel:SetMaterialParameter( "modelColorBaseG", baseColor.g )
+				jpModel:SetMaterialParameter( "modelColorBaseB", baseColor.b )
+				jpModel:SetMaterialParameter( "modelColorAccentR", accentColor.r )
+				jpModel:SetMaterialParameter( "modelColorAccentG", accentColor.g )
+				jpModel:SetMaterialParameter( "modelColorAccentB", accentColor.b )
+				jpModel:SetMaterialParameter( "modelColorTrimR", trimColor.r )
+				jpModel:SetMaterialParameter( "modelColorTrimG", trimColor.g )
+				jpModel:SetMaterialParameter( "modelColorTrimB", trimColor.b )
+				
+				//Set enabled state
+				jpModel:SetMaterialParameter( "colorizeModel", enabled )
+				
+				//Set Color Map Index of atlas texture
+				jpModel:SetMaterialParameter( "colorMapIndex", colorMapAtlasIndex )
 				
 			end
-		
+			
 		end
 		
 	end
 	
 	
-	if self:isa("Player") and self:GetIsLocalPlayer() then	//Don't run on World objects
+	if self:isa("Player") and self:GetIsLocalPlayer() then
 	
 		local viewEnt = self:GetViewModelEntity()
 	
 		if viewEnt then
-		
-			local viewModel = viewEnt:GetRenderModel()
+			
+			local viewModel = viewEnt:GetRenderModel()	//faster means to get ViewModel?
 			
 			if viewModel then
 				

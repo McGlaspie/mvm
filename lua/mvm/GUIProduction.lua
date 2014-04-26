@@ -244,31 +244,38 @@ end
 
 
 function GUIProduction:UpdateTech(onChange)
-
+	
     local teamInfo = GetEntitiesForTeam("TeamInfo", self.TeamIndex)[1]
-    local techActive, techOwned = teamInfo:GetTeamTechTreeInfo()
     
-    // Do a comparison on the bitmasks before looping through
-    if techActive ~= self.PrevTechActive or techOwned ~= self.PrevTechOwned then
-        local relevantIdMask, relevantTechIds = teamInfo:GetRelevantTech()
-        
-        for i, techId in ipairs(relevantTechIds) do
-        
-            local techIdString = EnumToString(kTechId, techId)
-            local isActive = bit.band(techActive, relevantIdMask[techIdString]) > 0
-            local isOwned = bit.band(techOwned, relevantIdMask[techIdString]) > 0
-            local stateChanged = updateState(self, techId, isActive, isOwned)
-            
-            if stateChanged and onChange then
-                onChange(self, techId)
-            end
+    if teamInfo then
+		
+		local techActive, techOwned = teamInfo:GetTeamTechTreeInfo()
+		
+		// Do a comparison on the bitmasks before looping through
+		if techActive ~= self.PrevTechActive or techOwned ~= self.PrevTechOwned then
+			local relevantIdMask, relevantTechIds = teamInfo:GetRelevantTech()
+			
+			for i, techId in ipairs(relevantTechIds) do
+			
+				local techIdString = EnumToString(kTechId, techId)
+				local isActive = bit.band(techActive, relevantIdMask[techIdString]) > 0
+				local isOwned = bit.band(techOwned, relevantIdMask[techIdString]) > 0
+				local stateChanged = updateState(self, techId, isActive, isOwned)
+				
+				if stateChanged and onChange then
+					onChange(self, techId)
+				end
 
-        end
-        
-        self.PrevTechActive = techActive
-        self.PrevTechOwned = techOwned
-        
-    end
+			end
+			
+			self.PrevTechActive = techActive
+			self.PrevTechOwned = techOwned
+			
+		end
+		
+	else
+		self:SetIsVisible(false)	//hack! So, nasty
+	end
     
 end
 

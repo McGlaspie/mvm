@@ -9,6 +9,9 @@ Script.Load("lua/mvm/NanoshieldMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
 Script.Load("lua/mvm/ScoringMixin.lua")
 Script.Load("lua/mvm/RagdollMixin.lua")
+Script.Load("lua/Weapons/Marine/ExoWeaponHolder.lua")
+Script.Load("lua/MarineVariantMixin.lua")
+Script.Load("lua/mvm/OrdersMixin.lua")
 
 if Client then
 	Script.Load("lua/mvm/CommanderGlowMixin.lua")
@@ -18,7 +21,9 @@ if Client then
 end
 
 
-local newNetworkVars = {}
+local newNetworkVars = {
+	weaponUpgradeLevel = "integer (0 to 4)",	//Overrides
+}
 
 AddMixinNetworkVars( FireMixin, newNetworkVars )
 AddMixinNetworkVars( LOSMixin, newNetworkVars )
@@ -194,8 +199,6 @@ function Exo:OnInitialized()	//OVERRIDES
         InitMixin(self, HiveVisionMixin)
         InitMixin(self, MarineOutlineMixin)	//??
         
-        self:InitializeSkin()
-        
         self.clientThrustersActive = self.thrustersActive
 
         self.thrusterLeftCinematic = Client.CreateCinematic(RenderScene.Zone_Default)
@@ -233,7 +236,42 @@ function Exo:OnInitialized()	//OVERRIDES
         
         self:AddHelpWidget("GUITunnelEntranceHelp", 1)
         
+        self:InitializeSkin()
+        
     end
+    
+end
+
+
+function Exo:InitWeapons()
+
+    Player.InitWeapons(self)
+    
+    local weaponHolder = self:GetWeapon(ExoWeaponHolder.kMapName)
+    
+    if not weaponHolder then
+        weaponHolder = self:GiveItem(ExoWeaponHolder.kMapName, false)   
+    end    
+    
+    if self.layout == "ClawMinigun" then
+        weaponHolder:SetWeapons(Claw.kMapName, Minigun.kMapName)
+    elseif self.layout == "MinigunMinigun" then
+        weaponHolder:SetWeapons(Minigun.kMapName, Minigun.kMapName)
+    elseif self.layout == "ClawRailgun" then
+        weaponHolder:SetWeapons(Claw.kMapName, Railgun.kMapName)
+    elseif self.layout == "RailgunRailgun" then
+        weaponHolder:SetWeapons(Railgun.kMapName, Railgun.kMapName)
+    else
+    
+        Print("Warning: incorrect layout set for exosuit")
+        weaponHolder:SetWeapons(Claw.kMapName, Minigun.kMapName)
+        
+    end
+    
+    weaponHolder:TriggerEffects("exo_login")
+    self.inventoryWeight = weaponHolder:GetInventoryWeight(self)
+    self:SetActiveWeapon(ExoWeaponHolder.kMapName)
+    StartSoundEffectForPlayer(kDeploy2DSound, self)
     
 end
 
@@ -263,7 +301,11 @@ if Client then
 		self.skinTrimColor = self:GetTrimSkinColor(teamNum)
 		
 		if teamNum == kTeamReadyRoom then
-			self.skinAtlasIndex = 0
+			if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index then
+				self.skinAtlasIndex = self.previousTeamNumber - 1
+			else
+				self.skinAtlasIndex = 0
+			end
 		else
 			self.skinAtlasIndex = teamNum - 1
 		end
@@ -299,6 +341,34 @@ if Client then
 			return kNeutral_TrimColor
 		end
 	end
+	
+	
+	// Bring up buy menu
+    function Exo:BuyMenu(structure)
+        
+        // Don't allow display in the ready room
+        if self:GetTeamNumber() ~= 0 and Client.GetLocalPlayer() == self then
+        
+            if not self.buyMenu then
+            
+                self.buyMenu = GetGUIManager():CreateGUIScript("mvm/Hud/Marine/GUIMarineBuyMenu")
+                
+                MarineUI_SetHostStructure(structure)
+                
+                if structure then
+                    self.buyMenu:SetHostStructure(structure)
+                end
+                
+                self:TriggerEffects("marine_buy_menu_open")
+                
+                TEST_EVENT("Exo buy menu displayed")
+                
+            end
+            
+        end
+        
+    end
+	
 
 end
 
@@ -322,6 +392,29 @@ local function UpdateHealthWarningTriggered(self)
     if healthPercent > kHealthCriticalTrigger then
         self.healthCriticalTriggered = false
     end
+    
+end
+
+
+function Exo:GetArmorAmount(armorLevels)
+
+    if not armorLevels then
+    
+        armorLevels = 0
+		
+		if GetHasTech(self, kTechId.Armor4, true) then
+            armorLevels = 4
+        elseif GetHasTech(self, kTechId.Armor3, true) then
+            armorLevels = 3
+        elseif GetHasTech(self, kTechId.Armor2, true) then
+            armorLevels = 2
+        elseif GetHasTech(self, kTechId.Armor1, true) then
+            armorLevels = 1
+        end
+    
+    end
+    
+    return kExosuitArmor + armorLevels * kExosuitArmorPerUpgradeLevel
     
 end
 

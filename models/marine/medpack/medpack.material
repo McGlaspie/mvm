@@ -1,0 +1,13 @@
+shader = "shaders/ColoredSkins.surface_shader"
+
+albedoMap = "models/marine/medpack/medpack.dds"
+normalMap = "models/marine/medpack/medpack_normal.dds"
+emissiveMap = "models/marine/medpack/medpack_illum.dds"
+specularMap = "models/marine/medpack/medpack_spec.dds"
+
+
+modelColorMap = "models/marine/medpack/medpack_colormap.dds"
+
+numColumns = 1
+numRows = 1
+colorMapIndex=0

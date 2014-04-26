@@ -29,8 +29,8 @@ GUIMarineBuyMenu.kArrowTexture = "ui/menu/arrow_horiz.dds"
 GUIMarineBuyMenu.kFont = "fonts/AgencyFB_small.fnt"
 GUIMarineBuyMenu.kFont2 = "fonts/AgencyFB_small.fnt"
 
-GUIMarineBuyMenu.kDescriptionFontName = "fonts/AgencyFB_small.fnt"
-GUIMarineBuyMenu.kDescriptionFontSize = GUIScale(20)
+GUIMarineBuyMenu.kDescriptionFontName = "fonts/AgencyFB_medium.fnt"	//small
+GUIMarineBuyMenu.kDescriptionFontSize = GUIScale(10)	//20
 
 GUIMarineBuyMenu.kScanLineHeight = GUIScale(256)
 GUIMarineBuyMenu.kScanLineAnimDuration = 5
@@ -528,10 +528,11 @@ local gResearchToWeaponIds = nil
 local function GetItemTechId(researchTechId)
 
     if not gResearchToWeaponIds then
-    
+		
         gResearchToWeaponIds = { }
         gResearchToWeaponIds[kTechId.ShotgunTech] = kTechId.Shotgun
-        gResearchToWeaponIds[kTechId.AdvancedWeaponry] = { kTechId.GrenadeLauncher, kTechId.Flamethrower }
+        gResearchToWeaponIds[kTechId.FlamethrowerTech] = kTechId.Flamethrower	//AdvancedWeaponry
+        gResearchToWeaponIds[kTechId.GrenadeLauncherTech] = kTechId.GrenadeLauncher
         gResearchToWeaponIds[kTechId.WelderTech] = kTechId.Welder
         gResearchToWeaponIds[kTechId.MinesTech] = kTechId.LayMines
         gResearchToWeaponIds[kTechId.JetpackTech] = kTechId.Jetpack
@@ -723,7 +724,7 @@ function GUIMarineBuyMenu:_UpdateContent(deltaTime)
         self.itemDescription:SetText(MarineBuy_GetWeaponDescription(techId))
         self.itemDescription:SetTextClipped(
 			true, 
-			GUIMarineBuyMenu.kItemDescriptionSize.x - 2* GUIMarineBuyMenu.kPadding, 
+			GUIMarineBuyMenu.kItemDescriptionSize.x - 2 * GUIMarineBuyMenu.kPadding, 
 			GUIMarineBuyMenu.kItemDescriptionSize.y - GUIMarineBuyMenu.kPadding
 		)
 		

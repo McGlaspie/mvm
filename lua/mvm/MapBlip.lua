@@ -55,8 +55,8 @@ function MapBlip:UpdateRelevancy()
     local mask = 0
     
     if self.mapBlipType == kMinimapBlipType.PowerPoint or self.mapBlipType == kMinimapBlipType.DestroyedPowerPoint then
-	//Special case for PowerNodes, only propigate if scouted
-	
+	//Special case for PowerNodes, only propagate if scouted
+		
 		local powerNode = Shared.GetEntity( self.ownerEntityId )
 			
 		if powerNode and powerNode:isa("PowerPoint") then
@@ -68,6 +68,8 @@ function MapBlip:UpdateRelevancy()
 			if powerNode.scoutedForTeam2 and powerNode.scoutedForTeam2 == true then
 				mask = bit.bor( mask, kRelevantToTeam2 )
 			end
+			
+			mask = bit.bor( mask, kRelevantToReadyRoom )	//Ensure always visible to spectators
 			
 		end
 		

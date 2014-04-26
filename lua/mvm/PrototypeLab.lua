@@ -156,6 +156,25 @@ function PrototypeLab:GetTechButtons(techId)
 end
 
 
+function PrototypeLab:GetItemList(forPlayer)
+
+    if forPlayer:isa("Exo") then
+    
+        if forPlayer:GetHasDualGuns() then
+            return {}
+        elseif forPlayer:GetHasRailgun() then
+            return { kTechId.UpgradeToDualRailgun }    
+        elseif forPlayer:GetHasMinigun() then
+            return { kTechId.UpgradeToDualMinigun }
+        end    
+
+    end    
+
+    return { kTechId.Jetpack, kTechId.Exosuit, kTechId.ClawRailgunExosuit, }
+    
+end
+
+
 if Client then
 	
 	function PrototypeLab:InitializeSkin()
@@ -180,8 +199,38 @@ if Client then
 	function PrototypeLab:GetTrimSkinColor()
 		return ConditionalValue( self:GetTeamNumber() == kTeam2Index, kTeam2_TrimColor, kTeam1_TrimColor )
 	end
+	
+	
+	function PrototypeLab:OnUse(player, elapsedTime, useSuccessTable)
 
-end
+		self:UpdatePrototypeLabWarmUp()
+    
+		if GetIsUnitActive(self) and not Shared.GetIsRunningPrediction() and not player.buyMenu and self:GetWarmupCompleted() then
+    
+			if Client.GetLocalPlayer() == player then
+					
+				Client.SetCursor("ui/Cursor_MarineCommanderDefault.dds", 0, 0)
+				
+				// Play looping "active" sound while logged in
+				// Shared.PlayPrivateSound(player, Armory.kResupplySound, player, 1.0, Vector(0, 0, 0))
+				
+				if player:GetTeamNumber() == kTeam2Index then
+					MouseTracker_SetIsVisible(true, "ui/Cursor_MenuDefault.dds", true)
+				else
+					MouseTracker_SetIsVisible(true, "ui/Cursor_MarineCommanderDefault.dds", true)
+				end
+				
+				// tell the player to show the lua menu
+				player:BuyMenu(self)
+				
+			end
+        
+		end
+    
+	end
+	
+
+end	//End Client
 
 
 //-----------------------------------------------------------------------------

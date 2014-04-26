@@ -12,6 +12,7 @@ Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/SupplyUserMixin.lua")
 Script.Load("lua/mvm/NanoshieldMixin.lua")
 Script.Load("lua/mvm/RagdollMixin.lua")
+Script.Load("lua/mvm/OrdersMixin.lua")
 
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
@@ -41,8 +42,8 @@ ARC.kFireRange              = kARCRange         // From NS1
 ARC.kMinFireRange           = kARCMinRange
 ARC.kSplashRadius           = 7
 ARC.kUpgradedSplashRadius   = 13
-ARC.kMoveSpeed              = 2.0
-ARC.kCombatMoveSpeed        = 1.0	//0.8
+ARC.kMoveSpeed              = 3.0
+ARC.kCombatMoveSpeed        = 2.0
 ARC.kFov                    = 360
 ARC.kBarrelMoveRate         = 100
 ARC.kMaxPitch               = 45
