@@ -7,7 +7,7 @@ Script.Load("lua/Mixins/CrouchMoveMixin.lua")
 Script.Load("lua/Mixins/LadderMoveMixin.lua")
 Script.Load("lua/Mixins/CameraHolderMixin.lua")
 Script.Load("lua/OrderSelfMixin.lua")
-Script.Load("lua/MarineActionFinderMixin.lua")
+Script.Load("lua/mvm/MarineActionFinderMixin.lua")
 Script.Load("lua/StunMixin.lua")
 Script.Load("lua/mvm/NanoShieldMixin.lua")
 Script.Load("lua/SprintMixin.lua")
@@ -42,6 +42,8 @@ Script.Load("lua/mvm/NanoshieldMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
 Script.Load("lua/mvm/ScoringMixin.lua")
 Script.Load("lua/mvm/RagdollMixin.lua")
+
+Script.Load("lua/mvm/QuickDodgeMixin.lua")
 
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
@@ -89,6 +91,11 @@ Marine.kSprintAcceleration = 190 // 70
 Marine.kGroundFrictionForce = 16
 Marine.kAirStrafeWeight = 0		//May need to add back in for JP - Can stop on a dime with JP...
 
+
+local kDropWeaponTimeLimit = 1
+local kPickupWeaponTimeLimit = 1
+
+
 Marine.kArmorPerUpgradeLevel = kArmorPerUpgradeLevel
 
 
@@ -101,6 +108,8 @@ AddMixinNetworkVars( FireMixin, newNetworkVars )
 AddMixinNetworkVars( DetectableMixin, newNetworkVars )
 AddMixinNetworkVars( DissolveMixin, newNetworkVars )
 AddMixinNetworkVars( ElectroMagneticMixin, newNetworkVars )
+AddMixinNetworkVars( QuickDodgeMixin, newNetworkVars )
+
 
 //-----------------------------------------------------------------------------
 
@@ -205,6 +214,8 @@ function Marine:OnInitialized()	//OVERRIDE
     InitMixin(self, SprintMixin)
     InitMixin(self, WeldableMixin)
     
+    InitMixin(self, QuickDodgeMixin)
+    
     // SetModel must be called before Player.OnInitialized is called so the attach points in
     // the Marine are valid to attach weapons to. This is far too subtle...
     self:SetModel(Marine.kModelName, Marine.kMarineAnimationGraph)
@@ -276,7 +287,120 @@ end
 
 if Client then
 
+
+
+local gWeaponDescription = nil
+function MarineBuy_GetWeaponDescription(techId)
+
+    if not gWeaponDescription then
+    
+        gWeaponDescription = { }
+        gWeaponDescription[kTechId.Axe] = "WEAPON_DESC_AXE"
+        gWeaponDescription[kTechId.Pistol] = "WEAPON_DESC_PISTOL"
+        gWeaponDescription[kTechId.Rifle] = "WEAPON_DESC_RIFLE"
+        gWeaponDescription[kTechId.Shotgun] = "WEAPON_DESC_SHOTGUN"
+        gWeaponDescription[kTechId.Flamethrower] = "WEAPON_DESC_FLAMETHROWER"
+        gWeaponDescription[kTechId.GrenadeLauncher] = "WEAPON_DESC_GRENADELAUNCHER"
+        gWeaponDescription[kTechId.Welder] = "WEAPON_DESC_WELDER"
+        gWeaponDescription[kTechId.DemoMines] = "WEAPON_DESC_MINE"
+        gWeaponDescription[kTechId.ClusterGrenade] = "WEAPON_DESC_CLUSTER_GRENADE"
+        gWeaponDescription[kTechId.GasGrenade] = "WEAPON_DESC_GAS_GRENADE"
+        gWeaponDescription[kTechId.PulseGrenade] = "WEAPON_DESC_PULSE_GRENADE"
+        gWeaponDescription[kTechId.Jetpack] = "WEAPON_DESC_JETPACK"
+        gWeaponDescription[kTechId.Exosuit] = "WEAPON_DESC_EXO"
+        gWeaponDescription[kTechId.DualMinigunExosuit] = "WEAPON_DESC_DUALMINIGUN_EXO"
+        gWeaponDescription[kTechId.UpgradeToDualMinigun] = "WEAPON_DESC_DUALMINIGUN_EXO"
+        gWeaponDescription[kTechId.ClawRailgunExosuit] = "WEAPON_DESC_CLAWRAILGUN_EXO"
+        gWeaponDescription[kTechId.DualRailgunExosuit] = "WEAPON_DESC_DUALRAILGUN_EXO"
+        gWeaponDescription[kTechId.UpgradeToDualRailgun] = "WEAPON_DESC_DUALRAILGUN_EXO"
+        
+    end
+    
+    local description = gWeaponDescription[techId]
+    if not description then
+        description = ""
+    end
+    
+    return Locale.ResolveString(description)
+    
+end
+
+//BuyMenu shit...	
+local gDisplayTechs = nil
+local function GetDisplayTechId(techId)
+
+    if not gDisplayTechs then
+    
+        gDisplayTechs = {}
+        gDisplayTechs[kTechId.Axe] = true
+        gDisplayTechs[kTechId.Pistol] = true
+        gDisplayTechs[kTechId.Rifle] = true
+        gDisplayTechs[kTechId.Shotgun] = true
+        gDisplayTechs[kTechId.Flamethrower] = true
+        gDisplayTechs[kTechId.GrenadeLauncher] = true
+        gDisplayTechs[kTechId.Welder] = true
+        gDisplayTechs[kTechId.ClusterGrenade] = true
+        gDisplayTechs[kTechId.GasGrenade] = true
+        gDisplayTechs[kTechId.PulseGrenade] = true
+        gDisplayTechs[kTechId.DemoMines] = true
+        gDisplayTechs[kTechId.Jetpack] = true
+        gDisplayTechs[kTechId.Exosuit] = true
+    
+    end
+
+    return gDisplayTechs[techId]
+
+end
+
+
+// special sounds for jetpack etc.
+function MarineBuy_OnItemSelect(techId)
+
+    if techId == kTechId.Axe or techId == kTechId.Rifle or techId == kTechId.Shotgun or techId == kTechId.GrenadeLauncher or 
+       techId == kTechId.Flamethrower or techId == kTechId.Welder or techId == kTechId.DemoMines then
+       
+        StartSoundEffect(kMarineBuyMenuSounds.SelectWeapon)
+        
+    elseif techId == kTechId.Jetpack then
+    
+        StartSoundEffect(kMarineBuyMenuSounds.SelectJetpack)
+
+    elseif techId == kTechId.Exosuit then
+    
+        StartSoundEffect(kMarineBuyMenuSounds.SelectExosuit)
+        
+    end
+
+end
+
+
+
+function Marine:UpdateGhostModel()
+
+    self.currentTechId = nil
+    self.ghostStructureCoords = nil
+    self.ghostStructureValid = false
+    self.showGhostModel = false
+    
+    local weapon = self:GetActiveWeapon()
+
+    if weapon and weapon:isa("DemoMines") then
+    
+        self.currentTechId = kTechId.Mine
+        self.ghostStructureCoords = weapon:GetGhostModelCoords()
+        self.ghostStructureValid = weapon:GetIsPlacementValid()
+        self.showGhostModel = weapon:GetShowGhostModel()
+    
+    end
+
+end
+
+
+
+//-------------------------------------
+
 	function Marine:InitializeSkin()
+		
 		local teamNum = self:GetTeamNumber()
 		
 		self.skinBaseColor = self:GetBaseSkinColor(teamNum)
@@ -291,7 +415,9 @@ if Client then
 		
 	end
 	
+	
 	function Marine:GetBaseSkinColor(teamNum)
+		
 		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index and teamNum == kTeamReadyRoom then
 			return ConditionalValue( self.previousTeamNumber == kTeam1Index, kTeam1_BaseColor, kTeam2_BaseColor )
 		elseif teamNum == kTeam1Index or teamNum == kTeam2Index then
@@ -299,9 +425,12 @@ if Client then
 		else
 			return kNeutral_BaseColor
 		end
+		
 	end
+	
 
 	function Marine:GetAccentSkinColor(teamNum)
+		
 		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index and teamNum == kTeamReadyRoom then
 			return ConditionalValue( self.previousTeamNumber == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
 		elseif teamNum == kTeam1Index or teamNum == kTeam2Index then
@@ -309,9 +438,11 @@ if Client then
 		else
 			return kNeutral_AccentColor
 		end
+		
 	end
 	
 	function Marine:GetTrimSkinColor(teamNum)
+		
 		if self.previousTeamNumber == kTeam1Index or self.previousTeamNumber == kTeam2Index and teamNum == kTeamReadyRoom then
 			return ConditionalValue( self.previousTeamNumber == kTeam1Index, kTeam1_TrimColor, kTeam2_TrimColor )
 		elseif teamNum == kTeam1Index or teamNum == kTeam2Index then
@@ -319,7 +450,9 @@ if Client then
 		else
 			return kNeutral_TrimColor
 		end
+		
 	end
+	
 
 end
 
@@ -452,6 +585,73 @@ end
 
 
 
+function Marine:HandleButtons( input )
+
+    PROFILE("Marine:HandleButtons")
+    
+    Player.HandleButtons( self, input )
+    
+    if self:GetCanControl() then
+		
+        // Update sprinting state
+        self:UpdateSprintingState( input )
+        
+        local flashlightPressed = bit.band(input.commands, Move.ToggleFlashlight) ~= 0
+        if not self.flashlightLastFrame and flashlightPressed then
+        
+            self:SetFlashlightOn(not self:GetFlashlightOn())
+            StartSoundEffectOnEntity(Marine.kFlashlightSoundName, self, 1, self)
+            
+        end
+        self.flashlightLastFrame = flashlightPressed
+        
+        if bit.band(input.commands, Move.Drop) ~= 0 and not self:GetIsVortexed() then
+        
+            if Server then
+            
+                // First check for a nearby weapon to pickup.
+                local nearbyDroppedWeapon = self:GetNearbyPickupableWeapon()
+                if nearbyDroppedWeapon then
+                
+                    if Shared.GetTime() > self.timeOfLastPickUpWeapon + kPickupWeaponTimeLimit then
+                    
+                        if nearbyDroppedWeapon.GetReplacementWeaponMapName then
+                        
+                            local replacement = nearbyDroppedWeapon:GetReplacementWeaponMapName()
+                            local toReplace = self:GetWeapon(replacement)
+                            if toReplace then
+                            
+                                self:RemoveWeapon(toReplace)
+                                DestroyEntity(toReplace)
+                                
+                            end
+                            
+                        end
+                        
+                        self:AddWeapon(nearbyDroppedWeapon, true)
+                        StartSoundEffectAtOrigin(Marine.kGunPickupSound, self:GetOrigin())
+                        
+                        self.timeOfLastPickUpWeapon = Shared.GetTime()
+                        
+                    end
+                    
+                else
+                
+                    // No nearby weapon, drop our current weapon.
+                    self:Drop()
+                    
+                end
+                
+            end
+            
+        end
+        
+    end
+    
+end
+
+
+
 
 
 if Server then	
@@ -479,6 +679,51 @@ if Server then
 		
 	end
 	
+	
+	// special threatment for mines and welders
+	function Marine:GiveItem(itemMapName)
+
+		local newItem = nil
+
+		if itemMapName then
+			
+			local continue = true
+			local setActive = true
+			
+			if itemMapName == DemoMines.kMapName then
+				
+				local mineWeapon = self:GetWeapon(DemoMines.kMapName)
+				
+				if mineWeapon then
+					mineWeapon:Refill(kNumMines)
+					continue = false
+					setActive = false
+				end
+				
+			elseif itemMapName == Welder.kMapName then
+			
+				// since axe cannot be dropped we need to delete it before adding the welder (shared hud slot)
+				local switchAxe = self:GetWeapon(Axe.kMapName)
+				
+				if switchAxe then
+					self:RemoveWeapon(switchAxe)
+					DestroyEntity(switchAxe)
+					continue = true
+				else
+					continue = false // don't give a second welder
+				end
+			
+			end
+			
+			if continue == true then
+				return Player.GiveItem(self, itemMapName, setActive)
+			end
+			
+		end
+		
+		return newItem
+		
+	end
 	
 	
 	local function GetHostSupportsTechId(forPlayer, host, techId)
@@ -655,10 +900,52 @@ end	//End Server
 
 if Client then
 	
-	//Stubbed here for checking if player already has grenades, etc
+	
 	function MarineBuy_GetHas(techId)
-		//TODO: check if local player already has the item / upgrades    
+		
+		
+		
 		return false
+		
+	end
+	
+	
+	/**
+	 * Return information about the available weapons in a linear array
+	 * Name - string (for tooltips?)
+	 * normal tex x - int
+	 * normal tex y - int
+	 */
+	function MarineBuy_GetEquipment()
+
+		local t = {}
+		
+		local player = Client.GetLocalPlayer()
+		local items = GetChildEntities( player, "ScriptActor" )
+		
+		for index, item in ipairs(items) do
+		
+			local techId = item:GetTechId()
+			
+			if techId ~= kTechId.Pistol and techId ~= kTechId.Axe then
+				
+				local itemName = GetDisplayNameForTechId(techId)
+				if itemName then
+					t[techId] = true
+				end
+				
+			end
+
+		end
+		
+		if player:isa("JetpackMarine") then
+			t[kTechId.Jetpack] = true
+		elseif player:isa("Exo") then
+			//hanlde exo weapon(s)
+		end
+		
+		return t
+		
 	end
 	
 	

@@ -184,7 +184,7 @@ kGeneralEffectData =
             {cinematic = "cinematics/marine/spawn_item.cinematic", classname = "Flamethrower", ismarine = true, done = true},
             {cinematic = "cinematics/marine/spawn_item.cinematic", classname = "GrenadeLauncher", ismarine = true, done = true},
             {cinematic = "cinematics/marine/spawn_item.cinematic", classname = "Jetpack", ismarine = true, done = true},
-            {cinematic = "cinematics/marine/spawn_item.cinematic", classname = "LayMines", ismarine = true, done = true},
+            {cinematic = "cinematics/marine/spawn_item.cinematic", classname = "DemoMines", ismarine = true, done = true},
             
             {cinematic = "cinematics/marine/spawn_item_team2.cinematic", classname = "AmmoPack", isalien = true, done = true},
             {cinematic = "cinematics/marine/spawn_item_team2.cinematic", classname = "MedPack", isalien = true, done = true},
@@ -195,7 +195,7 @@ kGeneralEffectData =
             {cinematic = "cinematics/marine/spawn_item_team2.cinematic", classname = "Flamethrower", isalien = true, done = true},
             {cinematic = "cinematics/marine/spawn_item_team2.cinematic", classname = "GrenadeLauncher", isalien = true, done = true},
             {cinematic = "cinematics/marine/spawn_item_team2.cinematic", classname = "Jetpack", isalien = true, done = true},
-            {cinematic = "cinematics/marine/spawn_item_team2.cinematic", classname = "LayMines", isalien = true, done = true},
+            {cinematic = "cinematics/marine/spawn_item_team2.cinematic", classname = "DemoMines", isalien = true, done = true},
             
             {cinematic = "cinematics/marine/structures/spawn_building_big.cinematic", classname = "CommandStation", ismarine = true, isalien = false, done = true},
             {cinematic = "cinematics/marine/structures/spawn_building_big.cinematic", classname = "RoboticsFactory", ismarine = true, isalien = false, done = true},

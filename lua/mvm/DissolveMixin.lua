@@ -49,12 +49,13 @@ function DissolveMixin:OnUpdate( deltaTime )
 				
 				self.dissolveAmount = math.min( 1, (now - dissolveStart) / kDissolveSpeed )
 				
-				if self.GetAccentSkinColor and self.dissolveAmount >= kDissolveAccentOnLimit then
-					self.skinAccentColor = self:GetAccentSkinColor()	//Reset for dissolve effect
-				end
-				
-				if 1 - self.dissolveAmount == 0 then
-					self.skinAccentColor = Color(0,0,0,0)	//lame attempt to keep Visors from appearing
+				local dissolveDiff = 1 - self.dissolveAmount
+				if self.GetAccentSkinColor then
+					if self.dissolveAmount >= kDissolveAccentOnLimit then
+						self.skinAccentColor = self:GetAccentSkinColor()	//Reset for dissolve effect
+					elseif dissolveDiff < kDissolveAccentOnLimit then
+						self.skinAccentColor = Color(0,0,0,0)
+					end
 				end
                 
             end

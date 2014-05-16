@@ -286,6 +286,36 @@ if Client then
 end
 
 
+function Armory:GetItemList(forPlayer)	//OVERRIDES
+    
+    local itemList = {   
+        kTechId.DemoMines, 
+        kTechId.Shotgun,
+        kTechId.Welder,
+        kTechId.ClusterGrenade,
+        kTechId.GasGrenade,
+        kTechId.PulseGrenade
+    }
+    
+    if self:GetTechId() == kTechId.AdvancedArmory then
+    
+	    itemList = {   
+	        kTechId.DemoMines,
+	        kTechId.Shotgun,
+	        kTechId.Welder,
+            kTechId.ClusterGrenade,
+            kTechId.GasGrenade,
+            kTechId.PulseGrenade,
+	        kTechId.GrenadeLauncher,
+	        kTechId.Flamethrower,
+	    }
+	    
+    end
+    
+    return itemList
+    
+end
+
 
 function Armory:UpdateLoggedIn()
 	
@@ -358,7 +388,7 @@ function Armory:GetTechButtons(techId)
     end
     
     if self:GetTechId() == kTechId.AdvancedArmory then
-		techButtons[6] = kTechId.GrenadeLauncherTech	//slot 5?
+		techButtons[5] = kTechId.GrenadeLauncherTech
     end
 	
     return techButtons
@@ -465,18 +495,6 @@ if Server then
             self:SetTechId(kTechId.AdvancedArmory)
             
             local techTree = self:GetTeam():GetTechTree()
-            /* Removed from MarineTeam-TechTree
-            local awResearchNode = techTree:GetTechNode(kTechId.AdvancedWeaponry)
-            
-            if awResearchNode then     
-       
-                awResearchNode:SetResearchProgress(1.0)
-                techTree:SetTechNodeChanged(awResearchNode, string.format("researchProgress = %.2f", self.researchProgress))
-                awResearchNode:SetResearched(true)
-                techTree:QueueOnResearchComplete(kTechId.AdvancedWeaponry, self)
-                
-            end
-            */
             
             local ftResearchNode = techTree:GetTechNode(kTechId.FlamethrowerTech)
             if ftResearchNode then
@@ -527,7 +545,7 @@ if Server then
         if ( player:GetHealth() < player:GetMaxHealth() ) then
 
             // third param true = ignore armor
-            player:AddHealth(Armory.kHealAmount, false, true)
+            player:AddHealth( Armory.kHealAmount, false, true, false, self )
             
             self:TriggerEffects("armory_health", {
                 effecthostcoords = Coords.GetTranslation( player:GetOrigin() ),

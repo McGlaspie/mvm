@@ -3,6 +3,9 @@
 Script.Load("lua/mvm/TechTreeConstants.lua")
 Script.Load("lua/mvm/TechData.lua")
 Script.Load("lua/mvm/MvMUtility.lua")
+Script.Load("lua/mvm/AFKMixin.lua")
+Script.Load("lua/mvm/LiveMixin.lua")
+Script.Load("lua/mvm/TeamMixin.lua")
 
 
 if Client then
@@ -38,6 +41,7 @@ Player.kCrouchSpeedScalar = 0.5
 // Percentage change in height when full crouched
 local kCrouchShrinkAmount = 0.7
 local kExtentsCrouchShrinkAmount = 0.5
+// How long does it take to crouch or uncrouch
 
 local kUseBoxSize = Vector(0.5, 0.5, 0.5)
 local kDownwardUseRange = 2.2
@@ -46,13 +50,130 @@ local kDoublePI = math.pi * 2
 local kHalfPI = math.pi / 2
 
 
+// Private
+local kTapInterval = 0.27
+
+local TAP_NONE = 0
+local TAP_LEFT = 1
+local TAP_RIGHT = 2
+local TAP_FORWARD = 3
+local TAP_BACKWARD = 4
+
+local tapVector =
+{
+    TAP_NONE     = Vector(0, 0, 0),
+    TAP_LEFT     = Vector(1, 0, 0),
+    TAP_RIGHT    = Vector(-1, 0, 0),
+    TAP_FORWARD  = Vector(0, 0, 1),
+    TAP_BACKWARD = Vector(0, 0, -1)
+}
+local tapString =
+{
+    TAP_NONE     = "TAP_NONE",
+    TAP_LEFT     = "TAP_LEFT",
+    TAP_RIGHT    = "TAP_RIGHT",
+    TAP_FORWARD  = "TAP_FORWARD",
+    TAP_BACKWARD = "TAP_BACKWARD"
+}
+
+
+
 //-----------------------------------------------------------------------------
 
 
-local orgPlayerCreate = Player.OnCreate
-function Player:OnCreate()
+function Player:OnCreate()		//OVERRIDES
 
-	orgPlayerCreate(self)
+	
+    ScriptActor.OnCreate(self)
+    
+    InitMixin(self, BaseModelMixin)
+    InitMixin(self, ModelMixin)
+    InitMixin(self, ControllerMixin)
+    InitMixin(self, WeaponOwnerMixin, { kStowedWeaponWeightScalar = Player.kStowedWeaponWeightScalar })
+    InitMixin(self, DoorMixin)
+    // TODO: move LiveMixin to child classes (some day)
+    InitMixin(self, LiveMixin)
+    InitMixin(self, UpgradableMixin)
+    InitMixin(self, GameEffectsMixin)
+    InitMixin(self, FlinchMixin)
+    InitMixin(self, TeamMixin)
+    InitMixin(self, PointGiverMixin)
+    InitMixin(self, EntityChangeMixin)
+    InitMixin(self, BadgeMixin)
+    
+    if Client then
+        InitMixin(self, HelpMixin)
+    end
+    
+    self:SetLagCompensated(true)
+    
+    self:SetUpdates(true)
+    
+    if Server then
+    
+        InitMixin(self, AFKMixin)
+        
+        self.name = ""
+        self.giveDamageTime = 0
+        self.sendTechTreeBase = false
+        self.waitingForAutoTeamBalance = false
+        
+        self.timeUntilResourceBlock = 0
+        self.blockPersonalResources = false
+        
+    end
+    
+    self.viewOffset = Vector(0, 0, 0)
+    
+    self.bodyYaw = 0
+    self.standingBodyYaw = 0
+    
+    self.bodyYawRun = 0
+    self.runningBodyYaw = 0
+    
+    self.clientIndex = -1
+    
+    self.timeLastMenu = 0
+    self.darwinMode = false
+    
+    self.leftFoot = true
+    self.mode = kPlayerMode.Default
+    self.modeTime = -1
+    self.primaryAttackLastFrame = false
+    self.secondaryAttackLastFrame = false
+    
+    self.requestsScores = false
+    self.viewModelId = Entity.invalidId
+    
+    self.usingStructure = nil
+    self.timeOfLastUse = 0
+    
+    self.timeOfDeath = nil
+    
+    self.timeLastOnGround = 0
+    
+    self.resources = 0
+    
+    self.stepStartTime = 0
+    self.stepAmount = 0
+    
+    self.isMoveBlocked = false
+    self.isRookie = false
+    
+    self.moveButtonPressed = false
+
+    // Make the player kinematic so that bullets and other things collide with it.
+    self:SetPhysicsGroup(PhysicsGroup.PlayerGroup)
+    
+    self.isUsing = false
+    self.slowAmount = 0
+    
+    self.lastButtonReleased = TAP_NONE
+    self.timeLastButtonReleased = 0
+    self.previousMove = Vector(0, 0, 0)
+    
+    self.pushImpulse = Vector(0, 0, 0)
+    self.pushTime = 0
 	
 	if Client then
 		InitMixin( self, ColoredSkinsMixin )
@@ -132,6 +253,22 @@ function Player:AddResources(amount)	//OVERRIDES
     end
     
     return resReward
+    
+end
+
+
+function Player:UpdateArmorAmount(armorLevel)
+
+    // note: some player may have maxArmor == 0
+    local armorPercent = self.maxArmor > 0 and self.armor/self.maxArmor or 0
+    local newMaxArmor = self:GetArmorAmount( armorLevel )
+    
+    if newMaxArmor ~= self.maxArmor and ( self:GetIsAlive() and newMaxArmor > self.maxArmor ) then
+    
+        self.maxArmor = newMaxArmor
+        self:SetArmor(self.maxArmor * armorPercent)
+        
+    end
     
 end
 
@@ -804,6 +941,7 @@ if Client then
 			local GetMapBlipRotation = MapBlip.GetRotation
 			local GetMapBlipType = MapBlip.GetType
 			local GetMapBlipIsInCombat = MapBlip.GetIsInCombat
+			local GetMapBlipIsParasited = MapBlip.GetIsParasited
 			local GetIsSteamFriend = Client.GetIsSteamFriend
 			local ClientIndexToSteamId = GetSteamIdForClientIndex
 			local GetIsMapBlipActive = MapBlip.GetIsActive
@@ -816,6 +954,7 @@ if Client then
 					local blipTeam = kMinimapBlipTeamNeutral
 					local blipTeamNumber = GetMapBlipTeamNumber(blip)
 					local isSteamFriend = false
+					local clientIndex = 0
 					
 					if blip.clientIndex and blip.clientIndex > 0 and blipTeamNumber ~= GetEnemyTeamNumber(playerTeam) then
 
@@ -823,6 +962,8 @@ if Client then
 						if steamId then
 							isSteamFriend = GetIsSteamFriend(steamId)
 						end
+						
+						clientIndex = blip.clientIndex
 						
 					end
 					
@@ -857,8 +998,8 @@ if Client then
 					blipsData[i + 1] = blipOrig.x
 					blipsData[i + 2] = blipOrig.z
 					blipsData[i + 3] = GetMapBlipRotation(blip)
-					blipsData[i + 4] = 0
-					blipsData[i + 5] = 0
+					blipsData[i + 4] = clientIndex
+					blipsData[i + 5] = GetMapBlipIsParasited(blip)
 					
 					local blipType = GetMapBlipType(blip)
 					if blipType == kMinimapBlipType.PowerPoint or blipType == kMinimapBlipType.DestroyedPowerPoint and playerTeam == kTeamReadyRoom then

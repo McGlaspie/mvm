@@ -8,6 +8,7 @@ Script.Load("lua/mvm/PickupableMixin.lua")
 Script.Load("lua/mvm/DetectableMixin.lua")
 Script.Load("lua/mvm/FireMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
+Script.Load("lua/ExoVariantMixin.lua")
 
 if Client then
 	Script.Load("lua/mvm/ColoredSkinsMixin.lua")
@@ -47,6 +48,8 @@ function Exosuit:OnCreate ()
     InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)
     InitMixin(self, ElectroMagneticMixin)
+    
+    InitMixin(self, ExoVariantMixin)	//Horrible way to do this...no need for models
 
     self:SetPhysicsGroup(PhysicsGroup.SmallStructuresGroup)
     

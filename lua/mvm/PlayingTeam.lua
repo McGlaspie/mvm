@@ -1,5 +1,6 @@
 
 
+Script.Load("lua/mvm/bots/BotTeamBrain.lua")
 
 
 function PlayingTeam:GetPresRecipientCount()	//OVERRIDES
@@ -174,6 +175,60 @@ function PlayingTeam:OnResearchComplete(structure, researchId)
     end
 
 end
+
+
+function PlayingTeam:GetTeamBrain()	//OVERRIDES
+
+    // we have bots, need a team brain
+    // lazily init team brain
+    if self.brain == nil then
+        self.brain = BotTeamBrain()
+        self.brain:Initialize( self.teamName.."-Brain", self:GetTeamNumber() )
+    end
+
+    return self.brain
+            
+end
+
+
+function PlayingTeam:UpdateVotes()
+
+    PROFILE("PlayingTeam:UpdateVotes")
+    
+    // Update with latest team size
+    self.ejectCommVoteManager:SetNumPlayers(self:GetNumPlayers())
+    self.concedeVoteManager:SetNumPlayers(self:GetNumPlayers())
+
+    // Eject commander if enough votes cast
+    if self.ejectCommVoteManager:GetVotePassed() then
+
+        local targetCommander = GetPlayerFromUserId(self.ejectCommVoteManager:GetTarget())
+        
+        if targetCommander and targetCommander.Eject then
+            targetCommander:Eject()
+        end
+        
+        self.ejectCommVoteManager:Reset()
+        
+    elseif self.ejectCommVoteManager:GetVoteElapsed(Shared.GetTime()) then
+        self.ejectCommVoteManager:Reset()
+    end
+    
+    -- Give up when enough votes
+    if self.concedeVoteManager:GetVotePassed() then
+    
+        self.concedeVoteManager:Reset()
+        self.conceded = true
+        Server.SendNetworkMessage("MvM_TeamConceded", { teamNumber = self:GetTeamNumber() })
+        
+    elseif self.concedeVoteManager:GetVoteElapsed(Shared.GetTime()) then
+        self.concedeVoteManager:Reset()
+    end
+
+    
+end
+
+
 
 
 Class_Reload( "PlayingTeam", {} )

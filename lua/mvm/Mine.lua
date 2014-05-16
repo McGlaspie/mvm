@@ -7,6 +7,7 @@ Script.Load("lua/mvm/FireMixin.lua")
 Script.Load("lua/mvm/WeldableMixin.lua")
 Script.Load("lua/mvm/ElectroMagneticMixin.lua")
 Script.Load("lua/EntityChangeMixin.lua")
+Script.Load("lua/OwnerMixin.lua")
 Script.Load("lua/mvm/LOSMixin.lua")
 //Script.Load("lua/mvm/DetectableMixin.lua")
 
@@ -19,10 +20,10 @@ end
 // The amount of time until the mine is detonated once armed.
 local kTimeArmed = 0.17
 // The amount of time it takes other mines to trigger their detonate sequence when nearby mines explode.
-local kTimedDestruction = 0.5
+local kTimedDestruction = 0.25
 
 // range in which other mines are trigger when detonating
-local kMineChainDetonateRange = 3
+local kMineChainDetonateRange = 2
 
 local kMineCameraShakeDistance = 15
 local kMineMinShakeIntensity = 0.01
@@ -30,9 +31,9 @@ local kMineMaxShakeIntensity = 0.13
 
 local newNetworkVars = {}
 
-AddMixinNetworkVars(FireMixin, newNetworkVars)
-AddMixinNetworkVars(LOSMixin, newNetworkVars)
-AddMixinNetworkVars(ElectroMagneticMixin, newNetworkVars)
+AddMixinNetworkVars( FireMixin, newNetworkVars )
+AddMixinNetworkVars( LOSMixin, newNetworkVars )
+AddMixinNetworkVars( ElectroMagneticMixin, newNetworkVars )
 
 
 //-----------------------------------------------------------------------------
@@ -44,28 +45,14 @@ local function SineFalloff(distanceFraction)
 end
 
 local function Detonate(self, armFunc)
-
-    local hitEntities = GetEntitiesWithMixinWithinRange("Live", self:GetOrigin(), kMineDetonateRange)
-    RadiusDamage(hitEntities, self:GetOrigin(), kMineDetonateRange, kMineDamage, self, false, SineFalloff)
-    
-    // Start the timed destruction sequence for any mine within range of this exploded mine.
-    local nearbyMines = GetEntitiesWithinRange("Mine", self:GetOrigin(), kMineChainDetonateRange)
-    for _, mine in ipairs(nearbyMines) do
-    
-        if mine ~= self and not mine.armed then
-            mine:AddTimedCallback(function() armFunc(mine) end, (math.random() + math.random()) * kTimedDestruction)
-        end
-        
-    end
+	
+	local hitEnts = Shared.GetEntitiesWithTagInRange( "Live", self:GetOrigin(), kMineDetonateRange, function(ent) return not ent:isa("Mine") end )
+    RadiusDamage( hitEnts, self:GetOrigin(), kMineDetonateRange, kMineDamage, self, false, SineFalloff )
     
     local params = {}
     params[kEffectHostCoords] = Coords.GetLookIn( self:GetOrigin(), self:GetCoords().zAxis )
-    
-    if GetIsVortexed(self) then
-        params[kEffectSurface] = "ethereal"
-    else
-        params[kEffectSurface] = "metal"
-    end
+    params[kEffectSurface] = "metal"
+    //TODO Adjust coords to be perpendicular to surface attach on, i.e. explode outwards
     
     self:TriggerEffects("mine_explode", params)
     
@@ -78,11 +65,16 @@ local function Detonate(self, armFunc)
     
 end
 
-local function Arm(self)
+local function Arm( self, notifyOwner )
 
     if not self.armed then
         
-        self:AddTimedCallback(function() Detonate(self, Arm) end, kTimeArmed)
+        self:AddTimedCallback( 
+			function() 
+				Detonate( self, Arm ) 
+			end, 
+			kTimeArmed
+		)
         
         self:TriggerEffects("mine_arm")
         
@@ -94,8 +86,6 @@ end
 
 
 local function MvM_CheckEntityExplodesMine(self, entity)
-
-	//Print("CheckEntityExplodesMine() entity:isa( %s )", tostring(entity:GetClassName()) )
 
     if not self.active then
         return false
@@ -147,20 +137,20 @@ function Mine:OnCreate()	//OVERRIDES
 
 	ScriptActor.OnCreate(self)
     
-    InitMixin(self, BaseModelMixin)
-    InitMixin(self, ClientModelMixin)
-    InitMixin(self, LiveMixin)
-    InitMixin(self, GameEffectsMixin)
-    InitMixin(self, StunMixin)
-    InitMixin(self, TeamMixin)
-    InitMixin(self, EntityChangeMixin)
-    InitMixin(self, LOSMixin)
-    InitMixin(self, DamageMixin)
-    InitMixin(self, VortexAbleMixin)
-    InitMixin(self, ParasiteMixin)
+    InitMixin( self, BaseModelMixin )
+    InitMixin( self, ClientModelMixin )
+    InitMixin( self, LiveMixin )
+    InitMixin( self, GameEffectsMixin )
+    InitMixin( self, StunMixin )
+    InitMixin( self, TeamMixin )
+    InitMixin( self, EntityChangeMixin )
+    InitMixin( self, LOSMixin )
+    InitMixin( self, DamageMixin )
+    InitMixin( self, VortexAbleMixin )
+    InitMixin( self, ParasiteMixin )
     
-    InitMixin(self, FireMixin)
-    InitMixin(self, ElectroMagneticMixin)
+    InitMixin( self, FireMixin )
+    InitMixin( self, ElectroMagneticMixin )
     
     if Server then
     
@@ -173,8 +163,8 @@ function Mine:OnCreate()	//OVERRIDES
     end
 	
 	if Client then
-		InitMixin(self, CommanderGlowMixin)
-		InitMixin(self, ColoredSkinsMixin)
+		InitMixin( self, CommanderGlowMixin )
+		InitMixin( self, ColoredSkinsMixin )
 	end
 
 end
@@ -195,6 +185,7 @@ function Mine:OnInitialized()   //OVERRIDES
         self:AddTimedCallback(activateFunc, kMineActiveTime)
         
         self.armed = false
+        self.detonatedWithoutTrigger = false
         self:SetHealth(self:GetMaxHealth())
         self:SetArmor(self:GetMaxArmor())
         
@@ -216,9 +207,10 @@ function Mine:OnInitialized()   //OVERRIDES
 end
 
 
-//function Mine:OverrideCheckVision()
-//	return false
-//end
+//???? Allow owners to pickup and move mine?
+function Mine:GetCanBeUsed(player, useSuccessTable)
+    useSuccessTable.useSuccess = false
+end
 
 function Mine:OverrideVisionRadius()
 	return 0
@@ -226,6 +218,15 @@ end
 
 function Mine:GetIsVulnerableToEMP()
     return true
+end
+
+
+function Mine:GetDeathIconIndex()	//?
+    return kDeathMessageIcon.Mine	//TODO Toggle on if manually detonated or auto
+end
+
+function Mine:GetDamageType()
+	return kMineDamageType
 end
 
 
@@ -273,6 +274,12 @@ if Server then
     end
 
 end	//Server
+
+
+function Mine:TriggerDetonation()
+	Arm(self)
+	return true
+end
 
 
 if Client then

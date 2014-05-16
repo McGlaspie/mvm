@@ -49,11 +49,11 @@ function PredictedProjectile:OnDestroy()
     end
     
     if Client then
-		
+		//Below causes script error from GasGrenade being removed
         local owner = Shared.GetEntity(self.ownerId)
 		//Bug caused by client moving to spec?
-        if owner and owner == Client.GetLocalPlayer() and self.projectileId ~= nil and HasMixin( owner, "PredictedProjectile" ) then        
-            owner:SetProjectileDestroyed(self.projectileId)   
+        if owner and owner == Client.GetLocalPlayer() and HasMixin( owner, "PredictedProjectile" ) then //and self.projectileId ~= nil 
+            owner:SetProjectileDestroyed(self.projectileId)
         end
 
     end    

@@ -1,0 +1,4 @@
+shader = "shaders/Multimodal_WeaponScreen.surface_shader"
+normalMap = "materials/dev/dev_normal.dds"
+emissiveMap = "*ammo_displaywelder"
+emissiveMap2 = "*ammo_displaytrigger"

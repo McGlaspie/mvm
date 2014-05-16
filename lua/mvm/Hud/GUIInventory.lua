@@ -86,7 +86,7 @@ local function LocalAdjustSlot(self, index, hudSlot, techId, isActive, resetAnim
     
     inventoryItem.KeyText:SetText(BindingsUI_GetInputValue("Weapon" .. hudSlot))
     inventoryItem.Graphic:SetUniformScale(self.scale)
-    inventoryItem.Graphic:SetTexturePixelCoordinates(GetTexCoordsForTechId(techId))
+    inventoryItem.Graphic:SetTexturePixelCoordinates( GetTexCoordsForTechId(techId) )
     inventoryItem.Graphic:SetPosition(Vector( (GUIInventory.kItemPadding + GUIInventory.kItemSize.x) * (index-1) , 0, 0) )
     
     if resetAnimations then

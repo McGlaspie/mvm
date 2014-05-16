@@ -39,7 +39,7 @@ kPistolAltDamage = 40
 kWelderDamagePerSecond = 40	//NS2 - 30
 kWelderDamageType = kDamageType.Structural
 kWelderWeldDelay = 0.3
-kSelfWeldAmount = 5
+kSelfWeldAmount = 0		//Why was this ever added? Confusing as hell...
 kPlayerArmorWeldRate = 20
 
 kAxeDamage = 35		//25 - orgMvM: 35 
@@ -47,7 +47,7 @@ kAxeDamageType = kDamageType.Puncture	//Structural
 
 kHandGrenadeWeight = 0.05	//0.1
 
-kPulseGrenadeDamageRadius = 6
+kPulseGrenadeDamageRadius = 7
 kPulseGrenadeEnergyDamageRadius = 10
 kPulseGrenadeDamage = 90	//125
 kPulseGrenadeEnergyDamage = 50
@@ -68,7 +68,7 @@ kShotgunDamageType = kDamageType.Normal
 kShotgunClipSize = 8
 kShotgunBulletsPerShot = 12	//ns2-10
 kShotgunBulletsPerShotUpgrade = 16
-kShotgunRange = 80	//v3.2 60 	NS2 - 30
+kShotgunRange = 75	//v3.2 60 	NS2 - 30
 
 kGrenadeLauncherGrenadeDamage = 130	//120
 kGrenadeLauncherGrenadeDamageType = kDamageType.Structural
@@ -111,18 +111,15 @@ kRailgunChargeDamage = 120		//ns2-130
 kRailgunDamageType = kDamageType.Structural
 kRailgunWeight = 0.11	//.08
 
-
-
 kMACAttackDamage = 5
 kMACEMPBlastDamage = 25
-kMACAttackDamageType = kDamageType.Normal	//Light?
+kMACAttackDamageType = kDamageType.Light	//Normal
 kMACAttackFireDelay = 0.6
 kMACEMPCooldown = kEmpDamageEffectsDuration
 
-
-kMineDamage = 150	//NS2 - 125
-kMineDamageType = kDamageType.Light	//structural?
-kLayMineWeight = 0.1	//0.19
+kMineDamage = 160	//NS2 - 125
+kMineDamageType = kDamageType.Structural	//Light
+kDemoMinesWeight = 0.12	//v3.2-0.1		NS2-0.19
 
 kSentryDamage = 7.75	//NS2 - 5
 kSentryAttackDamageType = kDamageType.Normal
@@ -131,6 +128,7 @@ kSentryAttackRandROF = 0.0
 kSentryAttackBulletsPerSalvo = 1
 kConfusedSentryBaseROF = 2.5
 kElectrifiedSentryBaseROF = 2.5
+kSentryWeight = 0.65
 
 
 kARCDamage = 450
@@ -178,7 +176,7 @@ kSupplyPerResourceNode = 10
 
 
 kMACSupply = 5
-kArmorySupply = 15
+kArmorySupply = 10
 kAdvancedArmorySupply = 5
 kARCSupply = 10
 kSentrySupply = 5
@@ -220,7 +218,7 @@ kARCCost = 15
 kSentryCost = 5
 kSentryBatteryCost = 5
 
-kWelderCost = 5
+kWelderCost = 3
 
 kClusterGrenadeCost = 5
 kGasGrenadeCost = 5

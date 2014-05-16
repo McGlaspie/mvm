@@ -9,9 +9,13 @@
 kGUI_Team1Index = 1
 kGUI_Team2Index = 2
 
-kGUI_Grey = Color( 0.65, 0.65, 0.65, 0.65 )
+kGUI_Trans = Color( 1, 1, 1, 0 )
+kGUI_White = Color( 1, 1, 1, 1 )
+kGUI_Grey = Color( 0.6, 0.6, 0.6, 0.6 )
+kGUI_Red = Color( 1, 0.1, 0.1, 1 )
+kGUI_RedGrey = Color( 0.4, 0.185, 0.185, 0.56 )
 
-kGUI_Team1_BaseColor = Color(0.085, 0.72, 0.96, 0.1)
+kGUI_Team1_BaseColor = Color(0.085, 0.72, 0.96, 0.15)
 kGUI_Team1_AccentColor = Color(0.756, 0.982, 1, 1)
 kGUI_Team1_TrimColor = Color(0.725, 0.921, 0.949, 1)
 

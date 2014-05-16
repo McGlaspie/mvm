@@ -26,6 +26,13 @@ kPlayerLOSDistance = 30		//NS2: 20	????: Performance hit through blips?
 kStructureLOSDistance = 5	//NS2 3.5
 
 
+kStructureTinyExtents = Vector( .32, .32, .32 )
+kStructureVerySmallExtents = Vector( .64, .64, .64 )
+kStructureSmallExtents = Vector( 1, 1, 1 )
+kStructureMediumExtents = Vector( 1.5, 1.5, 1.5 )
+kStructureLargeExtents = Vector( 2, 2, 2 )
+//CS - Vector(1.5, 1, 0.4)
+
 
 kNameTagFontColors = { 
 	[kTeam1Index] = kMarineFontColor,

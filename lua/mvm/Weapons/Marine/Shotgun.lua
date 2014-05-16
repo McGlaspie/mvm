@@ -36,6 +36,9 @@ local kMvMSpreadVectors =
     
 }
 
+local kViewModels = GenerateMarineViewModelPaths("shotgun")
+local kAnimationGraph = PrecacheAsset("models/marine/shotgun/shotgun_view.animation_graph")
+
 
 //-----------------------------------------------------------------------------
 
@@ -50,6 +53,24 @@ function Shotgun:OnCreate()
     
     self.emptyPoseParam = 0
 
+end
+
+if Client then
+
+    function Shotgun:OnInitialized()
+    
+        ClipWeapon.OnInitialized(self)
+    
+    end
+
+end
+
+function Shotgun:GetAnimationGraphName()
+    return kAnimationGraph
+end
+
+function Shotgun:GetViewModelName(sex, variant)
+    return kViewModels[sex][variant]
 end
 
 

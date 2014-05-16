@@ -64,8 +64,9 @@ function GUIWelderDisplay:Initialize()
     healthCircleSettings.ForegroundTextureY2 = kHealthCircleHeight
     healthCircleSettings.InheritParentAlpha = true
     self.circle = GUIDial()
-    self.circle:Initialize(healthCircleSettings)
-    self.circle.dialBackground:SetShader("shaders/GUI_TeamThemed.surface_shader")   //FIXME Dial not affected
+    self.circle:Initialize( healthCircleSettings )
+    //self.circle.GetBackground():SetShader("shaders/GUI_TeamThemed.surface_shader")   //FIXME Dial not affected
+    self.circle:GetBackground():SetIsVisible(true)
     
     // Slightly larger copy of the text for a glow effect
     self.percentageText = GUIManager:CreateTextItem()
@@ -75,7 +76,7 @@ function GUIWelderDisplay:Initialize()
     self.percentageText:SetTextAlignmentX(GUIItem.Align_Center)
     self.percentageText:SetTextAlignmentY(GUIItem.Align_Center)
     self.percentageText:SetPosition(Vector(256, 256, 0))
-    self.percentageText:SetIsVisible(false)
+    self.percentageText:SetIsVisible(true)
     self.percentageText:SetColor( Color(1, 1, 1, 1) )
     
     // Force an update so our initial state is correct.
@@ -84,6 +85,9 @@ function GUIWelderDisplay:Initialize()
 end
 
 function GUIWelderDisplay:Uninitialize()
+
+	self.percentageText:SetColor( kGUI_Trans )
+	self.percentageText:SetIsVisible(false)
 
     if self.circle then
         self.circle:Uninitialize()
@@ -113,9 +117,9 @@ function GUIWelderDisplay:UpdateTeamColors()
 	self.squares:SetFloatParameter( "teamBaseColorB", ui_color.b )
 	
 	//FIXME Below is not effecting Dial
-	self.circle.dialBackground:SetFloatParameter( "teamBaseColorR", kGUI_HealthBarColors[self.teamNumber].r )
-	self.circle.dialBackground:SetFloatParameter( "teamBaseColorG", kGUI_HealthBarColors[self.teamNumber].g )
-	self.circle.dialBackground:SetFloatParameter( "teamBaseColorB", kGUI_HealthBarColors[self.teamNumber].b )
+	//self.circle:GetBackground():SetFloatParameter( "teamBaseColorR", kGUI_HealthBarColors[self.teamNumber].r )
+	//self.circle:GetBackground():SetFloatParameter( "teamBaseColorG", kGUI_HealthBarColors[self.teamNumber].g )
+	//self.circle:GetBackground():SetFloatParameter( "teamBaseColorB", kGUI_HealthBarColors[self.teamNumber].b )
 	
 	//self.percentageText:SetColor( kGUI_NameTagFontColors[ self.teamNumber ] )
 
@@ -130,10 +134,10 @@ function GUIWelderDisplay:Update(deltaTime)
     self.time = self.time + deltaTime
     
     // Update percentage display.    
-    local isVisible = self.weldPercentage > 0    
+    local isVisible = self.weldPercentage > 0
     self.circle:GetBackground():SetIsVisible(isVisible)    
-    self.circle:SetPercentage(self.weldPercentage / 100)
-    self.circle:Update(deltaTime)
+    self.circle:SetPercentage( self.weldPercentage / 100 )
+    self.circle:Update( deltaTime )
     
     local yPos = 512 - ((self.time % 2) / 2) * (2560 + 256)
     
@@ -142,7 +146,7 @@ function GUIWelderDisplay:Update(deltaTime)
     local percentageFormat = string.format("%d%%", math.ceil(self.weldPercentage)) 
     self.percentageText:SetText( percentageFormat )
     
-    self.percentageText:SetIsVisible(self.weldPercentage > 0)
+    self.percentageText:SetIsVisible( isVisible )
 
 end
 
@@ -154,11 +158,11 @@ end
 /**
  * Called by the player to update the components.
  */
-function Update(deltaTime)
+function Update( deltaTime )
 
     welderDisplay:SetWeldPercentage(weldPercentage)
     welderDisplay:SetTeamNumber(teamNumber)
-    welderDisplay:Update(deltaTime)
+    welderDisplay:Update( deltaTime )
     
 end
 

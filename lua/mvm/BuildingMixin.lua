@@ -17,7 +17,12 @@ local function EvalBuildIsLegal(self, techId, origin, angle, builderEntity, isCo
     
         // When Drifters and MACs build, or untargeted build/buy actions, trace from order point down to see
         // if they're trying to build on top of anything and if that's OK.
-        local trace = Shared.TraceRay(Vector(origin.x, origin.y + .1, origin.z), Vector(origin.x, origin.y - .2, origin.z), CollisionRep.Select, PhysicsMask.CommanderBuild, EntityFilterOne(builderEntity))
+        local trace = Shared.TraceRay(
+			Vector( origin.x, origin.y + .1, origin.z ), 
+			Vector( origin.x, origin.y - .2, origin.z ), 
+			CollisionRep.Select, PhysicsMask.CommanderBuild, EntityFilterOne(builderEntity)
+		)
+		
         legalBuildPosition, position, attachEntity, errorString = GetIsBuildLegal(techId, trace.endPoint, angle, kStructureSnapRadius, self:GetOwner(), builderEntity)
         
     else
@@ -81,7 +86,12 @@ function BuildingMixin:AttemptToBuild(techId, origin, normal, orientation, isCom
             // If orientation yaw specified, set it
             elseif orientation then
             
-                local angles = Angles(0, orientation, 0)
+				local angles = Angles( 0, orientation, 0 )
+				
+				if techId == kTechId.DropDemoMines then
+					angles.pitch = 90
+				end
+				                
                 local coords = Coords.GetLookIn(newEnt:GetOrigin(), angles:GetCoords().zAxis)
                 newEnt:SetCoords(coords)
             

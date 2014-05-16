@@ -10,8 +10,9 @@ Script.Load("lua/mvm/ElectroMagneticMixin.lua")
 Script.Load("lua/mvm/ScoringMixin.lua")
 Script.Load("lua/mvm/RagdollMixin.lua")
 Script.Load("lua/Weapons/Marine/ExoWeaponHolder.lua")
-Script.Load("lua/MarineVariantMixin.lua")
 Script.Load("lua/mvm/OrdersMixin.lua")
+Script.Load("lua/ExoVariantMixin.lua")
+Script.Load("lua/mvm/MarineActionFinderMixin.lua")
 
 if Client then
 	Script.Load("lua/mvm/CommanderGlowMixin.lua")
@@ -53,7 +54,7 @@ local kHealthCriticalTrigger = 0.2
 local kWalkMaxSpeed = 3.6       //3.7
 local kMaxSpeed = 5.35           //6
 local kViewOffsetHeight = 2.3
-local kAcceleration = 35        //20
+local kAcceleration = 30        //20
 
 local kIdle2D = PrecacheAsset("sound/NS2.fev/marine/heavy/idle_2D")
 
@@ -99,8 +100,8 @@ function Exo:OnCreate()	//OVERRIDES
     InitMixin(self, TunnelUserMixin)
     InitMixin(self, ParasiteMixin)
     InitMixin(self, MarineActionFinderMixin)
-    InitMixin(self, WebableMixin)
-    InitMixin(self, MarineVariantMixin)
+    InitMixin(self, WebableMixin)    
+    InitMixin(self, ExoVariantMixin)
     
     InitMixin(self, FireMixin)
     InitMixin(self, DetectableMixin)

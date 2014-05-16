@@ -86,6 +86,8 @@ local function MvM_OnCommandSpawn(client, itemName, teamnum, marineVariant, useL
 					newItem.variant = kMarineVariant.assault
 				elseif string.find( marineVariant, "elite") or string.find( marineVariant, "eliteassault") then
 					newItem.variant = kMarineVariant.eliteassault
+				elseif string.find( marineVariant, "kodiak") then
+					newItem.variant = kMarineVariant.kodiak
 				else
 					newItem.variant = kMarineVariant.green
 				end

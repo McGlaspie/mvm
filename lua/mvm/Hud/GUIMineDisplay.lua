@@ -27,8 +27,8 @@ function GUIMineDisplay:Initialize()
     
     self.background = GUIManager:CreateGraphicItem()
     self.background:SetSize( Vector(256, 512, 0) )
-    self.background:SetPosition( Vector(0, 0, 0))    
-    self.background:SetColor( kGUI_NameTagFontColors[teamNumber] )
+    self.background:SetPosition( Vector(0, 0, 0) )    
+    self.background:SetColor( kGUI_NameTagFontColors[self.teamNumber] )
     self.background:SetIsVisible(true)
     
     // Slightly larger copy of the text for a glow effect
@@ -47,7 +47,7 @@ function GUIMineDisplay:Initialize()
     self.ammoText:SetTextAlignmentX(GUIItem.Align_Center)
     self.ammoText:SetTextAlignmentY(GUIItem.Align_Center)
     self.ammoText:SetAnchor(GUIItem.Middle, GUIItem.Center)
-    self.ammoText:SetColor( kGUI_HealthBarColors[teamNumber] )
+    self.ammoText:SetColor( kGUI_HealthBarColors[self.teamNumber] )
     
     self.flashInOverlay = GUIManager:CreateGraphicItem()
     self.flashInOverlay:SetSize(Vector(256, 512, 0))
@@ -106,9 +106,9 @@ function Update(deltaTime)
 
     PROFILE("GUIMineDisplay Update")
 	
-    mineDisplay:SetClip(weaponClip)
-    mineDisplay:SetTeamNumber(teamNumber)
-    mineDisplay:Update(deltaTime)
+    mineDisplay:SetClip( weaponClip )
+    mineDisplay:SetTeamNumber( teamNumber )
+    mineDisplay:Update( deltaTime )
     
 end
 
@@ -124,4 +124,6 @@ function Initialize()
     
 end
 
+
 Initialize()
+

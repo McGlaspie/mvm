@@ -16,6 +16,7 @@ AddMixinNetworkVars(LOSMixin, newNetworkVars )
 
 local kWelderEffectRate = 0.45
 local kWelderFireDelay = 0.5
+local kWelderConstructDelay = 0.3
 local kWeldRange = 2.4
 
 local kFireLoopingSound = PrecacheAsset("sound/NS2.fev/marine/welder/weld")
@@ -23,7 +24,7 @@ local kFireLoopingSound = PrecacheAsset("sound/NS2.fev/marine/welder/weld")
 local kHealScoreAdded = 2
 // Every kAmountHealedForPoints points of damage healed, the player gets
 // kHealScoreAdded points to their score.
-local kAmountHealedForPoints = 600
+local kAmountHealedForPoints = 300
 
 
 //-----------------------------------------------------------------------------
@@ -55,6 +56,17 @@ function Welder:OnCreate()
     
 end
 
+
+function Welder:OnDestroy()
+
+	Weapon.OnDestroy( self )
+	
+	if self.welderDisplayUI then
+		Client.DestroyGUIView(self.welderDisplayUI)
+		self.welderDisplayUI = nil
+	end
+
+end
 
 function Welder:OverrideCheckVision()
 	return false
@@ -143,12 +155,21 @@ function Welder:OnPrimaryAttack(player)
 end
 
 
+
 local function PrioritizeDamagedFriends(weapon, player, newTarget, oldTarget)
-    return not oldTarget or (HasMixin(newTarget, "Team") and newTarget:GetTeamNumber() == player:GetTeamNumber() and (HasMixin(newTarget, "Weldable") and newTarget:GetCanBeWelded(weapon)))
+
+    return not oldTarget or ( 
+		HasMixin(newTarget, "Team") 
+		and newTarget:GetTeamNumber() == player:GetTeamNumber() 
+		and (HasMixin(newTarget, "Weldable") 
+		and newTarget:GetCanBeWelded(weapon))
+	)
+	
 end
 
-function Welder:PerformWeld(player)
 
+function Welder:PerformWeld( player )
+	
     local attackDirection = player:GetViewCoords().zAxis
     local success = false
     // prioritize friendlies
@@ -157,8 +178,10 @@ function Welder:PerformWeld(player)
     if didHit and target and HasMixin(target, "Live") then
         
         if GetAreEnemies(player, target) then
+			
             self:DoDamage(kWelderDamagePerSecond * kWelderFireDelay, target, endPoint, attackDirection)
             success = true
+            
         elseif ( player:GetTeamNumber() == target:GetTeamNumber() or target:isa("PowerPoint") ) and HasMixin(target, "Weldable") then
         
             if target:GetHealthScalar() < 1 then
@@ -185,7 +208,7 @@ function Welder:PerformWeld(player)
             end
             
             if HasMixin(target, "Construct") and target:GetCanConstruct(player) then
-                target:Construct(kWelderFireDelay, player)
+                target:Construct( kWelderConstructDelay, player )	//kWelderFireDelay
             end
             
         end
@@ -198,6 +221,119 @@ function Welder:PerformWeld(player)
     
 end
 
+
+
+local function setupWelderDisplay( self, parent, settings )
+
+	local parent = self:GetParent()
+    local settings = self:GetUIDisplaySettings()
+    if parent and parent:GetIsLocalPlayer() and settings then
+    
+        local welderDisplayUI = self.welderDisplayUI
+        if not welderDisplayUI then
+        
+            welderDisplayUI = Client.CreateGUIView(settings.xSize, settings.ySize)
+            welderDisplayUI:Load(settings.script)
+            welderDisplayUI:SetTargetTexture("*ammo_displaywelder")
+            self.welderDisplayUI = welderDisplayUI
+            
+        end
+        
+        self.welderDisplayUI:SetGlobal( "weldPercentage", 0 )
+		self.welderDisplayUI:SetGlobal( "teamNumber", self:GetTeamNumber() )
+		if settings.variant then
+			welderDisplayUI:SetGlobal("weaponVariant", settings.variant)
+		end
+		
+    elseif self.welderDisplayUI then
+    
+        Client.DestroyGUIView(self.welderDisplayUI)
+        self.welderDisplayUI = nil
+        
+    end
+
+end
+
+
+function Welder:OnDrawClient()
+
+	Weapon.OnDrawClient(self)
+	
+	local welderSettings = self:GetUIDisplaySettings( kDemoMineStates.Trigger )
+	setupWelderDisplay( self, parent, welderSettings )
+	if self.welderDisplayUI then
+		self.welderDisplayUI:SetGlobal( "weldPercentage", 0 )
+		self.welderDisplayUI:SetGlobal( "teamNumber", self:GetTeamNumber() )
+	end
+
+end
+
+
+function Welder:OnHolsterClient()
+
+	Weapon.OnHolsterClient(self)
+	
+	if self.welderDisplayUI then
+        Client.DestroyGUIView(self.welderDisplayUI)
+        self.welderDisplayUI = nil
+    end
+
+end
+
+
+function Welder:OnUpdateRender()
+
+    //Weapon.OnUpdateRender(self)
+    
+    local parent = self:GetParent()
+	
+	if parent and not self.isHolstered then
+		local viewModel = parent:GetViewModelEntity():GetRenderModel()	//hackish
+		if viewModel then
+			viewModel:SetMaterialParameter( "screenMapIdx", 0 )
+		end
+	end
+    
+    local settings = self:GetUIDisplaySettings()
+    
+    if parent and settings then
+		
+		setupWelderDisplay( self, parent, settings )
+    
+		if self.welderDisplayUI then
+			local progress = PlayerUI_GetUnitStatusPercentage()
+			self.welderDisplayUI:SetGlobal("weldPercentage", progress )
+		end
+		
+	end
+    
+    if parent and self.welding then
+
+        if (not self.timeLastWeldHitEffect or self.timeLastWeldHitEffect + 0.06 < Shared.GetTime()) then
+        
+            local viewCoords = parent:GetViewCoords()
+        
+            local trace = Shared.TraceRay(viewCoords.origin, viewCoords.origin + viewCoords.zAxis * self:GetRange(), CollisionRep.Damage, PhysicsMask.Flame, EntityFilterTwo(self, parent))
+            if trace.fraction ~= 1 then
+            
+                local coords = Coords.GetTranslation(trace.endPoint - viewCoords.zAxis * .1)
+                
+                local className = nil
+                if trace.entity then
+                    className = trace.entity:GetClassName()
+                end
+                
+                self:TriggerEffects("welder_hit", { classname = className, effecthostcoords = coords})
+                
+            end
+            
+            self.timeLastWeldHitEffect = Shared.GetTime()
+            
+        end
+        
+    end
+    
+end
 
 
 

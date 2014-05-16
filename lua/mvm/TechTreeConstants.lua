@@ -79,7 +79,7 @@ kTechId = createTechIdEnum({
     // Weapon tech
     'AdvancedWeaponry', 'ShotgunTech', 'HeavyRifleTech', 'DetonationTimeTech', 'FlamethrowerRangeTech', 'GrenadeLauncherTech', 'FlamethrowerTech', 'FlamethrowerAltTech', 'WelderTech', 'MinesTech',
     'GrenadeTech', 'ClusterGrenade', 'ClusterGrenadeProjectile', 'GasGrenade', 'GasGrenadeProjectile', 'PulseGrenade', 'PulseGrenadeProjectile',
-    'DropWelder', 'DropMines', 'DropShotgun', 'DropGrenadeLauncher', 'DropFlamethrower',
+    'DropWelder', 'DropDemoMines', 'DropShotgun', 'DropGrenadeLauncher', 'DropFlamethrower',
     'NerveGasCloud',
     
     // Marine buys
@@ -96,7 +96,7 @@ kTechId = createTechIdEnum({
     'MACEMP', 'Welding',
     
     // Weapons 
-    'Rifle', 'Pistol', 'Shotgun', 'HeavyRifle', 'Claw', 'Minigun', 'Railgun', 'GrenadeLauncher', 'Flamethrower', 'Axe', 'LayMines', 'Welder',
+    'Rifle', 'Pistol', 'Shotgun', 'HeavyRifle', 'Claw', 'Minigun', 'Railgun', 'GrenadeLauncher', 'Flamethrower', 'Axe', 'DemoMines', 'Welder',
     
     // Armor
     'Jetpack', 'JetpackFuelTech', 'JetpackArmorTech', 'Exosuit', 'ExosuitLockdownTech', 'ExosuitUpgradeTech',

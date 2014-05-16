@@ -5,7 +5,8 @@ Script.Load("lua/TeamInfo.lua")
 
 
 local newNetworkVars = {
-	supplyUsed = "integer (0 to " .. kMaxSupply .. ")"		//OVERRIDES
+	supplyUsed = "integer (0 to " .. kMaxSupply .. ")",		//OVERRIDES
+	spawnQueueTotal = "integer (0 to 64)"
 }
 
 
@@ -60,6 +61,36 @@ end
 //-------------------------------------
 
 
+if Server then
+
+	function TeamInfo:Reset()
+    
+        self.teamResources = 0
+        self.personalResources = 0
+        self.numResourceTowers = 0
+        self.latestResearchId = 0
+        self.researchDisplayTime = 0
+        self.lastTechPriority = 0
+        self.lastCommPingTime = 0
+        self.lastCommPingPosition = Vector(0,0,0)
+        self.totalTeamResources = 0
+        self.techActiveMask = 0
+        self.techOwnedMask = 0
+        self.playerCount = 0
+        self.workerCount = 0
+        self.kills = 0
+        self.supplyUsed = 0
+        self.spawnQueueTotal = 0
+    
+    end
+
+end
+
+
+function TeamInfo:GetSpawnQueueTotal()
+    return self.spawnQueueTotal
+end
+
 
 local function MvM_UpdateInfo(self)
 
@@ -93,7 +124,6 @@ local function MvM_UpdateInfo(self)
         self.numResourceTowers = rtActiveCount
         self.kills = self.team:GetKills()
         
-        
         if Server then
         
             if self.lastTechTreeUpdate == nil or (Shared.GetTime() > (self.lastTechTreeUpdate + TeamInfo.kTechTreeUpdateInterval)) then
@@ -116,6 +146,8 @@ local function MvM_UpdateInfo(self)
             local team = self:GetTeam()
             self.numCapturedTechPoint = team:GetNumCapturedTechPoints()
             
+            self.spawnQueueTotal = team:GetTotalInRespawnQueue()
+            
             self.lastCommPingTime = team:GetCommanderPingTime()
             self.lastCommPingPosition = team:GetCommanderPingPosition() or Vector(0,0,0)
             
@@ -129,8 +161,12 @@ end
 
 
 
+function TeamInfo:OnUpdate(deltaTime)
+    MvM_UpdateInfo(self)
+end
 
-ReplaceLocals( TeamInfo.OnUpdate, { UpdateInfo = MvM_UpdateInfo } )
 
-Class_Reload("TeamInfo", newNetworkVars)
+
+
+Class_Reload( "TeamInfo", newNetworkVars )
 

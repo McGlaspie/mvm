@@ -102,11 +102,6 @@ function ColoredSkinsMixin:__initmixin()
 	
 	self.skinColoringEnabled = true	//Allows for colored skins to be toggled on per-entity basis
 	
-	//OnRenderUpdate flags
-	self.hasModel = false
-	self.hasViewModel = false
-	self.hasEquipmentModel = false
-	
 end
 
 
@@ -144,7 +139,7 @@ end
 function ColoredSkinsMixin:OnUpdateRender()		//??? Is this having an impact or introducing a race
 												//condition for animated models?
 	
-	PROFILE("ColoredSkinsMixin:OnUpdateRender()")
+	PROFILE("ColoredSkinsMixin:OnUpdateRender")
 	
 	local enabled = ConditionalValue( gColoredSkinsToggle and self.skinColoringEnabled, 1, 0 )
 	

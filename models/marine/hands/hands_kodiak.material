@@ -1,0 +1,13 @@
+shader = "shaders/ColoredSkins_noemissive.surface_shader"
+
+albedoMap = "models/marine/hands/hands_kodiak.dds"
+normalMap = "models/marine/hands/hands_normal.dds"
+specularMap = "models/marine/hands/hands_spec.dds"
+
+modelColorMap = "models/marine/hands/hands_colormap.dds"
+
+numColumns = 1
+numRows = 2
+
+surface = "metal"
+

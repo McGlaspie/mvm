@@ -3,6 +3,12 @@
 Script.Load("lua/mvm/Weapons/Marine/ClipWeapon.lua")
 Script.Load("lua/mvm/PickupableWeaponMixin.lua")
 Script.Load("lua/mvm/LiveMixin.lua")
+Script.Load("lua/RifleVariantMixin.lua")
+
+
+Rifle.kModelName = PrecacheAsset("models/marine/rifle/rifle.model")
+local kViewModels = GenerateMarineViewModelPaths("rifle")
+local kAnimationGraph = PrecacheAsset("models/marine/rifle/rifle_view.animation_graph")
 
 local newNetworkVars = {}
 
@@ -21,6 +27,7 @@ function Rifle:OnCreate()	//OVERRIDES
     InitMixin(self, PickupableWeaponMixin)
     //InitMixin(self, EntityChangeMixin)
     InitMixin(self, LiveMixin)
+    InitMixin(self, RifleVariantMixin)
     
     if Client then
         InitMixin(self, ClientWeaponEffectsMixin)
@@ -98,4 +105,5 @@ end
 //-----------------------------------------------------------------------------
 
 
-Class_Reload("Rifle", newNetworkVars)
+Class_Reload( "Rifle", newNetworkVars )
+

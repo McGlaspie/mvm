@@ -1,7 +1,12 @@
 
-Script.Load("lua/ScriptActor.lua")
+Script.Load("lua/Globals.lua")
 Script.Load("lua/mvm/EffectsMixin.lua")
 Script.Load("lua/mvm/TechMixin.lua")
+Script.Load("lua/ExtentsMixin.lua")
+Script.Load("lua/OwnerMixin.lua")
+Script.Load("lua/TargetMixin.lua")
+Script.Load("lua/UsableMixin.lua")
+Script.Load("lua/RelevancyMixin.lua")
 
 
 // Called right after an entity is created on the client or server. This happens through Server.CreateEntity, 

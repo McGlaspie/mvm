@@ -12,6 +12,7 @@ Script.Load("lua/Marine_Order.lua")
 Script.Load("lua/GUIAnimatedScript.lua")
 Script.Load("lua/mvm/GUIColorGlobals.lua")
 
+
 class 'GUIWaypoints' (GUIAnimatedScript)
 
 local kMarineTextureName = PrecacheAsset("ui/marine_order.dds")		//FIXME Colorize
@@ -109,12 +110,14 @@ function GUIWaypoints:Initialize()
     self.finalWaypoint:SetColor(Color(1, 1, 1, 0.0))
     self.finalWaypoint:SetRotation(Vector(0, 0, math.pi))
     self.finalWaypoint:SetBlendTechnique(GUIItem.Add)
+    self.finalWaypoint:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.finalWaypoint:SetTexturePixelCoordinates(0, 0, 128, 128)
     
     self.animatedCircle = self:CreateAnimatedGraphicItem()
     self.animatedCircle:SetIsScaling(false)
     self.animatedCircle:SetTexturePixelCoordinates(unpack(kCircleBorderTexCoords))
     self.animatedCircle:SetColor(Color(1, 1, 1, 0))
+    self.animatedCircle:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.animatedCircle:SetAnchor(GUIItem.Middle, GUIItem.Center)
     self.animatedCircle:SetBlendTechnique(GUIItem.Add)
     self.animatedCircle:AddAsChildTo(self.finalWaypoint)
@@ -123,6 +126,7 @@ function GUIWaypoints:Initialize()
     self.waypointDirection:SetAnchor(GUIItem.Middle, GUIItem.Center)
     self.waypointDirection:SetSize( kArrowSize )
     self.waypointDirection:SetTexture( kArrowTexture )
+    self.waypointDirection:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.waypointDirection:SetTexturePixelCoordinates(0, kOrderPixelHeight, 0, kOrderPixelWidth)
     self.finalWaypoint:AddChild(self.waypointDirection)
     
@@ -146,7 +150,9 @@ function GUIWaypoints:Initialize()
     self.orderIcon:SetBlendTechnique(GUIItem.Add)
     self.orderIcon:SetInheritsParentAlpha(true)
     self.orderIcon:SetTexture(kIconTexture)
+    self.orderIcon:SetShader("shaders/GUI_TeamThemed.surface_shader")
     self.finalWaypoint:AddChild(self.orderIcon)
+	
     
     // All arrow assets are stored here.
     self.arrows = table.array(8)
@@ -171,12 +177,11 @@ local function InitMarineTexture(self)
 		Color(0.2, 0.2, 1, 1)
     )
     
-    //TODO Add support for shader colorization
-    self.animatedCircle:SetTexture(	kMarineTextureName )
-    self.finalWaypoint:SetTexture( kMarineTextureName )
-    
+    self.animatedCircle:SetTexture(	kMarineTextureName )    
+    self.finalWaypoint:SetTexture( kMarineTextureName )    
     self.finalDistanceText:SetFontName( kMarineTextFontName )
     self.finalNameText:SetFontName( kMarineTextFontName )
+    
     self.orderIcon:SetColor( kIconColors[playerTeam] )
     
     self.waypointDirection:SetColor( Color(1, 1, 1, 1) )
@@ -595,6 +600,34 @@ local function AnimateFinalWaypoint(self)
     
 end
 
+
+function GUIWaypoints:UpdateTeamColors()
+
+	local uiColor = ConditionalValue(
+		PlayerUI_GetTeamNumber() == kTeam2Index,
+		kGUI_Team2_BaseColor,
+		kGUI_Team1_BaseColor
+	)
+	
+	self.finalWaypoint:SetFloatParameter( "teamBaseColorR", uiColor.r )
+	self.finalWaypoint:SetFloatParameter( "teamBaseColorG", uiColor.g )
+	self.finalWaypoint:SetFloatParameter( "teamBaseColorB", uiColor.b )
+	
+	self.animatedCircle:SetFloatParameter( "teamBaseColorR", uiColor.r )
+	self.animatedCircle:SetFloatParameter( "teamBaseColorG", uiColor.g )
+	self.animatedCircle:SetFloatParameter( "teamBaseColorB", uiColor.b )
+	
+	self.waypointDirection:SetFloatParameter( "teamBaseColorR", uiColor.r )
+	self.waypointDirection:SetFloatParameter( "teamBaseColorG", uiColor.g )
+	self.waypointDirection:SetFloatParameter( "teamBaseColorB", uiColor.b )
+	
+	self.orderIcon:SetFloatParameter( "teamBaseColorR", uiColor.r )
+	self.orderIcon:SetFloatParameter( "teamBaseColorG", uiColor.g )
+	self.orderIcon:SetFloatParameter( "teamBaseColorB", uiColor.b )
+
+end
+
+
 function GUIWaypoints:Update(deltaTime)
 
     PROFILE("GUIWaypoints:Update")
@@ -602,6 +635,8 @@ function GUIWaypoints:Update(deltaTime)
     UpdatePath(self, deltaTime)
     
     AnimateFinalWaypoint(self)
+    
+    self:UpdateTeamColors()
     
     GUIAnimatedScript.Update(self, deltaTime)
     

@@ -254,9 +254,12 @@ function SprintMixin:OnProcessMove(input)
 end
 
 function SprintMixin:GetSprintTime()
-    local dt = Shared.GetTime() - self.timeSprintChange
+    
+	local dt = Shared.GetTime() - self.timeSprintChange
     local rate = self.sprinting and -1 or SprintMixin.kSprintRecoveryRate
-    return Clamp(self.sprintTimeOnChange + dt * rate , 0, SprintMixin.kMaxSprintTime)
+    
+    return Clamp( self.sprintTimeOnChange + dt * rate , 0, SprintMixin.kMaxSprintTime )
+    
 end
 
 function SprintMixin:GetTiredScalar()

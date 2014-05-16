@@ -1,4 +1,4 @@
-shader = "shaders/ColoredSkins.surface_shader"
+shader = "shaders/ColoredSkinsExo.surface_shader"
 
 albedoMap = "models/marine/exosuit/exosuit.dds"
 normalMap = "models/marine/exosuit/exosuit_normal.dds"

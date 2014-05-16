@@ -6,9 +6,13 @@ Script.Load("lua/mvm/PlayingTeam.lua")
 
 
 // How often to send the "No IPs" message to the Marine team in seconds.
-local kSendNoIPsMessageRate = 20
+local kSendNoIPsMessageRate = 20	//TODO move to balancemisc
 
 local kCannotSpawnSound = PrecacheAsset("sound/NS2.fev/marine/voiceovers/commander/need_ip")
+
+local newNetworkVars = {
+	hasActiveArmslab = "boolean"
+}
 
 
 //-----------------------------------------------------------------------------
@@ -20,13 +24,21 @@ function MarineTeam:OnResetComplete()
     local initialTechPoint = self:GetInitialTechPoint()
     local powerPoint = GetPowerPointForLocation( initialTechPoint:GetLocationName() )
     
-    powerPoint:SetConstructionComplete()
-	powerPoint.isStartingPoint = true
-	
-	if self.teamNumber == kTeam1Index then
-		powerPoint.scoutedForTeam1 = true
-	elseif self.teamNumber == kTeam2Index then
-		powerPoint.scoutedForTeam2 = true
+    if powerPoint then
+		
+		powerPoint:SetConstructionComplete()
+		powerPoint.isStartingPoint = true
+		
+		if self.teamNumber == kTeam1Index then
+			powerPoint.scoutedForTeam1 = true
+		elseif self.teamNumber == kTeam2Index then
+			powerPoint.scoutedForTeam2 = true
+		end
+		
+	else
+		
+		DebugPrint("ERROR: Failed to retrieve Team[" .. tostring(self.teamNumber) .. "] starting power node")
+		
 	end
     
 end
@@ -130,29 +142,29 @@ function MarineTeam:InitTechTree()	//OVERRIDES
     self.techTree:AddActivation(kTechId.DoorUnlock)
     
     // Weapon-specific
-    self.techTree:AddResearchNode(kTechId.ShotgunTech,           kTechId.Armory,              kTechId.None)
-    self.techTree:AddTargetedBuyNode(kTechId.Shotgun,            kTechId.ShotgunTech,         kTechId.None)
-    self.techTree:AddTargetedActivation(kTechId.DropShotgun,     kTechId.ShotgunTech,         kTechId.None)
+    self.techTree:AddResearchNode(kTechId.ShotgunTech,					kTechId.Armory,              kTechId.None)
+    self.techTree:AddTargetedBuyNode(kTechId.Shotgun,					kTechId.ShotgunTech,         kTechId.None)
+    self.techTree:AddTargetedActivation(kTechId.DropShotgun,			kTechId.ShotgunTech,         kTechId.None)
     
-    self.techTree:AddResearchNode(kTechId.GrenadeLauncherTech,   kTechId.AdvancedArmory, kTechId.None )
-    self.techTree:AddTargetedBuyNode(kTechId.GrenadeLauncher,  	 kTechId.AdvancedArmory, kTechId.GrenadeLauncherTech, kTechId.None)
-    self.techTree:AddTargetedActivation(kTechId.DropGrenadeLauncher,  kTechId.AdvancedArmory, kTechId.GrenadeLauncherTech, kTechId.None)
+    self.techTree:AddResearchNode(kTechId.GrenadeLauncherTech,			kTechId.AdvancedArmory, kTechId.None )
+    self.techTree:AddTargetedBuyNode(kTechId.GrenadeLauncher,			kTechId.AdvancedArmory, kTechId.GrenadeLauncherTech, kTechId.None)
+    self.techTree:AddTargetedActivation(kTechId.DropGrenadeLauncher,	kTechId.AdvancedArmory, kTechId.GrenadeLauncherTech, kTechId.None)
     
-    self.techTree:AddResearchNode(kTechId.GrenadeTech,           kTechId.Armory, kTechId.None)
-    self.techTree:AddTargetedBuyNode(kTechId.ClusterGrenade,     kTechId.GrenadeTech, kTechId.None)
-    self.techTree:AddTargetedBuyNode(kTechId.GasGrenade,         kTechId.GrenadeTech, kTechId.None)
-    self.techTree:AddTargetedBuyNode(kTechId.PulseGrenade,       kTechId.GrenadeTech, kTechId.None)
+    self.techTree:AddResearchNode(kTechId.GrenadeTech,					kTechId.Armory, kTechId.None)
+    self.techTree:AddTargetedBuyNode(kTechId.ClusterGrenade,			kTechId.GrenadeTech, kTechId.None)
+    self.techTree:AddTargetedBuyNode(kTechId.GasGrenade,				kTechId.GrenadeTech, kTechId.None)
+    self.techTree:AddTargetedBuyNode(kTechId.PulseGrenade,				kTechId.GrenadeTech, kTechId.None)
     
-    self.techTree:AddResearchNode(kTechId.FlamethrowerTech,      	kTechId.AdvancedArmory, kTechId.None)
-    self.techTree:AddTargetedBuyNode(kTechId.Flamethrower,     		kTechId.AdvancedArmory, kTechId.None)
-    self.techTree:AddTargetedActivation(kTechId.DropFlamethrower,   kTechId.AdvancedArmory, kTechId.None)
+    self.techTree:AddResearchNode(kTechId.FlamethrowerTech,				kTechId.AdvancedArmory, kTechId.None)
+    self.techTree:AddTargetedBuyNode(kTechId.Flamethrower,				kTechId.AdvancedArmory, kTechId.None)
+    self.techTree:AddTargetedActivation(kTechId.DropFlamethrower,		kTechId.AdvancedArmory, kTechId.None)
     
-    self.techTree:AddResearchNode(kTechId.MinesTech,            kTechId.Armory,           kTechId.None)
-    self.techTree:AddTargetedBuyNode(kTechId.LayMines,          kTechId.MinesTech,        kTechId.None)
-    self.techTree:AddTargetedActivation(kTechId.DropMines,      kTechId.MinesTech,        kTechId.None)
+    self.techTree:AddResearchNode(kTechId.MinesTech,					kTechId.Armory,           kTechId.None)
+    self.techTree:AddTargetedBuyNode(kTechId.DemoMines,					kTechId.MinesTech,        kTechId.None)
+    self.techTree:AddTargetedActivation(kTechId.DropDemoMines,			kTechId.MinesTech,        kTechId.None)
     
-    self.techTree:AddTargetedBuyNode(kTechId.Welder,          kTechId.Armory,        kTechId.None)
-    self.techTree:AddTargetedActivation(kTechId.DropWelder,   kTechId.Armory,        kTechId.None)
+    self.techTree:AddTargetedBuyNode(kTechId.Welder,					kTechId.Armory,        kTechId.None)
+    self.techTree:AddTargetedActivation(kTechId.DropWelder,				kTechId.Armory,        kTechId.None)
     
     //MAC
     //self.techTree:AddActivation( kTechId.MACEMP )
@@ -241,6 +253,10 @@ local function GetArmorLevel(self)
     
     end
     
+    if not self.haveActiveArmslab then
+		armorLevels = 0
+    end
+    
     return armorLevels
 
 end
@@ -256,15 +272,56 @@ function MarineTeam:Update(timePassed)
     self:UpdateGameMasks(timePassed)    
 	
     if GetGamerules():GetGameStarted() then
-        CheckForNoIPs(self)
+        
+		CheckForNoIPs(self)
+        
+        self.haveActiveArmslab = GetTeamHasActiveArmsLab( self:GetTeamNumber() )
+        
     end
     
     local armorLevel = GetArmorLevel(self)
     //XXX Will have to update this if anything else gets armor upgrades. ARC? Strucutres?
-    for index, player in ipairs(GetEntitiesForTeam("Player", self:GetTeamNumber())) do
+    for index, player in ipairs( GetEntitiesForTeam("Player", self:GetTeamNumber() ) ) do
         player:UpdateArmorAmount(armorLevel)
     end
     
+end
+
+
+function MarineTeam:GetTotalInRespawnQueue()
+	
+	local queueSize = #self.respawnQueue
+	local numPlayers = 0
+	
+	//FIXME Add players in spawning sequence from IPs
+	for i = 1, #self.respawnQueue do
+    //Poll queue
+        local player = Shared.GetEntity(self.respawnQueue[i])
+        if player then
+            numPlayers = numPlayers + 1
+        end
+    
+    end
+    
+    local allIPs = GetEntitiesForTeam( "InfantryPortal", self:GetTeamNumber() )
+    if #allIPs > 0 then
+		
+		for _, ip in ipairs( allIPs ) do
+		
+			if MvM_GetIsUnitActive(ip) then
+				
+				if ip.queuedPlayerId ~= nil and ip.queuedPlayerId ~= Entity.invalidId then
+					numPlayers = numPlayers + 1
+				end
+				
+			end
+		
+		end
+		
+    end
+    
+    return numPlayers
+	
 end
 
 
@@ -272,5 +329,5 @@ end
 //-----------------------------------------------------------------------------
 
 
-Class_Reload( "MarineTeam", {} )
+Class_Reload( "MarineTeam", newNetworkVars )
 

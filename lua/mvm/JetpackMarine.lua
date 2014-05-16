@@ -104,9 +104,9 @@ function JetpackMarine:ModifyVelocity(input, velocity, deltaTime)
     end
     
     if not self.onGround then
-    
+		
         // do XZ acceleration
-        local prevXZSpeed = velocity:GetLengthXZ() + 0.05	//slight boost to horizontal movements
+        local prevXZSpeed = velocity:GetLengthXZ() //+ 0.05	//slight boost to horizontal movements
         local maxSpeedTable = { maxSpeed = math.max(kFlySpeed, prevXZSpeed) }
         self:ModifyMaxSpeed(maxSpeedTable)
         local maxSpeed = maxSpeedTable.maxSpeed        

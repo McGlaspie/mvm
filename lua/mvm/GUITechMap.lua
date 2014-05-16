@@ -242,14 +242,20 @@ function GUITechMap:Update(deltaTime)
         self.showtechMap = false
     end
     
-    if player:isa("Commander") and not self.registered then
+    if player:isa("Commander") then
+    
+        if not self.registered then
         
-        local script = GetGUIManager():GetGUIScriptSingle("mvm/GUICommanderTooltip")
-        if script then
-            script:Register(self)
-            self.registered = true
+            local script = GetGUIManager():GetGUIScriptSingle("mvm/Hud/GUICommanderTooltip")
+            if script then
+                script:Register(self)
+                self.registered = true
+            end
+        
         end
         
+    else
+        self.registered = false
     end
     
     local showMap = self.techMapButton or self.showtechMap

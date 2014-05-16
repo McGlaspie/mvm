@@ -7,6 +7,9 @@ Script.Load("lua/mvm/LOSMixin.lua")
 local newNetworkVars = {}
 AddMixinNetworkVars(LOSMixin, newNetworkVars)
 
+local kDropModelName = PrecacheAsset("models/marine/mine/mine_pile.model")
+local kHeldModelName = PrecacheAsset("models/marine/mine/mine_3p.model")
+
 
 function LayMines:OnCreate()	//OVERRIDES
 
@@ -19,6 +22,47 @@ function LayMines:OnCreate()	//OVERRIDES
     self.minesLeft = kNumMines
     self.droppingMine = false
     
+    if Client then
+		InitMixin( self, ColoredSkinsMixin)
+    end
+    
+end
+
+
+function LayMines:OnInitialized()	//OVERRIDES
+
+	Weapon.OnInitialized(self)
+    
+    self:SetModel(kDropModelName)
+	
+	if Client then
+		self:InitializeSkin()
+	end
+
+end
+
+
+if Client then
+
+	function LayMines:InitializeSkin()
+		self.skinBaseColor = self:GetBaseSkinColor()
+		self.skinAccentColor = self:GetAccentSkinColor()
+		self.skinTrimColor = self:GetTrimSkinColor()
+		self.skinAtlasIndex = 0	//Static
+	end
+	
+	function LayMines:GetBaseSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_BaseColor, kTeam2_BaseColor )
+	end
+
+	function LayMines:GetAccentSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_AccentColor, kTeam2_AccentColor )
+	end
+
+	function LayMines:GetTrimSkinColor()
+		return ConditionalValue( self:GetTeamNumber() == kTeam1Index, kTeam1_TrimColor, kTeam2_TrimColor )
+	end
+
 end
 
 
@@ -28,6 +72,15 @@ end
 
 function LayMines:OverrideVisionRadius()
 	return 0
+end
+
+
+function LayMines:Dropped( prevOwner )
+
+    Weapon.Dropped( self, prevOwner )
+    
+    self:SetModel( kDropModelName )
+    
 end
 
 

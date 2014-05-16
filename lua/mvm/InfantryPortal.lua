@@ -302,6 +302,13 @@ local function MvMSpawnPlayer(self)
         
         local success, player = team:ReplaceRespawnPlayer(queuedPlayer, spawnOrigin, queuedPlayer:GetAngles())
         if success then
+			
+			if player and HasMixin( player, "Controller" ) then
+				
+				player:DisableGroundMove(0.1)
+				player:SetVelocity( Vector( GetSign( math.random() - 0.5) * 2, 3, GetSign( math.random() - 0.5 ) * 2 ) )
+				
+			end
         
             player:SetCameraDistance(0)
 			if GetHasTech( player, kTechId.NanoShieldTech ) and HasMixin(player, "NanoShieldAble") then
@@ -324,6 +331,19 @@ local function MvMSpawnPlayer(self)
     end
     
     return false
+
+end
+
+
+if Server then
+
+	function InfantryPortal:FinishSpawn()
+    
+        MvMSpawnPlayer(self)        
+        MvMStopSpinning(self)
+        self.timeSpinUpStarted = nil
+        
+    end
 
 end
 
@@ -381,10 +401,6 @@ end
 
 //-----------------------------------------------------------------------------
 
-
-if Server then
-	ReplaceLocals( InfantryPortal.FinishSpawn, { SpawnPlayer = MvMSpawnPlayer } )
-end
 
 Class_Reload("InfantryPortal", newNetworkVars)
 

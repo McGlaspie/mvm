@@ -408,6 +408,8 @@ end
 
 function GUICommanderTooltip:Update(deltaTime)
 
+	self:UpdateTeamColors()
+
     local tooltipData = nil
 
     for _, script in ipairs(self.registeredScripts) do
@@ -418,17 +420,15 @@ function GUICommanderTooltip:Update(deltaTime)
     
     end
 	
-	self:UpdateTeamColors()	
-	
     if tooltipData then
     
         self:UpdateData(tooltipData.text, tooltipData.hotKey, tooltipData.costNumber, tooltipData.requires, tooltipData.enabled, tooltipData.info, tooltipData.resourceType, tooltipData.supply, tooltipData.biomass)
         self.background:SetIsVisible(true)
     
     else
-		if self.background ~= nil then	//fucking HAX Yo!
-			self.background:SetIsVisible(false)
-        end
+		self.background:SetIsVisible(false)
+		//if self.background ~= nil then	//fucking HAX Yo!
+        //end
     end
 
 end

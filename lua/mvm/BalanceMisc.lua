@@ -123,11 +123,11 @@ kJetpackUpgradeUseFuelRate = .15
 kJetpackReplenishFuelRate = .3	//.35
 
 // Mines
-kNumMines = 3
-kMineActiveTime = 3	//4
+kNumMines = 4
+kMineActiveTime = 2
 kMineAlertTime = 8
-kMineDetonateRange = 4.5
-kMineTriggerRange = 2	//1.5
+kMineDetonateRange = 5	//4.5
+kMineTriggerRange = 2.5	//1.5
 
 // Onos
 kGoreMarineFallTime = 1

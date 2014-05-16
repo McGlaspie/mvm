@@ -4,6 +4,8 @@
 //	This is only here to separate MvM source from other mods (lua/mvm)
 //
 
+Script.Load("lua/mvm/Utils.lua")
+
 Script.Load("lua/mvm_Globals.lua")
 
 Script.Load("lua/mvm/DamageTypes.lua")
@@ -18,6 +20,9 @@ Script.Load("lua/mvm/TechData.lua")
 Script.Load("lua/mvm/ScriptActor.lua")	//Yup...even had to modify this...fuckn-a
 										//Going to be surprising if this doesn't cause big bugs in the long run
 										//....much less, the pain of updates
+
+//Script.Load("lua/mvm/Order.lua") - Doesn't help clear network var message
+
 Script.Load("lua/mvm/MapBlip.lua")
 Script.Load("lua/mvm/SensorBlip.lua")
 
@@ -53,7 +58,7 @@ Script.Load("lua/mvm/ResourceTower.lua")
 
 Script.Load("lua/mvm/Location.lua")
 
-//Script.Load("lua/mvm/DeathTrigger.lua")
+Script.Load("lua/mvm/DeathTrigger.lua")
 
 Script.Load("lua/mvm/NS2Gamerules.lua")
 
@@ -105,15 +110,16 @@ Script.Load("lua/mvm/Weapons/Marine/Rifle.lua")
 //Script.Load("lua/mvm/Weapons/Marine/HeavyRifle.lua")
 Script.Load("lua/mvm/Weapons/Marine/Pistol.lua")
 Script.Load("lua/mvm/Weapons/Marine/Shotgun.lua")
-//Script.Load("lua/mvm/Weapons/Marine/Axe.lua")
+Script.Load("lua/mvm/Weapons/Marine/Axe.lua")
 Script.Load("lua/mvm/Weapons/Marine/Minigun.lua")
 Script.Load("lua/mvm/Weapons/Marine/Railgun.lua")
 Script.Load("lua/mvm/Weapons/Marine/Claw.lua")
 Script.Load("lua/mvm/Weapons/Marine/GrenadeLauncher.lua")
 Script.Load("lua/mvm/Weapons/Marine/Flamethrower.lua")
-Script.Load("lua/mvm/Weapons/Marine/LayMines.lua")
 Script.Load("lua/mvm/Weapons/Marine/Builder.lua")
 Script.Load("lua/mvm/Weapons/Marine/Welder.lua")
+//Script.Load("lua/mvm/Weapons/Marine/LayMines.lua")
+Script.Load("lua/mvm/Weapons/Marine/DemoMines.lua")
 Script.Load("lua/mvm/Weapons/Marine/Grenade.lua")
 Script.Load("lua/mvm/Jetpack.lua")
 

@@ -8,6 +8,21 @@ local newNetworkVars = {
 }
 
 
+local kModelName = PrecacheAsset("models/marine/grenades/gr_pulse.model")
+local kViewModels = GenerateMarineGrenadeViewModelPaths("gr_pulse")
+local kAnimationGraph = PrecacheAsset("models/marine/grenades/grenade_view.animation_graph")
+
+function PulseGrenadeThrower:GetThirdPersonModelName()
+    return kModelName
+end
+
+function PulseGrenadeThrower:GetViewModelName(sex, variant)
+    return kViewModels[sex][variant]
+end
+
+function PulseGrenadeThrower:GetAnimationGraphName()
+    return kAnimationGraph
+end
 
 function PulseGrenadeThrower:OnCreate()
 

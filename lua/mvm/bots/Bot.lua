@@ -1,6 +1,6 @@
 
 
-Script.Load("lua/mvm/bots/PlayerBot.lua")
+Script.Load("lua/mvm/bots/BotPlayer.lua")
 
 
 
@@ -17,7 +17,7 @@ if (not Server) then
     error("Bot.lua should only be included on the Server")
 end
 
-Script.Load("lua/bots/BotDebug.lua")
+Script.Load("lua/mvm/bots/BotDebug.lua")
 
 // Stores all of the bots
 gServerBots = { }
@@ -38,7 +38,8 @@ function Bot:Initialize(forceTeam, active)
     InitMixin(self, OrdersMixin, { kMoveOrderCompleteDistance = kAIMoveOrderCompleteDistance })
 
     // Create a virtual client for the bot
-    self.client = Server.AddVirtualClient()
+    self.client = Server.AddVirtualClient()	//??? Do we really want / need this?
+    //How will above change Server stats queries?
     self.forceTeam = forceTeam
     self.active = active
     
@@ -53,6 +54,8 @@ function Bot:GetIsFlying()
 end
 
 function Bot:UpdateTeam(joinTeam)
+	
+	PROFILE("Bot:UpdateTeam")
 
     local player = self:GetPlayer()
 
@@ -75,16 +78,20 @@ end
 
 
 function Bot:Disconnect()
+	
     Server.DisconnectClient(self.client)    
     self.client = nil
+    
 end
 
 function Bot:GetPlayer()
+	
     if self.client then
         return self.client:GetControllingPlayer()
     else
         return nil
     end
+    
 end
 
 //----------------------------------------
@@ -95,6 +102,8 @@ function Bot:OnThink()
 
     self:UpdateTeam(self.forceTeam)
     
+    //??? Good place for Decision-Tree management?
+    
 end
 
 //----------------------------------------
@@ -104,29 +113,29 @@ end
 local function GetIsClientAllowedToManage(client)
 
     return client == nil    // console command from server
-    or Shared.GetCheatsEnabled()
-    or Shared.GetDevMode()
+    //or Shared.GetCheatsEnabled()
+    //or Shared.GetDevMode()
     or client:GetIsLocalClient()    // the client that started the listen server
 
 end
 
-function OnConsoleAddPassiveBots(client, numBotsParam, forceTeam, className)
-    OnConsoleAddBots(client, numBotsParam, forceTeam, className, true)  
+function MvM_OnConsoleAddPassiveBots(client, numBotsParam, forceTeam, className)
+    MvM_OnConsoleAddBots(client, numBotsParam, forceTeam, className, true)  
 end
 
-function OnConsoleAddBots(client, numBotsParam, forceTeam, botType, passive)
+function MvM_OnConsoleAddBots(client, numBotsParam, forceTeam, botType, passive)
 
     if GetIsClientAllowedToManage(client) then
 
-        local kType2Class =
-        {
+        local kType2Class = {
             test = TestBot,
-            com = CommanderBot
+            com = BotCommander
         }
+        
         local class = kType2Class[ botType ]
     
         if class == nil then
-            class = PlayerBot   // Default
+            class = BotPlayer   // Default
         end
 
         local numBots = 1
@@ -135,9 +144,9 @@ function OnConsoleAddBots(client, numBotsParam, forceTeam, botType, passive)
         end
         
         for index = 1, numBots do
-        
+			
             local bot = class()
-            bot:Initialize(tonumber(forceTeam), not passive)
+            bot:Initialize( tonumber(forceTeam), not passive )
             table.insert( gServerBots, bot )
        
         end
@@ -146,7 +155,7 @@ function OnConsoleAddBots(client, numBotsParam, forceTeam, botType, passive)
     
 end
 
-function OnConsoleRemoveBots(client, numBotsParam, teamNum)
+function MvM_OnConsoleRemoveBots(client, numBotsParam, teamNum)
 
     if GetIsClientAllowedToManage(client) then
     
@@ -188,7 +197,7 @@ function OnConsoleRemoveBots(client, numBotsParam, teamNum)
     
 end
 
-function OnVirtualClientMove(client)
+function MvM_OnVirtualClientMove(client)
 
     // If the client corresponds to one of our bots, generate a move from it.
     for i,bot in ipairs(gServerBots) do
@@ -206,7 +215,7 @@ function OnVirtualClientMove(client)
 
 end
 
-function OnVirtualClientThink(client, deltaTime)
+function MvM_OnVirtualClientThink(client, deltaTime)
 
     // If the client corresponds to one of our bots, allow it to think.
     for i, bot in ipairs(gServerBots) do
@@ -223,22 +232,27 @@ function OnVirtualClientThink(client, deltaTime)
 end
 
 
+Class_Reload( "Bot", {} )	//Actually needed?
+
+
 // Make sure to load these after Bot is defined
-Script.Load("lua/bots/TestBot.lua")
-Script.Load("lua/mvm/bots/PlayerBot.lua")
-Script.Load("lua/mvm/bots/CommanderBot.lua")
+Script.Load("lua/mvm/bots/TestBots.lua")
+Script.Load("lua/mvm/bots/BotPlayer.lua")
+Script.Load("lua/mvm/bots/BotCommander.lua")
 
 // Register the bot console commands
-Event.Hook("Console_addpassivebot",  OnConsoleAddPassiveBots)
-Event.Hook("Console_addbot",         OnConsoleAddBots)
-Event.Hook("Console_removebot",      OnConsoleRemoveBots)
-Event.Hook("Console_addbots",        OnConsoleAddBots)
-Event.Hook("Console_removebots",     OnConsoleRemoveBots)
+Event.Hook("Console_maddpassivebot",  MvM_OnConsoleAddPassiveBots)
+Event.Hook("Console_maddbot",         MvM_OnConsoleAddBots)
+Event.Hook("Console_mremovebot",      MvM_OnConsoleRemoveBots)
+Event.Hook("Console_maddbots",        MvM_OnConsoleAddBots)
+Event.Hook("Console_mremovebots",     MvM_OnConsoleRemoveBots)
 
 // Register to handle when the server wants this bot to
 // process orders
-Event.Hook("VirtualClientThink",    OnVirtualClientThink)
+Event.Hook("VirtualClientThink",    MvM_OnVirtualClientThink)
 
 // Register to handle when the server wants to generate a move
 // for one of the virtual clients
-Event.Hook("VirtualClientMove",     OnVirtualClientMove)
+Event.Hook("VirtualClientMove",     MvM_OnVirtualClientMove)
+
+

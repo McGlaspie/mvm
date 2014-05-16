@@ -31,8 +31,8 @@ AddMixinNetworkVars( ElectroMagneticMixin, newNetworkVars )
 
 if Client then
 	
-	PowerPoint.kDisabledColor = Color(0.0075, 0.0075, 0.0075)		//Move to globals.lua? Balance?
-	PowerPoint.kDisabledCommanderColor = Color(0.11, 0.11, 0.11)
+	PowerPoint.kDisabledColor = Color(0.008, 0.008, 0.008)		//Move to globals.lua? Balance?
+	PowerPoint.kDisabledCommanderColor = Color(0.25, 0.25, 0.25)
 	
 	// chance of a aux light flickering when powering up
 	PowerPoint.kAuxFlickerChance = 0
@@ -128,7 +128,7 @@ if Client then
 				// powerpoint when outside this range, and short enough not to waste too much cpu.
 				local inRange = (powerPoint:GetOrigin() - playerPos):GetLengthSquared() < kDefaultUpdateRangeSq
 				
-				local isComm = ( player:isa("Commander") or ( player.GetTeamNumber and player:GetTeamNumber() == kSpectatorIndex ) )
+				local isComm = player:isa("Commander") or Client.GetLocalClientTeamNumber() == kSpectatorIndex
 				
 				// Ignore range check if the player is a commander since they are high above
 				// the lights in a lot of cases and see through ceilings and some walls.
@@ -843,7 +843,7 @@ if Server then
     end
     
     
-    function PowerPoint:OnTakeDamage(damage, attacker, doer, point)		//OVERRIDES
+    function PowerPoint:OnTakeDamage( damage, attacker, doer, point )		//OVERRIDES
 		
         if self:GetIsPowering() then
 			

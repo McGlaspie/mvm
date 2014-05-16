@@ -75,5 +75,23 @@ end		//End Client
 
 
 
+function MedPack:OnUpdate( deltaTime )
+
+	if Client then
+		if self:GetTeamNumber() ~= PlayerUI_GetTeamNumber() then
+			self.skinAccentColor = Color(0,0,0,0)
+		else
+			self.skinAccentColor = self:GetAccentSkinColor()
+		end
+	end
+	
+	if Server then
+		DropPack.OnUpdate( self, deltaTime )
+	end
+
+end
+
+
+
 Class_Reload( "MedPack", {} )
 

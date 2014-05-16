@@ -1,7 +1,46 @@
 
 
 
+function GetExtents(techId)	//OVERRIDES
+
+    local extents = LookupTechData(techId, kTechDataMaxExtents)
+    
+	if not extents then
+        extents = Vector(.75, .75, .75)	//Vector(.5, .5, .5)
+    end
+    
+    return extents
+
+end
+
+
+
+
+function GetTeamHasActiveArmsLab( teamNumber )
+
+	assert( type(teamNumber) == "number" )
+	
+	if teamNumber ~= kTeam1Index and teamNumber ~= kTeam2Index then
+	//should never be called for other teams, obviously
+		assert(false)
+	end
+	
+	local haveActiveLab = false
+	for _, lab in ipairs( GetEntitiesForTeam( "ArmsLab", teamNumber ) ) do
+		haveActiveLab = MvM_GetIsUnitActive( lab )
+		if haveActiveLab then
+			break
+		end
+	end
+	
+	return haveActiveLab
+	
+end
+
+
+
 function GetDisplayNameForAlert(techId, defaultText)
+	
 	local displayName = LookupTechData(techId, kTechDataAlertText, defaultText)
   
 	local localizedName = nil
@@ -173,8 +212,10 @@ function MvM_GetMaxSupplyForTeam( teamNumber )	//Would it not make more sense to
 		if kSupplyPerResourceNode > 0 and teamInfo.numCapturedResPoints then
 		//Add extra supply per captured resource node
 			
-			//FIXME This should only be working
 			maxSupply = maxSupply + ( teamInfo.numResourceTowers * kSupplyPerResourceNode )
+			if maxSupply > kMaxSupply then
+				maxSupply = kMaxSupply
+			end
 			
 		end
 		
@@ -518,7 +559,7 @@ function CanEntityDoDamageTo(attacker, target, cheats, devMode, friendlyFire, da
 end
 
 
-
+//Removed Vortexed check
 function MvM_GetIsUnitActive( unit, debug )		//OVERRIDES
 
     local powered = not HasMixin(unit, "PowerConsumer") or not unit:GetRequiresPower() or unit:GetIsPowered()
@@ -539,3 +580,82 @@ function MvM_GetIsUnitActive( unit, debug )		//OVERRIDES
     return powered and alive and isBuilt and not isRecycled	//??? Add IsShocked?
     
 end
+
+
+
+
+
+//McG: ....FFS...All just because I needed to update a single value...  *Le Sigh*
+
+// Look up texture coordinates in kInventoryIconsTexture
+// Used for death messages, inventory icons, and abilities drawn in the alien "energy ball"
+gTechIdPosition = nil
+function GetTexCoordsForTechId(techId)
+
+    local x1 = 0
+    local y1 = 0
+    local x2 = kInventoryIconTextureWidth
+    local y2 = kInventoryIconTextureHeight
+    
+    if not gTechIdPosition then
+    
+        gTechIdPosition = {}
+        
+        // marine weapons
+        gTechIdPosition[kTechId.Rifle] = kDeathMessageIcon.Rifle
+        gTechIdPosition[kTechId.HeavyRifle] = kDeathMessageIcon.Rifle
+        gTechIdPosition[kTechId.Pistol] = kDeathMessageIcon.Pistol
+        gTechIdPosition[kTechId.Axe] = kDeathMessageIcon.Axe
+        gTechIdPosition[kTechId.Shotgun] = kDeathMessageIcon.Shotgun
+        gTechIdPosition[kTechId.Flamethrower] = kDeathMessageIcon.Flamethrower
+        gTechIdPosition[kTechId.GrenadeLauncher] = kDeathMessageIcon.Grenade
+        gTechIdPosition[kTechId.Welder] = kDeathMessageIcon.Welder
+        gTechIdPosition[kTechId.DemoMines] = kDeathMessageIcon.Mine
+        gTechIdPosition[kTechId.ClusterGrenade] = kDeathMessageIcon.ClusterGrenade
+        gTechIdPosition[kTechId.GasGrenade] = kDeathMessageIcon.GasGrenade
+        gTechIdPosition[kTechId.PulseGrenade] = kDeathMessageIcon.PulseGrenade
+        
+        // alien abilities
+        gTechIdPosition[kTechId.Bite] = kDeathMessageIcon.Bite
+        gTechIdPosition[kTechId.Leap] = kDeathMessageIcon.Leap
+        gTechIdPosition[kTechId.Parasite] = kDeathMessageIcon.Parasite
+        gTechIdPosition[kTechId.Xenocide] = kDeathMessageIcon.Xenocide
+        
+        gTechIdPosition[kTechId.Spit] = kDeathMessageIcon.Spit
+        gTechIdPosition[kTechId.BuildAbility] = kDeathMessageIcon.BuildAbility
+        gTechIdPosition[kTechId.Spray] = kDeathMessageIcon.Spray
+        gTechIdPosition[kTechId.BileBomb] = kDeathMessageIcon.BileBomb
+        gTechIdPosition[kTechId.WhipBomb] = kDeathMessageIcon.WhipBomb
+        gTechIdPosition[kTechId.BabblerAbility] = kDeathMessageIcon.BabblerAbility
+        
+        gTechIdPosition[kTechId.LerkBite] = kDeathMessageIcon.LerkBite
+        gTechIdPosition[kTechId.Spikes] = kDeathMessageIcon.Spikes
+        gTechIdPosition[kTechId.Spores] = kDeathMessageIcon.SporeCloud
+        gTechIdPosition[kTechId.Umbra] = kDeathMessageIcon.Umbra
+        
+        gTechIdPosition[kTechId.Swipe] = kDeathMessageIcon.Swipe
+        gTechIdPosition[kTechId.Stab] = kDeathMessageIcon.Stab
+        gTechIdPosition[kTechId.Blink] = kDeathMessageIcon.Blink
+        gTechIdPosition[kTechId.Vortex] = kDeathMessageIcon.Vortex
+        
+        gTechIdPosition[kTechId.Gore] = kDeathMessageIcon.Gore
+        gTechIdPosition[kTechId.Stomp] = kDeathMessageIcon.Stomp
+        gTechIdPosition[kTechId.BoneShield] = kDeathMessageIcon.BoneShield
+        
+        gTechIdPosition[kTechId.GorgeTunnelTech] = kDeathMessageIcon.GorgeTunnel
+        
+    end
+    
+    local position = gTechIdPosition[techId]
+    
+    if position then
+    
+        y1 = (position - 1) * kInventoryIconTextureHeight
+        y2 = y1 + kInventoryIconTextureHeight
+    
+    end
+    
+    return x1, y1, x2, y2
+
+end
+

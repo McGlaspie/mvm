@@ -6,8 +6,6 @@ Script.Load("lua/PowerConsumerMixin.lua")
 //-----------------------------------------------------------------------------
 
 local kDissolveAccentOnLimit = 0.18
-local kDissolveSpeed = 0.75
-local kDissolveDelay = 5	//move to global?
 local unpoweredColor = Color( 0, 0, 0, 1 )
 
 

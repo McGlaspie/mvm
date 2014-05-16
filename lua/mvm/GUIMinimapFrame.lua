@@ -71,7 +71,18 @@ function GUIMinimapFrame:Initialize()
     self.chooseSpawnText:SetIsVisible(false)
     
     self.showingMouse = false
-
+    
+    self.spawnQueueText = GUIManager:CreateTextItem()
+	self.spawnQueueText:SetFontName("fonts/AgencyFB_small.fnt")
+	self.spawnQueueText:SetFontIsBold(true)
+	self.spawnQueueText:SetAnchor(GUIItem.Left, GUIItem.Top)
+	self.spawnQueueText:SetTextAlignmentX(GUIItem.Align_Min)
+	self.spawnQueueText:SetTextAlignmentY(GUIItem.Align_Center)
+	self.spawnQueueText:SetPosition( Vector( 15, -4, 0) )
+	self.spawnQueueText:SetColor( Color(1,1,1,1) )
+	self.spawnQueueText:SetIsVisible(true)
+	self.minimapFrame:AddChild( self.spawnQueueText )
+	
 end
 
 function GUIMinimapFrame:Uninitialize()
@@ -89,13 +100,19 @@ function GUIMinimapFrame:Uninitialize()
         self.showingMouse = false
         
     end
+    
+    if self.spawnQueueText then
+		GUI.DestroyItem(self.spawnQueueText)
+		self.spawnQueueText = nil
+    end
 
 end
 
 function GUIMinimapFrame:InitFrame()
 	
+	local playerTeam = PlayerUI_GetTeamNumber()
 	local ui_baseColor = ConditionalValue(
-		PlayerUI_GetTeamNumber() == kTeam1Index,
+		playerTeam == kTeam1Index,
 		kGUI_Team1_BaseColor,
 		kGUI_Team2_BaseColor
 	)
@@ -115,6 +132,7 @@ function GUIMinimapFrame:InitFrame()
     self.minimapFrame:SetTexturePixelCoordinates(unpack(kFramePixelCoords))
     self.minimapFrame:SetIsVisible(false)
     self.minimapFrame:SetLayer(-1)
+    
     self.background:AddChild(self.minimapFrame)
 
 end
@@ -195,7 +213,7 @@ function GUIMinimapFrame:Update(deltaTime)
 	self.minimapFrame:SetFloatParameter( "teamBaseColorR", ui_baseColor.r )
     self.minimapFrame:SetFloatParameter( "teamBaseColorG", ui_baseColor.g )
     self.minimapFrame:SetFloatParameter( "teamBaseColorB", ui_baseColor.b )
-
+	
     self.chooseSpawnText:SetIsVisible(not self.background:GetIsVisible() and isRespawning)
     
     self.minimapFrame:SetIsVisible(PlayerUI_GetTeamType() == kMarineTeamType and self.comMode == GUIMinimapFrame.kModeMini)
@@ -203,7 +221,13 @@ function GUIMinimapFrame:Update(deltaTime)
     if PlayerUI_IsOverhead() and self.comMode ~= GUIMinimapFrame.kModeBig then
         
         if PlayerUI_IsACommander() then
-        
+			
+			local teamInfo = GetTeamInfoEntity( playerTeam )
+			if teamInfo then
+				self.spawnQueueText:SetColor( kGUI_NameTagFontColors[playerTeam] )
+				self.spawnQueueText:SetText( "MARINES RESPAWNING: " .. tostring( teamInfo:GetSpawnQueueTotal() ) )
+			end
+			
             // Commander always sees the minimap.
             if not PlayerUI_IsCameraAnimated() then
                 self.background:SetIsVisible(true)

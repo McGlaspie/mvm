@@ -332,10 +332,10 @@ kMarineWeaponEffects =
         {
             //FIXME Cases like this don't care about LOS...
             {sound = "sound/NS2.fev/marine/common/mine_drop", ismarine = true, isalien = false },
-            {sound = "sound/NS2.fev/marine/common/mine_warmup", ismarine = true, isalien = false },
+            //{sound = "sound/NS2.fev/marine/common/mine_warmup", ismarine = true, isalien = false },
             
             {sound = "sound/NS2.fev/marine/common/mine_drop", ismarine = false, isalien = true },
-            {sound = "sound/NS2.fev/marine/common/mine_warmup", ismarine = false, isalien = true },
+            //{sound = "sound/NS2.fev/marine/common/mine_warmup", ismarine = false, isalien = true },
             
         },
     },
@@ -416,12 +416,23 @@ kMarineWeaponEffects =
         },
     },
     
+    grenade_armed_light = {
+		
+		armedLightEffect = {
+			{parented_cinematic = "cinematics/marine/grenades/armed_light_blue.cinematic", ismarine = true, isalien = false },
+			{parented_cinematic = "cinematics/marine/grenades/armed_light_red.cinematic", ismarine = false, isalien = true },
+		},
+		
+    },
+    
     cluster_grenade_explode =
     {
         grenadeExplodeEffects =
         {  
             {sound = "sound/NS2.fev/marine/grenades/cluster/primary_explode"},
-            {cinematic = "cinematics/marine/grenades/cluster_main_explo.cinematic", done = true}
+            {cinematic = "cinematics/marine/grenades/cluster_main_explo.cinematic", done = true },
+            {cinematic = "cinematics/marine/grenades/armed_light_blue.cinematic", done = true, ismarine = true, isalien = false },
+            {cinematic = "cinematics/marine/grenades/armed_light_red.cinematic", done = true, ismarine = false, isalien = true },
         }
     },
     

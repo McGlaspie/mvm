@@ -465,6 +465,13 @@ local function MvM_MAC_GetOrderTargetIsWeldTarget(order, doerTeamNumber)
 end
 
 
+function MAC:OnLocationChange( locationName )
+	
+
+
+end
+
+
 function MAC:OnOverrideOrder(order)		//OVERRIDE
 
     local orderTarget = nil

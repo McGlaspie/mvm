@@ -5,6 +5,9 @@
 		<input name="normalMap" type="texture" address="wrap" />
 		<input name="specularMap" type="texture" address="wrap" />
 		
+		<!-- Kodiak-hack support -->
+		<input name="textureIndex" type="float">0</input>
+		
 		<input name="modelColorMap" type="texture" address="wrap" />
 		
 		<input name="colorizeModel" type="float">1</input>
@@ -94,10 +97,19 @@
 		void MaterialShader(in Material_Input input, inout Material material)
 		{
 		
-			float4 specularGloss = tex2D(specularMap, input.texCoord);
+			float2 textureUV = input.texCoord;
+			if( textureIndex >= 0 ) {
+				float row = floor( textureIndex / numColumns );
+				float col = textureIndex - row * numColumns;
+			
+				textureUV.x = ( col + textureUV.x ) / numColumns;
+				textureUV.y = ( row + textureUV.y ) / numRows;
+			}
 		
-			//material.albedo 	= tex2D(albedoMap, input.texCoord).rgb;
-			material.tsNormal 	= DecodeNormal( tex2D(normalMap, input.texCoord) );
+		
+			float4 specularGloss = tex2D(specularMap, textureUV);
+			
+			material.tsNormal 	= DecodeNormal( tex2D(normalMap, textureUV) );
 			material.specular	= specularGloss.rgb;
 			material.gloss		= specularGloss.a;
 			
@@ -107,7 +119,7 @@
 			float3 modelColorAccent = float3( modelColorAccentR, modelColorAccentG, modelColorAccentB );
 			float3 modelColorTrim = float3( modelColorTrimR, modelColorTrimG, modelColorTrimB );
 			
-			float3 albedoTex = tex2D( albedoMap, input.texCoord ).rgb;	//No Alpha channel due to Deferred.hlsl - struct Material{}
+			float3 albedoTex = tex2D( albedoMap, textureUV ).rgb;	//No Alpha channel due to Deferred.hlsl - struct Material{}
 			
 			float2 colorMapUV = input.texCoord;
 			if( colorMapIndex >= 0 ) {

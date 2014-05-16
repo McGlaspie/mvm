@@ -17,6 +17,12 @@ local kScoreUpdate = {
 Shared.RegisterNetworkMessage("MvM_ScoreUpdate", kScoreUpdate)
 
 
+local kTeamConcededMessage = {
+    teamNumber = string.format("integer (-1 to %d)", kRandomTeamType)
+}
+Shared.RegisterNetworkMessage("MvM_TeamConceded", kTeamConcededMessage)
+
+
 if Client then
 	
 	local function MvM_OnScoreUpdate(message)
@@ -29,7 +35,7 @@ if Client then
 
 	
 	
-	function OnTeamConceded(message)
+	function MvM_OnTeamConceded(message)
 		
 		if message.teamNumber == kMarineTeamType then
 			ChatUI_AddSystemMessage(Locale.ResolveString("TEAM_MARINES_CONCEDED"))
@@ -38,5 +44,9 @@ if Client then
 		end
 		
 	end
+	
+	Client.HookNetworkMessage("MvM_TeamConceded", MvM_OnTeamConceded)
+	
+	
 
 end

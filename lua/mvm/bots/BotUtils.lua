@@ -267,9 +267,12 @@ function GetNumEntitiesOfType( className, teamNumber )
     return #ents
 end
 
+
 //----------------------------------------
 //  
 //----------------------------------------
+
+
 function GetAvailableTechPoints()
 
     local tps = {}
@@ -285,10 +288,11 @@ function GetAvailableTechPoints()
 
 end
 
+
 function GetAvailableResourcePoints()
 
     local rps = {}
-    for _,rp in ientitylist(Shared.GetEntitiesWithClassname("ResourcePoint")) do
+    for _,rp in ientitylist( Shared.GetEntitiesWithClassname("ResourcePoint") ) do
 
         if not rp:GetAttached() then
             table.insert( rps, rp )
@@ -299,6 +303,7 @@ function GetAvailableResourcePoints()
     return rps
 
 end
+
 
 function GetServerContainsBots()
 
@@ -319,3 +324,4 @@ function GetServerContainsBots()
     return hasBots
     
 end
+

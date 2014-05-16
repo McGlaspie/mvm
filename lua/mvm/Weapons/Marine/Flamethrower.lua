@@ -6,6 +6,7 @@ Script.Load("lua/mvm/Weapons/Marine/ClipWeapon.lua")
 Script.Load("lua/PointGiverMixin.lua")
 
 
+Flamethrower.kModelName = PrecacheAsset("models/marine/flamethrower/flamethrower.model")
 local kViewModels = GenerateMarineViewModelPaths("flamethrower")
 local kAnimationGraph = PrecacheAsset("models/marine/flamethrower/flamethrower_view.animation_graph")
 

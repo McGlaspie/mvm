@@ -63,7 +63,7 @@ local function GetBigIconPixelCoords(techId, researched)
         gBigIconIndex[kTechId.Jetpack] = 6
         gBigIconIndex[kTechId.Exosuit] = 7
         gBigIconIndex[kTechId.Welder] = 8
-        gBigIconIndex[kTechId.LayMines] = 9
+        gBigIconIndex[kTechId.DemoMines] = 9
         gBigIconIndex[kTechId.DualMinigunExosuit] = 10
         gBigIconIndex[kTechId.UpgradeToDualMinigun] = 10
         gBigIconIndex[kTechId.ClawRailgunExosuit] = 11
@@ -126,7 +126,7 @@ local function GetSmallIconPixelCoordinates(itemTechId)
         gSmallIconIndex[kTechId.Jetpack] = 24
         gSmallIconIndex[kTechId.Exosuit] = 26
         gSmallIconIndex[kTechId.Welder] = 10
-        gSmallIconIndex[kTechId.LayMines] = 21
+        gSmallIconIndex[kTechId.DemoMines] = 21
         gSmallIconIndex[kTechId.DualMinigunExosuit] = 26
         gSmallIconIndex[kTechId.UpgradeToDualMinigun] = 26
         gSmallIconIndex[kTechId.ClawRailgunExosuit] = 38
@@ -534,7 +534,7 @@ local function GetItemTechId(researchTechId)
         gResearchToWeaponIds[kTechId.FlamethrowerTech] = kTechId.Flamethrower	//AdvancedWeaponry
         gResearchToWeaponIds[kTechId.GrenadeLauncherTech] = kTechId.GrenadeLauncher
         gResearchToWeaponIds[kTechId.WelderTech] = kTechId.Welder
-        gResearchToWeaponIds[kTechId.MinesTech] = kTechId.LayMines
+        gResearchToWeaponIds[kTechId.MinesTech] = kTechId.DemoMines
         gResearchToWeaponIds[kTechId.JetpackTech] = kTechId.Jetpack
         gResearchToWeaponIds[kTechId.ExosuitTech] = kTechId.Exosuit
         gResearchToWeaponIds[kTechId.DualMinigunTech] = kTechId.DualMinigunExosuit
@@ -548,9 +548,13 @@ local function GetItemTechId(researchTechId)
 end
 
 function GUIMarineBuyMenu:_UpdateItemButtons(deltaTime)
-
+	
+	local equippedTechIds = MarineBuy_GetEquipment()
+	
     for i, item in ipairs(self.itemButtons) do
-    
+		
+		local playerHasEquipment = equippedTechIds[item.TechId]
+		
         if GetIsMouseOver(self, item.Button) then
         
             item.Highlight:SetIsVisible(true)
@@ -562,12 +566,12 @@ function GUIMarineBuyMenu:_UpdateItemButtons(deltaTime)
         
         local useColor = kGUI_NameTagFontColors[self.teamNumber]
         
-        // set grey if not researched
-        if not MarineBuy_IsResearched(item.TechId) then
-            useColor = Color(0.5, 0.5, 0.5, 0.5)
-        // set red if can't afford
+        if playerHasEquipment then
+			useColor = kGUI_Grey
+		elseif not MarineBuy_IsResearched(item.TechId) then
+			useColor = kGUI_RedGrey
         elseif PlayerUI_GetPlayerResources() < MarineBuy_GetCosts(item.TechId) then
-           useColor = Color(1, 0, 0, 1)
+           useColor = kGUI_Red
         // set normal visible
         else
 

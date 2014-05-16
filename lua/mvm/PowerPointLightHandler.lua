@@ -29,7 +29,7 @@
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 
-local kMinCommanderLightIntensityScalar = 0.125	//0.3
+local kMinCommanderLightIntensityScalar = 0.25	//0.3
 
 //FIXME Below two values take too long to update light states at game start/reset
 //but the effect is good and makes more interesting changes.
@@ -42,9 +42,9 @@ local kDamagedCycleTime = 0.8
 local kDamagedMinIntensity = 0.7
 local kAuxPowerCycleTime = 3
 local kAuxPowerMinIntensity = 0
-local kAuxPowerMinCommanderIntensity = 2.25	//3
+local kAuxPowerMinCommanderIntensity = 2.5	//3
 
-local kForceCommanderUpdateTime = 0.2	//.215
+local kForceCommanderUpdateTime = 0.175	//.215
 
 local UnScoutedLightMode = kLightMode.NoPower
 
