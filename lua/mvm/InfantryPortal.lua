@@ -303,10 +303,14 @@ local function MvMSpawnPlayer(self)
         local success, player = team:ReplaceRespawnPlayer(queuedPlayer, spawnOrigin, queuedPlayer:GetAngles())
         if success then
 			
-			if player and HasMixin( player, "Controller" ) then
+			if player and HasMixin( player, "Controller" ) and HasMixin( player, "AFKMixin" ) then
 				
-				player:DisableGroundMove(0.1)
-				player:SetVelocity( Vector( GetSign( math.random() - 0.5) * 2, 3, GetSign( math.random() - 0.5 ) * 2 ) )
+				if player:GetAFKTime() > self:GetSpawnTime() - 1 then
+				    
+				    player:DisableGroundMove(0.1)
+				    player:SetVelocity( Vector( GetSign( math.random() - 0.5) * 2.25, 3, GetSign( math.random() - 0.5 ) * 2.25 ) )
+				
+				end
 				
 			end
         

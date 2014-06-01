@@ -46,8 +46,9 @@ end
 
 local function Detonate(self, armFunc)
 	
+	//fixme failing to remove mines
 	local hitEnts = Shared.GetEntitiesWithTagInRange( "Live", self:GetOrigin(), kMineDetonateRange, function(ent) return not ent:isa("Mine") end )
-    RadiusDamage( hitEnts, self:GetOrigin(), kMineDetonateRange, kMineDamage, self, false, SineFalloff )
+    RadiusDamage( hitEnts, self:GetOrigin(), kMineDetonateRange, kMineDamage, self, false )	//, SineFalloff
     
     local params = {}
     params[kEffectHostCoords] = Coords.GetLookIn( self:GetOrigin(), self:GetCoords().zAxis )
@@ -220,6 +221,9 @@ function Mine:GetIsVulnerableToEMP()
     return true
 end
 
+function Mine:GetIsAffectedByWeaponUpgrades()
+	return true
+end
 
 function Mine:GetDeathIconIndex()	//?
     return kDeathMessageIcon.Mine	//TODO Toggle on if manually detonated or auto
@@ -256,6 +260,24 @@ end
 
 
 if Server then
+
+	function Mine:OnTouchInfestation()
+        Arm(self)
+    end
+    
+    function Mine:OnStun()
+        Arm(self)
+    end
+	
+    function Mine:OnKill(attacker, doer, point, direction)
+    
+        Arm(self)
+        
+        ScriptActor.OnKill(self, attacker, doer, point, direction)
+        
+        TEST_EVENT("Mine killed by player")
+        
+    end
 
 	function Mine:OnTriggerEntered(entity)
         MvM_CheckEntityExplodesMine(self, entity)

@@ -6,6 +6,7 @@ Script.Load("lua/mvm/MvMUtility.lua")
 Script.Load("lua/mvm/AFKMixin.lua")
 Script.Load("lua/mvm/LiveMixin.lua")
 Script.Load("lua/mvm/TeamMixin.lua")
+Script.Load("lua/mvm/WeaponOwnerMixin.lua")
 
 
 if Client then

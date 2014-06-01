@@ -680,6 +680,21 @@ if Server then
 	end
 	
 	
+	function Marine:InitWeapons()
+
+		Player.InitWeapons(self)
+		
+		self:GiveItem(Rifle.kMapName)
+		self:GiveItem(Pistol.kMapName)
+		self:GiveItem(Axe.kMapName)
+		self:GiveItem(Builder.kMapName)
+		
+		self:SetQuickSwitchTarget(Pistol.kMapName)
+		self:SetActiveWeapon(Rifle.kMapName)
+
+	end
+	
+	
 	// special threatment for mines and welders
 	function Marine:GiveItem(itemMapName)
 

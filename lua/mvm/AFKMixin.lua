@@ -32,7 +32,7 @@ function AFKMixin:OnProcessMove(input)
     
     local client = Server.GetOwner(self)
     
-    if client and autoKickOnAFKEnabled and not client:GetIsVirtual() then	//such a lame hack
+    if client and not client:GetIsVirtual() then	//such a lame hack
     
         local inputMove = input.move
         if not (inputMove.x == 0 and inputMove.y == 0 and inputMove.z == 0 and
@@ -47,24 +47,27 @@ function AFKMixin:OnProcessMove(input)
         client.lastAFKInputPitch = input.pitch
         
         local playerAFKTime = self:GetAFKTime()
-        if playerAFKTime >= serverAFKTime then
-			
-			if self:isa("Commander") then
-				
-				self:Logout()
-				
-			end
-			
-            Server.DisconnectClient(client)
-            Shared.Message("Player " .. self:GetName() .. " kicked for being AFK for " .. serverAFKTime .. " seconds")
-            TEST_EVENT("AFK Player auto-kicked")
-            
-        elseif playerAFKTime >= serverAFKTime * 0.75 then
         
-            if not self.warnedAtTime or (Shared.GetTime() - self.warnedAtTime) > (serverAFKTime * 0.75) then
+        if autoKickOnAFKEnabled then
             
-                Server.SendNetworkMessage(client, "AFKWarning", { timeAFK = playerAFKTime, maxAFKTime = serverAFKTime }, true)
-                self.warnedAtTime = Shared.GetTime()
+            if playerAFKTime >= serverAFKTime then
+                
+                if self:isa("Commander") then
+                    self:Logout()
+                end
+                
+                Server.DisconnectClient(client)
+                Shared.Message("Player " .. self:GetName() .. " kicked for being AFK for " .. serverAFKTime .. " seconds")
+                TEST_EVENT("AFK Player auto-kicked")
+                
+            elseif playerAFKTime >= serverAFKTime * 0.75 then
+            
+                if not self.warnedAtTime or (Shared.GetTime() - self.warnedAtTime) > (serverAFKTime * 0.75) then
+                
+                    Server.SendNetworkMessage(client, "AFKWarning", { timeAFK = playerAFKTime, maxAFKTime = serverAFKTime }, true)
+                    self.warnedAtTime = Shared.GetTime()
+                    
+                end
                 
             end
             

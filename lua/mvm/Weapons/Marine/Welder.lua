@@ -72,6 +72,9 @@ function Welder:OverrideCheckVision()
 	return false
 end
 
+function Welder:GetIsAffectedByWeaponUpgrades()
+	return true
+end
 
 function Welder:GetIsValidRecipient(recipient)	//OVERRIDES
 
@@ -286,25 +289,32 @@ function Welder:OnUpdateRender()
     //Weapon.OnUpdateRender(self)
     
     local parent = self:GetParent()
-	
-	if parent and not self.isHolstered then
-		local viewModel = parent:GetViewModelEntity():GetRenderModel()	//hackish
-		if viewModel then
-			viewModel:SetMaterialParameter( "screenMapIdx", 0 )
+	if parent then
+		if parent:isa("Player") and parent:GetIsLocalPlayer() then
+			if parent and not self.isHolstered then
+				local viewEnt = parent:GetViewModelEntity()
+				if viewEnt then
+					local viewModel = viewEnt:GetRenderModel()
+					if viewModel then
+						viewModel:SetMaterialParameter( "screenMapIdx", 0 )
+					end
+				end
+			end
+			
+			local settings = self:GetUIDisplaySettings()
+			
+			if settings then
+				
+				setupWelderDisplay( self, parent, settings )
+			
+				if self.welderDisplayUI then
+					local progress = PlayerUI_GetUnitStatusPercentage()
+					self.welderDisplayUI:SetGlobal("weldPercentage", progress )
+				end
+				
+			end
+			
 		end
-	end
-    
-    local settings = self:GetUIDisplaySettings()
-    
-    if parent and settings then
-		
-		setupWelderDisplay( self, parent, settings )
-    
-		if self.welderDisplayUI then
-			local progress = PlayerUI_GetUnitStatusPercentage()
-			self.welderDisplayUI:SetGlobal("weldPercentage", progress )
-		end
-		
 	end
     
     if parent and self.welding then

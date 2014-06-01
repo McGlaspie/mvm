@@ -12,7 +12,6 @@
 //
 //=============================================================================
 
-
 Script.Load("lua/mvm/Weapons/Weapon.lua")
 Script.Load("lua/mvm/PickupableWeaponMixin.lua")
 Script.Load("lua/EntityChangeMixin.lua")
@@ -146,8 +145,6 @@ function DemoMines:OnCreate()
     if Client then
 		InitMixin( self, ColoredSkinsMixin)
     end
-    
-    self:SetUpdates(true)
 
 end
 
@@ -156,7 +153,7 @@ function DemoMines:OnInitialized()
 	
 	Weapon.OnInitialized(self)
     
-    self:SetModel( kDropModelName )
+	self:SetModel( kDropModelName )
 	
 	if Client then
 		self:InitializeSkin()
@@ -220,13 +217,19 @@ function DemoMines:GetIsDroppable()
     return true
 end
 
-function DemoMines:Dropped( prevOwner )	//fixme leaves hanging in air (not actual drop)
-    
-	Weapon.Dropped( self, prevOwner )
+
+function DemoMines:OnUpdate( deltaTime )
+	Weapon.OnUpdate( self, deltaTime )
+end
+
+
+function DemoMines:Dropped( prevOwner )
     
     self:SetModel( kDropModelName )
-    
+    Weapon.Dropped( self, prevOwner )
+
 end
+
 
 function DemoMines:GetDropClassName()
     return "Mine"
@@ -236,13 +239,13 @@ end
 function DemoMines:SetWeaponState( state )
 	
 	assert(state)
-	
+	/*
 	if state == kDemoMineStates.Deploy and self.minesLeft == 0 then
 		state = kDemoMineStates.Trigger
 	elseif state == kDemoMineStates.Trigger and ( self.minesLeft == 0 and self.deployedLeft == 0 ) then
 		state = kDemoMineStates.Empty
 	end
-	
+	*/
 	self.previousWeaponState = self.weaponState
 	self.weaponState = state
 
@@ -252,14 +255,11 @@ function DemoMines:GetSprintAllowed()
     return true
 end
 
-function DemoMines:OnUpdate( deltaTime )
-	Weapon.OnUpdate(self, deltaTime)
-end
-
 
 local function setupTriggerDisplay( self, parent, settings )
 	
 	if parent and parent:GetIsLocalPlayer() and settings then
+		
         local triggerDisplayUI = self.triggerDisplayUI
         if not triggerDisplayUI then
             triggerDisplayUI = Client.CreateGUIView(settings.xSize, settings.ySize)
@@ -273,9 +273,12 @@ local function setupTriggerDisplay( self, parent, settings )
 		if settings.variant then
 			triggerDisplayUI:SetGlobal( "weaponVariant", settings.variant )
 		end
+		
     elseif self.triggerDisplayUI then
+		
         Client.DestroyGUIView( self.triggerDisplayUI )
         self.triggerDisplayUI = nil
+        
     end
     
 end
@@ -308,22 +311,28 @@ end
 
 
 function DemoMines:OnDraw( player, previousWeaponMapName )
-	
-    Weapon.OnDraw( self, player, previousWeaponMapName )    
+    
+    Weapon.OnDraw( self, player, previousWeaponMapName )
     
     self.droppingMine = false
     self:SetAttachPoint( Weapon.kHumanAttachPoint )
-    
-    self.deployedMines = self:GetAllDeployedMines(true)
+    /*
+    FIXME 
+    Something about this prevent the physics from running on
+    dropped weapon. This either has to do with how self.fullyUpdated
+    is set, or the creation of self.physicsModel during the SetModel()
+    sequence.
     
     if self.weaponState == kDemoMineStates.Deploy and self.minesLeft > 0 then
-		self:SetModel( kHeldModelName, self:GetAnimationGraphName()  )
+		self:SetModel( kHeldModelName )
 	elseif self.weaponState == kDemoMineStates.Trigger and self.deployedMines > 0 then
-		self:SetModel( kTriggerModelName, self:GetAnimationGraphName() )
+		self:SetModel( kTriggerModelName )
 	end
+    */
+	self.deployedMines = self:GetAllDeployedMines(true)
 	
 	if Client then
-		self:InitializeSkin()	//Needed?
+		self:InitializeSkin()	//actually needed?
 	end
     
 end
@@ -335,26 +344,27 @@ function DemoMines:GetViewModelName( sex, variant )
 		return kDemoMinesViewModels[sex][variant]
 	elseif self.weaponState == kDemoMineStates.Trigger then
 		return kTriggerViewModels[sex][variant]
-	else	
-		return nil	//?? certainly to cause error
+	else
+		return nil
 	end
 	
 end
 
+
 function DemoMines:GetAnimationGraphName()
 	
-	if self.weaponState == kDemoMineStates.Deploy then
+    if self.weaponState == kDemoMineStates.Deploy then
 		return kDeployMinesAnimationGraph
 	elseif self.weaponState == kDemoMineStates.Trigger then
 		return kTriggerAnimationGraph
 	else
-		return nil	//?? certainly to cause error
+		return nil
 	end
 	
 end
 
 function DemoMines:GetResetViewModelOnDraw()
-    return true
+    return 
 end
 
 function DemoMines:UpdateViewModelPoseParameters( viewModel )
@@ -456,10 +466,8 @@ function DemoMines:OnPrimaryAttack( player )
 					
 					for i, mine in ipairs(allMines) do
 						if mine:GetOrigin():GetDistance( player:GetOrigin() ) <= kMineTriggerDetonationRange then
-							if targetMine == nil then
-								targetMine = mine
-								break
-							end
+							targetMine = mine
+							break
 						end
 					end
 					
@@ -478,7 +486,7 @@ function DemoMines:OnPrimaryAttack( player )
 				end
 				
 				if self.deployedMines < 1 and self.minesLeft == 0 then
-					self:OnHolster(player)
+					self:OnHolster( player )
 					
 					player:RemoveWeapon( self )
 					player:SwitchWeapon( kPrimaryWeaponSlot )
@@ -516,7 +524,7 @@ function DemoMines:OnPrimaryAttackEnd( player )
 end
 
 function DemoMines:GetHasSecondary( player )
-    return true
+    return true //Change based on deployedCount?
 end
 
 function DemoMines:GetSecondaryAttackPrefix()
@@ -529,18 +537,24 @@ end
 
 local kDemoMinesModeSwitchDelay = 0.4	//minesLeft==0 act as reducer?
 function DemoMines:OnSecondaryAttack( player )
-//Fixme causing invalid sound to place twice, rapidly	
+//Fixme causing invalid sound to place twice, rapidly
+//fixme if only single mine left (0 deployed) Mines can be toggled repeatidly without moving to trigger
+
 	if not player:GetSecondaryAttackLastFrame() and player then
+	    
 		local now = Shared.GetTime()
+		
 		if self.timeLastModeSwitch + kDemoMinesModeSwitchDelay < now then
 			
 			local switched = false
 			local deployedMines = self:GetAllDeployedMines(true)
 			
+			self.previousWeaponState = self.weaponState
+			
 			if deployedMines > 0 and self.weaponState == kDemoMineStates.Deploy then
-				self:SetWeaponState( kDemoMineStates.Trigger )
+				self.weaponState = kDemoMineStates.Trigger
 			elseif self.minesLeft > 0 and self.weaponState == kDemoMineStates.Trigger then
-				self:SetWeaponState( kDemoMineStates.Deploy )
+				self.weaponState = kDemoMineStates.Deploy
 			end
 			
 			switched = (
@@ -551,19 +565,23 @@ function DemoMines:OnSecondaryAttack( player )
 				switched = switched and self.minesLeft > 0	//prvent redrawing over and over
 			end
 			
+			
 			if switched then
-				player:SetViewModel(nil, nil)
-				
+				//player:SetViewModel(nil, nil)
 				self:OnDraw( player, nil )
 				
 				self.timeLastModeSwitch = now
 				self.secondaryAttacking = true
 				self.primaryAttacking = false
+				
 			else
 				player:TriggerInvalidSound()
 			end
+			
 		else
+		    
 			player:TriggerInvalidSound()
+			
 		end
 	end
 	
@@ -783,9 +801,7 @@ function DemoMines:OnTag( tagName )
 					end
 				elseif self.minesLeft == 0 and deployedMines > 0 then
 					self:SetWeaponState( kDemoMineStates.Trigger )
-					
-					player:SetViewModel( nil, nil )
-					
+					//player:SetViewModel( nil, nil )
 					self:OnDraw( player, nil )
 					self.droppingMine = false
 					self.primaryAttacking = false
@@ -848,26 +864,37 @@ function DemoMines:OnUpdateRender()
 	
 	local parent = self:GetParent()
 	
-	if parent and not self.isHolstered then
-		local viewModel = parent:GetViewModelEntity():GetRenderModel()	//hackish
-		if viewModel then
-			viewModel:SetMaterialParameter( "screenMapIdx", 1.0 )
+	if parent then
+
+		if parent:isa("Player") and parent:GetIsLocalPlayer() then
+		
+			if parent and not self.isHolstered then
+				local viewEnt = parent:GetViewModelEntity()
+				if viewEnt then
+					local viewModel = viewEnt:GetRenderModel()
+					if viewModel then
+						viewModel:SetMaterialParameter( "screenMapIdx", 1.0 )
+					end
+				end
+			end
+			
+			local mineSettings = self:GetUIDisplaySettings( kDemoMineStates.Deploy )	
+			setupMinesDisplay( self, parent, mineSettings )	
+			if self.mineDisplayUI then
+				self.mineDisplayUI:SetGlobal( "weaponClip", self.minesLeft )
+				self.mineDisplayUI:SetGlobal( "teamNumber", self:GetTeamNumber() )
+			end
+			
+			local triggerSettings = self:GetUIDisplaySettings( kDemoMineStates.Trigger )
+			setupTriggerDisplay( self, parent, triggerSettings )
+			if self.triggerDisplayUI then
+				self.triggerDisplayUI:SetGlobal( "deployedMines", self.deployedMines )
+				self.triggerDisplayUI:SetGlobal( "teamNumber", self:GetTeamNumber() )
+				self.triggerDisplayUI:SetGlobal( "minesInRange", self.minesInRange )
+			end
+			
 		end
-	end
-	
-	local mineSettings = self:GetUIDisplaySettings( kDemoMineStates.Deploy )	
-	setupMinesDisplay( self, parent, mineSettings )	
-	if self.mineDisplayUI then
-		self.mineDisplayUI:SetGlobal( "weaponClip", self.minesLeft )
-		self.mineDisplayUI:SetGlobal( "teamNumber", self:GetTeamNumber() )
-	end
-	
-	local triggerSettings = self:GetUIDisplaySettings( kDemoMineStates.Trigger )
-	setupTriggerDisplay( self, parent, triggerSettings )
-	if self.triggerDisplayUI then
-		self.triggerDisplayUI:SetGlobal( "deployedMines", self.deployedMines )
-		self.triggerDisplayUI:SetGlobal( "teamNumber", self:GetTeamNumber() )
-		self.triggerDisplayUI:SetGlobal( "minesInRange", self.minesInRange )
+		
 	end
 	
 end

@@ -98,7 +98,7 @@ kExoDualRailgunModifier = 1
 
 kMinigunDamage = 20
 kMinigunDamageType = kDamageType.Heavy
-kMinigunClipSize = 175	//bv3-225   ns2-250		//unused..apparently...
+kMinigunClipSize = 200	//bv3-225   ns2-250		//unused..apparently...
 kMinigunWeight = 0.11
 //TODO Move heatUpRate setting to here, ref global as local in Minigun class
 
@@ -106,7 +106,7 @@ kClawDamage = 50		//60
 kClawDamageType = kDamageType.Structural
 kClawWeight = 0.05	//0.01
 
-kRailgunDamage = 30
+kRailgunDamage = 32
 kRailgunChargeDamage = 120		//ns2-130
 kRailgunDamageType = kDamageType.Structural
 kRailgunWeight = 0.11	//.08
